@@ -1,0 +1,67 @@
+{
+  "name": "@adaline/vertex",
+  "version": "0.8.0",
+  "license": "MIT",
+  "sideEffects": false,
+  "private": false,
+  "description": "Adaline Vertex",
+  "keywords": [
+    "AI",
+    "Adaline",
+    "LLM",
+    "Prompt Engineering",
+    "Prompt",
+    "GenAI"
+  ],
+  "author": "Adaline <support@adaline.ai>",
+  "homepage": "https://www.adaline.ai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adaline/gateway.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adaline/gateway/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "rimraf node_modules .turbo dist",
+    "build": "tsup",
+    "lint": "eslint . --ext js,jsx,ts,tsx",
+    "format": "prettier --write .",
+    "prepublishOnly": "pnpm run build",
+    "post": "npm publish --access public",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@adaline/types": "workspace:*",
+    "@adaline/provider": "workspace:*",
+    "@adaline/google": "workspace:*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@adaline/tsconfig": "workspace:*",
+    "eslint-config-adaline": "workspace:*"
+  }
+}

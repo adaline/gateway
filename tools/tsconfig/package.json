@@ -1,0 +1,11 @@
+{
+  "name": "@adaline/tsconfig",
+  "version": "0.11.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "core.json"
+  ]
+}

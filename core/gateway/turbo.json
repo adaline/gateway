@@ -1,0 +1,9 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "outputs": ["**/dist/**"],
+      "env": ["HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "ADX_NODE_ENV", "ADX_ANALYTICS_ENABLED"]
+    }
+  }
+}

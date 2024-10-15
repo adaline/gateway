@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "clean": {
+      "cache": false,
+      "dependsOn": ["^clean"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "env": ["HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "ADX_NODE_ENV", "ADX_ANALYTICS_ENABLED"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "env": ["HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "ADX_NODE_ENV", "ADX_ANALYTICS_ENABLED"]
+    },
+    "format": {
+      "dependsOn": ["^format"]
+    }
+  }
+}

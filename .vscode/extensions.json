@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "steoates.autoimport",
+    "formulahendry.auto-rename-tag",
+    "aaron-bond.better-comments",
+    "streetsidesoftware.code-spell-checker",
+    "kamikillerto.vscode-colorize",
+    "pranaygp.vscode-css-peek",
+    "dbaeumer.vscode-eslint",
+    "ecmel.vscode-html-css",
+    "wix.vscode-import-cost",
+    "oderwat.indent-rainbow",
+    "unifiedjs.vscode-mdx",
+    "cardinal90.multi-cursor-case-preserve",
+    "yoavbls.pretty-ts-errors",
+    "wayou.vscode-todo-highlight",
+    "gruntfuggly.todo-tree"
+  ]
+}

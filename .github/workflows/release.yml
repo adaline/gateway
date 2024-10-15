@@ -1,0 +1,118 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: "Release Version"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-to-production
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Check branch
+        run: |
+          if [[ "$(git branch --show-current)" != "main" ]]; then
+            echo "Workflow must be run on main branch."
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+
+      - name: Install semver tool
+        run: npm install -g semver
+
+      - name: Validate release version format
+        run: |
+          if ! semver -r ">=0.0.1" ${{ github.event.inputs.releaseVersion }}; then
+            echo "The release version does not match the semver format (MAJOR.MINOR.PATCH)."
+            exit 1
+          fi
+
+      - name: Check if release version is greater than current version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          if ! semver ${{ github.event.inputs.releaseVersion }} -r ">$CURRENT_VERSION"; then
+            echo "The release version must be greater than the current version ($CURRENT_VERSION)."
+            exit 1
+          fi
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.pnpm-store
+            **/node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create changeset versions
+        run: pnpm changeset version
+
+      - name: Update main package version
+        run: |
+          pnpm version ${{ github.event.inputs.releaseVersion }} --no-git-tag-version
+          pnpm run auto-changelog
+
+      - name: Commit changes
+        run: |
+          git config user.name "Akshay Gulati"
+          git config user.email "akshay@adaline.ai"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git add .
+          git commit -m "chore(release): v${{ github.event.inputs.releaseVersion }}"
+          git tag v${{ github.event.inputs.releaseVersion }}
+
+      - name: Run build
+        run: pnpm run build
+
+      - name: Publish to npm
+        continue-on-error: true
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          timeout_minutes: 15
+          command: |
+            echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+            pnpm changeset publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push changes
+        run: git push --follow-tags
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.releaseVersion }}
+          release_name: v${{ github.event.inputs.releaseVersion }}
+          body_path: cxrx.md
+          draft: false
+          prerelease: false

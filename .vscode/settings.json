@@ -1,0 +1,38 @@
+{
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#21f33d",
+    "titleBar.activeForeground": "#000000",
+    "titleBar.inactiveBackground": "#21f33d",
+    "titleBar.inactiveForeground": "#000000"
+  },
+
+  "files.exclude": {
+    "**/.git": true,
+    "**/coverage": true,
+    "**/.turbo": true
+  },
+
+  "editor.tabSize": 2,
+  "editor.wordWrapColumn": 140,
+  "editor.rulers": [140],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.bracketPairColorization.enabled": true,
+  "editor.suggest.preview": true,
+
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+
+  "typescript.inlayHints.parameterNames.enabled": "literals",
+  "cSpell.words": ["cxrx", "ianvs", "logprobs", "nextra", "openai", "opentelemetry", "svgr", "treeshake", "tsup", "uuidv4"]
+}

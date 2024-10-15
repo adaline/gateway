@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Adaline Core",
+  "compilerOptions": {
+    "module": "nodenext",
+    "target": "ES6",
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "ES2015"],
+    "outDir": "dist",
+    "types": ["@types/node", "vitest/globals", "jest"],
+    "stripInternal": true,
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "moduleResolution": "nodenext",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true,
+  }
+}
