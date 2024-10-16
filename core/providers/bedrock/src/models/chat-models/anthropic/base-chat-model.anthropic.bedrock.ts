@@ -162,9 +162,9 @@ class BaseChatModelAnthropic extends BaseChatModel {
         } catch (error) {
           // malformed JSON error
           throw new ModelResponseError({
-            info: "Malformed JSON received in stream",
-            cause: new Error(`Malformed JSON received in stream : ${structuredLine}`),
-          });
+            info: `Malformed JSON received in stream : ${structuredLine}`,
+            cause: error,
+          })
         }
         const data_delta = encodedBase64ToString(structuredLine["bytes"]);
         const transformed = (await super.transformStreamChatResponseChunk(`data: ${data_delta}`, buffer).next()).value;

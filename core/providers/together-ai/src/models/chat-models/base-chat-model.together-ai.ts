@@ -688,8 +688,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         } catch (error) {
           // malformed JSON error
           throw new ModelResponseError({
-            info: "Malformed JSON received in stream",
-            cause: new Error(`Malformed JSON received in stream : ${structuredLine}`),
+            info: `Malformed JSON received in stream : ${structuredLine}`,
+            cause: error,
           });
         }
 
