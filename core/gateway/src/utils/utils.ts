@@ -20,6 +20,7 @@ const isRunningInBrowser = () => {
   return typeof window !== "undefined" && typeof window.document !== "undefined" && typeof navigator !== "undefined";
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const logLevels = {
   error: 0,
   warn: 1,

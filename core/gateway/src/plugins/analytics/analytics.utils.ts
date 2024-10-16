@@ -37,7 +37,7 @@ const getGatewayVersion = (): string => {
     const packageJsonPath = join(__dirname, "../package.json");
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
     return packageJson.version;
-  } catch (error) {
+  } catch {
     return "unknown";
   }
 };
