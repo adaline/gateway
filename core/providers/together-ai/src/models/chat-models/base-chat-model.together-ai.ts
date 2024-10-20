@@ -25,8 +25,8 @@ import {
   ContentType,
   createPartialTextMessage,
   createPartialToolCallMessage,
-  createTextMessage,
-  createToolCallMessage,
+  createTextContent,
+  createToolCallContent,
   Message,
   MessageType,
   PartialChatResponseType,
@@ -585,16 +585,26 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
 
       const parsedResponse: TogetherAICompleteChatResponseType = safe.data;
-      const messages: MessageType[] = [];
+      const messages: MessageType[] = [
+        {
+          role: AssistantRoleLiteral,
+          content: [],
+        },
+      ];
       const message = parsedResponse.choices[0].message;
       if (message.content) {
-        messages.push(createTextMessage(AssistantRoleLiteral, message.content));
+        messages[0].content.push(createTextContent(message.content));
       }
 
       if (message.tool_calls) {
         message.tool_calls.forEach((toolCall, index) => {
-          messages.push(
-            createToolCallMessage(AssistantRoleLiteral, index, toolCall.id, toolCall.function.name, toolCall.function.arguments)
+          messages[0].content.push(
+            createToolCallContent(
+              index,
+              toolCall.id,
+              toolCall.function.name,
+              toolCall.function.arguments
+            )
           );
         });
       }

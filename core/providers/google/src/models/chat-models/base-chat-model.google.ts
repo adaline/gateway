@@ -625,16 +625,18 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     });
 
     const transformedTools = parsedTools.map((tool) => ({
-      function_declarations: [
-        {
-          name: tool.definition.schema.name,
-          description: tool.definition.schema.description,
-          parameters: tool.definition.schema.parameters,
-        },
-      ],
+      name: tool.definition.schema.name,
+      description: tool.definition.schema.description,
+      parameters: tool.definition.schema.parameters,
     }));
 
-    return { tools: transformedTools };
+    return {
+      tools: [
+        {
+          function_declarations: transformedTools,
+        },
+      ],
+    };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
