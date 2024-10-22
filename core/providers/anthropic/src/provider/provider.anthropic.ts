@@ -9,7 +9,7 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
   readonly version = "v1" as const;
   readonly name = ProviderLiteral;
   static readonly chatBaseUrl: string = "https://api.anthropic.com/v1";
-  static readonly embeddingBaseUrl: string = "https://api.anthropic.com/v1";
+  static readonly embeddingBaseUrl: string = "https://api.voyageai.com/v1";
 
   private readonly chatModelFactories: Record<
     string,
