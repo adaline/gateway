@@ -1,5 +1,7 @@
 import { defineConfig } from "tsup";
 
+import packageJson from "./package.json";
+
 export default defineConfig({
   entry: ["src/index.ts"],
   format: ["cjs", "esm"],
@@ -10,4 +12,7 @@ export default defineConfig({
   minify: true,
   dts: true,
   external: ["@adaline/types", "@adaline/provider", "@adaline/tsconfig", "eslint-config-adaline"],
+  define: {
+    __LIBRARY_VERSION__: JSON.stringify(packageJson.version),
+  },
 });
