@@ -1,7 +1,7 @@
 import { Context, context, Span, SpanStatusCode, Tracer } from "@opentelemetry/api";
 import { ATTR_HTTP_REQUEST_METHOD, ATTR_URL_FULL } from "@opentelemetry/semantic-conventions";
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
-import { ProxyAgent } from "proxy-agent";
+import type { ProxyAgent } from "proxy-agent";
 import { z } from "zod";
 
 import { LoggerManager } from "../../plugins";
@@ -54,10 +54,16 @@ class IsomorphicHttpClient implements HttpClient {
     this.defaultTimeout = Timeout.parse(timeoutInMilliseconds);
 
     this.client.defaults.timeout = this.defaultTimeout;
-    this.httpProxyAgent = new ProxyAgent();
-    this.httpsProxyAgent = new ProxyAgent({
-      rejectUnauthorized: false, // Don't check SSL cert
-    });
+    if (this.isNodeEnvironment()) {
+      (async () => {
+        const { ProxyAgent } = await import("proxy-agent");
+        logger?.debug("IsomorphicHttpClient initialized with ProxyAgent");
+        this.httpProxyAgent = new ProxyAgent();
+        this.httpsProxyAgent = new ProxyAgent({
+          rejectUnauthorized: false, // Don't check SSL cert
+        });
+      })();
+    }
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient initialized with defaultTimeout: ${this.defaultTimeout}`);
   }
@@ -80,8 +86,12 @@ class IsomorphicHttpClient implements HttpClient {
           ...(method === "get" || method === "delete" ? { params: dataOrParams } : { data: dataOrParams }),
           ...additionalConfig,
           timeout: this.defaultTimeout,
-          httpAgent: this.httpProxyAgent,
-          httpsAgent: this.httpsProxyAgent,
+          ...(this.isNodeEnvironment()
+            ? {
+                httpAgent: this.httpProxyAgent,
+                httpsAgent: this.httpsProxyAgent,
+              }
+            : {}),
         };
 
         if (method === "get" || method === "delete") {
