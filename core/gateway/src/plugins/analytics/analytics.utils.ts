@@ -1,7 +1,5 @@
 // TODO: test if this file is isomorphic
-import { readFileSync } from "fs";
 import os from "os";
-import { join } from "path";
 
 import { AnalyticsBrowserEnvironment, AnalyticsNodeEnvironment } from "./analytics.interface";
 
@@ -32,14 +30,4 @@ const getBrowserDetails = (): AnalyticsBrowserEnvironment => {
   };
 };
 
-const getGatewayVersion = (): string => {
-  try {
-    const packageJsonPath = join(__dirname, "../package.json");
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
-    return packageJson.version;
-  } catch {
-    return "unknown";
-  }
-};
-
-export { getGatewayEnvironment, getNodeDetails, getBrowserDetails, getGatewayVersion };
+export { getBrowserDetails, getGatewayEnvironment, getNodeDetails };
