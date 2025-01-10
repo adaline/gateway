@@ -2,11 +2,11 @@ import axios from "axios";
 
 import { isRunningInBrowser } from "./../../utils";
 import { AnalyticsBrowserEnvironment, AnalyticsEvent, AnalyticsNodeEnvironment, AnalyticsRecorder } from "./analytics.interface";
-import { getBrowserDetails, getGatewayVersion, getNodeDetails } from "./analytics.utils";
+import { getBrowserDetails, getNodeDetails } from "./analytics.utils";
 
 class PostAnalytics implements AnalyticsRecorder {
   private readonly eventVersion = "0.1";
-  private readonly gatewayVersion = getGatewayVersion();
+  private readonly gatewayVersion = __LIBRARY_VERSION__;
 
   private flushTimer: any;
   private flushInterval: number = 10000;
