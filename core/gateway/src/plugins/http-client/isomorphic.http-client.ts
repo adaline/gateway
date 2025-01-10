@@ -55,14 +55,12 @@ class IsomorphicHttpClient implements HttpClient {
 
     this.client.defaults.timeout = this.defaultTimeout;
     if (this.isNodeEnvironment()) {
-      (async () => {
-        const { ProxyAgent } = await import("proxy-agent");
-        logger?.debug("IsomorphicHttpClient initialized with ProxyAgent");
-        this.httpProxyAgent = new ProxyAgent();
-        this.httpsProxyAgent = new ProxyAgent({
-          rejectUnauthorized: false, // Don't check SSL cert
-        });
-      })();
+      // Use require here to avoid importing in a browser build
+      const ProxyAgent = require("proxy-agent");
+      this.httpProxyAgent = new ProxyAgent.ProxyAgent();
+      this.httpsProxyAgent = new ProxyAgent.ProxyAgent({
+        rejectUnauthorized: false, // Don't check SSL cert
+      });
     }
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient initialized with defaultTimeout: ${this.defaultTimeout}`);
