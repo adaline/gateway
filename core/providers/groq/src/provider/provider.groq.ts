@@ -68,6 +68,11 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Llama_3_2_11b_VisionOptions,
       modelSchema: Models.Llama_3_2_11b_VisionSchema,
     },
+    [Models.Llama_3_2_90b_VisionLiteral]: {
+      model: Models.Llama_3_2_90b_Vision,
+      modelOptions: Models.Llama_3_2_90b_VisionOptions,
+      modelSchema: Models.Llama_3_2_90b_VisionSchema,
+    },
     [Models.Llama_3_2_3bLiteral]: {
       model: Models.Llama_3_2_3b,
       modelOptions: Models.Llama_3_2_3b_Options,
