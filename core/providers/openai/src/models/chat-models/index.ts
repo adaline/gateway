@@ -15,6 +15,7 @@ export * from "./gpt-4o-2024-08-06.openai";
 export * from "./gpt-4o-mini-2024-07-18.openai";
 export * from "./gpt-4o-mini.openai";
 export * from "./gpt-4o.openai";
+export * from "./o1-2024-12-17.openai";
 export * from "./o1-mini-2024-09-12.openai";
 export * from "./o1-mini.openai";
 export * from "./o1-preview.openai";
