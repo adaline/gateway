@@ -12,7 +12,7 @@ const temperature = RangeConfigItem({
 
 const maxTokens = (maxOutputTokens: number) =>
   RangeConfigItem({
-    param: "max_tokens",
+    param: "max_completion_tokens",
     title: CHAT_CONFIG.MAX_TOKENS.title,
     description: CHAT_CONFIG.MAX_TOKENS.description,
     min: 0,
