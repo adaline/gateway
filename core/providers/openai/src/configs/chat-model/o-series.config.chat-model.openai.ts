@@ -13,27 +13,14 @@ const temperature = RangeConfigItem({
   default: 1,
 });
 
-const maxTokens = (maxOutputTokens: number) =>
-  RangeConfigItem({
-    param: "max_completion_tokens",
-    title: CHAT_CONFIG.MAX_TOKENS.title,
-    description: CHAT_CONFIG.MAX_TOKENS.description,
-    min: 0,
-    max: maxOutputTokens,
-    step: 1,
-    default: 0,
-  });
-
 const ChatModelOSeriesConfigDef = (maxOutputTokens: number, maxSequences: number) => ({
   ...ChatModelResponseSchemaConfigDef(maxOutputTokens, maxSequences),
   temperature: temperature.def,
-  maxTokens: maxTokens(maxOutputTokens).def,
 });
 
 const ChatModelOSeriesConfigSchema = (maxOutputTokens: number, maxSequences: number) =>
   ChatModelResponseSchemaConfigSchema(maxOutputTokens, maxSequences).extend({
     temperature: temperature.schema,
-    maxTokens: maxTokens(maxOutputTokens).schema,
   });
 
 export { ChatModelOSeriesConfigDef, ChatModelOSeriesConfigSchema };

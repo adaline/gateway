@@ -16,7 +16,6 @@ import {
   UrlType,
   urlWithoutTrailingSlash,
 } from "@adaline/provider";
-
 import {
   AssistantRoleLiteral,
   Base64ImageContentTypeLiteral,
@@ -27,10 +26,10 @@ import {
   Config,
   ConfigType,
   ContentType,
-  createTextContent,
-  createToolCallContent,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createTextContent,
+  createToolCallContent,
   ImageModalityLiteral,
   Message,
   MessageType,
@@ -48,6 +47,7 @@ import {
   UserRoleLiteral,
 } from "@adaline/types";
 
+import { OpenAI } from "./../../provider/provider.openai";
 import {
   OpenAIChatRequest,
   OpenAIChatRequestImageContentType,
@@ -59,8 +59,6 @@ import {
   OpenAIStreamChatResponse,
   OpenAIStreamChatResponseType,
 } from "./types";
-
-import { OpenAI } from "./../../provider/provider.openai";
 
 const BaseChatModelOptions = z.object({
   modelName: z.string(),
@@ -205,7 +203,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     }
 
     _config.seed = parsedRequest.seed;
-    _config.maxTokens = parsedRequest.max_tokens;
+    _config.maxTokens = parsedRequest.max_completion_tokens;
     _config.temperature = parsedRequest.temperature;
     _config.topP = parsedRequest.top_p;
     _config.presencePenalty = parsedRequest.presence_penalty;
@@ -393,7 +391,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       const paramKey = def.param;
       const paramValue = (parsedConfig as ConfigType)[key];
 
-      if (paramKey === "max_tokens" && def.type === "range" && paramValue === 0) {
+      if (paramKey === "max_completion_tokens" && def.type === "range" && paramValue === 0) {
         acc[paramKey] = def.max;
       } else {
         acc[paramKey] = paramValue;
@@ -696,14 +694,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
       if (message.tool_calls) {
         message.tool_calls.forEach((toolCall, index) => {
-          messages[0].content.push(
-            createToolCallContent(
-              index,
-              toolCall.id,
-              toolCall.function.name,
-              toolCall.function.arguments
-            )
-          );
+          messages[0].content.push(createToolCallContent(index, toolCall.id, toolCall.function.name, toolCall.function.arguments));
         });
       }
 
