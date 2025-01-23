@@ -18,8 +18,8 @@ const O1_2024_12_17Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatMode
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelModalities,
   config: {
-    def: OpenAIChatModelConfigs.responseFormat(100000, 4).def,
-    schema: OpenAIChatModelConfigs.responseFormat(100000, 4).schema,
+    def: OpenAIChatModelConfigs.oSeries(100000, 4).def,
+    schema: OpenAIChatModelConfigs.oSeries(100000, 4).schema,
   },
 });
 
