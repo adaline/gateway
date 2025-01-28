@@ -6,7 +6,7 @@ import { type Cache } from "../cache";
 type QueueTask<Request, Response> = {
   id: string;
   request: Request;
-  cache: Cache<Response>;
+  cache?: Cache<Response>;
   resolve: (value: Response) => void;
   reject: (error: any) => void;
   execute: (request: Request, context: Context) => Promise<Response>;

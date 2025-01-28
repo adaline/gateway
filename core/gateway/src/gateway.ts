@@ -9,12 +9,20 @@ import {
   GatewayGetEmbeddingsRequestType,
   GatewayOptions,
   GatewayOptionsType,
+  GatewayProxyCompleteChatRequest,
+  GatewayProxyCompleteChatRequestType,
   GatewayStreamChatRequest,
   GatewayStreamChatRequestType,
 } from "./gateway.types";
-import { CompleteChatHandlerResponseType, GetEmbeddingsHandlerResponseType, StreamChatHandlerResponseType } from "./handlers";
+import {
+  CompleteChatHandlerResponseType,
+  GetEmbeddingsHandlerResponseType,
+  ProxyCompleteChatHandlerResponseType,
+  StreamChatHandlerResponseType,
+} from "./handlers";
 import { handleCompleteChat } from "./handlers/complete-chat/complete-chat.handler";
 import { handleGetEmbeddings } from "./handlers/get-embeddings/get-embeddings.handler";
+import { handleProxyCompleteChat } from "./handlers/proxy-complete-chat/proxy-complete-chat.handler";
 import { handleStreamChat } from "./handlers/stream-chat/stream-chat.handler";
 import { Cache, HttpClient, IsomorphicHttpClient, LRUCache, Queue, QueueTask, SimpleQueue } from "./plugins";
 import { AnalyticsManager, AnalyticsRecorder } from "./plugins/analytics";
@@ -34,6 +42,7 @@ class Gateway {
   private queues: {
     completeChat: Queue<GatewayCompleteChatRequestType, CompleteChatHandlerResponseType>;
     getEmbeddings: Queue<GatewayGetEmbeddingsRequestType, GetEmbeddingsHandlerResponseType>;
+    proxyCompleteChat: Queue<GatewayProxyCompleteChatRequestType, ProxyCompleteChatHandlerResponseType>;
   };
   private caches: {
     completeChat: Cache<CompleteChatHandlerResponseType>;
@@ -78,6 +87,7 @@ class Gateway {
     this.queues = {
       completeChat: new SimpleQueue(queueOptions),
       getEmbeddings: new SimpleQueue(queueOptions),
+      proxyCompleteChat: new SimpleQueue(queueOptions),
     };
 
     // httpClient timeout is 90% of queue timeout
@@ -226,6 +236,54 @@ class Gateway {
         enableCache: data.options?.enableCache ?? true,
         callbacks: this.options.getEmbeddingsCallbacks,
         metadataForCallbacks: data.options?.metadataForCallbacks,
+      },
+      this.httpClient,
+      telemetryContext
+    );
+  }
+
+  async proxyCompleteChat(request: GatewayProxyCompleteChatRequestType): Promise<ProxyCompleteChatHandlerResponseType> {
+    this.logger?.info("gateway.proxyCompleteChat invoked");
+    this.logger?.debug("request: ", { request });
+    const data = GatewayProxyCompleteChatRequest.parse(request);
+    const modelName = data.model.modelSchema.name;
+    // const counter = this.meter.createCounter("completeChat.counter");
+    // counter.add(1, { modelName });
+    return await this.tracer.startActiveSpan("proxy-complete-chat", async (span: Span) => {
+      span.setAttribute("modelName", modelName);
+      return new Promise<ProxyCompleteChatHandlerResponseType>((resolve, reject) => {
+        const task: QueueTask<GatewayProxyCompleteChatRequestType, ProxyCompleteChatHandlerResponseType> = {
+          id: uuidv4(),
+          request: data,
+          resolve: (response: ProxyCompleteChatHandlerResponseType) => {
+            this.analytics.record("proxyCompleteChat", "success", { modelName, usage: response.transformedResponse.usage || {} });
+            resolve(response);
+          },
+          reject: (error: any) => {
+            console.log("proxyCompleteChat error", error);
+            this.analytics.record("proxyCompleteChat", "error", { modelName });
+            reject(error);
+          },
+          execute: this.executeProxyCompleteChat.bind(this),
+          telemetryContext: context.active(),
+        };
+        this.queues.proxyCompleteChat.enqueue(task);
+        this.logger?.debug(`gateway.proxyCompleteChat task enqueued, id: ${task.id}`);
+      });
+    });
+  }
+
+  private async executeProxyCompleteChat(
+    request: GatewayProxyCompleteChatRequestType,
+    telemetryContext: Context
+  ): Promise<ProxyCompleteChatHandlerResponseType> {
+    this.logger?.debug("gateway.executeCompleteChat invoked");
+    const data = GatewayProxyCompleteChatRequest.parse(request);
+    return handleProxyCompleteChat(
+      {
+        model: data.model,
+        data: data.data,
+        headers: data.headers,
       },
       this.httpClient,
       telemetryContext
