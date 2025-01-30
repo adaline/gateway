@@ -19,8 +19,8 @@ const GPT_4oSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModali
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelModalities,
   config: {
-    def: OpenAIChatModelConfigs.responseFormat(4092, 4).def,
-    schema: OpenAIChatModelConfigs.responseFormat(4092, 4).schema,
+    def: OpenAIChatModelConfigs.responseSchema(4092, 4).def,
+    schema: OpenAIChatModelConfigs.responseSchema(4092, 4).schema,
   },
 });
 
@@ -33,4 +33,4 @@ class GPT_4o extends BaseChatModel {
   }
 }
 
-export { GPT_4o, GPT_4oOptions, GPT_4oSchema, GPT_4oLiteral, type GPT_4oOptionsType };
+export { GPT_4o, GPT_4oLiteral, GPT_4oOptions, GPT_4oSchema, type GPT_4oOptionsType };
