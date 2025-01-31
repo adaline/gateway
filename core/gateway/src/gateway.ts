@@ -11,6 +11,8 @@ import {
   GatewayOptionsType,
   GatewayProxyCompleteChatRequest,
   GatewayProxyCompleteChatRequestType,
+  GatewayProxyStreamChatRequest,
+  GatewayProxyStreamChatRequestType,
   GatewayStreamChatRequest,
   GatewayStreamChatRequestType,
 } from "./gateway.types";
@@ -18,11 +20,13 @@ import {
   CompleteChatHandlerResponseType,
   GetEmbeddingsHandlerResponseType,
   ProxyCompleteChatHandlerResponseType,
+  ProxyStreamChatHandlerResponseType,
   StreamChatHandlerResponseType,
 } from "./handlers";
 import { handleCompleteChat } from "./handlers/complete-chat/complete-chat.handler";
 import { handleGetEmbeddings } from "./handlers/get-embeddings/get-embeddings.handler";
 import { handleProxyCompleteChat } from "./handlers/proxy-complete-chat/proxy-complete-chat.handler";
+import { handleProxyStreamChat } from "./handlers/proxy-stream-chat/proxy-stream-chat.handler";
 import { handleStreamChat } from "./handlers/stream-chat/stream-chat.handler";
 import { Cache, HttpClient, IsomorphicHttpClient, LRUCache, Queue, QueueTask, SimpleQueue } from "./plugins";
 import { AnalyticsManager, AnalyticsRecorder } from "./plugins/analytics";
@@ -288,6 +292,41 @@ class Gateway {
       this.httpClient,
       telemetryContext
     );
+  }
+
+  async *proxyStreamChat(request: GatewayProxyStreamChatRequestType): AsyncGenerator<ProxyStreamChatHandlerResponseType, void, unknown> {
+    this.logger?.info("gateway.proxyStreamChat invoked");
+    this.logger?.debug("proxyStreamChat request: ", { request });
+    const data = GatewayProxyStreamChatRequest.parse(request);
+    const modelName = data.model.modelSchema.name;
+
+    let status = "success";
+    const span = this.tracer.startSpan("proxy-stream-chat");
+    const activeContext = trace.setSpan(context.active(), span);
+
+    try {
+      span.setAttribute("modelName", modelName);
+      return yield* await context.with(activeContext, async () => {
+        return handleProxyStreamChat(
+          {
+            model: data.model,
+            data: data.data,
+            headers: data.headers,
+          },
+          this.httpClient,
+          activeContext
+        );
+      });
+    } catch (error) {
+      status = "error";
+      span.setStatus({ code: SpanStatusCode.ERROR, message: "proxy stream failed" });
+      this.logger?.error("gateway.proxyStreamChat error: ", { error });
+      if (error instanceof GatewayError) throw error;
+      else throw new GatewayError((error as any)?.message, 500, (error as any)?.response?.data);
+    } finally {
+      this.analytics.record("proxyStreamChat", status, { modelName });
+      span.end();
+    }
   }
 
   static GatewayError = GatewayError;
