@@ -93,6 +93,13 @@ const GatewayProxyStreamChatRequest = z.object({
 });
 type GatewayProxyStreamChatRequestType = z.infer<typeof GatewayProxyStreamChatRequest>;
 
+const GatewayProxyGetEmbeddingsRequest = z.object({
+  model: z.custom<EmbeddingModelV1>(),
+  data: z.any(),
+  headers: z.record(z.string()),
+});
+type GatewayProxyGetEmbeddingsRequestType = z.infer<typeof GatewayProxyGetEmbeddingsRequest>;
+
 export {
   GatewayCompleteChatRequest,
   GatewayCompleteChatRequestOptions,
@@ -100,6 +107,7 @@ export {
   GatewayGetEmbeddingsRequestOptions,
   GatewayOptions,
   GatewayProxyCompleteChatRequest,
+  GatewayProxyGetEmbeddingsRequest,
   GatewayProxyStreamChatRequest,
   GatewayStreamChatRequest,
   GatewayStreamChatRequestOptions,
@@ -109,6 +117,7 @@ export {
   type GatewayGetEmbeddingsRequestType,
   type GatewayOptionsType,
   type GatewayProxyCompleteChatRequestType,
+  type GatewayProxyGetEmbeddingsRequestType,
   type GatewayProxyStreamChatRequestType,
   type GatewayStreamChatRequestOptionsType,
   type GatewayStreamChatRequestType,
