@@ -15,6 +15,8 @@ async function* handleProxyStreamChat(
   const _handleProxyStreamChat = async function* (span?: Span): AsyncGenerator<ProxyStreamChatHandlerResponseType, void, unknown> {
     logger?.debug("handleProxyStreamChat invoked");
     logger?.debug("handleProxyStreamChat request: ", { request });
+    const handlerTelemetryContext = context.active();
+
     const data = ProxyStreamChatHandlerRequest.parse(request);
 
     try {
@@ -40,7 +42,9 @@ async function* handleProxyStreamChat(
         sanitizedProviderRequest.url,
         "post",
         sanitizedProviderRequest.data,
-        sanitizedProviderRequest.headers
+        sanitizedProviderRequest.headers,
+        undefined,
+        handlerTelemetryContext
       )) {
         for await (const transformed of data.model.transformStreamChatResponseChunk(chunk as string, buffer)) {
           if (transformed.partialResponse.partialMessages.length > 0) {
