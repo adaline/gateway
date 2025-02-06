@@ -37,10 +37,10 @@ import {
   SystemRoleLiteral,
   TextModalityLiteral,
   Tool,
-  ToolRoleLiteral,
   ToolCallContentType,
   ToolCallModalityLiteral,
   ToolResponseModalityLiteral,
+  ToolRoleLiteral,
   ToolType,
   UserRoleLiteral,
 } from "@adaline/types";
@@ -324,10 +324,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     }, {} as ParamsType);
 
     if (!transformedConfig.max_tokens) {
-      throw new InvalidConfigError({
-        info: `Invalid config for model : '${this.modelName}'`,
-        cause: new Error(`'max_tokens' is required for model : '${this.modelName}'`),
-      });
+      const def = this.modelSchema.config.def.maxTokens as { max: number };
+      transformedConfig.max_tokens = def["max"];
     }
 
     if ("tool_choice" in transformedConfig && transformedConfig.tool_choice !== undefined) {
@@ -449,10 +447,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
         case UserRoleLiteral:
           {
-            const userContent: (
-              | AnthropicRequestTextContentType
-              | AnthropicRequestImageContentType
-            )[] = [];
+            const userContent: (AnthropicRequestTextContentType | AnthropicRequestImageContentType)[] = [];
             message.content.forEach((content) => {
               if (content.modality === TextModalityLiteral) {
                 userContent.push({ type: "text", text: content.value });
