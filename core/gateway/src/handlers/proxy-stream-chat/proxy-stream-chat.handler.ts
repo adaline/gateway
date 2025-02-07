@@ -1,5 +1,7 @@
 import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
+import { PartialChatResponseType } from "@adaline/types";
+
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
 import { castToError } from "../../utils";
@@ -46,21 +48,23 @@ async function* handleProxyStreamChat(
         undefined,
         handlerTelemetryContext
       )) {
+        let accumulatedPartialResponse: PartialChatResponseType[] = [];
         for await (const transformed of data.model.transformStreamChatResponseChunk(chunk as string, buffer)) {
           if (transformed.partialResponse.partialMessages.length > 0) {
-            const streamResponse: ProxyStreamChatHandlerResponseType = {
-              request: providerRequest,
-              providerRequest: sanitizedProviderRequest,
-              providerResponse: chunk,
-              transformedResponse: transformed.partialResponse,
-            };
-
-            logger?.debug("handleProxyStreamChat streamResponse: ", { streamResponse });
-            yield streamResponse;
+            accumulatedPartialResponse.push(transformed.partialResponse);
           } else {
             buffer = transformed.buffer;
           }
         }
+        const streamResponse: ProxyStreamChatHandlerResponseType = {
+          request: providerRequest,
+          providerRequest: sanitizedProviderRequest,
+          providerResponse: chunk,
+          transformedResponse: accumulatedPartialResponse,
+        };
+
+        logger?.debug("handleProxyStreamChat streamResponse: ", { streamResponse });
+        yield streamResponse;
       }
 
       span?.setStatus({ code: SpanStatusCode.OK });

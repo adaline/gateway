@@ -19,7 +19,7 @@ const ProxyStreamChatHandlerResponse = z.object({
     data: z.any(),
   }), // request sent to provider
   providerResponse: z.any(), // raw chunk from provider
-  transformedResponse: PartialChatResponse, // transformed partial response
+  transformedResponse: z.array(PartialChatResponse), // transformed partial response
 });
 
 type ProxyStreamChatHandlerResponseType = z.infer<typeof ProxyStreamChatHandlerResponse>;
