@@ -53,8 +53,6 @@ class BaseChatModelGroq extends BaseChatModel {
 
     return transformedMessages;
   }
-
-  // TODO: streamChat needs it's own implementation, OpenAI stream transformer is skipping some chunks
 }
 
 export { BaseChatModelGroq, BaseChatModelOptions, type BaseChatModelOptionsType };
