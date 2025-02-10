@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 0.23.0
+
+### Minor Changes
+
+- 5086c86: fixes to max_tokens changes
+
 ## 0.22.0
 
 ### Minor Changes
