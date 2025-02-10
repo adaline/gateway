@@ -11,6 +11,8 @@ import {
   GatewayOptionsType,
   GatewayProxyCompleteChatRequest,
   GatewayProxyCompleteChatRequestType,
+  GatewayProxyGetEmbeddingsRequest,
+  GatewayProxyGetEmbeddingsRequestType,
   GatewayProxyStreamChatRequest,
   GatewayProxyStreamChatRequestType,
   GatewayStreamChatRequest,
@@ -20,12 +22,14 @@ import {
   CompleteChatHandlerResponseType,
   GetEmbeddingsHandlerResponseType,
   ProxyCompleteChatHandlerResponseType,
+  ProxyGetEmbeddingsHandlerResponseType,
   ProxyStreamChatHandlerResponseType,
   StreamChatHandlerResponseType,
 } from "./handlers";
 import { handleCompleteChat } from "./handlers/complete-chat/complete-chat.handler";
 import { handleGetEmbeddings } from "./handlers/get-embeddings/get-embeddings.handler";
 import { handleProxyCompleteChat } from "./handlers/proxy-complete-chat/proxy-complete-chat.handler";
+import { handleProxyGetEmbeddings } from "./handlers/proxy-get-embeddings/proxy-get-embeddings.handler";
 import { handleProxyStreamChat } from "./handlers/proxy-stream-chat/proxy-stream-chat.handler";
 import { handleStreamChat } from "./handlers/stream-chat/stream-chat.handler";
 import { Cache, HttpClient, IsomorphicHttpClient, LRUCache, Queue, QueueTask, SimpleQueue } from "./plugins";
@@ -47,6 +51,7 @@ class Gateway {
     completeChat: Queue<GatewayCompleteChatRequestType, CompleteChatHandlerResponseType>;
     getEmbeddings: Queue<GatewayGetEmbeddingsRequestType, GetEmbeddingsHandlerResponseType>;
     proxyCompleteChat: Queue<GatewayProxyCompleteChatRequestType, ProxyCompleteChatHandlerResponseType>;
+    proxyGetEmbeddings: Queue<GatewayProxyGetEmbeddingsRequestType, ProxyGetEmbeddingsHandlerResponseType>;
   };
   private caches: {
     completeChat: Cache<CompleteChatHandlerResponseType>;
@@ -92,6 +97,7 @@ class Gateway {
       completeChat: new SimpleQueue(queueOptions),
       getEmbeddings: new SimpleQueue(queueOptions),
       proxyCompleteChat: new SimpleQueue(queueOptions),
+      proxyGetEmbeddings: new SimpleQueue(queueOptions),
     };
 
     // httpClient timeout is 90% of queue timeout
@@ -327,6 +333,54 @@ class Gateway {
       this.analytics.record("proxyStreamChat", status, { modelName });
       span.end();
     }
+  }
+  async proxyGetEmbeddings(request: GatewayProxyGetEmbeddingsRequestType): Promise<ProxyGetEmbeddingsHandlerResponseType> {
+    this.logger?.info("gateway.proxyGetEmbeddings invoked");
+    this.logger?.debug("request: ", { request });
+
+    // Parse and validate the incoming request
+    const data = GatewayProxyGetEmbeddingsRequest.parse(request);
+    const modelName = data.model.modelSchema.name;
+
+    return await this.tracer.startActiveSpan("proxy-get-embeddings", async (span: Span) => {
+      span.setAttribute("modelName", modelName);
+
+      return new Promise<ProxyGetEmbeddingsHandlerResponseType>((resolve, reject) => {
+        const task: QueueTask<GatewayProxyGetEmbeddingsRequestType, ProxyGetEmbeddingsHandlerResponseType> = {
+          id: uuidv4(),
+          request: data,
+          resolve: (response: ProxyGetEmbeddingsHandlerResponseType) => {
+            this.analytics.record("proxyGetEmbeddings", "success", { modelName, usage: response.transformedResponse.usage || {} });
+            resolve(response);
+          },
+          reject: (error: any) => {
+            this.analytics.record("proxyGetEmbeddings", "error", { modelName });
+            reject(error);
+          },
+          execute: this.executeProxyGetEmbeddings.bind(this),
+          telemetryContext: context.active(),
+        };
+        this.queues.proxyGetEmbeddings.enqueue(task);
+        this.logger?.debug(`gateway.proxyGetEmbeddings task enqueued, id: ${task.id}`);
+      });
+    });
+  }
+
+  private async executeProxyGetEmbeddings(
+    request: GatewayProxyGetEmbeddingsRequestType,
+    telemetryContext: Context
+  ): Promise<ProxyGetEmbeddingsHandlerResponseType> {
+    this.logger?.debug("gateway.executeProxyGetEmbeddings invoked");
+    const data = GatewayProxyGetEmbeddingsRequest.parse(request);
+    return handleProxyGetEmbeddings(
+      {
+        model: data.model,
+        headers: data.headers,
+        data: data.data,
+      },
+      this.httpClient,
+      telemetryContext
+    );
   }
 
   static GatewayError = GatewayError;
