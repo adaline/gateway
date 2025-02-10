@@ -1,5 +1,7 @@
 import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
+import { PartialChatResponseType } from "@adaline/types";
+
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
 import { castToError } from "../../utils";
@@ -15,6 +17,8 @@ async function* handleProxyStreamChat(
   const _handleProxyStreamChat = async function* (span?: Span): AsyncGenerator<ProxyStreamChatHandlerResponseType, void, unknown> {
     logger?.debug("handleProxyStreamChat invoked");
     logger?.debug("handleProxyStreamChat request: ", { request });
+    const handlerTelemetryContext = context.active();
+
     const data = ProxyStreamChatHandlerRequest.parse(request);
 
     try {
@@ -40,23 +44,27 @@ async function* handleProxyStreamChat(
         sanitizedProviderRequest.url,
         "post",
         sanitizedProviderRequest.data,
-        sanitizedProviderRequest.headers
+        sanitizedProviderRequest.headers,
+        undefined,
+        handlerTelemetryContext
       )) {
+        let accumulatedPartialResponse: PartialChatResponseType[] = [];
         for await (const transformed of data.model.transformStreamChatResponseChunk(chunk as string, buffer)) {
           if (transformed.partialResponse.partialMessages.length > 0) {
-            const streamResponse: ProxyStreamChatHandlerResponseType = {
-              request: providerRequest,
-              providerRequest: sanitizedProviderRequest,
-              providerResponse: chunk,
-              transformedResponse: transformed.partialResponse,
-            };
-
-            logger?.debug("handleProxyStreamChat streamResponse: ", { streamResponse });
-            yield streamResponse;
+            accumulatedPartialResponse.push(transformed.partialResponse);
           } else {
             buffer = transformed.buffer;
           }
         }
+        const streamResponse: ProxyStreamChatHandlerResponseType = {
+          request: providerRequest,
+          providerRequest: sanitizedProviderRequest,
+          providerResponse: chunk,
+          transformedResponse: accumulatedPartialResponse,
+        };
+
+        logger?.debug("handleProxyStreamChat streamResponse: ", { streamResponse });
+        yield streamResponse;
       }
 
       span?.setStatus({ code: SpanStatusCode.OK });
