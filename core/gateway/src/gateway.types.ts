@@ -79,12 +79,36 @@ const GatewayGetEmbeddingsRequest = z.object({
 });
 type GatewayGetEmbeddingsRequestType = z.infer<typeof GatewayGetEmbeddingsRequest>;
 
+const GatewayProxyCompleteChatRequest = z.object({
+  model: z.custom<ChatModelV1>(),
+  data: z.any(),
+  headers: z.record(z.string()),
+});
+type GatewayProxyCompleteChatRequestType = z.infer<typeof GatewayProxyCompleteChatRequest>;
+
+const GatewayProxyStreamChatRequest = z.object({
+  model: z.custom<ChatModelV1>(),
+  data: z.any(),
+  headers: z.record(z.string()),
+});
+type GatewayProxyStreamChatRequestType = z.infer<typeof GatewayProxyStreamChatRequest>;
+
+const GatewayProxyGetEmbeddingsRequest = z.object({
+  model: z.custom<EmbeddingModelV1>(),
+  data: z.any(),
+  headers: z.record(z.string()),
+});
+type GatewayProxyGetEmbeddingsRequestType = z.infer<typeof GatewayProxyGetEmbeddingsRequest>;
+
 export {
   GatewayCompleteChatRequest,
   GatewayCompleteChatRequestOptions,
   GatewayGetEmbeddingsRequest,
   GatewayGetEmbeddingsRequestOptions,
   GatewayOptions,
+  GatewayProxyCompleteChatRequest,
+  GatewayProxyGetEmbeddingsRequest,
+  GatewayProxyStreamChatRequest,
   GatewayStreamChatRequest,
   GatewayStreamChatRequestOptions,
   type GatewayCompleteChatRequestOptionsType,
@@ -92,6 +116,9 @@ export {
   type GatewayGetEmbeddingsRequestOptionsType,
   type GatewayGetEmbeddingsRequestType,
   type GatewayOptionsType,
+  type GatewayProxyCompleteChatRequestType,
+  type GatewayProxyGetEmbeddingsRequestType,
+  type GatewayProxyStreamChatRequestType,
   type GatewayStreamChatRequestOptionsType,
   type GatewayStreamChatRequestType,
 };

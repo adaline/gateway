@@ -21,6 +21,7 @@ async function* handleStreamChat<M>(
     logger?.debug("handleStreamChat request: ", { request });
     const data = StreamChatHandlerRequest.parse(request);
     const callbacks = request.callbacks || [];
+    const handlerTelemetryContext = context.active();
 
     const stable = {
       config: data.config,
@@ -41,7 +42,7 @@ async function* handleStreamChat<M>(
         ...providerRequest.headers,
         source: "adaline.ai",
       };
-      
+
       if (data.customHeaders) {
         providerRequest.headers = {
           ...providerRequest.headers,
@@ -52,7 +53,14 @@ async function* handleStreamChat<M>(
 
       let buffer = "";
       let isFirstResponse = true;
-      for await (const chunk of client.stream(providerRequest.url, "post", providerRequest.data, providerRequest.headers)) {
+      for await (const chunk of client.stream(
+        providerRequest.url,
+        "post",
+        providerRequest.data,
+        providerRequest.headers,
+        undefined,
+        handlerTelemetryContext
+      )) {
         for await (const transformed of data.model.transformStreamChatResponseChunk(chunk as string, buffer)) {
           if (transformed.partialResponse.partialMessages.length > 0) {
             const streamResponse = {

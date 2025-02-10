@@ -160,6 +160,10 @@ class IsomorphicHttpClient implements HttpClient {
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient.STREAM request to ${url}`, { data, headers });
     const _stream = async function* (this: IsomorphicHttpClient, span?: Span): AsyncGenerator<T, void, unknown> {
+      // Record the time we start the request for TTFT measurement
+      const requestStart = Date.now();
+      let timeToFirstTokenSet = false;
+
       try {
         if (this.isNodeEnvironment()) {
           logger?.debug("IsomorphicHttpClient.stream in node environment");
@@ -173,6 +177,12 @@ class IsomorphicHttpClient implements HttpClient {
           });
 
           for await (const chunk of response.data) {
+            // Set time-to-first-token if this is the first chunk
+            if (!timeToFirstTokenSet) {
+              const ttfb = Date.now() - requestStart;
+              span?.setAttribute("time-to-first-token", ttfb);
+              timeToFirstTokenSet = true;
+            }
             span?.addEvent("stream.chunk", { message: "stream chunk received" });
             const decodedChunk = chunk.toString();
             logger?.debug("IsomorphicHttpClient.stream chunk: ", decodedChunk);
@@ -208,6 +218,12 @@ class IsomorphicHttpClient implements HttpClient {
             while (true) {
               const { done, value } = await reader.read();
               if (done) {
+                // Set time-to-first-token if we receive data on the last chunk
+                if (!timeToFirstTokenSet && value) {
+                  const ttfb = Date.now() - requestStart;
+                  span?.setAttribute("time-to-first-token", ttfb);
+                  timeToFirstTokenSet = true;
+                }
                 span?.addEvent("stream.chunk", { message: "stream chunk received" });
                 const decodedValue = new TextDecoder().decode(value, { stream: true });
                 logger?.debug("IsomorphicHttpClient.stream chunk: ", decodedValue);
@@ -215,6 +231,12 @@ class IsomorphicHttpClient implements HttpClient {
                 break;
               }
 
+              // Set time-to-first-token if this is the first chunk
+              if (!timeToFirstTokenSet) {
+                const ttfb = Date.now() - requestStart;
+                span?.setAttribute("time-to-first-token", ttfb);
+                timeToFirstTokenSet = true;
+              }
               span?.addEvent("stream.chunk", { message: "stream chunk received" });
               const decodedValue = new TextDecoder().decode(value, { stream: true });
               logger?.debug("IsomorphicHttpClient.stream chunk: ", decodedValue);
