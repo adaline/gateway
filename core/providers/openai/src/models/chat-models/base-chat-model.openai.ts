@@ -789,68 +789,85 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     chunk: string,
     buffer: string
   ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
-    // merge last buffer message and split into lines
-    const lines = (buffer + chunk).split("\n").filter((line) => line.trim() !== "");
+    const data = buffer + chunk;
+    let lines: string[] = [];
+    let newBuffer = "";
+
+    // Split data into complete lines and new buffer
+    let currentIndex = 0;
+    while (currentIndex < data.length) {
+      const newlineIndex = data.indexOf("\n", currentIndex);
+      if (newlineIndex === -1) {
+        newBuffer = data.substring(currentIndex);
+        break;
+      } else {
+        const line = data.substring(currentIndex, newlineIndex).trim();
+        if (line) {
+          lines.push(line);
+        }
+        currentIndex = newlineIndex + 1;
+      }
+    }
+
+    // Process each complete line
     for (const line of lines) {
       if (line === "data: [DONE]") {
-        // end of stream
-        return;
-      } else if (line.startsWith("data: {") && line.endsWith("}")) {
-        // line contains message
-        let structuredLine: any;
+        return; // End of stream
+      }
+
+      if (line.startsWith("data: ")) {
+        const jsonStr = line.substring("data: ".length);
         try {
-          // remove the 'data :' prefix from string JSON
-          structuredLine = JSON.parse(line.substring("data: ".length));
+          const structuredLine = JSON.parse(jsonStr);
+          const safe = OpenAIStreamChatResponse.safeParse(structuredLine);
+          if (safe.success) {
+            const partialResponse: PartialChatResponseType = { partialMessages: [] };
+            const parsedResponse: OpenAIStreamChatResponseType = safe.data;
+            // Process message content
+            if (parsedResponse.choices.length > 0) {
+              const message = parsedResponse.choices[0].delta;
+              if (message !== undefined && Object.keys(message).length !== 0) {
+                if ("content" in message && message.content !== null) {
+                  partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.content as string));
+                } else if ("refusal" in message && message.refusal !== null) {
+                  partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.refusal as string));
+                } else if ("tool_calls" in message && message.tool_calls !== undefined) {
+                  const toolCall = message.tool_calls.at(0)!;
+                  partialResponse.partialMessages.push(
+                    createPartialToolCallMessage(
+                      AssistantRoleLiteral,
+                      toolCall.index,
+                      toolCall.id,
+                      toolCall.function?.name,
+                      toolCall.function?.arguments
+                    )
+                  );
+                }
+              }
+            }
+
+            if (parsedResponse.usage) {
+              partialResponse.usage = {
+                promptTokens: parsedResponse.usage.prompt_tokens,
+                completionTokens: parsedResponse.usage.completion_tokens,
+                totalTokens: parsedResponse.usage.total_tokens,
+              };
+            }
+            yield { partialResponse: partialResponse, buffer: newBuffer };
+          } else {
+            throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
+          }
         } catch (error) {
-          // malformed JSON error
           throw new ModelResponseError({
-            info: `Malformed JSON received in stream : ${structuredLine}`,
+            info: `Malformed JSON received in stream: ${jsonStr}`,
             cause: error,
           });
         }
-
-        const safe = OpenAIStreamChatResponse.safeParse(structuredLine);
-        if (safe.success) {
-          const partialResponse: PartialChatResponseType = { partialMessages: [] };
-          const parsedResponse: OpenAIStreamChatResponseType = safe.data;
-          if (parsedResponse.choices.length > 0) {
-            const message = parsedResponse.choices[0].delta;
-            if (message !== undefined && Object.keys(message).length !== 0) {
-              if ("content" in message && message.content !== null) {
-                partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.content as string));
-              } else if ("refusal" in message && message.refusal !== null) {
-                partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.refusal as string));
-              } else if ("tool_calls" in message && message.tool_calls !== undefined) {
-                const toolCall = message.tool_calls.at(0)!;
-                partialResponse.partialMessages.push(
-                  createPartialToolCallMessage(
-                    AssistantRoleLiteral,
-                    toolCall.index,
-                    toolCall.id,
-                    toolCall.function?.name,
-                    toolCall.function?.arguments
-                  )
-                );
-              }
-            }
-          }
-
-          if (parsedResponse.usage) {
-            partialResponse.usage = {
-              promptTokens: parsedResponse.usage.prompt_tokens,
-              completionTokens: parsedResponse.usage.completion_tokens,
-              totalTokens: parsedResponse.usage.total_tokens,
-            };
-          }
-
-          yield { partialResponse: partialResponse, buffer: buffer };
-        } else {
-          throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
-        }
-      } else {
-        // line starts with unknown event -- ignore
       }
     }
+
+    // Yield the updated buffer after processing all lines
+    yield { partialResponse: { partialMessages: [] }, buffer: newBuffer };
   }
 }
 
