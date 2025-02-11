@@ -74,7 +74,7 @@ const TogetherAIStreamChatResponse = z.object({
           token_id: z.number().nullable().optional(),
           role: z.string().nullable().optional(),
           content: z.string().nullable().optional(),
-          tool_calls: TogetherAIToolCallsStreamChatResponse.optional(),
+          tool_calls: TogetherAIToolCallsStreamChatResponse.nullable().optional(), // allow null here
         })
         .or(z.object({})),
       logprobs: z.any().nullable().optional(), // logprobs not supported in streaming
@@ -95,10 +95,10 @@ const TogetherAIStreamChatResponse = z.object({
 type TogetherAIStreamChatResponseType = z.infer<typeof TogetherAIStreamChatResponse>;
 
 export {
-  TogetherAIStreamChatResponse,
   TogetherAICompleteChatResponse,
-  TogetherAIToolCallsStreamChatResponse,
+  TogetherAIStreamChatResponse,
   TogetherAIToolCallsCompleteChatResponse,
-  type TogetherAIStreamChatResponseType,
+  TogetherAIToolCallsStreamChatResponse,
   type TogetherAICompleteChatResponseType,
+  type TogetherAIStreamChatResponseType,
 };
