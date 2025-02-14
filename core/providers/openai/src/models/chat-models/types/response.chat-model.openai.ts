@@ -84,7 +84,7 @@ const OpenAIStreamChatResponse = z.object({
   object: z.string(),
   created: z.number(),
   model: z.string(),
-  system_fingerprint: z.string().nullable(),
+  system_fingerprint: z.string().nullable().optional(),
   choices: z.array(
     z.object({
       index: z.number(),
@@ -111,10 +111,10 @@ const OpenAIStreamChatResponse = z.object({
 type OpenAIStreamChatResponseType = z.infer<typeof OpenAIStreamChatResponse>;
 
 export {
-  OpenAIStreamChatResponse,
   OpenAICompleteChatResponse,
-  OpenAIToolCallsStreamChatResponse,
+  OpenAIStreamChatResponse,
   OpenAIToolCallsCompleteChatResponse,
-  type OpenAIStreamChatResponseType,
+  OpenAIToolCallsStreamChatResponse,
   type OpenAICompleteChatResponseType,
+  type OpenAIStreamChatResponseType,
 };
