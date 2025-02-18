@@ -793,7 +793,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       let completeLine = line;
       // remove all '\n' from string JSON
       completeLine = completeLine.replace(/\n/g, "");
-      if (completeLine.startsWith("[")) {
+      if (completeLine.startsWith("[") || completeLine.startsWith(",{")) {
         // start of stream, remove '['
         completeLine = completeLine.slice(1);
       } else if (completeLine.endsWith("]")) {
