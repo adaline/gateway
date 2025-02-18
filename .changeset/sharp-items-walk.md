@@ -11,9 +11,6 @@
 "@adaline/vertex": minor
 "@adaline/provider": minor
 "@adaline/types": minor
-"eslint-config-adaline": minor
-"gateway-experiments": minor
-"@adaline/tsconfig": minor
 ---
 
-pre-release for Gateway Proxy Service
+Pre-release for Gateway Proxy Service
