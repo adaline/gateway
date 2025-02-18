@@ -103,10 +103,10 @@ const GoogleStreamChatResponse = z.object({
   ),
   usageMetadata: z
     .object({
-      promptTokenCount: z.number(),
+      promptTokenCount: z.number().optional(),
       cachedContentTokenCount: z.number().optional(),
-      candidatesTokenCount: z.number(),
-      totalTokenCount: z.number(),
+      candidatesTokenCount: z.number().optional(),
+      totalTokenCount: z.number().optional(),
     })
     .optional(),
 });
@@ -119,6 +119,6 @@ export {
   GoogleStreamChatResponse,
   GoogleStreamChatTextResponse,
   GoogleStreamChatToolResponse,
-  type GoogleStreamChatResponseType,
   type GoogleCompleteChatResponseType,
+  type GoogleStreamChatResponseType,
 };
