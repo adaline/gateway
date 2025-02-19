@@ -1,5 +1,17 @@
 # @adaline/google
 
+## 0.11.0
+
+### Minor Changes
+
+- 749462f: minor changes
+
+### Patch Changes
+
+- Updated dependencies [749462f]
+  - @adaline/provider@0.19.0
+  - @adaline/types@0.17.0
+
 ## 0.10.0
 
 ### Minor Changes

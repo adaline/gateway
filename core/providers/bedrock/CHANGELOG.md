@@ -1,5 +1,18 @@
 # @adaline/bedrock
 
+## 0.16.0
+
+### Minor Changes
+
+- 749462f: minor changes
+
+### Patch Changes
+
+- Updated dependencies [749462f]
+  - @adaline/anthropic@0.22.0
+  - @adaline/provider@0.19.0
+  - @adaline/types@0.17.0
+
 ## 0.15.0
 
 ### Minor Changes

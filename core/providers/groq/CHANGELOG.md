@@ -1,5 +1,18 @@
 # @adaline/groq
 
+## 0.11.0
+
+### Minor Changes
+
+- 749462f: minor changes
+
+### Patch Changes
+
+- Updated dependencies [749462f]
+  - @adaline/openai@0.25.0
+  - @adaline/provider@0.19.0
+  - @adaline/types@0.17.0
+
 ## 0.10.0
 
 ### Minor Changes
