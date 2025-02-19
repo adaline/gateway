@@ -30,6 +30,7 @@ const GatewayOptions = z.object({
     })
     .optional(),
   analyticsEnabled: z.boolean().optional(),
+  enableProxyAgent: z.boolean().optional(),
 });
 type GatewayOptionsType = z.infer<typeof GatewayOptions>;
 
