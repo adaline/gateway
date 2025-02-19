@@ -38,6 +38,7 @@ interface IsomorphicHttpClientConfig {
   timeoutInMilliseconds?: number;
   axiosInstance?: AxiosInstance;
   telemetryTracer?: Tracer;
+  enableProxyAgent?: boolean;
 }
 
 class IsomorphicHttpClient implements HttpClient {
@@ -45,16 +46,21 @@ class IsomorphicHttpClient implements HttpClient {
   private client: AxiosInstance;
   private httpProxyAgent?: ProxyAgent;
   private httpsProxyAgent?: ProxyAgent;
+  private enableProxyAgent: boolean;
 
   constructor(config: IsomorphicHttpClientConfig) {
-    const { axiosInstance, timeoutInMilliseconds } = config;
+    const { axiosInstance, timeoutInMilliseconds, enableProxyAgent } = config;
     this.client = axiosInstance || axios.create();
 
     const Timeout = z.number().int().positive().optional();
     this.defaultTimeout = Timeout.parse(timeoutInMilliseconds);
 
     this.client.defaults.timeout = this.defaultTimeout;
-    if (this.isNodeEnvironment()) {
+
+    // Enable proxy agent by default unless explicitly disabled
+    this.enableProxyAgent = enableProxyAgent ?? true;
+
+    if (this.enableProxyAgent) {
       // Use require here to avoid importing in a browser build
       const ProxyAgent = require("proxy-agent");
       this.httpProxyAgent = new ProxyAgent.ProxyAgent();
@@ -84,7 +90,7 @@ class IsomorphicHttpClient implements HttpClient {
           ...(method === "get" || method === "delete" ? { params: dataOrParams } : { data: dataOrParams }),
           ...additionalConfig,
           timeout: this.defaultTimeout,
-          ...(this.isNodeEnvironment()
+          ...(this.enableProxyAgent
             ? {
                 httpAgent: this.httpProxyAgent,
                 httpsAgent: this.httpsProxyAgent,

@@ -100,8 +100,12 @@ class Gateway {
       proxyGetEmbeddings: new SimpleQueue(queueOptions),
     };
 
+    this.options.enableProxyAgent === undefined ? true : this.options.enableProxyAgent;
+
     // httpClient timeout is 90% of queue timeout
-    this.httpClient = options.httpClient || new IsomorphicHttpClient({ timeoutInMilliseconds: queueOptions.timeout * 0.9 });
+    this.httpClient =
+      options.httpClient ||
+      new IsomorphicHttpClient({ timeoutInMilliseconds: queueOptions.timeout * 0.9, enableProxyAgent: this.options.enableProxyAgent });
 
     this.caches = {
       completeChat: options.completeChatCache || new LRUCache<CompleteChatHandlerResponseType>(),
