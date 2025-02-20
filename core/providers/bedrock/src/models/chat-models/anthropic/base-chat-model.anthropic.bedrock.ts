@@ -109,7 +109,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
     const streamChatUrl = new URL(await this.getStreamChatUrl(config, messages, tools));
     const credentials: AwsCredentialIdentity = { accessKeyId: this.awsAccessKeyId, secretAccessKey: this.awsSecretAccessKey };
     const headers = this.getDefaultHeaders();
-    const body = this.getCompleteChatData(config || {}, messages || [], tools);
+    const body = await this.getCompleteChatData(config || {}, messages || [], tools);
 
     const request = new HttpRequest({
       hostname: streamChatUrl.hostname,
@@ -134,7 +134,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
   async getStreamChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
     const data = {
       ...this.getDefaultParams(),
-      ...super.getStreamChatData(config, messages, tools),
+      ...(await super.getStreamChatData(config, messages, tools)),
     };
 
     if ("stream" in data) {
