@@ -65,7 +65,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
     const completeChatUrl = new URL(await this.getCompleteChatUrl(config, messages, tools));
     const credentials: AwsCredentialIdentity = { accessKeyId: this.awsAccessKeyId, secretAccessKey: this.awsSecretAccessKey };
     const headers = this.getDefaultHeaders();
-    const body = this.getCompleteChatData(config || {}, messages || [], tools);
+    const body = await this.getCompleteChatData(config || {}, messages || [], tools);
 
     const request = new HttpRequest({
       hostname: completeChatUrl.hostname,
@@ -90,7 +90,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
   async getCompleteChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
     const data = {
       ...this.getDefaultParams(),
-      ...super.getCompleteChatData(config, messages, tools),
+      ...(await super.getCompleteChatData(config, messages, tools)),
     };
 
     return new Promise((resolve) => {
@@ -164,7 +164,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
           throw new ModelResponseError({
             info: `Malformed JSON received in stream : ${structuredLine}`,
             cause: error,
-          })
+          });
         }
         const data_delta = encodedBase64ToString(structuredLine["bytes"]);
         const transformed = (await super.transformStreamChatResponseChunk(`data: ${data_delta}`, buffer).next()).value;
