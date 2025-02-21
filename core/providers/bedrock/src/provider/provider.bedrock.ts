@@ -24,6 +24,31 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelOptions: Models.BedrockClaude3Haiku20240307Options,
       modelSchema: Models.BedrockClaude3Haiku20240307Schema,
     },
+    [Models.BedrockClaude3Sonnet20240229Literal]: {
+      model: Models.BedrockClaude3Sonnet20240229,
+      modelOptions: Models.BedrockClaude3Sonnet20240229Options,
+      modelSchema: Models.BedrockClaude3Sonnet20240229Schema,
+    },
+    [Models.BedrockClaude3Opus20240229Literal]: {
+      model: Models.BedrockClaude3Opus20240229,
+      modelOptions: Models.BedrockClaude3Opus20240229Options,
+      modelSchema: Models.BedrockClaude3Opus20240229Schema,
+    },
+    [Models.BedrockClaude3_5Sonnet20240620Literal]: {
+      model: Models.BedrockClaude3_5Sonnet20240620,
+      modelOptions: Models.BedrockClaude3_5Sonnet20240620Options,
+      modelSchema: Models.BedrockClaude3_5Sonnet20240620Schema,
+    },
+    [Models.BedrockClaude3_5Sonnet20241022Literal]: {
+      model: Models.BedrockClaude3_5Sonnet20241022,
+      modelOptions: Models.BedrockClaude3_5Sonnet20241022Options,
+      modelSchema: Models.BedrockClaude3_5Sonnet20241022Schema,
+    },
+    [Models.BedrockClaude3_5Haiku20241022Literal]: {
+      model: Models.BedrockClaude3_5Haiku20241022,
+      modelOptions: Models.BedrockClaude3_5Haiku20241022Options,
+      modelSchema: Models.BedrockClaude3_5Haiku20241022Schema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<

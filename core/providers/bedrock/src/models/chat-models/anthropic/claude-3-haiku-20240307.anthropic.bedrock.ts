@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-import { ChatModelSchema } from "@adaline/provider";
-
 import {
   AnthropicChatModelConfigs,
   AnthropicChatModelModalities,
@@ -9,6 +7,7 @@ import {
   AnthropicChatModelRoles,
   AnthropicChatModelRolesMap,
 } from "@adaline/anthropic";
+import { ChatModelSchema } from "@adaline/provider";
 
 import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
@@ -21,13 +20,13 @@ It is the successor to Claude 3 and is designed to be more powerful and capable 
 const BedrockClaude3Haiku20240307Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicChatModelModalitiesEnum).parse({
   name: BedrockClaude3Haiku20240307Literal,
   description: BedrockClaude3Haiku20240307Description,
-  maxInputTokens: 128000, // TODO: get from parent model
-  maxOutputTokens: 128000, // TODO: get from parent model
+  maxInputTokens: 200000,
+  maxOutputTokens: 4096,
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.base(128000, 4).def,
-    schema: AnthropicChatModelConfigs.base(128000, 4).schema,
+    def: AnthropicChatModelConfigs.base(4096, 4).def,
+    schema: AnthropicChatModelConfigs.base(4096, 4).schema,
   },
 });
 
