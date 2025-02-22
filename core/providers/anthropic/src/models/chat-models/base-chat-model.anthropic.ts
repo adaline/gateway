@@ -284,9 +284,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
     const _toolChoice = config.toolChoice;
-    delete config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
 
-    const _parsedConfig = this.modelSchema.config.schema.safeParse(config);
+    const _config = { ...config }; // create a copy to avoid mutating original config
+    delete _config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
+
+    const _parsedConfig = this.modelSchema.config.schema.safeParse(_config);
     if (!_parsedConfig.success) {
       throw new InvalidConfigError({
         info: `Invalid config for model : '${this.modelName}'`,
