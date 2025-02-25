@@ -7,6 +7,7 @@ const ProxyCompleteChatHandlerRequest = z.object({
   model: z.custom<ChatModelV1>(),
   data: z.any(),
   headers: z.record(z.string()),
+  query: z.record(z.string()).optional(),
 });
 
 type ProxyCompleteChatHandlerRequestType = z.infer<typeof ProxyCompleteChatHandlerRequest>;

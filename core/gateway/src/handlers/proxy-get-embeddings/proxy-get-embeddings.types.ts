@@ -7,6 +7,7 @@ const ProxyGetEmbeddingsHandlerRequest = z.object({
   model: z.custom<EmbeddingModelV1>(),
   data: z.any(),
   headers: z.record(z.string()),
+  query: z.record(z.string()).optional(),
 });
 
 type ProxyGetEmbeddingsHandlerRequestType = z.infer<typeof ProxyGetEmbeddingsHandlerRequest>;
