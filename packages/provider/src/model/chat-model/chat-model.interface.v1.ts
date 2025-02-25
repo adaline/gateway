@@ -41,6 +41,13 @@ interface ChatModelV1<MS extends ChatModelSchemaType = ChatModelSchemaType> {
     partialResponse: PartialChatResponseType;
     buffer: string;
   }>;
+
+  getProxyStreamChatUrl(
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): Promise<UrlType>;
 }
 
 export { type ChatModelV1 };

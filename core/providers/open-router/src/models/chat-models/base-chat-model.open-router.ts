@@ -839,6 +839,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     // Yield the updated buffer after processing all lines
     yield { partialResponse: { partialMessages: [] }, buffer: newBuffer };
   }
+  async getProxyStreamChatUrl(
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): Promise<UrlType> {
+    return new Promise((resolve) => {
+      resolve(this.streamChatUrl);
+    });
+  }
 }
 
 export { BaseChatModel, BaseChatModelOptions, type BaseChatModelOptionsType };
