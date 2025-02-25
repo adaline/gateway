@@ -878,7 +878,19 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     query?: Record<string, string>
   ): Promise<UrlType> {
     return new Promise((resolve) => {
-      resolve(this.streamChatUrl);
+      if (!query || Object.keys(query).length === 0) {
+        resolve(this.streamChatUrl);
+        return;
+      }
+
+      const url = new URL(this.streamChatUrl);
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null) {
+          url.searchParams.set(key, value);
+        }
+      });
+
+      resolve(url.toString() as UrlType);
     });
   }
 }
