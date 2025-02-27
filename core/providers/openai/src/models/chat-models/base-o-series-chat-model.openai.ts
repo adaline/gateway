@@ -1,4 +1,12 @@
-import { ChatModelSchemaType, HeadersType, InvalidModelRequestError, ModelError, ParamsType, UrlType } from "@adaline/provider";
+import {
+  ChatModelSchemaType,
+  ChatModelV1,
+  HeadersType,
+  InvalidModelRequestError,
+  ModelError,
+  ParamsType,
+  UrlType,
+} from "@adaline/provider";
 import { ConfigType, MessageType, PartialChatResponseType, ToolType } from "@adaline/types";
 
 import { BaseChatModel, BaseChatModelOptionsType } from "./base-chat-model.openai";
@@ -72,8 +80,30 @@ class BaseOSeriesChatModel extends BaseChatModel {
       info: `Model: '${this.modelSchema.name}' does not support streaming.`,
       cause: new Error(`Model: '${this.modelSchema.name}' does not support streaming.`),
     });
+  }
 
-    yield { partialResponse: { partialMessages: [] }, buffer: "" };
+  async *transformProxyStreamChatResponseChunk(
+    chunk: string,
+    buffer: string,
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    // Directly delegate to transformStreamChatResponseChunk
+    yield* this.transformStreamChatResponseChunk(chunk, buffer);
+  }
+
+  async getProxyStreamChatUrl(
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): Promise<UrlType> {
+    throw new ModelError({
+      info: `Model: '${this.modelSchema.name}' does not support streaming.`,
+      cause: new Error(`Model: '${this.modelSchema.name}' does not support streaming.`),
+    });
   }
 }
 

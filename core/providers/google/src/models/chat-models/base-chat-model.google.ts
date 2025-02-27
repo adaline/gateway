@@ -871,6 +871,131 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     yield { partialResponse: { partialMessages: [] }, buffer: buffer };
   }
+  async *transformProxyStreamChatResponseChunk(
+    chunk: string,
+    buffer: string,
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    // If query has alt not equal to 'sse', delegate to streamTransform logic
+    if (query?.alt !== "sse") {
+      yield* this.transformStreamChatResponseChunk(chunk, buffer);
+      return;
+    }
+
+    // --- proxyStreamTransform logic starts here ---
+    const newData = buffer + chunk;
+    let lines: string[] = [];
+    let newBuffer = "";
+
+    // Split newData into complete lines and new buffer
+    let currentIndex = 0;
+    while (currentIndex < newData.length) {
+      const newlineIndex = newData.indexOf("\n", currentIndex);
+      if (newlineIndex === -1) {
+        newBuffer = newData.substring(currentIndex);
+        break;
+      } else {
+        const line = newData.substring(currentIndex, newlineIndex).trim();
+        if (line) {
+          lines.push(line);
+        }
+        currentIndex = newlineIndex + 1;
+      }
+    }
+
+    // Process each complete line
+    for (const line of lines) {
+      if (line === "data: [DONE]") {
+        return; // End of stream
+      }
+
+      if (line.startsWith("data: ")) {
+        const jsonStr = line.substring("data: ".length);
+        try {
+          const structuredLine = JSON.parse(jsonStr);
+          const safe = GoogleStreamChatResponse.safeParse(structuredLine);
+          if (safe.success) {
+            const partialResponse: PartialChatResponseType = { partialMessages: [] };
+            const parsedResponse: GoogleStreamChatResponseType = safe.data;
+            if (parsedResponse.candidates.length > 0) {
+              const message = parsedResponse.candidates[0].content;
+              if (message && "parts" in message && message.parts.length > 0) {
+                message.parts.forEach((messagePart, index) => {
+                  if ("text" in messagePart && messagePart.text !== undefined) {
+                    partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, messagePart.text));
+                  }
+
+                  if ("functionCall" in messagePart && messagePart.functionCall !== undefined) {
+                    const toolCall = messagePart.functionCall;
+                    partialResponse.partialMessages.push(
+                      createPartialToolCallMessage(
+                        AssistantRoleLiteral,
+                        index,
+                        `${toolCall.name}_${index}`,
+                        toolCall.name,
+                        JSON.stringify(toolCall.args)
+                      )
+                    );
+                  }
+                });
+              }
+            }
+
+            if (
+              parsedResponse.usageMetadata &&
+              parsedResponse.usageMetadata.totalTokenCount &&
+              parsedResponse.usageMetadata.promptTokenCount &&
+              parsedResponse.usageMetadata.candidatesTokenCount
+            ) {
+              partialResponse.usage = {
+                promptTokens: parsedResponse.usageMetadata.promptTokenCount,
+                completionTokens: parsedResponse.usageMetadata.candidatesTokenCount,
+                totalTokens: parsedResponse.usageMetadata.totalTokenCount,
+              };
+            }
+
+            yield { partialResponse: partialResponse, buffer: buffer };
+          } else {
+            throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
+          }
+        } catch (error) {
+          throw new ModelResponseError({
+            info: `Malformed JSON received in stream: ${jsonStr}`,
+            cause: error,
+          });
+        }
+      }
+    }
+
+    // Yield the updated buffer after processing all lines
+    yield { partialResponse: { partialMessages: [] }, buffer: newBuffer };
+  }
+
+  async getProxyStreamChatUrl(
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): Promise<UrlType> {
+    return new Promise((resolve) => {
+      if (!query || Object.keys(query).length === 0) {
+        resolve(this.streamChatUrl);
+        return;
+      }
+
+      const url = new URL(this.streamChatUrl);
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null) {
+          url.searchParams.set(key, value);
+        }
+      });
+
+      resolve(url.toString() as UrlType);
+    });
+  }
 }
 
 export { BaseChatModel, BaseChatModelOptions, type BaseChatModelOptionsType };
