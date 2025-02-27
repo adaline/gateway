@@ -874,7 +874,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   async *transformProxyStreamChatResponseChunk(
     chunk: string,
     buffer: string,
-    model?: ChatModelV1,
     data?: any,
     headers?: Record<string, string>,
     query?: Record<string, string>
@@ -974,12 +973,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     yield { partialResponse: { partialMessages: [] }, buffer: newBuffer };
   }
 
-  async getProxyStreamChatUrl(
-    model?: ChatModelV1,
-    data?: any,
-    headers?: Record<string, string>,
-    query?: Record<string, string>
-  ): Promise<UrlType> {
+  async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
     return new Promise((resolve) => {
       if (!query || Object.keys(query).length === 0) {
         resolve(this.streamChatUrl);

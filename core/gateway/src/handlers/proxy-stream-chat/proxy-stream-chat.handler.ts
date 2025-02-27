@@ -23,7 +23,7 @@ async function* handleProxyStreamChat(
 
     try {
       const providerRequest = {
-        url: await data.model.getProxyStreamChatUrl(data.model, data.data, data.headers, data.query),
+        url: await data.model.getProxyStreamChatUrl(data.data, data.headers, data.query),
         headers: data.headers,
         data: data.data,
       };
@@ -52,7 +52,6 @@ async function* handleProxyStreamChat(
         for await (const transformed of data.model.transformProxyStreamChatResponseChunk(
           chunk as string,
           buffer,
-          data.model,
           data.data,
           data.headers,
           data.query

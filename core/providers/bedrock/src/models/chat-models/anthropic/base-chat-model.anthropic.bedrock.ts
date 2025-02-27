@@ -4,15 +4,7 @@ import { HttpRequest } from "@smithy/protocol-http";
 import { SignatureV4 } from "@smithy/signature-v4";
 
 import { BaseChatModel } from "@adaline/anthropic";
-import {
-  ChatModelSchemaType,
-  ChatModelV1,
-  encodedBase64ToString,
-  HeadersType,
-  ModelResponseError,
-  ParamsType,
-  UrlType,
-} from "@adaline/provider";
+import { ChatModelSchemaType, encodedBase64ToString, HeadersType, ModelResponseError, ParamsType, UrlType } from "@adaline/provider";
 import { ConfigType, MessageType, PartialChatResponseType, ToolType } from "@adaline/types";
 
 import { Bedrock } from "../../../provider";
@@ -185,7 +177,6 @@ class BaseChatModelAnthropic extends BaseChatModel {
   async *transformProxyStreamChatResponseChunk(
     chunk: string,
     buffer: string,
-    model?: ChatModelV1,
     data?: any,
     headers?: Record<string, string>,
     query?: Record<string, string>
@@ -193,12 +184,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
     // Directly delegate to transformStreamChatResponseChunk
     yield* this.transformStreamChatResponseChunk(chunk, buffer);
   }
-  async getProxyStreamChatUrl(
-    model?: ChatModelV1,
-    data?: any,
-    headers?: Record<string, string>,
-    query?: Record<string, string>
-  ): Promise<UrlType> {
+  async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
     return new Promise((resolve) => {
       resolve(`${this.awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
     });

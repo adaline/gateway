@@ -42,16 +42,10 @@ interface ChatModelV1<MS extends ChatModelSchemaType = ChatModelSchemaType> {
     buffer: string;
   }>;
 
-  getProxyStreamChatUrl(
-    model?: ChatModelV1,
-    data?: any,
-    headers?: Record<string, string>,
-    query?: Record<string, string>
-  ): Promise<UrlType>;
+  getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType>;
   transformProxyStreamChatResponseChunk(
     chunk: string,
     buffer: string,
-    model?: ChatModelV1,
     data?: any,
     headers?: Record<string, string>,
     query?: Record<string, string>

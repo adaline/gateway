@@ -1,12 +1,4 @@
-import {
-  ChatModelSchemaType,
-  ChatModelV1,
-  HeadersType,
-  InvalidModelRequestError,
-  ModelError,
-  ParamsType,
-  UrlType,
-} from "@adaline/provider";
+import { ChatModelSchemaType, HeadersType, InvalidModelRequestError, ModelError, ParamsType, UrlType } from "@adaline/provider";
 import { ConfigType, MessageType, PartialChatResponseType, ToolType } from "@adaline/types";
 
 import { BaseChatModel, BaseChatModelOptionsType } from "./base-chat-model.openai";
@@ -85,7 +77,6 @@ class BaseOSeriesChatModel extends BaseChatModel {
   async *transformProxyStreamChatResponseChunk(
     chunk: string,
     buffer: string,
-    model?: ChatModelV1,
     data?: any,
     headers?: Record<string, string>,
     query?: Record<string, string>
@@ -94,12 +85,7 @@ class BaseOSeriesChatModel extends BaseChatModel {
     yield* this.transformStreamChatResponseChunk(chunk, buffer);
   }
 
-  async getProxyStreamChatUrl(
-    model?: ChatModelV1,
-    data?: any,
-    headers?: Record<string, string>,
-    query?: Record<string, string>
-  ): Promise<UrlType> {
+  async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
     throw new ModelError({
       info: `Model: '${this.modelSchema.name}' does not support streaming.`,
       cause: new Error(`Model: '${this.modelSchema.name}' does not support streaming.`),
