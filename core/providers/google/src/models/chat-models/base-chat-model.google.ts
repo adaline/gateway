@@ -990,6 +990,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       resolve(url.toString() as UrlType);
     });
   }
+  async getProxyCompleteChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
+    if (!headers) {
+      return {};
+    }
+    const sanitizedHeaders: Record<string, string> = { ...headers, source: "adaline.ai" };
+
+    delete sanitizedHeaders.host;
+    delete sanitizedHeaders["content-length"];
+    return sanitizedHeaders;
+  }
 }
 
 export { BaseChatModel, BaseChatModelOptions, type BaseChatModelOptionsType };
