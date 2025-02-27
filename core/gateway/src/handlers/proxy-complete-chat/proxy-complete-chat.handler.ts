@@ -21,32 +21,22 @@ async function handleProxyCompleteChat(
     try {
       const providerRequest = {
         url: await data.model.getCompleteChatUrl(),
-        headers: data.headers,
+        headers: await data.model.getProxyCompleteChatHeaders(data.data, data.headers, data.query),
         data: data.data,
       };
-
-      providerRequest.headers = {
-        ...providerRequest.headers,
-        source: "adaline.ai",
-      };
-
-      const sanitizedProviderRequest = { ...providerRequest };
-      delete sanitizedProviderRequest.headers.host;
-      delete sanitizedProviderRequest.headers["content-length"];
-
       logger?.debug("handleProxyCompleteChat providerRequest: ", { providerRequest });
 
       const providerResponse = await client.post(
-        sanitizedProviderRequest.url,
-        sanitizedProviderRequest.data,
-        sanitizedProviderRequest.headers,
+        providerRequest.url,
+        providerRequest.data,
+        providerRequest.headers,
         handlerTelemetryContext
       );
       logger?.debug("handleProxyCompleteChat providerResponse: ", { providerResponse });
 
       const response: ProxyCompleteChatHandlerResponseType = {
-        request: providerRequest,
-        providerRequest: sanitizedProviderRequest,
+        request: { header: data.headers, data: data.data, query: data.query },
+        providerRequest: providerRequest,
         providerResponse: providerResponse,
         transformedResponse: data.model.transformCompleteChatResponse(providerResponse.data),
       };

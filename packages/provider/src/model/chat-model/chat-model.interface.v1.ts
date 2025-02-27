@@ -53,6 +53,7 @@ interface ChatModelV1<MS extends ChatModelSchemaType = ChatModelSchemaType> {
     partialResponse: PartialChatResponseType;
     buffer: string;
   }>;
+  getProxyCompleteChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType>;
 }
 
 export { type ChatModelV1 };
