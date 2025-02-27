@@ -49,7 +49,14 @@ async function* handleProxyStreamChat(
         handlerTelemetryContext
       )) {
         let accumulatedPartialResponse: PartialChatResponseType[] = [];
-        for await (const transformed of data.model.transformStreamChatResponseChunk(chunk as string, buffer)) {
+        for await (const transformed of data.model.transformProxyStreamChatResponseChunk(
+          chunk as string,
+          buffer,
+          data.model,
+          data.data,
+          data.headers,
+          data.query
+        )) {
           if (transformed.partialResponse.partialMessages.length > 0) {
             accumulatedPartialResponse.push(transformed.partialResponse);
           } else {

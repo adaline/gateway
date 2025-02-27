@@ -48,6 +48,17 @@ interface ChatModelV1<MS extends ChatModelSchemaType = ChatModelSchemaType> {
     headers?: Record<string, string>,
     query?: Record<string, string>
   ): Promise<UrlType>;
+  transformProxyStreamChatResponseChunk(
+    chunk: string,
+    buffer: string,
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): AsyncGenerator<{
+    partialResponse: PartialChatResponseType;
+    buffer: string;
+  }>;
 }
 
 export { type ChatModelV1 };

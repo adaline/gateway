@@ -82,6 +82,18 @@ class BaseOSeriesChatModel extends BaseChatModel {
     });
   }
 
+  async *transformProxyStreamChatResponseChunk(
+    chunk: string,
+    buffer: string,
+    model?: ChatModelV1,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    // Directly delegate to transformStreamChatResponseChunk
+    yield* this.transformStreamChatResponseChunk(chunk, buffer);
+  }
+
   async getProxyStreamChatUrl(
     model?: ChatModelV1,
     data?: any,
