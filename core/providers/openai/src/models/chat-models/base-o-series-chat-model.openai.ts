@@ -72,8 +72,24 @@ class BaseOSeriesChatModel extends BaseChatModel {
       info: `Model: '${this.modelSchema.name}' does not support streaming.`,
       cause: new Error(`Model: '${this.modelSchema.name}' does not support streaming.`),
     });
+  }
 
-    yield { partialResponse: { partialMessages: [] }, buffer: "" };
+  async *transformProxyStreamChatResponseChunk(
+    chunk: string,
+    buffer: string,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    // Directly delegate to transformStreamChatResponseChunk
+    yield* this.transformStreamChatResponseChunk(chunk, buffer);
+  }
+
+  async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
+    throw new ModelError({
+      info: `Model: '${this.modelSchema.name}' does not support streaming.`,
+      cause: new Error(`Model: '${this.modelSchema.name}' does not support streaming.`),
+    });
   }
 }
 

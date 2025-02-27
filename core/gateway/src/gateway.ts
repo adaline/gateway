@@ -298,6 +298,7 @@ class Gateway {
         model: data.model,
         data: data.data,
         headers: data.headers,
+        query: data.query,
       },
       this.httpClient,
       telemetryContext
@@ -322,6 +323,7 @@ class Gateway {
             model: data.model,
             data: data.data,
             headers: data.headers,
+            query: data.query,
           },
           this.httpClient,
           activeContext
@@ -381,6 +383,7 @@ class Gateway {
         model: data.model,
         headers: data.headers,
         data: data.data,
+        query: data.query,
       },
       this.httpClient,
       telemetryContext

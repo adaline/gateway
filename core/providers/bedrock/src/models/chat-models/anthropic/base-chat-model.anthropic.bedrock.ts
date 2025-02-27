@@ -174,6 +174,21 @@ class BaseChatModelAnthropic extends BaseChatModel {
       }
     }
   }
+  async *transformProxyStreamChatResponseChunk(
+    chunk: string,
+    buffer: string,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    // Directly delegate to transformStreamChatResponseChunk
+    yield* this.transformStreamChatResponseChunk(chunk, buffer);
+  }
+  async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
+    return new Promise((resolve) => {
+      resolve(`${this.awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
+    });
+  }
 }
 
 export { BaseChatModelAnthropic };
