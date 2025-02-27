@@ -268,7 +268,6 @@ class BaseChatModelAnthropic extends BaseChatModel {
     });
 
     const signedRequest = await signer.sign(request);
-    console.log("header", signedRequest.headers);
     return signedRequest.headers;
   }
 }
