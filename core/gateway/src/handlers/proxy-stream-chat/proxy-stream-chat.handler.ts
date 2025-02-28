@@ -24,27 +24,18 @@ async function* handleProxyStreamChat(
     try {
       const providerRequest = {
         url: await data.model.getProxyStreamChatUrl(data.data, data.headers, data.query),
-        headers: data.headers,
+        headers: await data.model.getProxyStreamChatHeaders(data.data, data.headers, data.query),
         data: data.data,
       };
-
-      providerRequest.headers = {
-        ...providerRequest.headers,
-        source: "adaline.ai",
-      };
-
-      const sanitizedProviderRequest = { ...providerRequest };
-      delete sanitizedProviderRequest.headers.host;
-      delete sanitizedProviderRequest.headers["content-length"];
 
       logger?.debug("handleProxyStreamChat providerRequest: ", { providerRequest });
 
       let buffer = "";
       for await (const chunk of client.stream(
-        sanitizedProviderRequest.url,
+        providerRequest.url,
         "post",
-        sanitizedProviderRequest.data,
-        sanitizedProviderRequest.headers,
+        providerRequest.data,
+        providerRequest.headers,
         undefined,
         handlerTelemetryContext
       )) {
@@ -63,8 +54,8 @@ async function* handleProxyStreamChat(
           }
         }
         const streamResponse: ProxyStreamChatHandlerResponseType = {
-          request: providerRequest,
-          providerRequest: sanitizedProviderRequest,
+          request: { header: data.headers, data: data.data, query: data.query },
+          providerRequest: providerRequest,
           providerResponse: chunk,
           transformedResponse: accumulatedPartialResponse,
         };

@@ -229,6 +229,47 @@ class BaseChatModelAnthropic extends BaseChatModel {
     const signedRequest = await signer.sign(request);
     return signedRequest.headers;
   }
+
+  async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
+    const streamChatUrl = new URL(await this.getStreamChatUrl());
+    if (!headers) return {};
+
+    const awsAccessKeyId = headers["aws-access-key-id"];
+    const awsSecretAccessKey = headers["aws-secret-access-key"];
+    let awsRegion = headers["aws-region"];
+
+    if (!awsAccessKeyId || !awsSecretAccessKey) return {};
+
+    if (!awsRegion) {
+      const match = headers["authorization"]?.match(/Credential=[^/]+\/\d+\/([^/]+)\/bedrock/);
+      if (!match) return {};
+      awsRegion = match[1];
+    }
+
+    const credentials: AwsCredentialIdentity = { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretAccessKey };
+    const defaultHeaders = this.getDefaultHeaders();
+
+    headers = { ...headers, ...defaultHeaders, source: "adaline.ai" };
+
+    const request = new HttpRequest({
+      hostname: streamChatUrl.hostname,
+      path: streamChatUrl.pathname,
+      protocol: streamChatUrl.protocol,
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: headers,
+    });
+
+    const signer = new SignatureV4({
+      credentials: credentials,
+      service: this.awsService,
+      region: awsRegion,
+      sha256: Sha256,
+    });
+
+    const signedRequest = await signer.sign(request);
+    return signedRequest.headers;
+  }
 }
 
 export { BaseChatModelAnthropic };

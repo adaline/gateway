@@ -895,6 +895,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     delete sanitizedHeaders["content-length"];
     return sanitizedHeaders;
   }
+  async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
+    // Directly delegate to getProxyCompleteChatHeaders for now
+    return await this.getProxyCompleteChatHeaders(data, headers, query);
+  }
 }
 
 export { BaseChatModel, BaseChatModelOptions, type BaseChatModelOptionsType };
