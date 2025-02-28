@@ -22,6 +22,7 @@ async function* handleProxyStreamChat(
     const data = ProxyStreamChatHandlerRequest.parse(request);
 
     try {
+      data.headers = { ...data.headers, source: "adaline.ai" };
       const providerRequest = {
         url: await data.model.getProxyStreamChatUrl(data.data, data.headers, data.query),
         headers: await data.model.getProxyStreamChatHeaders(data.data, data.headers, data.query),

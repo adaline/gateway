@@ -994,7 +994,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (!headers) {
       return {};
     }
-    const sanitizedHeaders: Record<string, string> = { ...headers, source: "adaline.ai" };
+    const sanitizedHeaders: Record<string, string> = { ...headers };
 
     delete sanitizedHeaders.host;
     delete sanitizedHeaders["content-length"];

@@ -19,6 +19,8 @@ async function handleProxyCompleteChat(
     const handlerTelemetryContext = context.active();
 
     try {
+      data.headers = { ...data.headers, source: "adaline.ai" };
+
       const providerRequest = {
         url: await data.model.getCompleteChatUrl(),
         headers: await data.model.getProxyCompleteChatHeaders(data.data, data.headers, data.query),
