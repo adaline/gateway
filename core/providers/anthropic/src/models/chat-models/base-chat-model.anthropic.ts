@@ -833,6 +833,22 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       resolve(this.streamChatUrl);
     });
   }
+
+  async getProxyCompleteChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
+    if (!headers) {
+      return {};
+    }
+    const sanitizedHeaders: Record<string, string> = { ...headers };
+
+    delete sanitizedHeaders.host;
+    delete sanitizedHeaders["content-length"];
+    return sanitizedHeaders;
+  }
+
+  async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
+    // Directly delegate to getProxyCompleteChatHeaders for now
+    return await this.getProxyCompleteChatHeaders(data, headers, query);
+  }
 }
 
 export { BaseChatModel, BaseChatModelOptions, type BaseChatModelOptionsType };
