@@ -24,12 +24,13 @@ import {
   FloatEmbeddingType,
 } from "@adaline/types";
 
+import { Google } from "../../provider/provider.google";
 import { GoogleEmbeddingRequest, GoogleEmbeddingRequestInputType, GoogleGetEmbeddingsResponse } from "./types";
 
 const BaseEmbeddingModelOptions = z.object({
   modelName: z.string(),
   apiKey: z.string(),
-  baseUrl: z.string().url(),
+  baseUrl: z.string().url().optional(),
   getEmbeddingsUrl: z.string().url().optional(),
 });
 type BaseEmbeddingModelOptionsType = z.infer<typeof BaseEmbeddingModelOptions>;
@@ -48,7 +49,7 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     this.modelSchema = modelSchema;
     this.modelName = parsedOptions.modelName;
     this.apiKey = parsedOptions.apiKey;
-    this.baseUrl = urlWithoutTrailingSlash(parsedOptions.baseUrl);
+    this.baseUrl = urlWithoutTrailingSlash(parsedOptions.baseUrl || Google.baseUrl);
     this.getEmbeddingsUrl = urlWithoutTrailingSlash(
       parsedOptions.getEmbeddingsUrl || `${this.baseUrl}/models/${this.modelName}:batchEmbedContents?key=${this.apiKey}`
     );
