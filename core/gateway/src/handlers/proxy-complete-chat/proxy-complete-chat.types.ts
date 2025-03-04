@@ -20,7 +20,7 @@ const ProxyCompleteChatHandlerResponse = z.object({
     data: z.any(),
   }), // request sent to provider
   providerResponse: z.any(), // response received from provider
-  transformedResponse: ChatResponse, // response received in Adaline chat types
+  transformedResponse: z.optional(ChatResponse), // response received in Adaline chat types
 });
 type ProxyCompleteChatHandlerResponseType = z.infer<typeof ProxyCompleteChatHandlerResponse>;
 

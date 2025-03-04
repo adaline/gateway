@@ -44,11 +44,18 @@ async function handleProxyGetEmbeddings(
       );
       logger?.debug("handleProxyGetEmbeddings providerResponse: ", { providerResponse });
 
+      let transformedResponse;
+      try {
+        transformedResponse = data.model.transformGetEmbeddingsResponse(providerResponse.data);
+      } catch (transformationError) {
+        logger?.warn("handleProxyGetEmbeddings transformation error: ", { transformationError });
+      }
+
       const response: ProxyGetEmbeddingsHandlerResponseType = {
         request: providerRequest,
         providerRequest: sanitizedProviderRequest,
         providerResponse: providerResponse,
-        transformedResponse: data.model.transformGetEmbeddingsResponse(providerResponse.data),
+        transformedResponse: transformedResponse,
       };
 
       logger?.debug("handleProxyGetEmbeddings response: ", { response });

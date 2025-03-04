@@ -36,11 +36,18 @@ async function handleProxyCompleteChat(
       );
       logger?.debug("handleProxyCompleteChat providerResponse: ", { providerResponse });
 
+      let transformedResponse;
+      try {
+        transformedResponse = data.model.transformCompleteChatResponse(providerResponse.data);
+      } catch (transformationError) {
+        logger?.warn("handleProxyCompleteChat transformation error: ", { transformationError });
+      }
+
       const response: ProxyCompleteChatHandlerResponseType = {
         request: { header: data.headers, data: data.data, query: data.query },
         providerRequest: providerRequest,
         providerResponse: providerResponse,
-        transformedResponse: data.model.transformCompleteChatResponse(providerResponse.data),
+        transformedResponse: transformedResponse,
       };
 
       logger?.debug("handleProxyCompleteChat response: ", { response });

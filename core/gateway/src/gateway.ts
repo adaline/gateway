@@ -270,7 +270,7 @@ class Gateway {
           id: uuidv4(),
           request: data,
           resolve: (response: ProxyCompleteChatHandlerResponseType) => {
-            this.analytics.record("proxyCompleteChat", "success", { modelName, usage: response.transformedResponse.usage || {} });
+            this.analytics.record("proxyCompleteChat", "success", { modelName, usage: response.transformedResponse?.usage || {} });
             resolve(response);
           },
           reject: (error: any) => {
@@ -356,7 +356,7 @@ class Gateway {
           id: uuidv4(),
           request: data,
           resolve: (response: ProxyGetEmbeddingsHandlerResponseType) => {
-            this.analytics.record("proxyGetEmbeddings", "success", { modelName, usage: response.transformedResponse.usage || {} });
+            this.analytics.record("proxyGetEmbeddings", "success", { modelName, usage: response.transformedResponse?.usage || {} });
             resolve(response);
           },
           reject: (error: any) => {
