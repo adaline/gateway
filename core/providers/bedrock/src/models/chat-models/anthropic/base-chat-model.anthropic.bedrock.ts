@@ -184,9 +184,21 @@ class BaseChatModelAnthropic extends BaseChatModel {
     // Directly delegate to transformStreamChatResponseChunk
     yield* this.transformStreamChatResponseChunk(chunk, buffer);
   }
+
+  private getRegionHelper(headers: Record<string, string>): string {
+    let awsRegion = headers["aws-region"];
+    if (!awsRegion) {
+      const match = headers["authorization"]?.match(/Credential=[^/]+\/\d+\/([^/]+)\/bedrock/);
+      if (match) {
+        awsRegion = match[1];
+      }
+    }
+    return awsRegion;
+  }
   async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
+    const awsRegion = this.getRegionHelper(headers || {});
     return new Promise((resolve) => {
-      resolve(`${this.awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
+      resolve(`${Bedrock.awsUrl(awsRegion)}/model/${this.modelName}/invoke-with-response-stream`);
     });
   }
 
@@ -202,20 +214,14 @@ class BaseChatModelAnthropic extends BaseChatModel {
 
     const awsAccessKeyId = headers["aws-access-key-id"];
     const awsSecretAccessKey = headers["aws-secret-access-key"];
-    let awsRegion = headers["aws-region"];
+    const awsRegion = this.getRegionHelper(headers);
 
     if (!awsAccessKeyId || !awsSecretAccessKey) return {};
 
-    if (!awsRegion) {
-      const match = headers["authorization"]?.match(/Credential=[^/]+\/\d+\/([^/]+)\/bedrock/);
-      if (!match) return {};
-      awsRegion = match[1];
-    }
-
     const credentials: AwsCredentialIdentity = { accessKeyId: awsAccessKeyId, secretAccessKey: awsSecretAccessKey };
-    const defaultHeaders = this.getDefaultHeaders();
 
-    headers = { ...headers, ...defaultHeaders };
+    headers = { ...headers, host: chatUrl.host, "content-type": "application/json", accept: "application/json" };
+
     delete headers["content-length"];
 
     const request = new HttpRequest({
@@ -237,15 +243,22 @@ class BaseChatModelAnthropic extends BaseChatModel {
     const signedRequest = await signer.sign(request);
     return signedRequest.headers;
   }
+  async getProxyCompleteChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
+    const awsRegion = this.getRegionHelper(headers || {});
+
+    return new Promise((resolve) => {
+      resolve(`${Bedrock.awsUrl(awsRegion)}/model/${this.modelName}/invoke`);
+    });
+  }
 
   // Use the helper function for complete chat headers
   async getProxyCompleteChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
-    return this.getProxyChatHeaders(() => this.getCompleteChatUrl(), data, headers, query);
+    return this.getProxyChatHeaders(() => this.getProxyCompleteChatUrl(data, headers, query), data, headers, query);
   }
 
   // Use the helper function for stream chat headers
   async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
-    return this.getProxyChatHeaders(() => this.getStreamChatUrl(), data, headers, query);
+    return this.getProxyChatHeaders(() => this.getProxyStreamChatUrl(data, headers, query), data, headers, query);
   }
 }
 

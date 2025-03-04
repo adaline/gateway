@@ -22,7 +22,7 @@ async function handleProxyCompleteChat(
       data.headers = { ...data.headers, source: "adaline.ai" };
 
       const providerRequest = {
-        url: await data.model.getCompleteChatUrl(),
+        url: await data.model.getProxyCompleteChatUrl(data.data, data.headers, data.query),
         headers: await data.model.getProxyCompleteChatHeaders(data.data, data.headers, data.query),
         data: data.data,
       };

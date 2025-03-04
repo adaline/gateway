@@ -884,6 +884,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       resolve(this.streamChatUrl);
     });
   }
+  async getProxyCompleteChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
+    return new Promise((resolve) => {
+      resolve(this.completeChatUrl);
+    });
+  }
 
   async getProxyCompleteChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
     if (!headers) {

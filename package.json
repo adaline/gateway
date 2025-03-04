@@ -45,6 +45,7 @@
     "prepare": "husky",
     "clean": "turbo clean && rimraf node_modules .turbo",
     "build": "turbo build",
+    "experiment": "turbo build && cd tools/gateway-experiments && pnpm run experiment",
     "test": "turbo run test",
     "dev": "turbo dev",
     "lint": "turbo lint",
