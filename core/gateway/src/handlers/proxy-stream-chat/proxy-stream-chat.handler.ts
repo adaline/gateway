@@ -40,19 +40,24 @@ async function* handleProxyStreamChat(
         undefined,
         handlerTelemetryContext
       )) {
-        let accumulatedPartialResponse: PartialChatResponseType[] = [];
-        for await (const transformed of data.model.transformProxyStreamChatResponseChunk(
-          chunk as string,
-          buffer,
-          data.data,
-          data.headers,
-          data.query
-        )) {
-          if (transformed.partialResponse.partialMessages.length > 0) {
-            accumulatedPartialResponse.push(transformed.partialResponse);
-          } else {
-            buffer = transformed.buffer;
+        let accumulatedPartialResponse: PartialChatResponseType[] | undefined = [];
+        try {
+          for await (const transformed of data.model.transformProxyStreamChatResponseChunk(
+            chunk as string,
+            buffer,
+            data.data,
+            data.headers,
+            data.query
+          )) {
+            if (transformed.partialResponse.partialMessages.length > 0) {
+              accumulatedPartialResponse.push(transformed.partialResponse);
+            } else {
+              buffer = transformed.buffer;
+            }
           }
+        } catch (transformationError) {
+          logger?.warn("handleProxyStreamChat transformation error", { transformationError });
+          accumulatedPartialResponse = undefined;
         }
         const streamResponse: ProxyStreamChatHandlerResponseType = {
           request: { header: data.headers, data: data.data, query: data.query },
