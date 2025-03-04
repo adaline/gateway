@@ -20,7 +20,7 @@ const ProxyGetEmbeddingsHandlerResponse = z.object({
     data: z.any(),
   }), // Actual request sent to provider
   providerResponse: z.any(), // Raw response from provider
-  transformedResponse: EmbeddingResponse, // Response in Adaline embedding types
+  transformedResponse: z.optional(EmbeddingResponse), // Response in Adaline embedding types
 });
 
 type ProxyGetEmbeddingsHandlerResponseType = z.infer<typeof ProxyGetEmbeddingsHandlerResponse>;
