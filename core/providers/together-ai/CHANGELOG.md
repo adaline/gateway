@@ -1,5 +1,17 @@
 # @adaline/together-ai
 
+## 0.11.0
+
+### Minor Changes
+
+- ab5b072: fixes
+
+### Patch Changes
+
+- Updated dependencies [ab5b072]
+  - @adaline/provider@0.20.0
+  - @adaline/types@0.18.0
+
 ## 0.10.0
 
 ### Minor Changes
