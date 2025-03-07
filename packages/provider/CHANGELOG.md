@@ -1,5 +1,16 @@
 # @adaline/provider
 
+## 0.20.0
+
+### Minor Changes
+
+- ab5b072: fixes
+
+### Patch Changes
+
+- Updated dependencies [ab5b072]
+  - @adaline/types@0.18.0
+
 ## 0.19.0
 
 ### Minor Changes
