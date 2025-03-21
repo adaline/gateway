@@ -101,6 +101,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       "x-api-key": `${this.apiKey}`,
       "anthropic-version": "2023-06-01",
       "content-type": "application/json",
+      "anthropic-dangerous-direct-browser-access": "true",
     };
   }
 
