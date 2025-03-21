@@ -62,7 +62,9 @@ const GatewayStreamChatRequest = z.object({
   messages: z.array(Message()),
   tools: z.array(Tool()).optional(),
   options: GatewayStreamChatRequestOptions.optional(),
+  abortSignal: z.instanceof(AbortSignal).optional(),
 });
+
 type GatewayStreamChatRequestType = z.infer<typeof GatewayStreamChatRequest>;
 
 const GatewayGetEmbeddingsRequestOptions = z.object({

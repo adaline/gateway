@@ -58,7 +58,9 @@ async function* handleStreamChat<M>(
         "post",
         providerRequest.data,
         providerRequest.headers,
-        undefined,
+        {
+          abortSignal: request.abortSignal,
+        },
         handlerTelemetryContext
       )) {
         for await (const transformed of data.model.transformStreamChatResponseChunk(chunk as string, buffer)) {
