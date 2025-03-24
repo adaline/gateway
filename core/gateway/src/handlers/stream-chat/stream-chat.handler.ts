@@ -2,7 +2,7 @@ import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, safelyInvokeCallbacks } from "../../utils";
+import { castToError, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
 import {
   StreamChatCallbackType,
   StreamChatHandlerRequest,
@@ -38,10 +38,12 @@ async function* handleStreamChat<M>(
         data: await data.model.getStreamChatData(data.config, data.messages, data.tools),
       };
 
-      providerRequest.headers = {
-        ...providerRequest.headers,
-        source: "adaline.ai",
-      };
+      if (!isRunningInBrowser()) {
+        providerRequest.headers = {
+          ...providerRequest.headers,
+          source: "adaline.ai",
+        };
+      }
 
       if (data.customHeaders) {
         providerRequest.headers = {
