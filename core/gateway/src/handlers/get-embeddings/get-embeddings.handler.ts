@@ -2,7 +2,7 @@ import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, getCacheKeyHash, safelyInvokeCallbacks } from "../../utils";
+import { castToError, getCacheKeyHash, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
 import {
   GetEmbeddingsCallbackType,
   GetEmbeddingsHandlerRequest,
@@ -41,11 +41,13 @@ async function handleGetEmbeddings(
         data: await data.model.getGetEmbeddingsData(data.config, data.embeddingRequests),
       };
 
-      providerRequest.headers = {
-        ...providerRequest.headers,
-        source: "adaline.ai",
-      };
-      
+      if (!isRunningInBrowser()) {
+        providerRequest.headers = {
+          ...providerRequest.headers,
+          source: "adaline.ai",
+        };
+      }
+
       if (data.customHeaders) {
         providerRequest.headers = {
           ...providerRequest.headers,
