@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 0.29.0
+
+### Minor Changes
+
+- 1936d9b: First release for custom provider, abortSignal in stream
+
 ## 0.28.0
 
 ### Minor Changes
