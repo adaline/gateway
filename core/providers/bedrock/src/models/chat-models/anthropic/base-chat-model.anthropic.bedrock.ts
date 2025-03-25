@@ -15,11 +15,12 @@ class BaseChatModelAnthropic extends BaseChatModel {
   modelSchema: ChatModelSchemaType;
   modelName: string;
 
-  private readonly awsUrl: string;
   private readonly awsService: string;
-  private readonly awsRegion: string;
   private readonly awsAccessKeyId: string;
   private readonly awsSecretAccessKey: string;
+  private getAwsUrl(region: string): string {
+    return Bedrock.awsUrl(region);
+  }
 
   constructor(modelSchema: ChatModelSchemaType, options: BaseChatModelOptionsType) {
     const parsedOptions = BaseChatModelOptions.parse(options);
@@ -29,22 +30,19 @@ class BaseChatModelAnthropic extends BaseChatModel {
     });
     this.modelSchema = modelSchema;
     this.modelName = parsedOptions.modelName;
-    this.awsRegion = parsedOptions.awsRegion;
-    this.awsUrl = Bedrock.awsUrl(this.awsRegion);
     this.awsService = Bedrock.awsService;
     this.awsAccessKeyId = parsedOptions.awsAccessKeyId;
     this.awsSecretAccessKey = parsedOptions.awsSecretAccessKey;
   }
 
   getDefaultBaseUrl(): UrlType {
-    return this.awsUrl;
+    return this.getAwsUrl("random-region");
   }
 
   getDefaultHeaders(): HeadersType {
     return {
       Accept: "application/json",
       "Content-Type": "application/json",
-      host: this.awsUrl.split("://")[1], // remove 'https://' prefix
     };
   }
 
@@ -56,17 +54,29 @@ class BaseChatModelAnthropic extends BaseChatModel {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getCompleteChatUrl(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<UrlType> {
+    if (!config || !(config && config.awsRegion)) {
+      throw new ModelResponseError({
+        info: "AWS Region is required in the config",
+        cause: new Error("AWS Region is required in the config"),
+      });
+    }
+    const awsUrl = this.getAwsUrl(config.awsRegion);
     return new Promise((resolve) => {
-      resolve(`${this.awsUrl}/model/${this.modelName}/invoke`);
+      resolve(`${awsUrl}/model/${this.modelName}/invoke`);
     });
   }
 
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     const completeChatUrl = new URL(await this.getCompleteChatUrl(config, messages, tools));
     const credentials: AwsCredentialIdentity = { accessKeyId: this.awsAccessKeyId, secretAccessKey: this.awsSecretAccessKey };
-    const headers = this.getDefaultHeaders();
-    const body = await this.getCompleteChatData(config || {}, messages || [], tools);
+    const awsRegion = config?.awsRegion;
 
+    let headers = this.getDefaultHeaders();
+    headers = {
+      ...headers,
+      host: this.getAwsUrl(awsRegion).split("://")[1], // remove 'https://' prefix
+    };
+    const body = await this.getCompleteChatData(config || {}, messages || [], tools);
     const request = new HttpRequest({
       hostname: completeChatUrl.hostname,
       path: completeChatUrl.pathname,
@@ -79,7 +89,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
     const signer = new SignatureV4({
       credentials: credentials,
       service: this.awsService,
-      region: this.awsRegion,
+      region: awsRegion,
       sha256: Sha256,
     });
 
@@ -100,17 +110,29 @@ class BaseChatModelAnthropic extends BaseChatModel {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getStreamChatUrl(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<UrlType> {
+    if (!config || !(config && config.awsRegion)) {
+      throw new ModelResponseError({
+        info: "AWS Region is required in the config",
+        cause: new Error("AWS Region is required in the config"),
+      });
+    }
+    const awsUrl = this.getAwsUrl(config.awsRegion);
     return new Promise((resolve) => {
-      resolve(`${this.awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
+      resolve(`${awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
     });
   }
 
   async getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     const streamChatUrl = new URL(await this.getStreamChatUrl(config, messages, tools));
     const credentials: AwsCredentialIdentity = { accessKeyId: this.awsAccessKeyId, secretAccessKey: this.awsSecretAccessKey };
-    const headers = this.getDefaultHeaders();
-    const body = await this.getCompleteChatData(config || {}, messages || [], tools);
+    const awsRegion = config?.awsRegion;
 
+    let headers = this.getDefaultHeaders();
+    headers = {
+      ...headers,
+      host: this.getAwsUrl(awsRegion).split("://")[1], // remove 'https://' prefix
+    };
+    const body = await this.getCompleteChatData(config || {}, messages || [], tools);
     const request = new HttpRequest({
       hostname: streamChatUrl.hostname,
       path: streamChatUrl.pathname,
@@ -123,7 +145,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
     const signer = new SignatureV4({
       credentials: credentials,
       service: this.awsService,
-      region: this.awsRegion,
+      region: awsRegion,
       sha256: Sha256,
     });
 
@@ -197,8 +219,9 @@ class BaseChatModelAnthropic extends BaseChatModel {
   }
   async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
     const awsRegion = this.getRegionHelper(headers || {});
+    const awsUrl = this.getAwsUrl(awsRegion);
     return new Promise((resolve) => {
-      resolve(`${Bedrock.awsUrl(awsRegion)}/model/${this.modelName}/invoke-with-response-stream`);
+      resolve(`${awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
     });
   }
 
@@ -245,9 +268,9 @@ class BaseChatModelAnthropic extends BaseChatModel {
   }
   async getProxyCompleteChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
     const awsRegion = this.getRegionHelper(headers || {});
-
+    const awsUrl = this.getAwsUrl(awsRegion);
     return new Promise((resolve) => {
-      resolve(`${Bedrock.awsUrl(awsRegion)}/model/${this.modelName}/invoke`);
+      resolve(`${awsUrl}/model/${this.modelName}/invoke`);
     });
   }
 
