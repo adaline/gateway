@@ -189,6 +189,7 @@ class Gateway {
             tools: data.tools,
             callbacks: this.options.streamChatCallbacks,
             metadataForCallbacks: data.options?.metadataForCallbacks,
+            abortSignal: data.abortSignal,
           },
           this.httpClient,
           activeContext

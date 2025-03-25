@@ -14,6 +14,7 @@ const StreamChatHandlerRequest = z.object({
   customHeaders: z.record(z.string()).optional(),
   callbacks: z.array(z.custom<StreamChatCallbackType>()).nonempty().optional(),
   metadataForCallbacks: z.any().optional(),
+  abortSignal: z.instanceof(AbortSignal).optional(),
 });
 type StreamChatHandlerRequestType = z.infer<typeof StreamChatHandlerRequest>;
 

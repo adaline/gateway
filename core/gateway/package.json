@@ -60,7 +60,7 @@
     "@opentelemetry/semantic-conventions": "^1.27.0",
     "@smithy/protocol-http": "^4.0.4",
     "@smithy/signature-v4": "^4.0.0",
-    "axios": "^1.7.2",
+    "axios": "^1.8.4",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "env-paths": "^3.0.0",
@@ -77,7 +77,6 @@
     "@aws-sdk/types": "^3.609.0",
     "@types/crypto-js": "^4.2.2",
     "@types/uuid": "^10.0.0",
-    "axios-mock-adapter": "^1.22.0",
     "cross-env": "^7.0.3",
     "eslint-config-adaline": "workspace:*"
   }

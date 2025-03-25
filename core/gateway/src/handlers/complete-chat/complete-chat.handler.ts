@@ -2,7 +2,7 @@ import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, getCacheKeyHash, safelyInvokeCallbacks } from "../../utils";
+import { castToError, getCacheKeyHash, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
 import {
   CompleteChatCallbackType,
   CompleteChatHandlerRequest,
@@ -42,18 +42,19 @@ async function handleCompleteChat(
         data: await data.model.getCompleteChatData(data.config, data.messages, data.tools),
       };
 
-      providerRequest.headers = {
-        ...providerRequest.headers,
-        source: "adaline.ai",
-      };
-
+      if (!isRunningInBrowser()) {
+        providerRequest.headers = {
+          ...providerRequest.headers,
+          source: "adaline.ai",
+        };
+      }
       if (data.customHeaders) {
         providerRequest.headers = {
           ...providerRequest.headers,
           ...data.customHeaders,
         };
       }
-      
+
       logger?.debug("handleCompleteChat providerRequest: ", { providerRequest });
       const cacheKey = getCacheKeyHash(`complete-chat:${providerRequest.url}:${data.model.modelSchema.name}`, providerData);
       if (data.enableCache) {
