@@ -36,7 +36,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
   }
 
   getDefaultBaseUrl(): UrlType {
-    return this.getAwsUrl("random-region");
+    return Bedrock.awsUrl();
   }
 
   getDefaultHeaders(): HeadersType {
