@@ -66,6 +66,14 @@ class BaseChatModelAnthropic extends BaseChatModel {
     });
   }
 
+  transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
+    const _config = { ...config }; // create a copy to avoid mutating the original config
+    delete _config.awsRegion; // Region is not used in the config
+
+    // Call the base class method with the modified config
+    return super.transformConfig(_config, messages, tools);
+  }
+
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     const completeChatUrl = new URL(await this.getCompleteChatUrl(config, messages, tools));
     const credentials: AwsCredentialIdentity = { accessKeyId: this.awsAccessKeyId, secretAccessKey: this.awsSecretAccessKey };
