@@ -415,7 +415,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (!messages || (messages && messages.length === 0)) {
       return { messages: [] };
     }
-
+    const stripBase64Prefix = (data: string): string => {
+      const prefixMatch = data.match(/^data:image\/[a-zA-Z]+;base64,/);
+      if (prefixMatch) {
+        return data.substring(prefixMatch[0].length);
+      }
+      return data;
+    };
     const parsedMessages = messages.map((message) => {
       const parsedMessage = Message().safeParse(message);
       if (!parsedMessage.success) {
@@ -501,10 +507,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                 userContent.push({ text: content.value });
               } else if (content.modality === ImageModalityLiteral) {
                 if (content.value.type === "base64") {
+                  let base64Data = content.value.base64;
+                  // Check and strip the data URL prefix if it exists.
+                  base64Data = stripBase64Prefix(base64Data);
                   userContent.push({
                     inline_data: {
                       mime_type: content.value.media_type,
-                      data: content.value.base64,
+                      data: base64Data,
                     },
                   });
                 } else if (content.value.type === "url") {
