@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import {
-  AnthropicChatModelConfigs,
   AnthropicChatModelModalities,
   AnthropicChatModelModalitiesEnum,
   AnthropicChatModelRoles,
@@ -9,6 +8,7 @@ import {
 } from "@adaline/anthropic";
 import { ChatModelSchema } from "@adaline/provider";
 
+import { BedrockAnthropicChatModelConfigs } from "../../../configs";
 import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
@@ -24,8 +24,8 @@ const BedrockClaude3Opus20240229Schema = ChatModelSchema(AnthropicChatModelRoles
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.base(4096, 4).def,
-    schema: AnthropicChatModelConfigs.base(4096, 4).schema,
+    def: BedrockAnthropicChatModelConfigs.base(4096, 4).def,
+    schema: BedrockAnthropicChatModelConfigs.base(4096, 4).schema,
   },
 });
 
