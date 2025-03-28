@@ -1,5 +1,16 @@
 # @adaline/provider
 
+## 0.22.0
+
+### Minor Changes
+
+- c3ac896: fixes
+
+### Patch Changes
+
+- Updated dependencies [c3ac896]
+  - @adaline/types@0.20.0
+
 ## 0.21.0
 
 ### Minor Changes
