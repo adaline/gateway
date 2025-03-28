@@ -18,11 +18,6 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelSchema: ChatModelSchemaType;
     }
   > = {
-    [Models.Gemma_7b_ITLiteral]: {
-      model: Models.Gemma_7b_IT,
-      modelOptions: Models.Gemma_7b_ITOptions,
-      modelSchema: Models.Gemma_7b_ITSchema,
-    },
     [Models.Gemma2_9b_ITLiteral]: {
       model: Models.Gemma2_9b_IT,
       modelOptions: Models.Gemma2_9b_ITOptions,
@@ -48,21 +43,6 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Llama_3_1_8b_Options,
       modelSchema: Models.Llama_3_1_8bSchema,
     },
-    [Models.Llama_3_8b_Tool_UseLiteral]: {
-      model: Models.Llama_3_8b_Tool_Use,
-      modelOptions: Models.Llama_3_8b_Tool_Use_Options,
-      modelSchema: Models.Llama_3_8b_Tool_UseSchema,
-    },
-    [Models.Llama_3_1_70bLiteral]: {
-      model: Models.Llama_3_1_70b,
-      modelOptions: Models.Llama_3_1_70b_Options,
-      modelSchema: Models.Llama_3_1_70bSchema,
-    },
-    [Models.Llama_3_70b_Tool_UseLiteral]: {
-      model: Models.Llama_3_70b_Tool_Use,
-      modelOptions: Models.Llama_3_70b_Tool_Use_Options,
-      modelSchema: Models.Llama_3_70b_Tool_UseSchema,
-    },
     [Models.Llama_3_2_11b_VisionLiteral]: {
       model: Models.Llama_3_2_11b_Vision,
       modelOptions: Models.Llama_3_2_11b_VisionOptions,
@@ -82,11 +62,6 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       model: Models.Llama_3_2_1b,
       modelOptions: Models.Llama_3_2_1b_Options,
       modelSchema: Models.Llama_3_2_1bSchema,
-    },
-    [Models.Mixtral_8x7bLiteral]: {
-      model: Models.Mixtral_8x7b,
-      modelOptions: Models.Mixtral_8x7bOptions,
-      modelSchema: Models.Mixtral_8x7bSchema,
     },
   };
 
