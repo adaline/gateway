@@ -18,9 +18,6 @@ class BaseChatModelAnthropic extends BaseChatModel {
   private readonly awsService: string;
   private readonly awsAccessKeyId: string;
   private readonly awsSecretAccessKey: string;
-  private getAwsUrl(region: string): string {
-    return Bedrock.awsUrl(region);
-  }
 
   constructor(modelSchema: ChatModelSchemaType, options: BaseChatModelOptionsType) {
     const parsedOptions = BaseChatModelOptions.parse(options);
@@ -54,13 +51,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getCompleteChatUrl(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<UrlType> {
-    if (!config || !(config && config.awsRegion)) {
-      throw new ModelResponseError({
-        info: "AWS Region is required in the config",
-        cause: new Error("AWS Region is required in the config"),
-      });
-    }
-    const awsUrl = this.getAwsUrl(config.awsRegion);
+    const awsUrl = Bedrock.awsUrl(config?.awsRegion);
     return new Promise((resolve) => {
       resolve(`${awsUrl}/model/${this.modelName}/invoke`);
     });
@@ -82,7 +73,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
     let headers = this.getDefaultHeaders();
     headers = {
       ...headers,
-      host: this.getAwsUrl(awsRegion).split("://")[1], // remove 'https://' prefix
+      host: Bedrock.awsUrl(awsRegion).split("://")[1], // remove 'https://' prefix
     };
     const body = await this.getCompleteChatData(config || {}, messages || [], tools);
     const request = new HttpRequest({
@@ -118,13 +109,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getStreamChatUrl(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<UrlType> {
-    if (!config || !(config && config.awsRegion)) {
-      throw new ModelResponseError({
-        info: "AWS Region is required in the config",
-        cause: new Error("AWS Region is required in the config"),
-      });
-    }
-    const awsUrl = this.getAwsUrl(config.awsRegion);
+    const awsUrl = Bedrock.awsUrl(config?.awsRegion);
     return new Promise((resolve) => {
       resolve(`${awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
     });
@@ -138,7 +123,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
     let headers = this.getDefaultHeaders();
     headers = {
       ...headers,
-      host: this.getAwsUrl(awsRegion).split("://")[1], // remove 'https://' prefix
+      host: Bedrock.awsUrl(awsRegion).split("://")[1], // remove 'https://' prefix
     };
     const body = await this.getCompleteChatData(config || {}, messages || [], tools);
     const request = new HttpRequest({
@@ -227,7 +212,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
   }
   async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
     const awsRegion = this.getRegionHelper(headers || {});
-    const awsUrl = this.getAwsUrl(awsRegion);
+    const awsUrl = Bedrock.awsUrl(awsRegion);
     return new Promise((resolve) => {
       resolve(`${awsUrl}/model/${this.modelName}/invoke-with-response-stream`);
     });
@@ -276,7 +261,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
   }
   async getProxyCompleteChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
     const awsRegion = this.getRegionHelper(headers || {});
-    const awsUrl = this.getAwsUrl(awsRegion);
+    const awsUrl = Bedrock.awsUrl(awsRegion);
     return new Promise((resolve) => {
       resolve(`${awsUrl}/model/${this.modelName}/invoke`);
     });
