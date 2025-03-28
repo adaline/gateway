@@ -9,7 +9,8 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
   readonly version = "v1" as const;
   readonly name = ProviderLiteral;
   static readonly awsService = "bedrock";
-  static readonly awsUrl = (awsRegion: string): string => `https://bedrock-runtime.${awsRegion}.amazonaws.com`;
+  static readonly awsDefaultRegion = "us-east-1";
+  static readonly awsUrl = (awsRegion?: string): string => `https://bedrock-runtime.${awsRegion ?? this.awsDefaultRegion}.amazonaws.com`;
 
   private readonly chatModelFactories: Record<
     string,
