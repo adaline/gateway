@@ -362,6 +362,15 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       return { messages: [] };
     }
 
+    // Helper function to remove base64 data URL prefix if present.
+    const stripBase64Prefix = (data: string): string => {
+      const prefixMatch = data.match(/^data:image\/[a-zA-Z]+;base64,/);
+      if (prefixMatch) {
+        return data.substring(prefixMatch[0].length);
+      }
+      return data;
+    };
+
     const parsedMessages = messages.map((message) => {
       const parsedMessage = Message().safeParse(message);
       if (!parsedMessage.success) {
@@ -405,112 +414,104 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     parsedMessages.forEach((message) => {
       switch (message.role) {
-        case SystemRoleLiteral:
-          {
-            message.content.forEach((content) => {
-              if (content.modality === TextModalityLiteral) {
-                systemMessage += content.value;
-              } else {
+        case SystemRoleLiteral: {
+          message.content.forEach((content) => {
+            if (content.modality === TextModalityLiteral) {
+              systemMessage += content.value;
+            } else {
+              throw new InvalidMessagesError({
+                info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
+                cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
+              });
+            }
+          });
+          break;
+        }
+        case AssistantRoleLiteral: {
+          const assistantContent: (AnthropicRequestTextContentType | AnthropicRequestToolCallContentType)[] = [];
+          message.content.forEach((content) => {
+            if (content.modality === TextModalityLiteral) {
+              assistantContent.push({ type: "text", text: content.value });
+            } else if (content.modality === ToolCallModalityLiteral) {
+              assistantContent.push({
+                type: "tool_use",
+                id: content.id,
+                name: content.name,
+                input: JSON.parse(content.arguments),
+              });
+            } else {
+              throw new InvalidMessagesError({
+                info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
+                cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
+              });
+            }
+          });
+          nonSystemMessages.push({
+            role: this.modelSchema.roles[message.role] as AnthropicRequestAssistantMessageType["role"],
+            content: assistantContent,
+          });
+          break;
+        }
+        case UserRoleLiteral: {
+          const userContent: (AnthropicRequestTextContentType | AnthropicRequestImageContentType)[] = [];
+          message.content.forEach((content) => {
+            if (content.modality === TextModalityLiteral) {
+              userContent.push({ type: "text", text: content.value });
+            } else if (content.modality === ImageModalityLiteral) {
+              if (content.value.type === "base64") {
+                let base64Data = content.value.base64;
+                // Check and strip the data URL prefix if it exists.
+                base64Data = stripBase64Prefix(base64Data);
+                userContent.push({
+                  type: "image",
+                  source: {
+                    type: "base64",
+                    media_type: `image/${content.value.media_type}`,
+                    data: base64Data,
+                  },
+                });
+              } else if (content.value.type === "url") {
+                // TODO: add logic to fetch image from url, remove this error
                 throw new InvalidMessagesError({
-                  info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
-                  cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
+                  info: `Invalid message 'modality' for model : ${this.modelName}`,
+                  cause: new Error(`model: '${this.modelName}' does not support image content type: '${content.value.type}'`),
                 });
               }
-            });
-          }
+            } else {
+              throw new InvalidMessagesError({
+                info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
+                cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
+              });
+            }
+          });
+          nonSystemMessages.push({
+            role: this.modelSchema.roles[message.role] as AnthropicRequestUserMessageType["role"],
+            content: userContent,
+          });
           break;
-
-        case AssistantRoleLiteral:
-          {
-            const assistantContent: (AnthropicRequestTextContentType | AnthropicRequestToolCallContentType)[] = [];
-            message.content.forEach((content) => {
-              if (content.modality === TextModalityLiteral) {
-                assistantContent.push({ type: "text", text: content.value });
-              } else if (content.modality === ToolCallModalityLiteral) {
-                assistantContent.push({
-                  type: "tool_use",
-                  id: content.id,
-                  name: content.name,
-                  input: JSON.parse(content.arguments),
-                });
-              } else {
-                throw new InvalidMessagesError({
-                  info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
-                  cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
-                });
-              }
-            });
-
-            nonSystemMessages.push({
-              role: this.modelSchema.roles[message.role] as AnthropicRequestAssistantMessageType["role"],
-              content: assistantContent,
-            });
-          }
+        }
+        case ToolRoleLiteral: {
+          const toolContent: AnthropicRequestToolResponseContentType[] = [];
+          message.content.forEach((content) => {
+            if (content.modality === ToolResponseModalityLiteral) {
+              toolContent.push({
+                type: "tool_result",
+                tool_use_id: content.id,
+                content: content.data,
+              });
+            } else {
+              throw new InvalidMessagesError({
+                info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
+                cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
+              });
+            }
+          });
+          nonSystemMessages.push({
+            role: this.modelSchema.roles[message.role] as "user",
+            content: toolContent,
+          });
           break;
-
-        case UserRoleLiteral:
-          {
-            const userContent: (AnthropicRequestTextContentType | AnthropicRequestImageContentType)[] = [];
-            message.content.forEach((content) => {
-              if (content.modality === TextModalityLiteral) {
-                userContent.push({ type: "text", text: content.value });
-              } else if (content.modality === ImageModalityLiteral) {
-                if (content.value.type === "base64") {
-                  userContent.push({
-                    type: "image",
-                    source: {
-                      type: "base64",
-                      media_type: `image/${content.value.media_type}`,
-                      data: content.value.base64,
-                    },
-                  });
-                } else if (content.value.type === "url") {
-                  // TODO: add logic to fetch image from url, remove this error
-                  throw new InvalidMessagesError({
-                    info: `Invalid message 'modality' for model : ${this.modelName}`,
-                    cause: new Error(`model: '${this.modelName}' does not support image content type: '${content.value.type}'`),
-                  });
-                }
-              } else {
-                throw new InvalidMessagesError({
-                  info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
-                  cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
-                });
-              }
-            });
-
-            nonSystemMessages.push({
-              role: this.modelSchema.roles[message.role] as AnthropicRequestUserMessageType["role"],
-              content: userContent,
-            });
-          }
-          break;
-
-        case ToolRoleLiteral:
-          {
-            const toolContent: AnthropicRequestToolResponseContentType[] = [];
-            message.content.forEach((content) => {
-              if (content.modality === ToolResponseModalityLiteral) {
-                toolContent.push({
-                  type: "tool_result",
-                  tool_use_id: content.id,
-                  content: content.data,
-                });
-              } else {
-                throw new InvalidMessagesError({
-                  info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
-                  cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
-                });
-              }
-            });
-
-            nonSystemMessages.push({
-              role: this.modelSchema.roles[message.role] as "user",
-              content: toolContent,
-            });
-          }
-          break;
-
+        }
         default: {
           throw new InvalidMessagesError({
             info: `Invalid message 'role' for model : ${this.modelName}`,
