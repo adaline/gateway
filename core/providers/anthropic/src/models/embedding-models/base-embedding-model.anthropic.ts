@@ -127,6 +127,13 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transformConfig(config: ConfigType, requests?: EmbeddingRequestsType): ParamsType {
+    if ("inputType" in config && config.inputType === "") {
+      delete config.inputType;
+    }
+    if ("encodingFormat" in config && config.encodingFormat === "") {
+      delete config.encodingFormat;
+    }
+
     const _parsedConfig = this.modelSchema.config.schema.safeParse(config);
     if (!_parsedConfig.success) {
       throw new InvalidConfigError({
