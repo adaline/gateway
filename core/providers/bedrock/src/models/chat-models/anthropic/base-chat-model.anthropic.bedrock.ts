@@ -240,6 +240,27 @@ class BaseChatModelAnthropic extends BaseChatModel {
 
     delete headers["content-length"];
 
+    const authHeader = headers["authorization"] || headers["Authorization"];
+
+    if (authHeader) {
+      const match = authHeader.match(/SignedHeaders=([^,]+)/);
+      if (match && match[1]) {
+        const essentialHeaders = match[1].split(";").map((h) => h.trim().toLowerCase());
+
+        essentialHeaders.push("authorization");
+
+        headers = Object.keys(headers).reduce(
+          (acc, key) => {
+            if (essentialHeaders.includes(key.toLowerCase())) {
+              acc[key] = headers?.[key] ?? "";
+            }
+            return acc;
+          },
+          {} as Record<string, string>
+        );
+      }
+    }
+
     const request = new HttpRequest({
       hostname: chatUrl.hostname,
       path: chatUrl.pathname,
