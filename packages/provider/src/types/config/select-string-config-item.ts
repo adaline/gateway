@@ -7,8 +7,8 @@ const SelectStringConfigItemDef = z.object({
   param: z.string().min(1),
   title: z.string().min(1),
   description: z.string().min(1).max(500),
-  default: z.string().min(1).nullable(),
-  choices: z.array(z.string().min(1)),
+  default: z.string(),
+  choices: z.array(z.string()),
 });
 type SelectStringConfigItemDefType = z.infer<typeof SelectStringConfigItemDef>;
 
