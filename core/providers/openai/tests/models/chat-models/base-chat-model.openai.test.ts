@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { ChatModelSchema, ChatModelSchemaType } from "@adaline/provider";
@@ -31,6 +32,7 @@ describe("BaseChatModel", () => {
   const mockOptions = {
     apiKey: "test-api-key",
     baseUrl: "https://api.openai.com/v1",
+    modelName: "test-model",
   };
 
   describe("constructor", () => {
