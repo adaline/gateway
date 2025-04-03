@@ -1,11 +1,24 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { ChatModelSchema, ChatModelSchemaType } from "@adaline/provider";
-import { Config, MessageType, ToolType } from "@adaline/types";
+import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError } from "@adaline/provider";
+import {
+  AssistantRoleLiteral,
+  Config,
+  ImageModalityLiteral,
+  MessageType,
+  SystemRoleLiteral,
+  TextModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  ToolRoleLiteral,
+  ToolType,
+  UserRoleLiteral,
+} from "@adaline/types";
 
 import { OpenAIChatModelConfigs } from "../../../src/configs";
 import { BaseChatModel } from "../../../src/models";
+import { OpenAIChatRequestType } from "../../../src/models/chat-models/types";
 
 describe("BaseChatModel", () => {
   const mockRolesMap = {
@@ -397,6 +410,506 @@ describe("BaseChatModel", () => {
         });
         model.transformConfig(config, messages, tools);
       }).toThrowError();
+    });
+  });
+
+  describe("BaseChatModel transformMessages", () => {
+    let model: BaseChatModel;
+
+    beforeEach(() => {
+      model = new BaseChatModel(mockModelSchema, mockOptions);
+    });
+
+    // --- Basic Cases ---
+
+    it("should return empty array for null input", () => {
+      expect(model.transformMessages(null as any)).toEqual({ messages: [] });
+    });
+
+    it("should return empty array for undefined input", () => {
+      expect(model.transformMessages(undefined as any)).toEqual({ messages: [] });
+    });
+
+    it("should return empty array for empty messages array", () => {
+      expect(model.transformMessages([])).toEqual({ messages: [] });
+    });
+
+    // --- Parsing Errors ---
+
+    it("should throw InvalidMessagesError if safeParse fails", () => {
+      const invalidInput = [{ role: "user" }]; // Missing content array
+
+      expect(() => model.transformMessages(invalidInput as any)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(invalidInput as any);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toBe("Invalid messages");
+        expect(JSON.parse(e.cause.message)).toEqual([
+          {
+            code: "invalid_type",
+            expected: "array",
+            received: "undefined",
+            path: ["content"],
+            message: "Required",
+          },
+        ]);
+      }
+    });
+
+    it("should throw InvalidMessagesError if safeParse fails on second message", () => {
+      const messages: MessageType[] = [
+        { role: SystemRoleLiteral, content: [{ modality: TextModalityLiteral, value: "Hi" }] },
+        { role: UserRoleLiteral, content: null as any }, // Invalid content
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toBe("Invalid messages");
+        expect(JSON.parse(e.cause.message)).toEqual([
+          {
+            code: "invalid_type",
+            expected: "array",
+            received: "null",
+            path: ["content"],
+            message: "Expected array, received null",
+          },
+        ]); // Check it's the error from the *second* parse attempt
+      }
+    });
+
+    // --- Validation Errors ---
+
+    it("should throw InvalidMessagesError for unsupported modality", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [{ modality: "audio", value: "some_audio.mp3" }] as any, // audio is not in modalities
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+    });
+
+    it("should throw InvalidMessagesError for unsupported role", () => {
+      const messages: MessageType[] = [
+        {
+          role: "guest" as any, // guest is not in roles
+          content: [{ modality: TextModalityLiteral, value: "Hello" }],
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(JSON.parse(e.cause?.message)).toEqual([
+          {
+            received: "guest",
+            code: "invalid_enum_value",
+            options: ["system", "user", "assistant", "tool"],
+            path: ["role"],
+            message: "Invalid enum value. Expected 'system' | 'user' | 'assistant' | 'tool', received 'guest'",
+          },
+        ]);
+      }
+    });
+
+    // --- Role/Modality Combination Errors ---
+
+    it("should throw InvalidMessagesError for System role with non-text modality", () => {
+      const messages: MessageType[] = [
+        {
+          role: SystemRoleLiteral,
+          content: [{ modality: ImageModalityLiteral, value: { type: "url", url: "image.png" }, detail: "low" }],
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toContain("Invalid message 'role' and 'modality' combination");
+        expect(e.cause?.message).toContain(`role : '${SystemRoleLiteral}' cannot have content with modality : '${ImageModalityLiteral}'`);
+      }
+    });
+
+    it("should throw InvalidMessagesError for Assistant role with non-text/tool_call modality", () => {
+      const messages: MessageType[] = [
+        {
+          role: AssistantRoleLiteral,
+          content: [{ modality: ImageModalityLiteral, value: { type: "url", url: "image.png" }, detail: "low" }],
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toContain("Invalid message 'role' and 'modality' combination");
+        expect(e.cause?.message).toContain(
+          `role : '${AssistantRoleLiteral}' cannot have content with modality : '${ImageModalityLiteral}'`
+        );
+      }
+    });
+
+    it("should throw InvalidMessagesError for User role with non-text/image modality", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [{ modality: ToolCallModalityLiteral, id: "t1", name: "f1", arguments: "{}" }] as any,
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toContain("Invalid messages");
+        expect(JSON.parse(e.cause?.message)).toEqual([
+          {
+            code: "invalid_type",
+            expected: "number",
+            received: "undefined",
+            path: ["content", 0, "index"],
+            message: "Required",
+          },
+        ]);
+      }
+    });
+
+    it("should throw InvalidMessagesError for Tool role with non-tool_response modality", () => {
+      const messages: MessageType[] = [
+        {
+          role: ToolRoleLiteral,
+          content: [{ modality: TextModalityLiteral, value: "some text instead of response" }],
+        },
+      ];
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toContain("Invalid message 'role' and 'modality' combination");
+        expect(e.cause?.message).toContain(
+          `role : '${ToolRoleLiteral}' must have content with modality : '${ToolResponseModalityLiteral}'`
+        );
+      }
+    });
+
+    it("should throw InvalidMessagesError for Tool role with zero content items", () => {
+      const messages: MessageType[] = [
+        {
+          role: ToolRoleLiteral,
+          content: [],
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toContain(`Invalid message for role : '${ToolRoleLiteral}'`);
+        expect(e.cause?.message).toContain(`role : '${ToolRoleLiteral}' must have exactly one content item`);
+      }
+    });
+
+    it("should throw InvalidMessagesError for Tool role with multiple content items", () => {
+      const messages: MessageType[] = [
+        {
+          role: ToolRoleLiteral,
+          content: [
+            { modality: ToolResponseModalityLiteral, id: "t1", data: "Result 1" } as any,
+            { modality: ToolResponseModalityLiteral, id: "t2", data: "Result 2" } as any,
+          ],
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toContain(`Invalid messages`);
+        expect(JSON.parse(e.cause?.message)).toEqual([
+          {
+            code: "invalid_type",
+            expected: "number",
+            received: "undefined",
+            path: ["content", 0, "index"],
+            message: "Required",
+          },
+          {
+            code: "invalid_type",
+            expected: "string",
+            received: "undefined",
+            path: ["content", 0, "name"],
+            message: "Required",
+          },
+          {
+            code: "invalid_type",
+            expected: "number",
+            received: "undefined",
+            path: ["content", 1, "index"],
+            message: "Required",
+          },
+          {
+            code: "invalid_type",
+            expected: "string",
+            received: "undefined",
+            path: ["content", 1, "name"],
+            message: "Required",
+          },
+        ]);
+      }
+    });
+
+    // --- Happy Path Transformations ---
+
+    it("should correctly transform a simple System message", () => {
+      const messages: MessageType[] = [
+        {
+          role: SystemRoleLiteral,
+          content: [{ modality: TextModalityLiteral, value: "Be concise." }],
+        },
+      ];
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "system", // "system role"
+            content: [{ type: "text", text: "Be concise." }],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a simple User message with text", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [{ modality: TextModalityLiteral, value: "Hello there!" }],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "user", // "user role"
+            content: [{ type: "text", text: "Hello there!" }],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a User message with image URL", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [{ modality: ImageModalityLiteral, value: { type: "url", url: "http://example.com/image.jpg" }, detail: "high" }],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "user", // "user role"
+            content: [{ type: "image_url", image_url: { url: "http://example.com/image.jpg", detail: "high" } }],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a User message with image Base64", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            {
+              modality: ImageModalityLiteral,
+              value: { type: "base64", base64: "data:image/png;base64,iVBORw0KG...", media_type: "png" },
+              detail: "low",
+            },
+          ],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "user", // "user role"
+            content: [{ type: "image_url", image_url: { url: "data:image/png;base64,iVBORw0KG...", detail: "low" } }],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a User message with mixed text and image content", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            { modality: TextModalityLiteral, value: "Look at this:" },
+            { modality: ImageModalityLiteral, value: { type: "url", url: "http://example.com/image.jpg" }, detail: "auto" },
+            { modality: TextModalityLiteral, value: "What do you see?" },
+          ],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "user", // "user role"
+            content: [
+              { type: "text", text: "Look at this:" },
+              { type: "text", text: "What do you see?" },
+              { type: "image_url", image_url: { url: "http://example.com/image.jpg", detail: "auto" } },
+            ],
+          },
+        ],
+      };
+
+      const result = model.transformMessages(messages);
+      expect((result as any).messages[0].role).toEqual("user");
+      expect((result as any).messages[0].content).toEqual(
+        expect.arrayContaining([
+          { type: "text", text: "Look at this:" },
+          { type: "text", text: "What do you see?" },
+          { type: "image_url", image_url: { url: "http://example.com/image.jpg", detail: "auto" } },
+        ])
+      );
+      expect((result as any).messages[0].content.length).toBe(3);
+    });
+
+    it("should correctly transform an Assistant message with text", () => {
+      const messages: MessageType[] = [
+        {
+          role: AssistantRoleLiteral,
+          content: [{ modality: TextModalityLiteral, value: "The answer is 4." }],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "assistant", // "assistant role"
+            content: [{ type: "text", text: "The answer is 4." }],
+            // No tool_calls key expected
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform an Assistant message with tool calls", () => {
+      const messages: MessageType[] = [
+        {
+          role: AssistantRoleLiteral,
+          content: [
+            { modality: ToolCallModalityLiteral, id: "call_123", name: "get_weather", arguments: '{"location": "London"}', index: 1 },
+            { modality: ToolCallModalityLiteral, id: "call_456", name: "get_stock", arguments: '{"ticker": "ACME"}', index: 2 },
+          ],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "assistant", // "assistant role"
+            content: [], // No text content
+            tool_calls: [
+              { id: "call_123", type: "function", function: { name: "get_weather", arguments: '{"location": "London"}' } },
+              { id: "call_456", type: "function", function: { name: "get_stock", arguments: '{"ticker": "ACME"}' } },
+            ],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform an Assistant message with mixed text and tool calls", () => {
+      const messages: MessageType[] = [
+        {
+          role: AssistantRoleLiteral,
+          content: [
+            { modality: TextModalityLiteral, value: "Okay, I will call those tools." },
+            { modality: ToolCallModalityLiteral, id: "call_abc", name: "send_email", arguments: '{"to": "test@example.com"}', index: 1 },
+          ],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "assistant", // "assistant role"
+            content: [{ type: "text", text: "Okay, I will call those tools." }],
+            tool_calls: [{ id: "call_abc", type: "function", function: { name: "send_email", arguments: '{"to": "test@example.com"}' } }],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a Tool message (tool response)", () => {
+      const messages: MessageType[] = [
+        {
+          role: ToolRoleLiteral,
+          content: [{ modality: ToolResponseModalityLiteral, id: "call_123", data: '{"temperature": 15}', index: 1, name: "func" }],
+        },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          {
+            role: "tool", // "tool role"
+            tool_call_id: "call_123",
+            content: '{"temperature": 15}',
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a sequence of various valid messages", () => {
+      const messages: MessageType[] = [
+        { role: SystemRoleLiteral, content: [{ modality: TextModalityLiteral, value: "System prompt." }] },
+        { role: UserRoleLiteral, content: [{ modality: TextModalityLiteral, value: "User query?" }] },
+        {
+          role: AssistantRoleLiteral,
+          content: [
+            { modality: TextModalityLiteral, value: "Assistant response." },
+            { modality: ToolCallModalityLiteral, id: "t1", name: "func", arguments: "{}", index: 1 },
+          ],
+        },
+        { role: ToolRoleLiteral, content: [{ modality: ToolResponseModalityLiteral, id: "t1", data: "result", index: 1, name: "a" }] },
+        { role: UserRoleLiteral, content: [{ modality: ImageModalityLiteral, value: { type: "url", url: "img.png" }, detail: "auto" }] },
+      ];
+
+      const expected: OpenAIChatRequestType = {
+        messages: [
+          { role: "system", content: [{ type: "text", text: "System prompt." }] },
+          { role: "user", content: [{ type: "text", text: "User query?" }] },
+          {
+            role: "assistant",
+            content: [{ type: "text", text: "Assistant response." }],
+            tool_calls: [{ id: "t1", type: "function", function: { name: "func", arguments: "{}" } }],
+          },
+          { role: "tool", tool_call_id: "t1", content: "result" },
+          { role: "user", content: [{ type: "image_url", image_url: { url: "img.png", detail: "auto" } }] },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
     });
   });
 });
