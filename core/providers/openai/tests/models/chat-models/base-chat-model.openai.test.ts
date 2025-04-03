@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError } from "@adaline/provider";
+import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, ModelResponseError } from "@adaline/provider";
 import {
   AssistantRoleLiteral,
   Config,
+  createPartialTextMessage,
+  createPartialToolCallMessage,
   ImageModalityLiteral,
   MessageType,
   SystemRoleLiteral,
@@ -19,6 +21,15 @@ import {
 import { OpenAIChatModelConfigs } from "../../../src/configs";
 import { BaseChatModel } from "../../../src/models";
 import { OpenAIChatRequestType } from "../../../src/models/chat-models/types";
+
+// Helper function to collect results from the async generator
+async function collectAsyncGenerator<T>(generator: AsyncGenerator<T>): Promise<T[]> {
+  const results: T[] = [];
+  for await (const value of generator) {
+    results.push(value);
+  }
+  return results;
+}
 
 describe("BaseChatModel", () => {
   const mockRolesMap = {
@@ -910,6 +921,346 @@ describe("BaseChatModel", () => {
         ],
       };
       expect(model.transformMessages(messages)).toEqual(expected);
+    });
+  });
+
+  describe("transformStreamChatResponseChunk", () => {
+    let model: BaseChatModel;
+
+    beforeEach(() => {
+      model = new BaseChatModel(mockModelSchema, mockOptions);
+    });
+
+    // --- Happy Paths ---
+
+    it("should process a chunk with only role (first chunk)", async () => {
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","system_fingerprint": "fp_44709d6fcb","choices":[{"index":0,"delta":{"role":"assistant"},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      // Role delta usually doesn't create a message object on its own, it sets up context for subsequent chunks
+      expect(results[0].partialResponse.partialMessages).toEqual([]);
+      expect(results[0].partialResponse.usage).toBeUndefined();
+    });
+
+    it("should process a single complete text chunk (after role)", async () => {
+      // Assumes role was set in a previous chunk
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","system_fingerprint": "fp_44709d6fcb","choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Hello")]);
+      expect(results[0].partialResponse.usage).toBeUndefined();
+    });
+
+    it("should process a chunk containing only refusal", async () => {
+      // Refusal might come with or without a preceding role chunk. Assume standalone here.
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","system_fingerprint": "fp_44709d6fcb","choices":[{"index":0,"delta":{"refusal":"Sorry, I cannot fulfill that request."},"logprobs":null,"finish_reason":"refusal"}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      // Expect refusal content to be treated like regular content for the partial message
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialTextMessage(AssistantRoleLiteral, "Sorry, I cannot fulfill that request."),
+      ]);
+      expect(results[0].partialResponse.usage).toBeUndefined();
+    });
+
+    it("should process a single complete tool call chunk (name/id)", async () => {
+      // Often, the first tool chunk establishes the call structure
+      const chunk =
+        'data: {"id":"chatcmpl-90q2mkANz92k7hnN47vUR3KzdcPAI","object":"chat.completion.chunk","created":1712329636,"model":"gpt-4-turbo-2024-04-09","system_fingerprint":"fp_ea6eb70049","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_abc123","type":"function","function":{"name":"get_current_weather","arguments":""}}]},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialToolCallMessage(AssistantRoleLiteral, 0, "call_abc123", "get_current_weather", ""),
+      ]);
+      expect(results[0].partialResponse.usage).toBeUndefined();
+    });
+
+    it("should process a single complete tool call chunk (arguments)", async () => {
+      // Subsequent chunk adding arguments
+      const chunk =
+        'data: {"id":"chatcmpl-90q2mkANz92k7hnN47vUR3KzdcPAI","object":"chat.completion.chunk","created":1712329636,"model":"gpt-4-turbo-2024-04-09","system_fingerprint":"fp_ea6eb70049","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":"{\\"location\\": \\"Boston\\"}"}}]},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      // Expect arguments to append. Assumes previous chunk set id/name.
+      // The partial message creation needs to handle accumulating args.
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        // The createPartialToolCallMessage needs context, or the reducer combining these partials handles accumulation.
+        // Testing transform in isolation shows the delta content.
+        createPartialToolCallMessage(AssistantRoleLiteral, 0, undefined, undefined, '{"location": "Boston"}'),
+      ]);
+      expect(results[0].partialResponse.usage).toBeUndefined();
+    });
+
+    it("should process a chunk with usage information", async () => {
+      // Typically the last chunk with finish_reason and usage
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":10,"completion_tokens":20,"total_tokens":30}}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      expect(results[0].partialResponse.partialMessages).toEqual([]); // Empty delta
+      expect(results[0].partialResponse.usage).toEqual({
+        promptTokens: 10,
+        completionTokens: 20,
+        totalTokens: 30,
+      });
+      // We might also want to check for finishReason if the function extracts it
+      // expect(results[0].partialResponse.finishReason).toBe("stop");
+    });
+
+    it("should process a chunk with both content and usage", async () => {
+      // Less common, but possible: final content + usage in one chunk
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":" final part."},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":10,"completion_tokens":20,"total_tokens":30}}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, " final part.")]);
+      expect(results[0].partialResponse.usage).toEqual({
+        promptTokens: 10,
+        completionTokens: 20,
+        totalTokens: 30,
+      });
+      // We might also want to check for finishReason
+      // expect(results[0].partialResponse.finishReason).toBe("stop");
+    });
+
+    it("should process multiple complete lines in a single chunk", async () => {
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Part 1."},"logprobs":null,"finish_reason":null}]}\n' +
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":" Part 2."},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(3); // Yields per processed line
+
+      expect(results[0].buffer).toBe(""); // Buffer state after processing the *first* complete line within the chunk
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Part 1.")]);
+      expect(results[0].partialResponse.usage).toBeUndefined();
+
+      expect(results[1].buffer).toBe(""); // Buffer state after processing the *second* complete line
+      expect(results[1].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, " Part 2.")]);
+      expect(results[1].partialResponse.usage).toBeUndefined();
+    });
+
+    it("should terminate processing when 'data: [DONE]' is received", async () => {
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Final bit."},"logprobs":null,"finish_reason":null}]}\n' +
+        "data: [DONE]\n" +
+        'data: {"id":"chatcmpl-456","object":"chat.completion.chunk","created":1694268199,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Should be ignored."},"logprobs":null,"finish_reason":null}]}\n'; // Data after [DONE]
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      // Only yields for the line before [DONE]
+      expect(results).toHaveLength(1);
+      expect(results[0].buffer).toBe(""); // Buffer is empty because [DONE] caused loop termination after processing previous line
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Final bit.")]);
+      expect(results[0].partialResponse.usage).toBeUndefined();
+    });
+
+    it("should handle empty delta objects", async () => {
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      expect(results[0].partialResponse.partialMessages).toEqual([]); // No message generated for empty delta
+      expect(results[0].partialResponse.usage).toBeUndefined();
+    });
+
+    // --- Buffering Scenarios ---
+
+    it("should handle an empty chunk", async () => {
+      const chunk = "";
+      const buffer = "previous incomplete data";
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
+
+      // Yields once with the current state of the buffer if no lines processed
+      expect(results).toHaveLength(1);
+      expect(results[0].buffer).toBe(buffer);
+      expect(results[0].partialResponse.partialMessages).toEqual([]);
+    });
+
+    it("should handle a chunk with only whitespace/newlines", async () => {
+      const chunk = "\n \n";
+      // Buffer contains a *complete* line ending with \n
+      const buffer =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Buffered."},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
+
+      // Should process the buffered line, then process the newlines (which do nothing), yielding once.
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe(""); // Buffer processed, new buffer empty after whitespace
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Buffered.")]);
+    });
+
+    it("should buffer an incomplete chunk (start of line)", async () => {
+      const chunk = 'data: {"id":"chatc';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(1); // Yields once with the buffer update
+      expect(results[0].buffer).toBe(chunk);
+      expect(results[0].partialResponse.partialMessages).toEqual([]);
+    });
+
+    it("should buffer an incomplete chunk (middle of line)", async () => {
+      const chunk = 'mpl-123","object":"ch';
+      const buffer = 'data: {"id":"chatc';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
+
+      expect(results).toHaveLength(1); // Yields once with the buffer update
+      expect(results[0].buffer).toBe(buffer + chunk);
+      expect(results[0].partialResponse.partialMessages).toEqual([]);
+    });
+
+    it("should process a complete line from buffer and new chunk", async () => {
+      const buffer =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":';
+      const chunk = '{"content":"Complete!"},"logprobs":null,"finish_reason":null}]}\n'; // Completes the JSON and adds newline
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe(""); // Line was completed and processed
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Complete!")]);
+    });
+
+    it("should process complete line and buffer the rest", async () => {
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"First."},"logprobs":null,"finish_reason":null}]}\n' + // Complete line
+        'data: {"id":"chatcmpl-456","object":"chat.completion.chunk","created":1694268199,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Second part...'; // Incomplete line
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      // Yields for the first complete line, second yield updates buffer
+      expect(results).toHaveLength(2);
+
+      const bufferedPart =
+        'data: {"id":"chatcmpl-456","object":"chat.completion.chunk","created":1694268199,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Second part...';
+
+      // First yield corresponds to processing the first line
+      expect(results[0].buffer).toBe(bufferedPart); // Buffer contains the start of the second line
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "First.")]);
+
+      // The final yield reflects the state *after* the loop finishes processing the chunk
+      expect(results[1].buffer).toBe(bufferedPart);
+      expect(results[1].partialResponse.partialMessages).toEqual([]); // No new message *fully processed* in this yield step
+    });
+
+    it("should handle chunk ending exactly at newline", async () => {
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Exact."},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe(""); // Newline consumed, buffer empty
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Exact.")]);
+    });
+
+    it("should combine buffer and chunk correctly when buffer has partial data", async () => {
+      const buffer = 'data: {"id":"chatc';
+      const chunk =
+        'mpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Joined!"},"logprobs":null,"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].buffer).toBe("");
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Joined!")]);
+    });
+
+    // --- Error Handling ---
+
+    it("should throw ModelResponseError for malformed JSON", async () => {
+      const chunk = 'data: {"id":"chatcmpl-123", "object":chat.completion.chunk"}\n'; // Invalid JSON (missing quotes)
+      const generator = model.transformStreamChatResponseChunk(chunk, "");
+
+      try {
+        await collectAsyncGenerator(generator);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(ModelResponseError);
+        expect(e.message).toContain("Malformed JSON received in stream"); //
+        expect(e.cause).toBeInstanceOf(Error); // Assuming the cause is an Error instance
+        expect(e.cause?.message).toContain("Unexpected token 'c'"); // Updated to match actual error message
+      }
+    });
+
+    it("should throw ModelResponseError for invalid data structure (Zod schema fail)", async () => {
+      // Valid JSON, but doesn't match OpenAIStreamChatResponse schema (missing required fields)
+      const chunk = 'data: {"id":"chatcmpl-123", "foo": "bar"}\n';
+      const generator = model.transformStreamChatResponseChunk(chunk, "");
+
+      try {
+        await collectAsyncGenerator(generator);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(ModelResponseError);
+        expect(e.message).toContain("Malformed JSON received in stream"); //
+        expect(e.cause).toBeInstanceOf(Error); // Assuming the cause is an Error instance
+      }
+    });
+
+    it("should ignore lines not starting with 'data: ' after trimming", async () => {
+      const chunk =
+        "event: message\n" + // Ignored line
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Valid"},"logprobs":null,"finish_reason":null}]}\n' + // Valid line
+        "ignore this line\n" + // Ignored line (ends up in buffer if no more data)
+        ":heartbeat\n"; // Ignored line (SSE comment)
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      // Only yields for the valid 'data:' line
+      expect(results).toHaveLength(2);
+      // The final state of the buffer depends on how trailing ignored lines are handled.
+      expect(results[0].buffer).toBe("");
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Valid")]);
+    });
+
+    it("should throw parsing error if JSON parsing throws an unexpected error", async () => {
+      // Use JSON that would be syntactically valid but triggers the mock error
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"abc"},"logprobs":null,"finish_reason":null}]}\n';
+      try {
+        const generator = model.transformStreamChatResponseChunk(chunk, "");
+        await collectAsyncGenerator(generator);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(ModelResponseError);
+        expect(e.message).toContain("Unexpected error while parsing JSON");
+        expect(e.cause).toBeInstanceOf(Error); // Assuming the cause is an Error instance
+        expect(e.cause?.message).toContain("Mock error");
+      }
+    });
+
+    it("should handle [DONE] correctly even with preceding valid data", async () => {
+      const chunk =
+        'data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":"Final bit."},"logprobs":null,"finish_reason":null}]}\ndata: [DONE]\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(1); // Yields for the data before [DONE]
+      expect(results[0].buffer).toBe(""); // Buffer empty as [DONE] terminated processing
+      expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Final bit.")]);
+    });
+
+    it("should yield nothing if chunk only contains [DONE]", async () => {
+      const doneChunk = "data: [DONE]\n";
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(doneChunk, ""));
+      expect(results).toHaveLength(0); // Generator returns immediately, yields nothing.
+    });
+
+    it("should yield nothing if chunk has data *after* [DONE]", async () => {
+      const chunkWithDoneFirst =
+        'data: [DONE]\ndata: {"id":"chatcmpl-789", "object":"chat.completion.chunk","created":1694268199,"model":"gpt-4o", "choices":[{"index":0, "delta": {"content":"ignored"}, "logprobs":null, "finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunkWithDoneFirst, ""));
+      expect(results).toHaveLength(0); // Returns on [DONE], ignores subsequent lines in the same chunk processing loop.
     });
   });
 });
