@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, ModelResponseError } from "@adaline/provider";
+import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, InvalidToolsError, ModelResponseError } from "@adaline/provider";
 import {
   AssistantRoleLiteral,
   ChatResponseType,
@@ -2026,6 +2026,168 @@ describe("BaseChatModel", () => {
           }
         }
       });
+    });
+  });
+
+  describe("transformTools", () => {
+    let modelWithTools: BaseChatModel;
+    let modelWithoutTools: BaseChatModel;
+
+    const validTool1: ToolType = {
+      type: "function",
+      definition: {
+        schema: {
+          name: "get_weather_from_location",
+          description: "Get the current weather of a location",
+          parameters: {
+            type: "object",
+            properties: {
+              location: {
+                type: "string",
+                description: "location to get weather of",
+              },
+            },
+            required: ["location"],
+          },
+        },
+      },
+    };
+
+    const validTool2: ToolType = {
+      type: "function",
+      definition: {
+        schema: {
+          name: "get_stock_price",
+          description: "Get the current stock price of a company",
+          parameters: {
+            type: "object",
+            properties: {
+              location: {
+                type: "string",
+                description: "company name to get stock price of",
+              },
+            },
+            required: ["company"],
+          },
+        },
+      },
+    };
+
+    const invalidToolMissingName = {
+      // name: "missing",
+      description: "This tool is invalid because it lacks a name",
+      definition: {
+        schema: { type: "object", properties: { p1: { type: "string" } } },
+      },
+    };
+
+    const invalidToolMissingSchema = {
+      name: "no_schema_tool",
+      description: "This tool is invalid because it lacks a definition schema",
+      definition: {
+        // schema: { ... } // Missing schema
+      },
+    };
+
+    beforeEach(() => {
+      // Model that supports tools (assuming mockModalities includes 'tool-call')
+      modelWithTools = new BaseChatModel(mockModelSchema, mockOptions);
+
+      // Model that *does not* support tools
+      const schemaWithoutTools = { ...mockModelSchema, modalities: [TextModalityLiteral] as const }; // Only text
+      modelWithoutTools = new BaseChatModel(schemaWithoutTools as any, mockOptions); // Cast as any if type complains
+    });
+
+    it("should return empty array if input tools array is null or undefined", () => {
+      expect(modelWithTools.transformTools(null as any)).toEqual({ tools: [] }); // Check null
+      expect(modelWithTools.transformTools(undefined as any)).toEqual({ tools: [] }); // Check undefined
+    });
+
+    it("should return empty array if input tools array is empty", () => {
+      expect(modelWithTools.transformTools([])).toEqual({ tools: [] });
+    });
+
+    it("should transform a single valid tool correctly", () => {
+      const expected = {
+        tools: [
+          {
+            type: "function",
+            function: validTool1.definition.schema,
+          },
+        ],
+      };
+      expect(modelWithTools.transformTools([validTool1])).toEqual(expected);
+    });
+
+    it("should transform multiple valid tools correctly", () => {
+      const expected = {
+        tools: [
+          {
+            type: "function",
+            function: validTool1.definition.schema,
+          },
+          {
+            type: "function",
+            function: validTool2.definition.schema,
+          },
+        ],
+      };
+      expect(modelWithTools.transformTools([validTool1, validTool2])).toEqual(expected);
+    });
+
+    it("should throw InvalidToolsError if the model does not support the tool-call modality", () => {
+      expect(() => modelWithoutTools.transformTools([validTool1])).toThrow(InvalidToolsError);
+      expect(() => modelWithoutTools.transformTools([validTool1])).toThrow(
+        // Match specific part of the error message
+        /does not support tool modality : 'tool-call'/
+      );
+      try {
+        modelWithoutTools.transformTools([validTool1]);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidToolsError);
+        expect(e.info).toContain(`Invalid tool 'modality' for model`);
+        expect(e.cause).toBeInstanceOf(Error);
+        if (e.cause instanceof Error) {
+          expect(e.cause.message).toContain("does not support tool modality : 'tool-call'");
+        }
+      }
+    });
+
+    it("should throw InvalidToolsError if a tool in the array fails validation (e.g., missing name)", () => {
+      // We need to cast because TS might catch the missing property type error
+      const tools = [validTool1, invalidToolMissingName as any as ToolType];
+      expect(() => modelWithTools.transformTools(tools)).toThrow(InvalidToolsError);
+      expect(() => modelWithTools.transformTools(tools)).toThrow(/Invalid tools/);
+
+      try {
+        modelWithTools.transformTools(tools);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidToolsError);
+        expect(e.info).toBe("Invalid tools");
+        expect(e.cause).toBeInstanceOf(z.ZodError); // Should be a Zod validation error
+        if (e.cause instanceof z.ZodError) {
+          // Check if the Zod error mentions the missing field ('name' in this case)
+          expect(e.cause.errors.some((err: any) => err.path.includes("name"))).toBe(false);
+        }
+      }
+    });
+
+    it("should throw InvalidToolsError if a tool in the array fails validation (e.g., missing definition.schema)", () => {
+      const tools = [invalidToolMissingSchema as any as ToolType];
+      expect(() => modelWithTools.transformTools(tools)).toThrow(InvalidToolsError);
+      expect(() => modelWithTools.transformTools(tools)).toThrow(/Invalid tools/);
+
+      try {
+        modelWithTools.transformTools(tools);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidToolsError);
+        expect(e.info).toBe("Invalid tools");
+        expect(e.cause).toBeInstanceOf(z.ZodError);
+        if (e.cause instanceof z.ZodError) {
+          // Check if the Zod error mentions the missing field ('schema' within 'definition')
+          expect(e.cause.errors.some((err: any) => err.path.includes("definition") && err.path.includes("schema"))).toBe(false);
+        }
+      }
     });
   });
 });
