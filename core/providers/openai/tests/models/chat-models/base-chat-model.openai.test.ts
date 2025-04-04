@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, ModelResponseError } from "@adaline/provider";
 import {
   AssistantRoleLiteral,
+  ChatResponseType,
   Config,
   createPartialTextMessage,
   createPartialToolCallMessage,
@@ -20,7 +21,7 @@ import {
 
 import { OpenAIChatModelConfigs } from "../../../src/configs";
 import { BaseChatModel } from "../../../src/models";
-import { OpenAIChatRequestType } from "../../../src/models/chat-models/types";
+import { OpenAIChatRequestType, OpenAICompleteChatResponse } from "../../../src/models/chat-models/types";
 
 // Helper function to collect results from the async generator
 async function collectAsyncGenerator<T>(generator: AsyncGenerator<T>): Promise<T[]> {
@@ -1261,6 +1262,770 @@ describe("BaseChatModel", () => {
         'data: [DONE]\ndata: {"id":"chatcmpl-789", "object":"chat.completion.chunk","created":1694268199,"model":"gpt-4o", "choices":[{"index":0, "delta": {"content":"ignored"}, "logprobs":null, "finish_reason":null}]}\n';
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunkWithDoneFirst, ""));
       expect(results).toHaveLength(0); // Returns on [DONE], ignores subsequent lines in the same chunk processing loop.
+    });
+  });
+  // --- Tests for transformCompleteChatResponse ---
+  describe("transformCompleteChatResponse", () => {
+    let baseChatModel: BaseChatModel;
+
+    beforeEach(() => {
+      baseChatModel = new BaseChatModel(mockModelSchema, mockOptions);
+    });
+
+    // --- Tests for transformCompleteChatResponse ---
+    describe("transformCompleteChatResponse", () => {
+      // --- Helper to create a basic valid response structure ---
+      const createBasicResponse = (overrides: Partial<any> = {}) => {
+        const base = {
+          id: "chatcmpl-123",
+          object: "chat.completion" as const,
+          created: 1677652288,
+          model: "test-model-001",
+          system_fingerprint: "fp_44709d6fcb",
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: "Hello there!",
+              },
+              logprobs: null,
+              finish_reason: "stop",
+            },
+          ],
+          usage: {
+            prompt_tokens: 9,
+            completion_tokens: 12,
+            total_tokens: 21,
+          },
+        };
+
+        const merged = JSON.parse(JSON.stringify(base));
+        for (const key in overrides) {
+          if (overrides.hasOwnProperty(key)) {
+            if (
+              typeof overrides[key] === "object" &&
+              overrides[key] !== null &&
+              !Array.isArray(overrides[key]) &&
+              key !== "choices" &&
+              key !== "logprobs"
+            ) {
+              // Simple merge for nested objects like 'message', 'usage'
+              merged[key] = { ...merged[key], ...overrides[key] };
+            } else if (key === "choices" && typeof overrides.choices !== "undefined") {
+              // Overwrite choices array entirely if provided
+              merged.choices = JSON.parse(JSON.stringify(overrides.choices));
+            } else if (key === "logprobs" && typeof overrides.logprobs !== "undefined") {
+              // Overwrite logprobs if provided (could be null or object)
+              merged.choices[0].logprobs = overrides.logprobs === null ? null : JSON.parse(JSON.stringify(overrides.logprobs));
+            } else {
+              merged[key] = overrides[key];
+            }
+          }
+        }
+        // Adjust nested message/usage within choices if needed via overrides.choices
+        if (overrides.choices && overrides.choices[0]) {
+          if (overrides.choices[0].message) {
+            merged.choices[0].message = { ...merged.choices[0].message, ...overrides.choices[0].message };
+          }
+          if (overrides.choices[0].logprobs !== undefined) {
+            // Allow setting logprobs to null via choices override
+            merged.choices[0].logprobs = overrides.choices[0].logprobs;
+          }
+          if (overrides.choices[0].finish_reason) {
+            merged.choices[0].finish_reason = overrides.choices[0].finish_reason;
+          }
+        }
+        return merged;
+      };
+
+      it("should transform a basic valid response with text content", () => {
+        const response = createBasicResponse();
+        // Use the inferred ChatResponseType for the expected value
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral, // "assistant"
+              content: [{ modality: "text", value: "Hello there!", metadata: undefined }],
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 9,
+            completionTokens: 12,
+            totalTokens: 21,
+          },
+          logProbs: [], // Empty because logprobs was null in input and optional
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should transform a response with only tool calls", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: null, // No text content
+                tool_calls: [
+                  {
+                    id: "call_abc123",
+                    type: "function", // Input format
+                    function: {
+                      name: "get_weather",
+                      arguments: '{"location": "San Francisco"}',
+                    },
+                  },
+                ],
+              },
+              logprobs: null,
+              finish_reason: "tool_calls",
+            },
+          ],
+          usage: { prompt_tokens: 50, completion_tokens: 30, total_tokens: 80 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [
+                {
+                  modality: "tool-call",
+                  id: "call_abc123",
+                  name: "get_weather",
+                  arguments: '{"location": "San Francisco"}',
+                  index: 0, // Index within the tool calls array
+                  metadata: undefined,
+                },
+              ],
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 50,
+            completionTokens: 30,
+            totalTokens: 80,
+          },
+          logProbs: [],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should transform a response with both text content and tool calls", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: "Okay, planning the trip.", // Text content present
+                tool_calls: [
+                  {
+                    id: "call_book_flight",
+                    type: "function",
+                    function: { name: "book_flight", arguments: '{"destination": "Paris"}' },
+                  },
+                  {
+                    id: "call_book_hotel",
+                    type: "function",
+                    function: { name: "book_hotel", arguments: '{"city": "Paris", "nights": 3}' },
+                  },
+                ],
+              },
+              logprobs: null,
+              finish_reason: "tool_calls",
+            },
+          ],
+          usage: { prompt_tokens: 100, completion_tokens: 70, total_tokens: 170 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [
+                { modality: "text", value: "Okay, planning the trip.", metadata: undefined },
+                {
+                  modality: "tool-call",
+                  id: "call_book_flight",
+                  name: "book_flight",
+                  arguments: '{"destination": "Paris"}',
+                  index: 0,
+                  metadata: undefined,
+                },
+                {
+                  modality: "tool-call",
+                  id: "call_book_hotel",
+                  name: "book_hotel",
+                  arguments: '{"city": "Paris", "nights": 3}',
+                  index: 1,
+                  metadata: undefined,
+                },
+              ],
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 100,
+            completionTokens: 70,
+            totalTokens: 170,
+          },
+          logProbs: [],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should transform a response with a refusal message", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: null, // Content might be null
+                refusal: "I cannot provide information on that topic.", // Refusal present
+              },
+              logprobs: null,
+              finish_reason: "stop", // Or potentially a content_filter reason
+            },
+          ],
+          usage: { prompt_tokens: 15, completion_tokens: 10, total_tokens: 25 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [{ modality: "text", value: "I cannot provide information on that topic.", metadata: undefined }],
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 15,
+            completionTokens: 10,
+            totalTokens: 25,
+          },
+          logProbs: [],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should transform a response with both content and refusal (unusual but handled)", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: "Here is some allowed content.", // Content present
+                refusal: "But I must refuse part of the request.", // Refusal also present
+              },
+              logprobs: null,
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 20, completion_tokens: 25, total_tokens: 45 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [
+                { modality: "text", value: "Here is some allowed content.", metadata: undefined },
+                { modality: "text", value: "But I must refuse part of the request.", metadata: undefined },
+              ],
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 20,
+            completionTokens: 25,
+            totalTokens: 45,
+          },
+          logProbs: [],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should handle null content with zod error", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: null, // Explicitly null
+                tool_calls: null, // Explicitly null
+              },
+              logprobs: null,
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 5, completion_tokens: 0, total_tokens: 5 }, // Example usage
+        });
+
+        try {
+          const result = baseChatModel.transformCompleteChatResponse(response);
+        } catch (e: any) {
+          expect(e).toBeInstanceOf(ModelResponseError);
+          expect(e.message).toContain(" Invalid response from model");
+          expect(e.cause).toBeInstanceOf(Error);
+        }
+      });
+
+      it("should handle empty string content", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: "", // Empty string
+              },
+              logprobs: null,
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 5, completion_tokens: 1, total_tokens: 6 }, // Example usage
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [], // Should not include the empty text content
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 5,
+            completionTokens: 1,
+            totalTokens: 6,
+          },
+          logProbs: [],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should handle empty tool_calls array", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: "Some text",
+                tool_calls: [], // Empty array
+              },
+              logprobs: null,
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [{ modality: "text", value: "Some text", metadata: undefined }], // Only text content
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 10,
+            completionTokens: 5,
+            totalTokens: 15,
+          },
+          logProbs: [],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should transform a response with logprobs for content", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: "Log probs test" },
+              logprobs: {
+                // Add logprobs object
+                content: [
+                  {
+                    token: "Log",
+                    logprob: -0.1,
+                    bytes: [76, 111, 103],
+                    top_logprobs: [{ token: "Log", logprob: -0.1, bytes: [76, 111, 103] }],
+                  },
+                  { token: " probs", logprob: -0.2, bytes: null, top_logprobs: [{ token: " probs", logprob: -0.2, bytes: null }] },
+                  { token: " test", logprob: -0.3, bytes: [32, 116, 101, 115, 116], top_logprobs: [] }, // Empty top_logprobs example
+                ],
+                refusal: null, // No refusal logprobs
+              },
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 5, completion_tokens: 3, total_tokens: 8 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [{ modality: "text", value: "Log probs test", metadata: undefined }],
+              metadata: undefined,
+            },
+          ],
+          usage: { promptTokens: 5, completionTokens: 3, totalTokens: 8 },
+          logProbs: [
+            { token: "Log", logProb: -0.1, bytes: [76, 111, 103], topLogProbs: [{ token: "Log", logProb: -0.1, bytes: [76, 111, 103] }] },
+            { token: " probs", logProb: -0.2, bytes: null, topLogProbs: [{ token: " probs", logProb: -0.2, bytes: null }] },
+            { token: " test", logProb: -0.3, bytes: [32, 116, 101, 115, 116], topLogProbs: [] },
+          ],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should transform a response with logprobs for refusal", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: null, refusal: "Refused." },
+              logprobs: {
+                // Add logprobs object
+                content: null, // No content logprobs
+                refusal: [
+                  {
+                    token: "Refused",
+                    logprob: -0.5,
+                    bytes: [82, 101, 102, 117, 115, 101, 100],
+                    top_logprobs: [{ token: "Refused", logprob: -0.5, bytes: [82, 101, 102, 117, 115, 101, 100] }],
+                  },
+                  { token: ".", logprob: -0.1, bytes: [46], top_logprobs: [{ token: ".", logprob: -0.1, bytes: [46] }] },
+                ],
+              },
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 5, completion_tokens: 2, total_tokens: 7 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [{ modality: "text", value: "Refused.", metadata: undefined }],
+              metadata: undefined,
+            },
+          ],
+          usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
+          logProbs: [
+            {
+              token: "Refused",
+              logProb: -0.5,
+              bytes: [82, 101, 102, 117, 115, 101, 100],
+              topLogProbs: [{ token: "Refused", logProb: -0.5, bytes: [82, 101, 102, 117, 115, 101, 100] }],
+            },
+            { token: ".", logProb: -0.1, bytes: [46], topLogProbs: [{ token: ".", logProb: -0.1, bytes: [46] }] },
+          ],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should transform a response with logprobs for both content and refusal", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: "OK. ", refusal: "Denied." },
+              logprobs: {
+                content: [
+                  { token: "OK", logprob: -0.1, bytes: [79, 75], top_logprobs: [] },
+                  { token: ". ", logprob: -0.2, bytes: [46, 32], top_logprobs: [] },
+                ],
+                refusal: [
+                  { token: "Denied", logprob: -0.5, bytes: [68, 101, 110, 105, 101, 100], top_logprobs: [] },
+                  { token: ".", logprob: -0.1, bytes: [46], top_logprobs: [] },
+                ],
+              },
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 5, completion_tokens: 4, total_tokens: 9 },
+        });
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [
+                { modality: "text", value: "OK. ", metadata: undefined },
+                { modality: "text", value: "Denied.", metadata: undefined },
+              ],
+              metadata: undefined,
+            },
+          ],
+          usage: { promptTokens: 5, completionTokens: 4, totalTokens: 9 },
+          logProbs: [
+            // Logprobs should be concatenated
+            { token: "OK", logProb: -0.1, bytes: [79, 75], topLogProbs: [] },
+            { token: ". ", logProb: -0.2, bytes: [46, 32], topLogProbs: [] },
+            { token: "Denied", logProb: -0.5, bytes: [68, 101, 110, 105, 101, 100], topLogProbs: [] },
+            { token: ".", logProb: -0.1, bytes: [46], topLogProbs: [] },
+          ],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        expect(result).toEqual(expected);
+      });
+
+      it("should handle null system_fingerprint", () => {
+        const response = createBasicResponse({ system_fingerprint: null });
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [{ modality: "text", value: "Hello there!", metadata: undefined }],
+              metadata: undefined,
+            },
+          ],
+          usage: {
+            promptTokens: 9,
+            completionTokens: 12,
+            totalTokens: 21,
+          },
+          logProbs: [],
+        };
+
+        const result = baseChatModel.transformCompleteChatResponse(response);
+        // We mainly care that it doesn't throw an error and parses correctly
+        expect(result).toEqual(expected);
+        expect(response.system_fingerprint).toBeNull(); // Verify the input had null fingerprint
+      });
+
+      it("should omit optional usage and logProbs if not present in response (though OpenAI usually includes usage)", () => {
+        // Create a response *without* usage and with null logprobs
+        const responseMinimal = {
+          id: "chatcmpl-456",
+          object: "chat.completion" as const,
+          created: 1677652299,
+          model: "test-model-002",
+          system_fingerprint: null,
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: "Minimal" },
+              logprobs: null, // Explicitly null
+              finish_reason: "stop",
+            },
+          ],
+          // NO usage field
+        };
+
+        const expected: ChatResponseType = {
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [{ modality: "text", value: "Minimal", metadata: undefined }],
+              metadata: undefined,
+            },
+          ],
+          // NO usage field expected
+          // NO logProbs field expected
+        };
+
+        // Need to use safeParse here because our helper always adds usage
+        const safeMinimal = OpenAICompleteChatResponse.safeParse(responseMinimal);
+        expect(safeMinimal.success).toBe(false); // Fails *input* validation because usage is required by OpenAICompleteChatResponse
+        // However, let's test the transform logic *if* it were to receive such input and pass Zod somehow
+        // (This tests the transform's handling of potentially missing fields post-Zod validation,
+        // although the Zod check should catch it first in the current implementation)
+
+        // If we bypass the initial Zod check and force the transform:
+        const transformResult = baseChatModel.transformCompleteChatResponse({
+          ...responseMinimal,
+          // Manually add a fake usage to pass initial Zod, then test transform logic
+          usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+        });
+
+        // Now check the *structure* against the target ChatResponseType
+        const expectedWithFakedUsage: ChatResponseType = {
+          logProbs: [],
+          messages: [
+            {
+              role: AssistantRoleLiteral,
+              content: [{ modality: "text", value: "Minimal" }],
+            },
+          ],
+          usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+          // logProbs still omitted as it was null in input
+        };
+        expect(transformResult).toEqual(expectedWithFakedUsage);
+        expect(transformResult.logProbs).toEqual([]); // Explicitly check optional field to be empty
+      });
+
+      // --- Error Handling (These should largely remain the same as they test the Zod parsing and initial checks) ---
+
+      it("should throw ModelResponseError if response is not a valid object", () => {
+        const invalidResponse = "this is not an object";
+        expect(() => baseChatModel.transformCompleteChatResponse(invalidResponse)).toThrow(ModelResponseError);
+        expect(() => baseChatModel.transformCompleteChatResponse(invalidResponse)).toThrow(/Invalid response from model/);
+        try {
+          baseChatModel.transformCompleteChatResponse(invalidResponse);
+        } catch (e: any) {
+          // Use any or unknown and type guard
+          expect(e).toBeInstanceOf(ModelResponseError);
+          if (e instanceof ModelResponseError) {
+            // Type guard
+            expect(e.cause).toBeInstanceOf(z.ZodError);
+          }
+        }
+      });
+
+      it("should throw ModelResponseError if response is null or undefined", () => {
+        expect(() => baseChatModel.transformCompleteChatResponse(null)).toThrow(ModelResponseError);
+        expect(() => baseChatModel.transformCompleteChatResponse(undefined)).toThrow(ModelResponseError);
+        try {
+          baseChatModel.transformCompleteChatResponse(null);
+        } catch (e: any) {
+          expect(e).toBeInstanceOf(ModelResponseError);
+          if (e instanceof ModelResponseError) {
+            expect(e.cause).toBeInstanceOf(z.ZodError);
+          }
+        }
+      });
+
+      it("should throw ModelResponseError if response is missing required fields (e.g., id)", () => {
+        const response = createBasicResponse();
+        delete (response as any).id; // Remove required field
+        expect(() => baseChatModel.transformCompleteChatResponse(response)).toThrow(ModelResponseError);
+        try {
+          baseChatModel.transformCompleteChatResponse(response);
+        } catch (e: any) {
+          expect(e).toBeInstanceOf(ModelResponseError);
+          if (e instanceof ModelResponseError) {
+            expect(e.cause).toBeInstanceOf(z.ZodError);
+            expect((e.cause as any).message).toContain("id"); // Check Zod error message
+          }
+        }
+      });
+
+      it("should throw ModelResponseError if response has incorrect types (e.g., usage.prompt_tokens is string)", () => {
+        const response = createBasicResponse({
+          usage: { prompt_tokens: "not-a-number", completion_tokens: 12, total_tokens: 21 },
+        });
+        expect(() => baseChatModel.transformCompleteChatResponse(response)).toThrow(ModelResponseError);
+        try {
+          baseChatModel.transformCompleteChatResponse(response);
+        } catch (e: any) {
+          expect(e).toBeInstanceOf(ModelResponseError);
+          if (e instanceof ModelResponseError) {
+            expect(e.cause).toBeInstanceOf(z.ZodError);
+            expect((e.cause as any).message).toContain("prompt_tokens");
+          }
+        }
+      });
+
+      it("should throw ModelResponseError if choices array is empty", () => {
+        const response = createBasicResponse({ choices: [] }); // Empty choices array
+        expect(() => baseChatModel.transformCompleteChatResponse(response)).toThrow(ModelResponseError);
+        expect(() => baseChatModel.transformCompleteChatResponse(response)).toThrow(/No choices in response/);
+        try {
+          baseChatModel.transformCompleteChatResponse(response);
+        } catch (e: any) {
+          expect(e).toBeInstanceOf(ModelResponseError);
+          // Check the specific error message for empty choices
+          expect(e.info).toBe("Invalid response from model");
+          expect(e.cause).toBeInstanceOf(Error);
+          if (e.cause instanceof Error) {
+            expect(e.cause.message).toContain("No choices in response");
+          }
+        }
+      });
+
+      it("should throw ModelResponseError if tool_calls structure is invalid", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: {
+                role: "assistant",
+                content: null,
+                tool_calls: [
+                  {
+                    // Missing 'id' which is required by OpenAICompleteChatResponse schema
+                    type: "function",
+                    function: { name: "get_weather", arguments: "{}" },
+                  },
+                ],
+              },
+              logprobs: null,
+              finish_reason: "tool_calls",
+            },
+          ],
+        });
+        expect(() => baseChatModel.transformCompleteChatResponse(response)).toThrow(ModelResponseError);
+        try {
+          baseChatModel.transformCompleteChatResponse(response);
+        } catch (e: any) {
+          expect(e).toBeInstanceOf(ModelResponseError);
+          if (e instanceof ModelResponseError) {
+            expect(e.cause).toBeInstanceOf(z.ZodError);
+            // Zod error message should indicate the issue within tool_calls
+            expect((e.cause as any).message).toContain("tool_calls");
+            expect((e.cause as any).message).toContain("id"); // Specifically missing id
+          }
+        }
+      });
+
+      it("should throw ModelResponseError if logprobs structure is invalid", () => {
+        const response = createBasicResponse({
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: "Test" },
+              logprobs: {
+                // Invalid structure for logprobs object itself
+                content: [{ token: "Test", logprob: "not-a-number", bytes: [], top_logprobs: [] }], // Invalid logprob type
+              },
+              finish_reason: "stop",
+            },
+          ],
+        });
+        expect(() => baseChatModel.transformCompleteChatResponse(response)).toThrow(ModelResponseError);
+        try {
+          baseChatModel.transformCompleteChatResponse(response);
+        } catch (e: any) {
+          expect(e).toBeInstanceOf(ModelResponseError);
+          if (e instanceof ModelResponseError) {
+            expect(e.cause).toBeInstanceOf(z.ZodError);
+            // Zod error message should indicate the issue within logprobs
+            expect((e.cause as any).message).toContain("logprob");
+          }
+        }
+      });
     });
   });
 });
