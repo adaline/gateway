@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { BaseChatModel, OpenAIChatRequestMessageType } from "@adaline/openai";
-import { ChatModelSchemaType, ParamsType } from "@adaline/provider";
+import { ChatModelSchemaType, InvalidMessagesError, ParamsType } from "@adaline/provider";
 import { MessageType } from "@adaline/types";
 
 import { Groq } from "../../provider";
@@ -35,6 +35,16 @@ class BaseChatModelGroq extends BaseChatModel {
   }
 
   transformMessages(messages: MessageType[]): ParamsType {
+    const hasSystemRole = messages.some((msg) => msg.role === "system");
+    const hasImageModality = messages.some((msg) => msg.content.some((content: any) => content.modality === "image"));
+
+    if (hasSystemRole && hasImageModality) {
+      throw new InvalidMessagesError({
+        info: `Invalid message content for model : '${this.modelName}'`,
+        cause: new Error("Prompting with images is incompatible with system messages`)"),
+      });
+    }
+
     const transformedMessages = super.transformMessages(messages) as { messages: OpenAIChatRequestMessageType[] };
 
     // Groq expects the content to be a string for system and assistant messages
