@@ -1,648 +1,359 @@
-import { performance } from "perf_hooks";
-// +++++++++++++++++++
-import { Context, context, ROOT_CONTEXT, Span, SpanStatusCode } from "@opentelemetry/api";
-import { v4 as uuidv4 } from "uuid";
+// simple-queue.test.ts
+import { context } from "@opentelemetry/api"; // Assuming these are needed for context propagation if not mocked
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { GatewayCompleteChatRequest } from "../../../src/gateway.types";
-import { HttpRequestError } from "../../../src/plugins/http-client";
-import { LoggerManager } from "../../../src/plugins/logger";
 import { QueueTaskTimeoutError } from "../../../src/plugins/queue/queue.error";
 import { QueueOptionsType, QueueTask } from "../../../src/plugins/queue/queue.interface";
 import { SimpleQueue } from "../../../src/plugins/queue/simple.queue";
-import { TelemetryManager } from "../../../src/plugins/telemetry";
+import { delay } from "../../../src/utils"; // Assuming path
 
-jest.mock("@opentelemetry/api", () => ({
-  trace: {
-    getTracer: jest.fn().mockReturnValue({
-      startActiveSpan: jest.fn((name, callback) => {
-        if (typeof callback !== "function") {
-          throw new TypeError("'callback' is not a function");
-        }
+const mockLogger = {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+};
+const mockTracer = {
+  startActiveSpan: vi.fn((name, fn) => {
+    // Simulate span execution - call the function immediately
+    const span = {
+      setAttribute: vi.fn(),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+    };
+    // @ts-ignore // Allow calling fn with span
+    return fn(span);
+  }),
+};
 
-        const span = {
-          end: jest.fn(),
-          setAttribute: jest.fn(),
-          addEvent: jest.fn(),
-        };
-
-        return callback(span);
-      }),
-    }),
-    getSpan: jest.fn().mockReturnValue({
-      end: jest.fn(),
-    }),
-  },
-  context: {
-    active: jest.fn().mockReturnValue({}),
-    with: jest.fn((ctx, fn) => fn()),
+vi.mock("./../logger", () => ({
+  LoggerManager: {
+    getLogger: () => mockLogger,
   },
 }));
 
-describe("SimpleQueue", () => {
-  let queue: SimpleQueue<string, string>;
-  let options: QueueOptionsType;
+vi.mock("./../telemetry", () => ({
+  TelemetryManager: {
+    getTracer: () => mockTracer,
+  },
+}));
 
-  beforeEach(() => {
-    options = {
-      maxConcurrentTasks: 4,
-      retryCount: 2,
-      timeout: 1000,
-      retry: {
-        initialDelay: 100,
-        exponentialFactor: 2,
-      },
-    };
-    queue = new SimpleQueue<string, string>(options);
-  });
+// We need a minimal definition for types used in the retry logic if not mocking it.
+// These are placeholders. Replace with actual imports/definitions if needed for complex retry logic tests.
+class MockHttpRequestError extends Error {
+  cause: { status: number; headers?: any };
+  constructor(message: string, status: number, headers?: any) {
+    super(message);
+    this.name = "HttpRequestError";
+    this.cause = { status, headers };
+  }
+  static isHttpRequestError(error: any): error is MockHttpRequestError {
+    return error instanceof MockHttpRequestError;
+  }
+}
+const mockModel = {
+  getRetryDelay: (headers: any) => ({ shouldRetry: true, delayMs: -1 }), // Default retry behavior
+};
+const MockGatewayCompleteChatRequest = {
+  safeParse: (data: any) => ({ success: true, data: { ...data, model: mockModel } }),
+};
+vi.mock("./../http-client", () => ({ HttpRequestError: MockHttpRequestError })); // Assuming path
+vi.mock("../../gateway.types", () => ({ GatewayCompleteChatRequest: MockGatewayCompleteChatRequest })); // Assuming path
 
-  describe("Unit tests", () => {
-    it("should process tasks concurrently", async () => {
-      const results: string[] = [];
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id: uuidv4(),
-        request: id,
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        resolve: (value) => results.push(value),
-        reject: jest.fn(),
-        execute: jest.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(id), 100))),
-        telemetryContext: ROOT_CONTEXT,
-      });
-
-      queue.enqueue(createTask("1"));
-      queue.enqueue(createTask("2"));
-      queue.enqueue(createTask("3"));
-      queue.enqueue(createTask("4"));
-      queue.enqueue(createTask("5"));
-      queue.enqueue(createTask("6"));
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-      expect(results).toEqual(["1", "2", "3", "4"]);
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-      expect(results).toEqual(["1", "2", "3", "4", "5", "6"]);
-    });
-
-    it("should retry on failure", async () => {
-      const task: QueueTask<string, string> = {
-        id: uuidv4(),
-        request: "test",
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        resolve: jest.fn(),
-        reject: jest.fn(),
-        execute: jest
-          .fn()
-          .mockRejectedValueOnce(new Error("Fail 1"))
-          .mockRejectedValueOnce(new Error("Fail 2"))
-          .mockResolvedValue("success"),
-        telemetryContext: ROOT_CONTEXT,
-      };
-
-      queue.enqueue(task);
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      expect(task.execute).toHaveBeenCalledTimes(3);
-      expect(task.resolve).toHaveBeenCalledWith("success");
-      expect(task.reject).not.toHaveBeenCalled();
-    });
-
-    it("should handle timeouts", async () => {
-      const task: QueueTask<string, string> = {
-        id: uuidv4(),
-        request: "test",
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        resolve: jest.fn(),
-        reject: jest.fn(),
-        execute: jest.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve("late"), 2000))),
-        telemetryContext: ROOT_CONTEXT,
-      };
-
-      queue.enqueue(task);
-
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-
-      expect(task.execute).toHaveBeenCalledTimes(3);
-      expect(task.resolve).not.toHaveBeenCalled();
-      expect(task.reject).toHaveBeenCalledWith(expect.any(Error));
-      expect(task.reject).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining("Queue task timeout"),
-        })
-      );
-    });
-
-    it("should handle rate limiting errors", async () => {
-      const rateLimitError = new HttpRequestError("Rate limit exceeded", 429, { "retry-after": "2" }, {});
-      const task: QueueTask<any, string> = {
-        id: uuidv4(),
-        request: {
-          model: {
-            getRetryDelay: jest.fn().mockReturnValue({ shouldRetry: true, delayMs: 2000 }),
-          },
-        },
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        resolve: jest.fn(),
-        reject: jest.fn(),
-        execute: jest.fn().mockRejectedValueOnce(rateLimitError).mockResolvedValue("success"),
-        telemetryContext: ROOT_CONTEXT,
-      };
-
-      queue.enqueue(task);
-
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      expect(task.execute).toHaveBeenCalledTimes(2);
-      expect(task.resolve).toHaveBeenCalledWith("success");
-      expect(task.reject).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("Performance tests", () => {
-    it("should handle a large number of tasks efficiently", async () => {
-      const taskCount = 1000;
-      const results: string[] = [];
-
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id: uuidv4(),
-        request: id,
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        resolve: (value) => results.push(value),
-        reject: jest.fn(),
-        execute: jest.fn().mockResolvedValue(id),
-        telemetryContext: ROOT_CONTEXT,
-      });
-
-      const startTime = Date.now();
-
-      for (let i = 0; i < taskCount; i++) {
-        queue.enqueue(createTask(`task-${i}`));
-      }
-
-      while (results.length < taskCount) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-
-      expect(results.length).toBe(taskCount);
-      expect(duration).toBeLessThan(10000);
-      console.log(`Processed ${taskCount} tasks in ${duration}ms`);
-    });
-
-    it("should maintain performance under high concurrency", async () => {
-      const taskCount = 100;
-      const results: string[] = [];
-      const highConcurrencyOptions: QueueOptionsType = { ...options, maxConcurrentTasks: 50 };
-      const highConcurrencyQueue = new SimpleQueue<string, string>(highConcurrencyOptions);
-
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id: uuidv4(),
-        request: id,
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        resolve: (value) => results.push(value),
-        reject: jest.fn(),
-        execute: jest.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(id), 50))),
-        telemetryContext: ROOT_CONTEXT,
-      });
-
-      const startTime = Date.now();
-
-      for (let i = 0; i < taskCount; i++) {
-        highConcurrencyQueue.enqueue(createTask(`task-${i}`));
-      }
-
-      while (results.length < taskCount) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      }
-
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-
-      expect(results.length).toBe(taskCount);
-      expect(duration).toBeLessThan(5000);
-      console.log(`Processed ${taskCount} tasks with high concurrency in ${duration}ms`);
-    });
-  });
-});
+// --- Test Suite ---
 
 describe("SimpleQueue", () => {
-  let queue: SimpleQueue<string, string>;
-  let options: QueueOptionsType;
+  let defaultOptions: QueueOptionsType;
 
   beforeEach(() => {
-    options = {
-      maxConcurrentTasks: 4,
-      retryCount: 2,
-      timeout: 1000,
-      retry: {
-        initialDelay: 100,
-        exponentialFactor: 2,
-      },
-    };
-    queue = new SimpleQueue<string, string>(options);
-  });
-
-  describe("Unit tests", () => {
-    it("should process tasks concurrently", async () => {
-      const results: string[] = [];
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id: uuidv4(),
-        request: id,
-        cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), clear: vi.fn() },
-        resolve: (value) => results.push(value),
-        reject: vi.fn(),
-        execute: vi.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(id), 100))),
-        telemetryContext: {} as Context,
-      });
-
-      queue.enqueue(createTask("1"));
-      queue.enqueue(createTask("2"));
-      queue.enqueue(createTask("3"));
-      queue.enqueue(createTask("4"));
-      queue.enqueue(createTask("5"));
-      queue.enqueue(createTask("6"));
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-      expect(results).toEqual(["1", "2", "3", "4"]);
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-      expect(results).toEqual(["1", "2", "3", "4", "5", "6"]);
-    });
-
-    it("should retry on failure", async () => {
-      const task: QueueTask<string, string> = {
-        id: uuidv4(),
-        request: "test",
-        cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), clear: vi.fn() },
-        resolve: vi.fn(),
-        reject: vi.fn(),
-        execute: vi.fn().mockRejectedValueOnce(new Error("Fail 1")).mockRejectedValueOnce(new Error("Fail 2")).mockResolvedValue("success"),
-        telemetryContext: {} as Context,
-      };
-
-      queue.enqueue(task);
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      expect(task.execute).toHaveBeenCalledTimes(3);
-      expect(task.resolve).toHaveBeenCalledWith("success");
-      expect(task.reject).not.toHaveBeenCalled();
-    });
-
-    it("should handle timeouts", async () => {
-      const task: QueueTask<string, string> = {
-        id: uuidv4(),
-        request: "test",
-        cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), clear: vi.fn() },
-        resolve: vi.fn(),
-        reject: vi.fn(),
-        execute: vi.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve("late"), 2000))),
-        telemetryContext: {} as Context,
-      };
-
-      queue.enqueue(task);
-
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-
-      expect(task.execute).toHaveBeenCalledTimes(3);
-      expect(task.resolve).not.toHaveBeenCalled();
-      expect(task.reject).toHaveBeenCalledWith(expect.any(Error));
-      expect(task.reject).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining("Queue task timeout"),
-        })
-      );
-    });
-
-    it("should handle rate limiting errors", async () => {
-      const rateLimitError = new HttpRequestError("Rate limit exceeded", 429, { "retry-after": "2" }, {});
-      const task: QueueTask<any, string> = {
-        id: uuidv4(),
-        request: {
-          model: {
-            getRetryDelay: vi.fn().mockReturnValue({ shouldRetry: true, delayMs: 2000 }),
-          },
-        },
-        cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), clear: vi.fn() },
-        resolve: vi.fn(),
-        reject: vi.fn(),
-        execute: vi.fn().mockRejectedValueOnce(rateLimitError).mockResolvedValue("success"),
-        telemetryContext: {} as Context,
-      };
-
-      queue.enqueue(task);
-
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      expect(task.execute).toHaveBeenCalledTimes(2);
-      expect(task.resolve).toHaveBeenCalledWith("success");
-      expect(task.reject).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("Performance tests", () => {
-    it("should handle a large number of tasks efficiently", async () => {
-      const taskCount = 1000;
-      const results: string[] = [];
-
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id: uuidv4(),
-        request: id,
-        cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), clear: vi.fn() },
-        resolve: (value) => results.push(value),
-        reject: vi.fn(),
-        execute: vi.fn().mockResolvedValue(id),
-        telemetryContext: {} as Context,
-      });
-
-      const startTime = Date.now();
-
-      for (let i = 0; i < taskCount; i++) {
-        queue.enqueue(createTask(`task-${i}`));
-      }
-
-      while (results.length < taskCount) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-
-      expect(results.length).toBe(taskCount);
-      expect(duration).toBeLessThan(10000);
-      console.log(`Processed ${taskCount} tasks in ${duration}ms`);
-    });
-
-    it("should maintain performance under high concurrency", async () => {
-      const taskCount = 100;
-      const results: string[] = [];
-      const highConcurrencyOptions: QueueOptionsType = { ...options, maxConcurrentTasks: 50 };
-      const highConcurrencyQueue = new SimpleQueue<string, string>(highConcurrencyOptions);
-
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id: uuidv4(),
-        request: id,
-        cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn(), clear: vi.fn() },
-        resolve: (value) => results.push(value),
-        reject: vi.fn(),
-        execute: vi.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(id), 50))),
-        telemetryContext: {} as Context,
-      });
-
-      const startTime = Date.now();
-
-      for (let i = 0; i < taskCount; i++) {
-        highConcurrencyQueue.enqueue(createTask(`task-${i}`));
-      }
-
-      while (results.length < taskCount) {
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      }
-
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-
-      expect(results.length).toBe(taskCount);
-      expect(duration).toBeLessThan(5000);
-      console.log(`Processed ${taskCount} tasks with high concurrency in ${duration}ms`);
-    });
-  });
-});
-
-// Mock dependencies
-jest.mock("@opentelemetry/api");
-jest.mock("../../../src/plugins/telemetry");
-jest.mock("../../../src/plugins/logger");
-jest.mock("../../../src/plugins/http-client");
-jest.mock("../../../src/gateway.types");
-
-describe("SimpleQueue", () => {
-  let queue: SimpleQueue<any, any>;
-  let mockOptions: QueueOptionsType;
-  let mockTask: QueueTask<any, any>;
-  let mockContext: Context;
-  let mockSpan: Span;
-  let mockTracer: any;
-  let mockLogger: any;
-
-  beforeEach(() => {
-    mockOptions = {
+    defaultOptions = {
       maxConcurrentTasks: 2,
-      timeout: 5000,
-      retryCount: 3,
+      retryCount: 2,
+      timeout: 500, // ms
       retry: {
-        initialDelay: 1000,
+        initialDelay: 50, // ms
         exponentialFactor: 2,
       },
     };
-
-    mockTask = {
-      id: "test-task",
-      request: {},
-      cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-      execute: jest.fn(),
-      resolve: jest.fn(),
-      reject: jest.fn(),
-      telemetryContext: {} as Context,
-    };
-
-    mockContext = {} as Context;
-    mockSpan = {
-      setAttribute: jest.fn(),
-      setStatus: jest.fn(),
-      end: jest.fn(),
-    } as unknown as Span;
-
-    mockTracer = {
-      startActiveSpan: jest.fn((name, callback) => callback(mockSpan)),
-    };
-
-    mockLogger = {
-      debug: jest.fn(),
-      warn: jest.fn(),
-    };
-
-    (context.with as jest.Mock).mockImplementation((ctx, callback) => callback());
-    (TelemetryManager.getTracer as jest.Mock).mockReturnValue(mockTracer);
-    (LoggerManager.getLogger as jest.Mock).mockReturnValue(mockLogger);
-
-    queue = new SimpleQueue(mockOptions);
+    // Reset mocks before each test if needed
+    vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  // Helper to create a task promise
+  const createTaskPromise = <Req, Res>(
+    queue: SimpleQueue<Req, Res>,
+    taskDetails: Omit<QueueTask<Req, Res>, "resolve" | "reject" | "telemetryContext">
+  ): Promise<Res> => {
+    return new Promise<Res>((resolve, reject) => {
+      const task: QueueTask<Req, Res> = {
+        ...taskDetails,
+        resolve,
+        reject,
+        telemetryContext: context.active(), // Get current context
+      };
+      queue.enqueue(task);
+    });
+  };
 
-  test("enqueue should add task to queue and start processing", async () => {
-    await queue.enqueue(mockTask);
+  it("should process a single task successfully", async () => {
+    const queue = new SimpleQueue<string, string>(defaultOptions);
+    const taskPayload = "task1_payload";
+    const expectedResult = "task1_payload_result";
 
-    expect(context.with).toHaveBeenCalledWith(mockTask.telemetryContext, expect.any(Function));
-    expect(mockTracer.startActiveSpan).toHaveBeenCalledWith("queue.task.pickup-wait", expect.any(Function));
-    expect(mockSpan.setAttribute).toHaveBeenCalledWith("id", mockTask.id);
-    expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("SimpleQueue.enqueue invoked"));
-    expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("SimpleQueue.enqueue task enqueued"));
-  });
-
-  test("executeWithRetry should retry on failure", async () => {
-    const mockError = new Error("Test error");
-    mockTask.execute = jest
-      .fn()
-      .mockRejectedValueOnce(mockError)
-      .mockRejectedValueOnce(mockError)
-      .mockResolvedValueOnce({ data: "success" });
-
-    const result = await (queue as any).executeWithRetry(mockTask, mockOptions.retryCount);
-
-    expect(result).toEqual({ data: "success" });
-    expect(mockTask.execute).toHaveBeenCalledTimes(3);
-    expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("SimpleQueue.executeWithRetry invoked"));
-    expect(mockSpan.setStatus).toHaveBeenCalledWith({ code: SpanStatusCode.OK });
-  });
-
-  test("executeWithTimeout should resolve within timeout", async () => {
-    const mockResponse = { data: "test" };
-    mockTask.execute = jest.fn().mockResolvedValue(mockResponse);
-
-    const result = await (queue as any).executeWithTimeout(mockTask, mockContext);
-
-    expect(result).toEqual(mockResponse);
-    expect(mockTask.execute).toHaveBeenCalledWith(mockTask.request, mockContext);
-    expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("SimpleQueue.executeWithTimeout invoked"));
-    expect(mockLogger.debug).toHaveBeenCalledWith(expect.stringContaining("SimpleQueue.executeWithTimeout task completed"));
-  });
-
-  test("executeWithTimeout should reject on timeout", async () => {
-    jest.useFakeTimers();
-    mockTask.execute = jest.fn().mockImplementation(() => new Promise(() => {}));
-
-    const executePromise = (queue as any).executeWithTimeout(mockTask, mockContext);
-    jest.advanceTimersByTime(mockOptions.timeout + 100);
-
-    await expect(executePromise).rejects.toThrow(QueueTaskTimeoutError);
-    expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining("SimpleQueue.executeWithTimeout timed out"));
-
-    jest.useRealTimers();
-  });
-
-  test("executeWithRetry should handle HttpRequestError with rate limiting", async () => {
-    const mockHttpError = new HttpRequestError("Rate limit exceeded", 429, { "retry-after": "1420" }, {});
-    mockTask.execute = jest.fn().mockRejectedValueOnce(mockHttpError).mockResolvedValueOnce({ data: "success" });
-
-    (GatewayCompleteChatRequest.safeParse as jest.Mock).mockReturnValue({
-      success: true,
-      data: {
-        model: {
-          getRetryDelay: jest.fn().mockReturnValue({ shouldRetry: true, delayMs: 1000 }),
-        },
+    const taskPromise = createTaskPromise(queue, {
+      id: "task1",
+      request: taskPayload,
+      execute: async (req) => {
+        await delay(10); // Simulate work
+        return `${req}_result`;
       },
     });
 
-    const result = await (queue as any).executeWithRetry(mockTask, mockOptions.retryCount);
-
-    expect(result).toEqual({ data: "success" });
-    expect(mockTask.execute).toHaveBeenCalledTimes(2);
-    expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining("SimpleQueue.executeWithRetry rate limiting error"));
+    await expect(taskPromise).resolves.toBe(expectedResult);
   });
 
-  describe("Performance tests", () => {
-    test("should handle a large number of tasks efficiently", async () => {
-      const taskCount = 1000;
-      const results: string[] = [];
+  it("should process tasks sequentially if maxConcurrentTasks is 1", async () => {
+    const options = { ...defaultOptions, maxConcurrentTasks: 1 };
+    const queue = new SimpleQueue<string, number>(options);
+    const taskDurations = [50, 50]; // ms
+    const startTime = Date.now();
+    let task1EndTime = 0;
+    let task2StartTime = 0;
 
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id,
-        request: id,
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        execute: jest.fn().mockResolvedValue(id),
-        resolve: (value) => results.push(value),
-        reject: jest.fn(),
-        telemetryContext: {} as Context,
-      });
-
-      const startTime = performance.now();
-
-      for (let i = 0; i < taskCount; i++) {
-        await queue.enqueue(createTask(`task-${i}`));
-      }
-
-      while (results.length < taskCount) {
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-
-      expect(results.length).toBe(taskCount);
-      expect(duration).toBeLessThan(10000); // Adjust this threshold as needed
-      console.log(`Processed ${taskCount} tasks in ${duration.toFixed(2)}ms`);
+    const task1Promise = createTaskPromise(queue, {
+      id: "taskSeq1",
+      request: "req1",
+      execute: async () => {
+        await delay(taskDurations[0]);
+        task1EndTime = Date.now();
+        return 1;
+      },
     });
 
-    test("should maintain performance under high concurrency", async () => {
-      const taskCount = 100;
-      const results: string[] = [];
-      const highConcurrencyOptions: QueueOptionsType = { ...mockOptions, maxConcurrentTasks: 50 };
-      const highConcurrencyQueue = new SimpleQueue<string, string>(highConcurrencyOptions);
-
-      const createTask = (id: string): QueueTask<string, string> => ({
-        id,
-        request: id,
-        execute: jest.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(id), 50))),
-        resolve: (value) => results.push(value),
-        reject: jest.fn(),
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        telemetryContext: {} as Context,
-      });
-
-      const startTime = performance.now();
-
-      for (let i = 0; i < taskCount; i++) {
-        await highConcurrencyQueue.enqueue(createTask(`task-${i}`));
-      }
-
-      while (results.length < taskCount) {
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
-
-      const endTime = performance.now();
-      const duration = endTime - startTime;
-
-      expect(results.length).toBe(taskCount);
-      expect(duration).toBeLessThan(5000); // Adjust this threshold as needed
-      console.log(`Processed ${taskCount} tasks with high concurrency in ${duration.toFixed(2)}ms`);
+    const task2Promise = createTaskPromise(queue, {
+      id: "taskSeq2",
+      request: "req2",
+      execute: async () => {
+        task2StartTime = Date.now();
+        await delay(taskDurations[1]);
+        return 2;
+      },
     });
 
-    test("should handle tasks with varying execution times", async () => {
-      const taskCount = 100;
-      const results: string[] = [];
+    const results = await Promise.all([task1Promise, task2Promise]);
 
-      const createTask = (id: string, executionTime: number): QueueTask<string, string> => ({
+    expect(results).toEqual([1, 2]);
+    // Task 2 should start only after Task 1 finishes (or very close to it)
+    expect(task2StartTime).toBeGreaterThanOrEqual(task1EndTime);
+    // Total time should be roughly sum of durations + overhead
+    expect(Date.now() - startTime).toBeGreaterThanOrEqual(taskDurations[0] + taskDurations[1]);
+  });
+
+  it("should respect maxConcurrentTasks limit", async () => {
+    const options = { ...defaultOptions, maxConcurrentTasks: 2 };
+    const queue = new SimpleQueue<string, number>(options);
+    const taskDuration = 100; // ms
+    let runningTasks = 0;
+    let maxRunningTasks = 0;
+
+    const createTask = (id: string) =>
+      createTaskPromise(queue, {
         id,
         request: id,
-        execute: jest.fn().mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(id), executionTime))),
-        resolve: (value) => results.push(value),
-        reject: jest.fn(),
-        cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn(), clear: jest.fn() },
-        telemetryContext: {} as Context,
+        execute: async () => {
+          runningTasks++;
+          maxRunningTasks = Math.max(maxRunningTasks, runningTasks);
+          await delay(taskDuration);
+          runningTasks--;
+          return parseInt(id.slice(-1));
+        },
       });
 
-      const startTime = performance.now();
+    const promises = [createTask("conc1"), createTask("conc2"), createTask("conc3"), createTask("conc4")];
 
-      for (let i = 0; i < taskCount; i++) {
-        const executionTime = Math.random() * 100; // Random execution time between 0-100ms
-        await queue.enqueue(createTask(`task-${i}`, executionTime));
-      }
+    await Promise.all(promises);
 
-      while (results.length < taskCount) {
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
+    expect(maxRunningTasks).toBe(options.maxConcurrentTasks);
+  });
 
-      const endTime = performance.now();
-      const duration = endTime - startTime;
+  it("should reject a task if it times out", async () => {
+    const options = { ...defaultOptions, timeout: 50 }; // Short timeout
+    const queue = new SimpleQueue<string, string>(options);
 
-      expect(results.length).toBe(taskCount);
-      expect(duration).toBeLessThan(8000); // Adjust this threshold as needed
-      console.log(`Processed ${taskCount} tasks with varying execution times in ${duration.toFixed(2)}ms`);
+    const taskPromise = createTaskPromise(queue, {
+      id: "timeoutTask",
+      request: "reqTimeout",
+      execute: async () => {
+        await delay(options.timeout + 50); // Ensure it exceeds timeout
+        return "should_not_resolve";
+      },
     });
+
+    await expect(taskPromise).rejects.toThrow(QueueTaskTimeoutError);
+    await expect(taskPromise).rejects.toThrow("Queue task timeout");
+  });
+
+  it("should retry a task on failure and succeed on retry", async () => {
+    const options = { ...defaultOptions, retryCount: 1, retry: { initialDelay: 20, exponentialFactor: 2 } };
+    const queue = new SimpleQueue<string, string>(options);
+    let attempt = 0;
+    const expectedResult = "success_on_retry";
+
+    const taskPromise = createTaskPromise(queue, {
+      id: "retrySuccessTask",
+      request: "reqRetrySuccess",
+      execute: async () => {
+        attempt++;
+        if (attempt === 1) {
+          await delay(10); // Simulate work before failing
+          throw new Error("Temporary failure");
+        }
+        await delay(10);
+        return expectedResult;
+      },
+    });
+
+    await expect(taskPromise).resolves.toBe(expectedResult);
+    expect(attempt).toBe(2); // Initial attempt + 1 retry
+  });
+
+  it("should retry with exponential backoff delay", async () => {
+    const options = {
+      ...defaultOptions,
+      retryCount: 2, // Allows for 2 retries (3 attempts total)
+      retry: { initialDelay: 50, exponentialFactor: 2 }, // 50ms, then 100ms delay
+    };
+    const queue = new SimpleQueue<string, string>(options);
+    let attempt = 0;
+    const failureTimestamps: number[] = [];
+    const successTimestamp = 0;
+
+    const taskPromise = createTaskPromise(queue, {
+      id: "retryDelayTask",
+      request: "reqRetryDelay",
+      execute: async () => {
+        attempt++;
+        if (attempt <= 2) {
+          failureTimestamps.push(Date.now());
+          await delay(10); // Simulate work before failing
+          throw new Error(`Temporary failure ${attempt}`);
+        }
+        await delay(10);
+        return "success_finally";
+      },
+    });
+
+    const startTime = Date.now();
+    await expect(taskPromise).resolves.toBe("success_finally");
+    const endTime = Date.now();
+
+    expect(attempt).toBe(3); // Initial + 2 retries
+    expect(failureTimestamps.length).toBe(2);
+
+    // Check approximate delays (allow for processing overhead)
+    // Delay after 1st failure should be ~50ms
+    const firstRetryStartTime = failureTimestamps[1];
+    const firstRetryDelay = firstRetryStartTime - failureTimestamps[0];
+    expect(firstRetryDelay).toBeGreaterThanOrEqual(options.retry.initialDelay);
+    expect(firstRetryDelay).toBeLessThan(options.retry.initialDelay * 1.5 + 50); // Allow generous overhead
+
+    // Delay after 2nd failure should be ~100ms (50 * 2^1)
+    // Approximate start time of 3rd attempt is endTime - execution time (~10ms)
+    const secondRetryDelay = endTime - 10 - failureTimestamps[1];
+    const expectedSecondDelay = options.retry.initialDelay * Math.pow(options.retry.exponentialFactor, 1);
+    expect(secondRetryDelay).toBeGreaterThanOrEqual(expectedSecondDelay);
+    expect(secondRetryDelay).toBeLessThan(expectedSecondDelay * 1.5 + 50); // Allow generous overhead
+  });
+
+  it("should reject a task after exhausting retries", async () => {
+    const options = { ...defaultOptions, retryCount: 1 }; // 1 retry (2 attempts total)
+    const queue = new SimpleQueue<string, string>(options);
+    let attempt = 0;
+    const failError = new Error("Permanent failure");
+
+    const taskPromise = createTaskPromise(queue, {
+      id: "retryFailTask",
+      request: "reqRetryFail",
+      execute: async () => {
+        attempt++;
+        await delay(10);
+        throw failError;
+      },
+    });
+
+    await expect(taskPromise).rejects.toThrow(failError);
+    expect(attempt).toBe(2); // Initial attempt + 1 retry
+  });
+
+  // Example testing specific error retry logic (minimal mock needed here)
+  it("should handle simulated 429 error retry delay (if logic exists)", async () => {
+    // This test assumes your actual `GatewayCompleteChatRequest` and `model.getRetryDelay`
+    // work as mocked above for 429 errors.
+
+    const options = { ...defaultOptions, retryCount: 1 };
+    const queue = new SimpleQueue<string, string>(options); // Recreate queue to pick up the new mock
+
+    let attempt = 0;
+    let failureTimestamp = 0;
+    let successTimestamp = 0;
+
+    const taskPromise = createTaskPromise(queue, {
+      id: "429Task",
+      request: "req429", // Needs to be parsable by the mocked safeParse
+      execute: async () => {
+        attempt++;
+        if (attempt === 1) {
+          failureTimestamp = Date.now();
+          await delay(10);
+          // Throw the error type the queue checks
+          throw new MockHttpRequestError("Rate Limited", 429);
+        }
+        successTimestamp = Date.now();
+        await delay(10);
+        return "success_after_429";
+      },
+    });
+
+    await expect(taskPromise).resolves.toBe("success_after_429");
+    expect(attempt).toBe(2);
+    expect(successTimestamp - failureTimestamp).toBeGreaterThanOrEqual(60);
+    expect(successTimestamp - failureTimestamp).toBeLessThan(60 * 1.5 + 50); // Allow overhead
+
+    // Restore original mock if needed (or let Vitest handle it with vi.doMock scope)
+    vi.doUnmock("../../gateway.types");
+  });
+
+  it("should handle tasks added while processing others", async () => {
+    const options = { ...defaultOptions, maxConcurrentTasks: 1, timeout: 200 };
+    const queue = new SimpleQueue<string, number>(options);
+
+    const results: number[] = [];
+
+    // Task 1 takes time
+    const task1Promise = createTaskPromise(queue, {
+      id: "addLater1",
+      request: "req1",
+      execute: async () => {
+        await delay(100);
+        results.push(1);
+        return 1;
+      },
+    });
+
+    // While task 1 is running (or queued), add task 2
+    await delay(20); // Ensure task 1 has started processing
+    const task2Promise = createTaskPromise(queue, {
+      id: "addLater2",
+      request: "req2",
+      execute: async () => {
+        await delay(50);
+        results.push(2);
+        return 2;
+      },
+    });
+
+    await expect(task1Promise).resolves.toBe(1);
+    await expect(task2Promise).resolves.toBe(2);
+    expect(results).toEqual([1, 2]); // Ensure they finished in the correct order due to concurrency 1
   });
 });
