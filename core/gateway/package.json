@@ -51,7 +51,7 @@
     "format": "prettier --write .",
     "prepublishOnly": "pnpm run build",
     "post": "npm publish --access public",
-    "test": "jest",
+    "test": "vitest",
     "test:watch": "jest --watch"
   },
   "dependencies": {
