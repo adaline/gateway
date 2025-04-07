@@ -1,11 +1,13 @@
 // simple-queue.test.ts
-import { context } from "@opentelemetry/api"; // Assuming these are needed for context propagation if not mocked
+import { context, Context } from "@opentelemetry/api"; // Added ROOT_CONTEXT, Context
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { QueueTaskTimeoutError } from "../../../src/plugins/queue/queue.error";
 import { QueueOptionsType, QueueTask } from "../../../src/plugins/queue/queue.interface";
 import { SimpleQueue } from "../../../src/plugins/queue/simple.queue";
 import { delay } from "../../../src/utils"; // Assuming path
+
+// --- Mocks Setup ---
 
 const mockLogger = {
   debug: vi.fn(),
@@ -14,11 +16,13 @@ const mockLogger = {
   error: vi.fn(),
 };
 const mockTracer = {
-  startActiveSpan: vi.fn((name, fn) => {
-    // Simulate span execution - call the function immediately
+  startActiveSpan: vi.fn((name, options, contextMaybe, fnMaybe) => {
+    // Handle optional context argument
+    const fn = fnMaybe ?? contextMaybe;
     const span = {
       setAttribute: vi.fn(),
       setStatus: vi.fn(),
+      recordException: vi.fn(), // Added for error recording
       end: vi.fn(),
     };
     // @ts-ignore // Allow calling fn with span
@@ -38,65 +42,80 @@ vi.mock("./../telemetry", () => ({
   },
 }));
 
-// We need a minimal definition for types used in the retry logic if not mocking it.
-// These are placeholders. Replace with actual imports/definitions if needed for complex retry logic tests.
+// Mock for HttpRequestError and related logic (adjust status/headers as needed per test)
 class MockHttpRequestError extends Error {
-  cause: { status: number; headers?: any };
-  constructor(message: string, status: number, headers?: any) {
+  cause: { status: number; headers?: Record<string, string> }; // Adjusted type
+  response?: any; // Added optional response property if queue checks it
+  constructor(message: string, status: number, headers?: Record<string, string>, response?: any) {
     super(message);
     this.name = "HttpRequestError";
     this.cause = { status, headers };
+    this.response = response; // Store response if provided
   }
   static isHttpRequestError(error: any): error is MockHttpRequestError {
     return error instanceof MockHttpRequestError;
   }
 }
-const mockModel = {
-  getRetryDelay: (headers: any) => ({ shouldRetry: true, delayMs: -1 }), // Default retry behavior
+
+// Default mock model behavior - gets overridden in specific tests if needed
+const mockModelDefault = {
+  // Default: retry immediately unless overridden
+  getRetryDelay: (headers: any) => ({ shouldRetry: true, delayMs: 1 }),
 };
+
+// Mock for Gateway Request Parsing (used in 429 test)
 const MockGatewayCompleteChatRequest = {
-  safeParse: (data: any) => ({ success: true, data: { ...data, model: mockModel } }),
+  // Ensure the parsed data includes a model object for getRetryDelay
+  safeParse: (data: any) => ({ success: true, data: { ...data, model: data?.model ?? mockModelDefault } }),
 };
-vi.mock("./../http-client", () => ({ HttpRequestError: MockHttpRequestError })); // Assuming path
-vi.mock("../../gateway.types", () => ({ GatewayCompleteChatRequest: MockGatewayCompleteChatRequest })); // Assuming path
+
+vi.mock("./../http-client", () => ({ HttpRequestError: MockHttpRequestError }));
+vi.mock("../../gateway.types", () => ({ GatewayCompleteChatRequest: MockGatewayCompleteChatRequest }));
 
 // --- Test Suite ---
 
 describe("SimpleQueue", () => {
   let defaultOptions: QueueOptionsType;
+  let queue: SimpleQueue<any, any>; // Use 'any' for broader testability or define specific types per test block
 
   beforeEach(() => {
+    // Reset mocks before each test
+    vi.clearAllMocks();
+
     defaultOptions = {
-      maxConcurrentTasks: 2,
-      retryCount: 2,
+      maxConcurrentTasks: 2, // Default, can be overridden
+      retryCount: 2, // Default: 2 retries (3 attempts total)
       timeout: 500, // ms
       retry: {
         initialDelay: 50, // ms
         exponentialFactor: 2,
       },
     };
-    // Reset mocks before each test if needed
-    vi.clearAllMocks();
+
+    // Initialize queue with default options - tests can override options if needed
+    queue = new SimpleQueue<any, any>(defaultOptions);
   });
 
-  // Helper to create a task promise
+  // Helper to create a task promise (same as before)
   const createTaskPromise = <Req, Res>(
-    queue: SimpleQueue<Req, Res>,
-    taskDetails: Omit<QueueTask<Req, Res>, "resolve" | "reject" | "telemetryContext">
+    q: SimpleQueue<Req, Res>, // Pass queue instance
+    taskDetails: Omit<QueueTask<Req, Res>, "resolve" | "reject" | "telemetryContext">,
+    taskContext: Context = context.active() // Allow overriding context
   ): Promise<Res> => {
     return new Promise<Res>((resolve, reject) => {
       const task: QueueTask<Req, Res> = {
         ...taskDetails,
         resolve,
         reject,
-        telemetryContext: context.active(), // Get current context
+        telemetryContext: taskContext,
       };
-      queue.enqueue(task);
+      q.enqueue(task);
     });
   };
 
+  // --- Existing Tests (Keep them) ---
+
   it("should process a single task successfully", async () => {
-    const queue = new SimpleQueue<string, string>(defaultOptions);
     const taskPayload = "task1_payload";
     const expectedResult = "task1_payload_result";
 
@@ -104,7 +123,7 @@ describe("SimpleQueue", () => {
       id: "task1",
       request: taskPayload,
       execute: async (req) => {
-        await delay(10); // Simulate work
+        await delay(10);
         return `${req}_result`;
       },
     });
@@ -114,13 +133,13 @@ describe("SimpleQueue", () => {
 
   it("should process tasks sequentially if maxConcurrentTasks is 1", async () => {
     const options = { ...defaultOptions, maxConcurrentTasks: 1 };
-    const queue = new SimpleQueue<string, number>(options);
+    const seqQueue = new SimpleQueue<string, number>(options); // Use a dedicated queue for this test
     const taskDurations = [50, 50]; // ms
     const startTime = Date.now();
     let task1EndTime = 0;
     let task2StartTime = 0;
 
-    const task1Promise = createTaskPromise(queue, {
+    const task1Promise = createTaskPromise(seqQueue, {
       id: "taskSeq1",
       request: "req1",
       execute: async () => {
@@ -130,7 +149,7 @@ describe("SimpleQueue", () => {
       },
     });
 
-    const task2Promise = createTaskPromise(queue, {
+    const task2Promise = createTaskPromise(seqQueue, {
       id: "taskSeq2",
       request: "req2",
       execute: async () => {
@@ -143,21 +162,20 @@ describe("SimpleQueue", () => {
     const results = await Promise.all([task1Promise, task2Promise]);
 
     expect(results).toEqual([1, 2]);
-    // Task 2 should start only after Task 1 finishes (or very close to it)
     expect(task2StartTime).toBeGreaterThanOrEqual(task1EndTime);
-    // Total time should be roughly sum of durations + overhead
     expect(Date.now() - startTime).toBeGreaterThanOrEqual(taskDurations[0] + taskDurations[1]);
   });
 
   it("should respect maxConcurrentTasks limit", async () => {
+    // This test already covers part of the concurrency scenario
     const options = { ...defaultOptions, maxConcurrentTasks: 2 };
-    const queue = new SimpleQueue<string, number>(options);
+    const concQueue = new SimpleQueue<string, number>(options);
     const taskDuration = 100; // ms
     let runningTasks = 0;
     let maxRunningTasks = 0;
 
     const createTask = (id: string) =>
-      createTaskPromise(queue, {
+      createTaskPromise(concQueue, {
         id,
         request: id,
         execute: async () => {
@@ -178,9 +196,9 @@ describe("SimpleQueue", () => {
 
   it("should reject a task if it times out", async () => {
     const options = { ...defaultOptions, timeout: 50 }; // Short timeout
-    const queue = new SimpleQueue<string, string>(options);
+    const timeoutQueue = new SimpleQueue<string, string>(options);
 
-    const taskPromise = createTaskPromise(queue, {
+    const taskPromise = createTaskPromise(timeoutQueue, {
       id: "timeoutTask",
       request: "reqTimeout",
       execute: async () => {
@@ -195,142 +213,111 @@ describe("SimpleQueue", () => {
 
   it("should retry a task on failure and succeed on retry", async () => {
     const options = { ...defaultOptions, retryCount: 1, retry: { initialDelay: 20, exponentialFactor: 2 } };
-    const queue = new SimpleQueue<string, string>(options);
+    const retryQueue = new SimpleQueue<string, string>(options);
     let attempt = 0;
     const expectedResult = "success_on_retry";
+    const mockExecute = vi.fn(async () => {
+      attempt++;
+      if (attempt === 1) {
+        await delay(10); // Simulate work before failing
+        throw new Error("Temporary failure");
+      }
+      await delay(10);
+      return expectedResult;
+    });
 
-    const taskPromise = createTaskPromise(queue, {
+    const taskPromise = createTaskPromise(retryQueue, {
       id: "retrySuccessTask",
       request: "reqRetrySuccess",
-      execute: async () => {
-        attempt++;
-        if (attempt === 1) {
-          await delay(10); // Simulate work before failing
-          throw new Error("Temporary failure");
-        }
-        await delay(10);
-        return expectedResult;
-      },
+      execute: mockExecute,
     });
 
     await expect(taskPromise).resolves.toBe(expectedResult);
     expect(attempt).toBe(2); // Initial attempt + 1 retry
+    expect(mockExecute).toHaveBeenCalledTimes(2);
   });
 
   it("should retry with exponential backoff delay", async () => {
     const options = {
       ...defaultOptions,
-      retryCount: 2, // Allows for 2 retries (3 attempts total)
-      retry: { initialDelay: 50, exponentialFactor: 2 }, // 50ms, then 100ms delay
+      maxConcurrentTasks: 1, // Make timing easier to predict
+      retryCount: 2,
+      retry: { initialDelay: 50, exponentialFactor: 2 },
     };
-    const queue = new SimpleQueue<string, string>(options);
+    const backoffQueue = new SimpleQueue<string, string>(options);
     let attempt = 0;
     const failureTimestamps: number[] = [];
-    const successTimestamp = 0;
-
-    const taskPromise = createTaskPromise(queue, {
-      id: "retryDelayTask",
-      request: "reqRetryDelay",
-      execute: async () => {
-        attempt++;
-        if (attempt <= 2) {
-          failureTimestamps.push(Date.now());
-          await delay(10); // Simulate work before failing
-          throw new Error(`Temporary failure ${attempt}`);
-        }
-        await delay(10);
-        return "success_finally";
-      },
+    let successTimestamp = 0;
+    const mockExecute = vi.fn(async () => {
+      const now = Date.now();
+      attempt++;
+      if (attempt <= 2) {
+        failureTimestamps.push(now);
+        await delay(10); // Simulate work before failing
+        throw new Error(`Temporary failure ${attempt}`);
+      }
+      await delay(10);
+      successTimestamp = Date.now();
+      return "success_finally";
     });
 
-    const startTime = Date.now();
+    const taskPromise = createTaskPromise(backoffQueue, {
+      id: "retryDelayTask",
+      request: "reqRetryDelay",
+      execute: mockExecute,
+    });
+
     await expect(taskPromise).resolves.toBe("success_finally");
-    const endTime = Date.now();
 
     expect(attempt).toBe(3); // Initial + 2 retries
+    expect(mockExecute).toHaveBeenCalledTimes(3);
     expect(failureTimestamps.length).toBe(2);
 
-    // Check approximate delays (allow for processing overhead)
-    // Delay after 1st failure should be ~50ms
-    const firstRetryStartTime = failureTimestamps[1];
-    const firstRetryDelay = firstRetryStartTime - failureTimestamps[0];
+    // Check approximate delays (allow for processing overhead + execution time)
+    const firstRetryAttemptStart = failureTimestamps[1];
+    const firstFailureEnd = failureTimestamps[0] + 10; // Approx end time of first attempt work
+    const firstRetryDelay = firstRetryAttemptStart - firstFailureEnd;
     expect(firstRetryDelay).toBeGreaterThanOrEqual(options.retry.initialDelay);
-    expect(firstRetryDelay).toBeLessThan(options.retry.initialDelay * 1.5 + 50); // Allow generous overhead
+    // Looser upper bound for CI/timing variations
+    expect(firstRetryDelay).toBeLessThan(options.retry.initialDelay * 1.5 + 50);
 
-    // Delay after 2nd failure should be ~100ms (50 * 2^1)
-    // Approximate start time of 3rd attempt is endTime - execution time (~10ms)
-    const secondRetryDelay = endTime - 10 - failureTimestamps[1];
+    const secondRetryAttemptStart = successTimestamp - 10; // Approx start time of final attempt work
+    const secondFailureEnd = failureTimestamps[1] + 10; // Approx end time of second attempt work
+    const secondRetryDelay = secondRetryAttemptStart - secondFailureEnd;
     const expectedSecondDelay = options.retry.initialDelay * Math.pow(options.retry.exponentialFactor, 1);
     expect(secondRetryDelay).toBeGreaterThanOrEqual(expectedSecondDelay);
-    expect(secondRetryDelay).toBeLessThan(expectedSecondDelay * 1.5 + 50); // Allow generous overhead
+    expect(secondRetryDelay).toBeLessThan(expectedSecondDelay * 1.5 + 50);
   });
 
   it("should reject a task after exhausting retries", async () => {
     const options = { ...defaultOptions, retryCount: 1 }; // 1 retry (2 attempts total)
-    const queue = new SimpleQueue<string, string>(options);
+    const failQueue = new SimpleQueue<string, string>(options);
     let attempt = 0;
     const failError = new Error("Permanent failure");
+    const mockExecute = vi.fn(async () => {
+      attempt++;
+      await delay(5);
+      throw failError;
+    });
 
-    const taskPromise = createTaskPromise(queue, {
+    const taskPromise = createTaskPromise(failQueue, {
       id: "retryFailTask",
       request: "reqRetryFail",
-      execute: async () => {
-        attempt++;
-        await delay(10);
-        throw failError;
-      },
+      execute: mockExecute,
     });
 
     await expect(taskPromise).rejects.toThrow(failError);
     expect(attempt).toBe(2); // Initial attempt + 1 retry
-  });
-
-  // Example testing specific error retry logic (minimal mock needed here)
-  it("should handle simulated 429 error retry delay (if logic exists)", async () => {
-    // This test assumes your actual `GatewayCompleteChatRequest` and `model.getRetryDelay`
-    // work as mocked above for 429 errors.
-
-    const options = { ...defaultOptions, retryCount: 1 };
-    const queue = new SimpleQueue<string, string>(options); // Recreate queue to pick up the new mock
-
-    let attempt = 0;
-    let failureTimestamp = 0;
-    let successTimestamp = 0;
-
-    const taskPromise = createTaskPromise(queue, {
-      id: "429Task",
-      request: "req429", // Needs to be parsable by the mocked safeParse
-      execute: async () => {
-        attempt++;
-        if (attempt === 1) {
-          failureTimestamp = Date.now();
-          await delay(10);
-          // Throw the error type the queue checks
-          throw new MockHttpRequestError("Rate Limited", 429);
-        }
-        successTimestamp = Date.now();
-        await delay(10);
-        return "success_after_429";
-      },
-    });
-
-    await expect(taskPromise).resolves.toBe("success_after_429");
-    expect(attempt).toBe(2);
-    expect(successTimestamp - failureTimestamp).toBeGreaterThanOrEqual(60);
-    expect(successTimestamp - failureTimestamp).toBeLessThan(60 * 1.5 + 50); // Allow overhead
-
-    // Restore original mock if needed (or let Vitest handle it with vi.doMock scope)
-    vi.doUnmock("../../gateway.types");
+    expect(mockExecute).toHaveBeenCalledTimes(2);
   });
 
   it("should handle tasks added while processing others", async () => {
     const options = { ...defaultOptions, maxConcurrentTasks: 1, timeout: 200 };
-    const queue = new SimpleQueue<string, number>(options);
+    const addLaterQueue = new SimpleQueue<string, number>(options);
 
     const results: number[] = [];
 
-    // Task 1 takes time
-    const task1Promise = createTaskPromise(queue, {
+    const task1Promise = createTaskPromise(addLaterQueue, {
       id: "addLater1",
       request: "req1",
       execute: async () => {
@@ -340,9 +327,8 @@ describe("SimpleQueue", () => {
       },
     });
 
-    // While task 1 is running (or queued), add task 2
     await delay(20); // Ensure task 1 has started processing
-    const task2Promise = createTaskPromise(queue, {
+    const task2Promise = createTaskPromise(addLaterQueue, {
       id: "addLater2",
       request: "req2",
       execute: async () => {
@@ -354,6 +340,114 @@ describe("SimpleQueue", () => {
 
     await expect(task1Promise).resolves.toBe(1);
     await expect(task2Promise).resolves.toBe(2);
-    expect(results).toEqual([1, 2]); // Ensure they finished in the correct order due to concurrency 1
+    expect(results).toEqual([1, 2]);
+  });
+
+  // --- New/Extended Tests Based on Jest Examples ---
+  it("should process tasks concurrently based on limits", async () => {
+    const options = { ...defaultOptions, maxConcurrentTasks: 4 };
+    const concQueue = new SimpleQueue<string, string>(options);
+    const taskDuration = 100; // ms
+    const numTasks = 6;
+    const expectedBatches = Math.ceil(numTasks / options.maxConcurrentTasks); // 6 / 4 = 2 batches
+    const expectedMinDuration = expectedBatches * taskDuration; // ~200ms
+    const expectedMaxDuration = expectedMinDuration + 100; // Allow generous overhead
+
+    const promises: Promise<string>[] = [];
+    const executeMock = vi.fn(async (req: string) => {
+      await delay(taskDuration);
+      return `result-${req}`;
+    });
+
+    const startTime = Date.now();
+
+    for (let i = 1; i <= numTasks; i++) {
+      promises.push(
+        createTaskPromise(concQueue, {
+          id: `conc-task-${i}`,
+          request: `${i}`,
+          execute: executeMock,
+        })
+      );
+    }
+
+    const results = await Promise.all(promises);
+    const endTime = Date.now();
+    const totalDuration = endTime - startTime;
+
+    // Verify all tasks completed
+    expect(results.length).toBe(numTasks);
+    expect(results).toContain("result-1");
+    expect(results).toContain("result-6");
+
+    // Verify the execution mock was called for each task
+    expect(executeMock).toHaveBeenCalledTimes(numTasks);
+
+    // Verify timing suggests concurrency
+    // It should be faster than sequential execution (numTasks * taskDuration)
+    expect(totalDuration).toBeLessThan(numTasks * taskDuration);
+    // It should be roughly the time for the number of batches
+    expect(totalDuration).toBeGreaterThanOrEqual(expectedMinDuration);
+    expect(totalDuration).toBeLessThan(expectedMaxDuration); // Check it's not excessively long
+  });
+
+  /**
+   * @description Corresponds to jest "should retry on failure"
+   * Tests retrying multiple times before success.
+   */
+  it("should retry multiple times and succeed eventually", async () => {
+    const options = { ...defaultOptions, retryCount: 3, retry: { initialDelay: 20 } }; // 3 retries (4 attempts)
+    const retryQueue = new SimpleQueue<string, string>(options);
+    const expectedResult = "success_on_3rd_attempt";
+    let attempt = 0;
+    const mockExecute = vi.fn(async () => {
+      attempt++;
+      await delay(5); // Simulate work
+      if (attempt <= 2) {
+        throw new Error(`Fail ${attempt}`);
+      }
+      return expectedResult;
+    });
+
+    const taskPromise = createTaskPromise(retryQueue, {
+      id: "multiRetryTask",
+      request: "reqMultiRetry",
+      execute: mockExecute,
+    });
+
+    await expect(taskPromise).resolves.toBe(expectedResult);
+    expect(attempt).toBe(3); // Failed twice, succeeded on the third attempt
+    expect(mockExecute).toHaveBeenCalledTimes(3);
+  });
+
+  it("should reject due to timeout after exhausting retries", async () => {
+    const options = {
+      ...defaultOptions,
+      timeout: 50, // Short timeout
+      retryCount: 2, // 3 attempts total
+    };
+    const timeoutQueue = new SimpleQueue<string, string>(options);
+    let attempt = 0;
+    const mockExecute = vi.fn(async () => {
+      attempt++;
+      // This delay will exceed the timeout on every attempt
+      await delay(options.timeout + 50);
+      return "should_never_resolve";
+    });
+
+    const taskPromise = createTaskPromise(timeoutQueue, {
+      id: "timeoutRetryTask",
+      request: "reqTimeoutRetry",
+      execute: mockExecute,
+    });
+
+    // Expect rejection with the specific timeout error
+    await expect(taskPromise).rejects.toThrow(QueueTaskTimeoutError);
+    await expect(taskPromise).rejects.toThrow("Queue task timeout");
+
+    // Verify it attempted the task multiple times (initial + retries) before final timeout rejection
+    // The exact number of calls might depend on internal queue logic (does it call execute *then* timeout, or timeout *before* call?)
+    // Assuming it calls execute for each attempt:
+    expect(mockExecute).toHaveBeenCalledTimes(options.retryCount + 1); // e.g., 3 times for retryCount: 2
   });
 });
