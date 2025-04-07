@@ -450,4 +450,100 @@ describe("SimpleQueue", () => {
     // Assuming it calls execute for each attempt:
     expect(mockExecute).toHaveBeenCalledTimes(options.retryCount + 1); // e.g., 3 times for retryCount: 2
   });
+
+  // --- Performance Tests ---
+  describe("Performance tests", () => {
+    it("should handle a large number of tasks efficiently", async () => {
+      // Consider skipping this on CI if it's too slow/flaky, using it.skip
+      const taskCount = 1000;
+      const performanceThresholdMs = 10000; // 10 seconds threshold from jest test
+      const perfQueue = new SimpleQueue<string, string>({
+        ...defaultOptions,
+        maxConcurrentTasks: 10, // Increase concurrency slightly for faster processing
+      });
+      const promises: Promise<string>[] = [];
+      const quickExecute = vi.fn().mockResolvedValue("done"); // Very fast execution
+
+      console.log(`[Performance Test] Starting ${taskCount} quick tasks...`);
+      const startTime = Date.now();
+
+      for (let i = 0; i < taskCount; i++) {
+        promises.push(
+          createTaskPromise(perfQueue, {
+            id: `perf-task-${i}`,
+            request: `task-${i}`,
+            execute: quickExecute, // Use the fast mock
+          })
+        );
+      }
+
+      // Wait for all tasks to complete using Promise.all
+      const results = await Promise.all(promises);
+
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+
+      expect(results.length).toBe(taskCount); // Verify all tasks resolved
+      expect(quickExecute).toHaveBeenCalledTimes(taskCount);
+      // Check against the performance threshold
+      expect(duration).toBeLessThan(performanceThresholdMs);
+
+      console.log(`[Performance Test] Processed ${taskCount} quick tasks in ${duration}ms (Threshold: < ${performanceThresholdMs}ms)`);
+    });
+
+    it("should maintain performance under high concurrency", async () => {
+      // Consider skipping this on CI if it's too slow/flaky, using it.skip
+      const taskCount = 100;
+      const taskWorkDuration = 50; // ms of simulated work per task
+      const highConcurrencyOptions: QueueOptionsType = {
+        ...defaultOptions,
+        maxConcurrentTasks: 50, // High concurrency setting from  st
+        retryCount: 0, // Disable retries for perf test simplicity
+        timeout: 5000, // Increase timeout for safety under load
+      };
+      const highConcQueue = new SimpleQueue<string, string>(highConcurrencyOptions);
+      const promises: Promise<string>[] = [];
+
+      // Calculate a rough expected minimum duration based on batches
+      const expectedBatches = Math.ceil(taskCount / highConcurrencyOptions.maxConcurrentTasks); // 100 / 50 = 2
+      const expectedMinDuration = expectedBatches * taskWorkDuration; // 2 * 50 = 100ms
+      // Set a reasonable threshold slightly above the minimum + overhead
+      const performanceThresholdMs = Math.max(500, expectedMinDuration * 3); // e.g., 500ms or 3x expected, whichever is higher
+
+      const executeWithDelay = vi.fn(async (id: string) => {
+        await delay(taskWorkDuration);
+        return id;
+      });
+
+      console.log(
+        `[Performance Test] Starting ${taskCount} tasks (${taskWorkDuration}ms each) with concurrency ${highConcurrencyOptions.maxConcurrentTasks}...`
+      );
+      const startTime = Date.now();
+
+      for (let i = 0; i < taskCount; i++) {
+        promises.push(
+          createTaskPromise(highConcQueue, {
+            id: `high-conc-task-${i}`,
+            request: `task-${i}`,
+            execute: executeWithDelay,
+          })
+        );
+      }
+
+      // Wait for all tasks to complete
+      const results = await Promise.all(promises);
+
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+
+      expect(results.length).toBe(taskCount);
+      expect(executeWithDelay).toHaveBeenCalledTimes(taskCount);
+      // Check against the performance threshold
+      expect(duration).toBeLessThan(performanceThresholdMs);
+
+      console.log(
+        `[Performance Test] Processed ${taskCount} tasks (${taskWorkDuration}ms each) with concurrency ${highConcurrencyOptions.maxConcurrentTasks} in ${duration}ms (Expected Min: ~${expectedMinDuration}ms, Threshold: < ${performanceThresholdMs}ms)`
+      );
+    });
+  });
 });
