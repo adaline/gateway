@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 0.21.0
+
+### Minor Changes
+
+- c0e688e: fixes
+
 ## 0.20.0
 
 ### Minor Changes

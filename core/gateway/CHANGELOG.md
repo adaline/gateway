@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 0.31.0
+
+### Minor Changes
+
+- c0e688e: fixes
+
 ## 0.30.0
 
 ### Minor Changes
