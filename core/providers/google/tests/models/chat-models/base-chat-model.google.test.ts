@@ -26,28 +26,6 @@ const createTextContent = (text: string): any => ({
   value: text,
 });
 
-const createToolCallContent = (
-  index: number, // Index is used in the original code
-  toolCallId: string, // The generated ID `${name}_${index}`
-  toolName: string,
-  args: string // Stringified args
-): ContentType => ({
-  modality: "tool_call",
-  value: {
-    toolCallId: toolCallId, // Use the generated ID
-    toolName: toolName,
-    args: args,
-  },
-});
-// Helper function to collect results from the async generator
-async function collectAsyncGenerator<T>(generator: AsyncGenerator<T>): Promise<T[]> {
-  const results: T[] = [];
-  for await (const value of generator) {
-    results.push(value);
-  }
-  return results;
-}
-
 describe("BaseChatModel", () => {
   const mockRolesMap = {
     system: "system",
@@ -693,7 +671,7 @@ describe("BaseChatModel", () => {
         { role: UserRoleLiteral, content: [{ modality: TextModalityLiteral, value: "Query" }] },
       ];
 
-      const expected: GoogleChatRequestType = {
+      const expected: any = {
         contents: [
           { role: "user", parts: [{ text: "Query" }] },
           {
@@ -900,8 +878,8 @@ describe("BaseChatModel", () => {
         model.transformMessages(messages);
       } catch (error) {
         expect(error).toBeInstanceOf(InvalidMessagesError);
-        expect(error.info).toContain("Invalid message format for model : test-model");
-        expect(error.cause?.message).toContain(
+        expect((error as any).info).toContain("Invalid message format for model : test-model");
+        expect((error as any).cause?.message).toContain(
           "model : 'test-model' cannot have message with role : 'user' after message with role : 'tool'"
         );
       }
@@ -981,7 +959,7 @@ describe("BaseChatModel", () => {
         },
       });
 
-      const expected: ChatResponseType = {
+      const expected: any = {
         messages: [
           {
             role: AssistantRoleLiteral,
@@ -1019,7 +997,7 @@ describe("BaseChatModel", () => {
       // Annoyingly, need to delete the key if the schema makes it optional
       delete apiResponse.usageMetadata.candidatesTokenCount;
 
-      const expected: ChatResponseType = {
+      const expected: any = {
         messages: [
           {
             role: AssistantRoleLiteral,
@@ -1055,7 +1033,7 @@ describe("BaseChatModel", () => {
         },
       });
 
-      const expected: ChatResponseType = {
+      const expected: any = {
         messages: [
           {
             role: AssistantRoleLiteral,
@@ -1114,7 +1092,7 @@ describe("BaseChatModel", () => {
         expect(e).toBeInstanceOf(ModelResponseError);
         expect((e as ModelResponseError).info).toBe("Invalid response from model");
         expect((e as ModelResponseError).cause).toBeInstanceOf(z.ZodError);
-        expect((e as ModelResponseError).cause?.errors[0]?.path).toEqual(["usageMetadata", "promptTokenCount"]);
+        expect((e as ModelResponseError as any).cause?.errors[0]?.path).toEqual(["usageMetadata", "promptTokenCount"]);
       }
     });
 
@@ -1127,7 +1105,7 @@ describe("BaseChatModel", () => {
         expect(e).toBeInstanceOf(ModelResponseError);
         expect((e as ModelResponseError).info).toBe("Invalid response from model");
         expect((e as ModelResponseError).cause).toBeInstanceOf(Error); // Specific error created inside
-        expect((e as ModelResponseError).cause?.message).toContain("No choices in response");
+        expect((e as ModelResponseError as any).cause?.message).toContain("No choices in response");
       }
     });
 
@@ -1155,7 +1133,7 @@ describe("BaseChatModel", () => {
         expect(e).toBeInstanceOf(ModelResponseError);
         expect((e as ModelResponseError).info).toBe("Blocked content, model response finished with safety reason");
         expect((e as ModelResponseError).cause).toBeInstanceOf(Error);
-        expect((e as ModelResponseError).cause?.message).toBe("Blocked content, model response finished with safety reason");
+        expect((e as ModelResponseError as any).cause?.message).toBe("Blocked content, model response finished with safety reason");
       }
     });
 
@@ -1183,7 +1161,7 @@ describe("BaseChatModel", () => {
         expect(e).toBeInstanceOf(ModelResponseError);
         expect((e as ModelResponseError).info).toBe("Blocked content for category: HARM_CATEGORY_HATE_SPEECH with probability: HIGH");
         expect((e as ModelResponseError).cause).toBeInstanceOf(Error);
-        expect((e as ModelResponseError).cause?.message).toBe(
+        expect((e as ModelResponseError as any).cause?.message).toBe(
           "Blocked content for category: HARM_CATEGORY_HATE_SPEECH with probability: HIGH"
         );
       }
@@ -1202,7 +1180,7 @@ describe("BaseChatModel", () => {
         expect(e).toBeInstanceOf(ModelResponseError);
         expect((e as ModelResponseError).info).toBe("Invalid response from model");
         expect((e as ModelResponseError).cause).toBeInstanceOf(z.ZodError);
-        expect((e as ModelResponseError).cause?.errors[0]?.path).toEqual(["candidates", 0, "content", "parts", 0]);
+        expect((e as ModelResponseError as any).cause?.errors[0]?.path).toEqual(["candidates", 0, "content", "parts", 0]);
       }
     });
   });

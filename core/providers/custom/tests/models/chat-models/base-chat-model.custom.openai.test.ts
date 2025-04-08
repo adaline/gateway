@@ -413,7 +413,7 @@ describe("BaseChatModelOpenAI", () => {
   });
 
   describe("BaseChatModel transformMessages", () => {
-    let model: BaseChatModel;
+    let model: BaseChatModelOpenAI;
 
     beforeEach(() => {
       model = new BaseChatModelOpenAI(mockModelSchema, mockOptions);
@@ -913,7 +913,7 @@ describe("BaseChatModelOpenAI", () => {
   });
 
   describe("transformStreamChatResponseChunk", () => {
-    let model: BaseChatModel;
+    let model: BaseChatModelOpenAI;
 
     beforeEach(() => {
       model = new BaseChatModelOpenAI(mockModelSchema, mockOptions);
@@ -1253,7 +1253,7 @@ describe("BaseChatModelOpenAI", () => {
   });
   // --- Tests for transformCompleteChatResponse ---
   describe("transformCompleteChatResponse", () => {
-    let baseChatModel: BaseChatModel;
+    let baseChatModel: BaseChatModelOpenAI;
 
     beforeEach(() => {
       baseChatModel = new BaseChatModelOpenAI(mockModelSchema, mockOptions);
@@ -2017,8 +2017,8 @@ describe("BaseChatModelOpenAI", () => {
   });
 
   describe("transformTools", () => {
-    let modelWithTools: BaseChatModel;
-    let modelWithoutTools: BaseChatModel;
+    let modelWithTools: BaseChatModelOpenAI;
+    let modelWithoutTools: BaseChatModelOpenAI;
 
     const validTool1: ToolType = {
       type: "function",
