@@ -2,6 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Adaline Provider",
   "extends": "./node_modules/@adaline/tsconfig/core.json",
-  "include": ["src"],
+  "include": ["src", "tests"],
   "exclude": ["node_modules"]
 }

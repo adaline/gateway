@@ -51,8 +51,8 @@
     "format": "prettier --write .",
     "prepublishOnly": "pnpm run build",
     "post": "npm publish --access public",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@adaline/types": "workspace:*",
