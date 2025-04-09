@@ -1389,13 +1389,13 @@ describe("BaseChatModelVertex", () => {
   });
   // --- Tests for transformStreamChatResponseChunk ---
   describe("transformStreamChatResponseChunk", () => {
-    let model: BaseChatModel; // Use your actual model class name
+    let model: BaseChatModelVertex; // Use your actual model class name
 
     // Using your specified beforeEach structure
     beforeEach(() => {
       // Assuming mockModelSchema and mockOptions are defined/imported
       // and BaseChatModel is the class containing the transform methods
-      model = new BaseChatModel(mockModelSchema, mockOptions);
+      model = new BaseChatModelVertex(mockModelSchema, mockOptions);
     });
 
     it("should process a single complete text chunk", async () => {
@@ -1559,13 +1559,13 @@ describe("BaseChatModelVertex", () => {
   // --- Tests for transformProxyStreamChatResponseChunk ---
   describe("transformProxyStreamChatResponseChunk", () => {
     // --- Tests for SSE Handling (query.alt === 'sse' or default) ---
-    let model: BaseChatModel; // Use your actual model class name
+    let model: BaseChatModelVertex; // Use your actual model class name
 
     // Using your specified beforeEach structure
     beforeEach(() => {
       // Assuming mockModelSchema and mockOptions are defined/imported
       // and BaseChatModel is the class containing the transform methods
-      model = new BaseChatModel(mockModelSchema, mockOptions);
+      model = new BaseChatModelVertex(mockModelSchema, mockOptions);
     });
 
     describe("SSE Handling", () => {

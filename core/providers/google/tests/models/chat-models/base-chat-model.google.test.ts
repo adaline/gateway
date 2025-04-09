@@ -5,6 +5,8 @@ import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, InvalidTool
 import {
   AssistantRoleLiteral,
   Config,
+  createPartialTextMessage,
+  createPartialToolCallMessage,
   ImageModalityLiteral,
   MessageType,
   SystemRoleLiteral,
@@ -18,8 +20,48 @@ import {
 
 import { GoogleChatModelConfigs } from "../../../src/configs";
 import { BaseChatModel } from "../../../src/models";
-import { GoogleChatRequestType, GoogleCompleteChatResponseType } from "../../../src/models/chat-models/types";
+import { GoogleChatRequestType, GoogleCompleteChatResponseType, GoogleStreamChatResponseType } from "../../../src/models/chat-models/types";
 
+async function collectAsyncGenerator<T>(generator: AsyncGenerator<T>): Promise<T[]> {
+  const results: T[] = [];
+  for await (const value of generator) {
+    results.push(value);
+  }
+  return results;
+}
+
+// --- MOCK DATA (Reusing from previous example) ---
+const mockTextPart = {
+  text: "Hello there!",
+};
+
+const mockFunctionCallPart = {
+  functionCall: {
+    name: "get_weather",
+    args: { location: "London" },
+  },
+};
+
+const mockUsageMetadata = {
+  promptTokenCount: 10,
+  candidatesTokenCount: 25,
+  totalTokenCount: 35,
+};
+
+const createMockResponse = (
+  parts: (typeof mockTextPart | typeof mockFunctionCallPart)[],
+  usage?: typeof mockUsageMetadata
+): GoogleStreamChatResponseType => ({
+  candidates: [
+    {
+      content: {
+        role: "model",
+        parts: parts,
+      },
+    },
+  ],
+  usageMetadata: usage,
+});
 // Mock helper functions
 const createTextContent = (text: string): any => ({
   modality: "text",
@@ -1337,6 +1379,411 @@ describe("BaseChatModel", () => {
           expect(e.cause.errors.some((err: any) => err.path.includes("definition") && err.path.includes("schema"))).toBe(false);
         }
       }
+    });
+  });
+
+  // --- Tests for transformStreamChatResponseChunk ---
+  describe("transformStreamChatResponseChunk", () => {
+    let model: BaseChatModel; // Use your actual model class name
+
+    // Using your specified beforeEach structure
+    beforeEach(() => {
+      // Assuming mockModelSchema and mockOptions are defined/imported
+      // and BaseChatModel is the class containing the transform methods
+      model = new BaseChatModel(mockModelSchema, mockOptions);
+    });
+
+    it("should process a single complete text chunk", async () => {
+      const response = createMockResponse([mockTextPart]);
+      const chunk = JSON.stringify(response);
+      // Use the model instance to call the method
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      const results = await collectAsyncGenerator(generator);
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+      expect(results[0].buffer).toBe("");
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
+    });
+
+    it("should process a single complete function call chunk", async () => {
+      const response = createMockResponse([mockFunctionCallPart]);
+      const chunk = JSON.stringify(response);
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      const results = await collectAsyncGenerator(generator);
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages![0]).toEqual(
+        createPartialToolCallMessage(
+          AssistantRoleLiteral,
+          0, // index
+          `${mockFunctionCallPart.functionCall.name}_0`, // toolCallId
+          mockFunctionCallPart.functionCall.name,
+          JSON.stringify(mockFunctionCallPart.functionCall.args)
+        )
+      );
+      expect(results[0].buffer).toBe("");
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
+    });
+
+    it("should process a chunk with usage metadata", async () => {
+      const response = createMockResponse([mockTextPart], mockUsageMetadata);
+      const chunk = JSON.stringify(response);
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      const results = await collectAsyncGenerator(generator);
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].partialResponse.usage).toEqual({
+        promptTokens: mockUsageMetadata.promptTokenCount,
+        completionTokens: mockUsageMetadata.candidatesTokenCount,
+        totalTokens: mockUsageMetadata.totalTokenCount,
+      });
+      expect(results[0].buffer).toBe("");
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
+    });
+
+    it("should handle JSON split across multiple chunks", async () => {
+      const response = createMockResponse([mockTextPart]);
+      const jsonString = JSON.stringify(response);
+      const midpoint = Math.floor(jsonString.length / 2);
+      const chunk1 = jsonString.slice(0, midpoint);
+      const chunk2 = jsonString.slice(midpoint);
+
+      const generator1 = model.transformStreamChatResponseChunk(chunk1, "[");
+      const results1 = await collectAsyncGenerator(generator1);
+      expect(results1).toHaveLength(1);
+      expect(results1[0].partialResponse.partialMessages).toEqual([]);
+      expect(results1[0].buffer).toBe(chunk1.replace(/\n/g, ""));
+
+      const generator2 = model.transformStreamChatResponseChunk(chunk2, results1[0].buffer);
+      const results2 = await collectAsyncGenerator(generator2);
+      expect(results2).toHaveLength(2);
+      expect(results2[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results2[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+      expect(results2[0].buffer).toBe("");
+      expect(results2[1].partialResponse.partialMessages).toEqual([]);
+      expect(results2[1].buffer).toBe("");
+    });
+
+    it("should handle multiple JSON objects in a single chunk separated by ,\\r", async () => {
+      const response1 = createMockResponse([mockTextPart]);
+      const response2 = createMockResponse([mockFunctionCallPart]);
+      const chunk = `${JSON.stringify(response1)},\r${JSON.stringify(response2)}`;
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      const results = await collectAsyncGenerator(generator);
+
+      expect(results).toHaveLength(3);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+      expect(results[0].buffer).toBe("");
+      expect(results[1].partialResponse.partialMessages).toHaveLength(1);
+      // ... assertion for second message ...
+      expect(results[1].buffer).toBe("");
+      expect(results[2].partialResponse.partialMessages).toEqual([]);
+      expect(results[2].buffer).toBe("");
+    });
+
+    it("should buffer malformed JSON", async () => {
+      const malformedChunk = '{"candidates":[{"content":';
+      const generator = model.transformStreamChatResponseChunk(malformedChunk, "[");
+      const results = await collectAsyncGenerator(generator);
+      expect(results).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages).toEqual([]);
+      expect(results[0].buffer).toBe(malformedChunk);
+    });
+
+    it("should handle leading comma correctly", async () => {
+      const response = createMockResponse([mockTextPart]);
+      const chunk = `,${JSON.stringify(response)}`;
+      const generator = model.transformStreamChatResponseChunk(chunk, "");
+      const results = await collectAsyncGenerator(generator);
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].buffer).toBe("");
+      // ... more assertions ...
+    });
+
+    it("should handle stream end marker ']' attached to JSON", async () => {
+      const response = createMockResponse([mockTextPart]);
+      const chunk = JSON.stringify(response) + "]";
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      const results = await collectAsyncGenerator(generator);
+      expect(results).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(0);
+    });
+
+    it("should handle stream end marker ']' as a separate chunk", async () => {
+      const generator = model.transformStreamChatResponseChunk("]", "");
+      const results = await collectAsyncGenerator(generator);
+      expect(results).toHaveLength(0); // Should return immediately
+    });
+
+    it("should throw ModelResponseError for valid JSON not matching schema", async () => {
+      const invalidData = { someOtherField: "value" };
+      const chunk = JSON.stringify(invalidData);
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      await expect(collectAsyncGenerator(generator)).rejects.toThrow(ModelResponseError);
+    });
+
+    it("should remove newlines before parsing JSON", async () => {
+      const response = createMockResponse([mockTextPart]);
+      const chunk = `{\n"candidates": [\n{\n"content": {\n"role": "model",\n"parts": [\n${JSON.stringify(mockTextPart)}\n]\n}\n}\n]\n}`;
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      const results = await collectAsyncGenerator(generator);
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].buffer).toBe("");
+      // ... more assertions ...
+    });
+
+    it("should handle empty chunk input", async () => {
+      const generator = model.transformStreamChatResponseChunk("", "existing_buffer");
+      const results = await collectAsyncGenerator(generator);
+      expect(results).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages).toEqual([]);
+      expect(results[0].buffer).toBe("existing_buffer");
+    });
+  });
+
+  // --- Tests for transformProxyStreamChatResponseChunk ---
+  describe("transformProxyStreamChatResponseChunk", () => {
+    // --- Tests for SSE Handling (query.alt === 'sse' or default) ---
+    let model: BaseChatModel; // Use your actual model class name
+
+    // Using your specified beforeEach structure
+    beforeEach(() => {
+      // Assuming mockModelSchema and mockOptions are defined/imported
+      // and BaseChatModel is the class containing the transform methods
+      model = new BaseChatModel(mockModelSchema, mockOptions);
+    });
+
+    describe("SSE Handling", () => {
+      const sseQuery = { alt: "sse" };
+
+      it("should process a single complete SSE data line", async () => {
+        const response = createMockResponse([mockTextPart]);
+        const chunk = `data: ${JSON.stringify(response)}\n\n`;
+        // Call the method on the model instance
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+
+        expect(results).toHaveLength(2);
+        expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+        expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+        expect(results[0].buffer).toBe(""); // Original buffer yielded inside loop
+        expect(results[1].partialResponse.partialMessages).toEqual([]);
+        expect(results[1].buffer).toBe(""); // Final buffer state
+      });
+
+      it("should process SSE function call", async () => {
+        const response = createMockResponse([mockFunctionCallPart]);
+        const chunk = `data: ${JSON.stringify(response)}\n\n`;
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+
+        expect(results).toHaveLength(2);
+        expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+        // ... assert function call message ...
+        expect(results[0].buffer).toBe("");
+        expect(results[1].partialResponse.partialMessages).toEqual([]);
+        expect(results[1].buffer).toBe("");
+      });
+
+      it("should process SSE with usage metadata", async () => {
+        const response = createMockResponse([mockTextPart], mockUsageMetadata);
+        const chunk = `data: ${JSON.stringify(response)}\n\n`;
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+
+        expect(results).toHaveLength(2);
+        expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+        expect(results[0].partialResponse.usage).toEqual({ completionTokens: 25, promptTokens: 10, totalTokens: 35 });
+        expect(results[0].buffer).toBe("");
+        expect(results[1].partialResponse.partialMessages).toEqual([]);
+        expect(results[1].buffer).toBe("");
+      });
+
+      it("should handle SSE data split across chunks", async () => {
+        const response = createMockResponse([mockTextPart]);
+        const jsonData = JSON.stringify(response);
+        const sseLine = `data: ${jsonData}\n`;
+        const midpoint = Math.floor(sseLine.length / 2);
+        const chunk1 = sseLine.slice(0, midpoint);
+        const chunk2 = sseLine.slice(midpoint);
+
+        const generator1 = model.transformProxyStreamChatResponseChunk(chunk1, "", undefined, undefined, sseQuery);
+        const results1 = await collectAsyncGenerator(generator1);
+        expect(results1).toHaveLength(1);
+        expect(results1[0].partialResponse.partialMessages).toEqual([]);
+        expect(results1[0].buffer).toBe(chunk1);
+
+        const generator2 = model.transformProxyStreamChatResponseChunk(chunk2, results1[0].buffer, undefined, undefined, sseQuery);
+        const results2 = await collectAsyncGenerator(generator2);
+
+        expect(results2).toHaveLength(2);
+        expect(results2[0].partialResponse.partialMessages).toHaveLength(1);
+        // ... assert message ...
+        expect(results2[0].buffer).toBe(results1[0].buffer); // Original buffer yielded
+        expect(results2[1].partialResponse.partialMessages).toEqual([]);
+        expect(results2[1].buffer).toBe(""); // Final buffer empty
+      });
+
+      it("should handle multiple SSE data lines in one chunk", async () => {
+        const response1 = createMockResponse([mockTextPart]);
+        const response2 = createMockResponse([mockFunctionCallPart]);
+        const chunk = `data: ${JSON.stringify(response1)}\ndata: ${JSON.stringify(response2)}\n`;
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+
+        expect(results).toHaveLength(3);
+        // ... assert first message ...
+        expect(results[0].buffer).toBe("");
+        // ... assert second message ...
+        expect(results[1].buffer).toBe("");
+        // ... assert final yield ...
+        expect(results[2].buffer).toBe("");
+      });
+
+      it("should handle [DONE] marker", async () => {
+        const chunk = "data: [DONE]\n";
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+        expect(results).toHaveLength(0);
+      });
+
+      it("should handle [DONE] marker after some data", async () => {
+        const response = createMockResponse([mockTextPart]);
+        const chunk = `data: ${JSON.stringify(response)}\ndata: [DONE]\n`;
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+        expect(results).toHaveLength(1); // Only the message before DONE
+        // ... assert message ...
+        expect(results[0].buffer).toBe("");
+      });
+
+      it("should buffer incomplete SSE lines", async () => {
+        const chunk = 'data: {"key":';
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "prev_buf", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+        expect(results).toHaveLength(1);
+        expect(results[0].partialResponse.partialMessages).toEqual([]);
+        expect(results[0].buffer).toBe("prev_buf" + chunk);
+      });
+
+      it("should throw ModelResponseError for malformed JSON in SSE data", async () => {
+        const chunk = "data: {invalid json\n\n";
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        await expect(collectAsyncGenerator(generator)).rejects.toThrow(ModelResponseError);
+      });
+
+      it("should throw ModelResponseError for SSE data not matching schema", async () => {
+        const chunk = 'data: {"valid": "json", "but": "wrong schema"}\n\n';
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, sseQuery);
+        await expect(collectAsyncGenerator(generator)).rejects.toThrow(ModelResponseError);
+      });
+
+      it("should handle empty chunk input in SSE mode", async () => {
+        const generator = model.transformProxyStreamChatResponseChunk("", "sse_buf", undefined, undefined, sseQuery);
+        const results = await collectAsyncGenerator(generator);
+        expect(results).toHaveLength(1);
+        expect(results[0].partialResponse.partialMessages).toEqual([]);
+        expect(results[0].buffer).toBe("sse_buf");
+      });
+
+      it("should default to SSE handling if query.alt is missing", async () => {
+        const response = createMockResponse([mockTextPart]);
+        const chunk = `data: ${JSON.stringify(response)}\n\n`;
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, {}); // Empty query
+        const results = await collectAsyncGenerator(generator);
+        expect(results).toHaveLength(1); // Should behave like SSE
+        expect(results[0].partialResponse.partialMessages).toHaveLength(0);
+      });
+
+      it("should default to SSE handling if query is undefined", async () => {
+        const response = createMockResponse([mockTextPart]);
+        const chunk = `data: ${JSON.stringify(response)}\n\n`;
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, undefined); // No query
+        const results = await collectAsyncGenerator(generator);
+        expect(results).toHaveLength(1); // Should behave like SSE
+        expect(results[0].partialResponse.partialMessages).toHaveLength(0);
+      });
+    });
+
+    // --- Tests for Standard Stream Handling (when query.alt !== 'sse') ---
+    describe("Standard Stream Handling (via Proxy)", () => {
+      const nonSseQuery = { alt: "json" }; // Example non-SSE query
+
+      it("should process standard stream format when query.alt is not 'sse'", async () => {
+        const response = createMockResponse([mockTextPart]);
+        // Use the standard stream format input
+        const chunk = JSON.stringify(response);
+        const initialBuffer = "[";
+
+        // Call the proxy method with non-SSE query
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, initialBuffer, undefined, undefined, nonSseQuery);
+        const results = await collectAsyncGenerator(generator);
+
+        // Assert the output matches the expected output for the STANDARD stream format
+        expect(results).toHaveLength(2); // Message + final yield
+        expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+        expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+        expect(results[0].buffer).toBe(""); // Buffer cleared as per standard stream logic
+        expect(results[1].partialResponse.partialMessages).toEqual([]);
+        expect(results[1].buffer).toBe("");
+      });
+
+      it("should handle buffering for standard stream format when query.alt is not 'sse'", async () => {
+        const response = createMockResponse([mockTextPart]);
+        const jsonString = JSON.stringify(response);
+        const midpoint = Math.floor(jsonString.length / 2);
+        const chunk1 = jsonString.slice(0, midpoint);
+        const chunk2 = jsonString.slice(midpoint);
+        const initialBuffer = "[";
+
+        // Process first chunk via proxy (delegates implicitly)
+        const generator1 = model.transformProxyStreamChatResponseChunk(chunk1, initialBuffer, undefined, undefined, nonSseQuery);
+        const results1 = await collectAsyncGenerator(generator1);
+        expect(results1).toHaveLength(1); // Only final yield from standard logic
+        expect(results1[0].partialResponse.partialMessages).toEqual([]);
+        // Expect buffer to contain incomplete JSON as per standard logic
+        expect(results1[0].buffer).toBe(chunk1.replace(/\n/g, ""));
+
+        // Process second chunk via proxy (delegates implicitly)
+        const generator2 = model.transformProxyStreamChatResponseChunk(chunk2, results1[0].buffer, undefined, undefined, nonSseQuery);
+        const results2 = await collectAsyncGenerator(generator2);
+        expect(results2).toHaveLength(2); // Message yield + final yield from standard logic
+        expect(results2[0].partialResponse.partialMessages).toHaveLength(1);
+        expect(results2[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+        expect(results2[0].buffer).toBe(""); // Buffer cleared by standard logic
+        expect(results2[1].partialResponse.partialMessages).toEqual([]);
+        expect(results2[1].buffer).toBe("");
+      });
+
+      it("should handle multiple standard JSON objects when query.alt is not 'sse'", async () => {
+        const response1 = createMockResponse([mockTextPart]);
+        const response2 = createMockResponse([mockFunctionCallPart]);
+        // Standard stream format with ,\r separator
+        const chunk = `${JSON.stringify(response1)},\r${JSON.stringify(response2)}`;
+        const generator = model.transformProxyStreamChatResponseChunk(chunk, "[", undefined, undefined, nonSseQuery);
+        const results = await collectAsyncGenerator(generator);
+
+        // Assert output matches standard multi-JSON processing
+        expect(results).toHaveLength(3);
+        expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+        expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+        expect(results[0].buffer).toBe("");
+        expect(results[1].partialResponse.partialMessages).toHaveLength(1);
+        // ... assertion for second message ...
+        expect(results[1].buffer).toBe("");
+        expect(results[2].partialResponse.partialMessages).toEqual([]);
+        expect(results[2].buffer).toBe("");
+      });
     });
   });
 });
