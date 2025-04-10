@@ -18,6 +18,7 @@ const ChatModelSchema = <
     modalities: z.array(Modalities).nonempty(),
     maxInputTokens: z.number().int().positive().min(1),
     maxOutputTokens: z.number().int().positive().min(1),
+    maxThinkingTokens: z.number().int().positive().min(1).optional(),
     config: z
       .object({
         def: z.record(z.string().min(1), ConfigItemDef),
