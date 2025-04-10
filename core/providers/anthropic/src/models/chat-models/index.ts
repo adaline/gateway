@@ -2,6 +2,7 @@ export * from "./base-chat-model.anthropic";
 export * from "./claude-3-5-sonnet-20240620.anthropic";
 export * from "./claude-3-5-sonnet-20241022.anthropic";
 export * from "./claude-3-5-sonnet-latest.anthropic";
+export * from "./claude-3-7-sonnet-20240620.anthropic";
 export * from "./claude-3-haiku-20240307.anthropic";
 export * from "./claude-3-haiku-20241022.anthropic";
 export * from "./claude-3-haiku-latest.anthropic";
