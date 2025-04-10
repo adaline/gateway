@@ -285,9 +285,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
     const _toolChoice = config.toolChoice;
+    const _extendedThinking = config.extendedThinking;
+    const _maxExtendedThinkingTokens = config.maxExtendedThinkingTokens;
 
     const _config = { ...config }; // create a copy to avoid mutating original config
+
     delete _config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
+    delete _config.extendedThinking;
+    delete _config.maxExtendedThinkingTokens;
 
     const _parsedConfig = this.modelSchema.config.schema.safeParse(_config);
     if (!_parsedConfig.success) {
@@ -349,6 +354,34 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             info: `Invalid config for model : '${this.modelName}'`,
             cause: new Error(`toolChoice : '${toolChoice}' is not part of provided 'tools' names or 
               one of [${configToolChoice.choices.join(", ")}]`),
+          });
+        }
+      }
+    }
+
+    const hasExtendedThinking = _extendedThinking !== undefined;
+    const hasThinkingTokens = _maxExtendedThinkingTokens !== undefined;
+
+    if (hasExtendedThinking !== hasThinkingTokens) {
+      throw new InvalidConfigError({
+        info: `Invalid extended thinking config for model: '${this.modelName}'`,
+        cause: new Error(`Both 'extendedThinking' and 'maxExtendedThinkingTokens' must be defined together.`),
+      });
+    }
+
+    if (hasExtendedThinking && hasThinkingTokens) {
+      const maxTokens = transformedConfig.max_tokens;
+
+      if (_extendedThinking) {
+        if (_maxExtendedThinkingTokens < maxTokens) {
+          transformedConfig.thinking = {
+            type: "enabled",
+            budget_tokens: _maxExtendedThinkingTokens,
+          };
+        } else {
+          throw new InvalidConfigError({
+            info: `Invalid extended thinking token budget for model: '${this.modelName}'`,
+            cause: new Error(`maxExtendedThinkingTokens (${_maxExtendedThinkingTokens}) must be less than max_tokens (${maxTokens})`),
           });
         }
       }
