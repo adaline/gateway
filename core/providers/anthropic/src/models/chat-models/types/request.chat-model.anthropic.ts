@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+const AnthropicRequestThinkingContent = z.object({
+  type: z.literal("thinking"),
+  thinking: z.string().optional(),
+  signature: z.string().optional(),
+});
+type AnthropicRequestThinkingContentType = z.infer<typeof AnthropicRequestThinkingContent>;
+
+const AnthropicRequestRedactedThinkingContent = z.object({
+  type: z.literal("redacted_thinking"),
+  data: z.string(),
+});
+type AnthropicRequestRedactedThinkingContentType = z.infer<typeof AnthropicRequestRedactedThinkingContent>;
+
 const AnthropicRequestTool = z.object({
   name: z.string().min(1),
   description: z.string().min(1).optional(),
@@ -66,7 +79,18 @@ const AnthropicRequestAssistantMessage = z.object({
   content: z
     .string()
     .min(1)
-    .or(z.array(z.union([AnthropicRequestTextContent, AnthropicRequestToolResponseContent])).min(1)),
+    .or(
+      z
+        .array(
+          z.union([
+            AnthropicRequestTextContent,
+            AnthropicRequestToolResponseContent,
+            AnthropicRequestThinkingContent,
+            AnthropicRequestRedactedThinkingContent,
+          ])
+        )
+        .min(1)
+    ),
 });
 type AnthropicRequestAssistantMessageType = z.infer<typeof AnthropicRequestAssistantMessage>;
 
@@ -89,25 +113,29 @@ type AnthropicRequestType = z.infer<typeof AnthropicRequest>;
 
 export {
   AnthropicRequest,
-  AnthropicRequestMessage,
-  AnthropicRequestUserMessage,
   AnthropicRequestAssistantMessage,
+  AnthropicRequestImageContent,
+  AnthropicRequestMessage,
+  AnthropicRequestRedactedThinkingContent,
+  AnthropicRequestTextContent,
+  AnthropicRequestThinkingContent,
   AnthropicRequestTool,
+  AnthropicRequestToolCallContent,
   AnthropicRequestToolChoiceEnum,
   AnthropicRequestToolChoiceTool,
-  AnthropicRequestTextContent,
-  AnthropicRequestImageContent,
-  AnthropicRequestToolCallContent,
   AnthropicRequestToolResponseContent,
-  type AnthropicRequestType,
-  type AnthropicRequestMessageType,
-  type AnthropicRequestUserMessageType,
+  AnthropicRequestUserMessage,
   type AnthropicRequestAssistantMessageType,
-  type AnthropicRequestToolType,
+  type AnthropicRequestImageContentType,
+  type AnthropicRequestMessageType,
+  type AnthropicRequestRedactedThinkingContentType,
+  type AnthropicRequestTextContentType,
+  type AnthropicRequestThinkingContentType,
+  type AnthropicRequestToolCallContentType,
   type AnthropicRequestToolChoiceEnumType,
   type AnthropicRequestToolChoiceToolType,
-  type AnthropicRequestTextContentType,
-  type AnthropicRequestImageContentType,
-  type AnthropicRequestToolCallContentType,
   type AnthropicRequestToolResponseContentType,
+  type AnthropicRequestToolType,
+  type AnthropicRequestType,
+  type AnthropicRequestUserMessageType,
 };

@@ -8,10 +8,16 @@ import {
   MessageType,
   PartialMessage,
   PartialMessageType,
+  PartialReasoningContent,
+  PartialReasoningModalityLiteral,
   PartialTextContent,
   PartialTextModalityLiteral,
   PartialToolCallContent,
   PartialToolCallModalityLiteral,
+  ReasoningContent,
+  ReasoningContentTypeLiteral,
+  ReasoningModalityLiteral,
+  RedactedReasoningContentTypeLiteral,
   RoleEnumType,
   TextContent,
   TextModalityLiteral,
@@ -136,14 +142,102 @@ const createPartialToolCallMessage = (role: RoleEnumType, index: number, id?: st
   });
 };
 
+const createReasoningContent = (thinking: string, signature: string): ContentType => {
+  return ReasoningContent().parse({
+    modality: ReasoningModalityLiteral,
+    value: {
+      type: ReasoningContentTypeLiteral,
+      thinking,
+      signature,
+    },
+  });
+};
+
+const createReasoningMessage = (role: RoleEnumType, thinking: string, signature: string): MessageType => {
+  return Message().parse({
+    role: role,
+    content: [
+      ReasoningContent().parse({
+        modality: ReasoningModalityLiteral,
+        value: {
+          type: ReasoningContentTypeLiteral,
+          thinking,
+          signature,
+        },
+      }),
+    ],
+  });
+};
+// Redacted Reasoning Content
+const createRedactedReasoningContent = (data: string): ContentType => {
+  return ReasoningContent().parse({
+    modality: ReasoningModalityLiteral,
+    value: {
+      type: RedactedReasoningContentTypeLiteral,
+      data,
+    },
+  });
+};
+
+const createRedactedReasoningMessage = (role: RoleEnumType, data: string): MessageType => {
+  return Message().parse({
+    role: role,
+    content: [
+      ReasoningContent().parse({
+        modality: ReasoningModalityLiteral,
+        value: {
+          type: RedactedReasoningContentTypeLiteral,
+          data,
+        },
+      }),
+    ],
+  });
+};
+
+const createPartialReasoningMessage = (role: RoleEnumType, thinking?: string, signature?: string): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialReasoningContent().parse({
+      modality: PartialReasoningModalityLiteral,
+      value: {
+        type: ReasoningContentTypeLiteral,
+        thinking,
+        signature,
+      },
+      // metadata is optional; omit or provide if needed
+    }),
+  });
+};
+
+// Create a partial redacted reasoning message
+const createPartialRedactedReasoningMessage = (role: RoleEnumType, data: string): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialReasoningContent().parse({
+      modality: PartialReasoningModalityLiteral,
+      value: {
+        type: RedactedReasoningContentTypeLiteral,
+        data,
+      },
+      // metadata is optional; omit or provide if needed
+    }),
+  });
+};
+
 export {
+  createBase64ImageMessage,
+  createPartialReasoningMessage,
+  createPartialRedactedReasoningMessage,
+  createPartialTextMessage,
+  createPartialToolCallMessage,
+  createReasoningContent,
+  createReasoningMessage,
+  createRedactedReasoningContent,
+  createRedactedReasoningMessage,
   createTextContent,
   createTextMessage,
-  createUrlImageMessage,
-  createBase64ImageMessage,
   createToolCallContent,
   createToolCallMessage,
   createToolResponseMessage,
-  createPartialTextMessage,
-  createPartialToolCallMessage,
+  createUrlImageMessage,
 };

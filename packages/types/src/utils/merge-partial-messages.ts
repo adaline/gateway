@@ -2,6 +2,7 @@ import {
   AssistantRoleLiteral,
   MessageType,
   PartialMessageType,
+  PartialReasoningModalityLiteral,
   PartialTextContentType,
   PartialTextModalityLiteral,
   PartialToolCallContentType,
@@ -21,8 +22,10 @@ const mergePartialMessages = (messages: MessageType[], partialMessages: PartialM
 
   const mergedMessages: MessageType[] = messages;
 
-  let lastMessageModality: typeof PartialTextModalityLiteral | typeof PartialToolCallModalityLiteral =
-    partialMessages[0].partialContent.modality;
+  let lastMessageModality:
+    | typeof PartialTextModalityLiteral
+    | typeof PartialToolCallModalityLiteral
+    | typeof PartialReasoningModalityLiteral = partialMessages[0].partialContent.modality;
 
   let lastTextContent: PartialTextContentType = {
     modality: PartialTextModalityLiteral,
