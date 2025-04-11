@@ -38,6 +38,7 @@ import {
   MessageType,
   PartialChatResponseType,
   PartialMessageType,
+  ReasoningModalityLiteral,
   SystemRoleLiteral,
   TextModalityLiteral,
   Tool,
@@ -56,7 +57,9 @@ import {
   AnthropicRequest,
   AnthropicRequestAssistantMessageType,
   AnthropicRequestImageContentType,
+  AnthropicRequestRedactedThinkingContentType,
   AnthropicRequestTextContentType,
+  AnthropicRequestThinkingContentType,
   AnthropicRequestToolCallContentType,
   AnthropicRequestToolResponseContentType,
   AnthropicRequestToolType,
@@ -295,8 +298,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     const _config = { ...config }; // create a copy to avoid mutating original config
 
     delete _config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
-    delete _config.extendedThinking;
-    delete _config.maxExtendedThinkingTokens;
+    delete _config.reasoningEnabled;
+    delete _config.maxReasoningTokens;
 
     const _parsedConfig = this.modelSchema.config.schema.safeParse(_config);
     if (!_parsedConfig.success) {
@@ -411,7 +414,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     const parsedMessages = messages.map((message) => {
       const parsedMessage = Message().safeParse(message);
       if (!parsedMessage.success) {
-        throw new InvalidMessagesError({ info: "Invalid messages", cause: parsedMessage.error });
+        throw new InvalidMessagesError({
+          info: "Invalid messages",
+          cause: parsedMessage.error,
+        });
       }
       return parsedMessage.data;
     });
@@ -421,8 +427,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         if (!this.modelSchema.modalities.includes(content.modality)) {
           throw new InvalidMessagesError({
             info: `Invalid message content for model : '${this.modelName}'`,
-            cause: new Error(`model : '${this.modelName}' does not support modality : '${content.modality}', 
-              available modalities : [${this.modelSchema.modalities.join(", ")}]`),
+            cause: new Error(
+              `model : '${this.modelName}' does not support modality : '${content.modality}', available modalities : [${this.modelSchema.modalities.join(
+                ", "
+              )}]`
+            ),
           });
         }
       });
@@ -432,8 +441,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       if (!Object.keys(this.modelSchema.roles).includes(message.role)) {
         throw new InvalidMessagesError({
           info: `Invalid message content for model : '${this.modelName}'`,
-          cause: new Error(`model : '${this.modelName}' does not support role : '${message.role}', 
-            available roles : [${Object.keys(this.modelSchema.roles).join(", ")}]`),
+          cause: new Error(
+            `model : '${this.modelName}' does not support role : '${message.role}', available roles : [${Object.keys(
+              this.modelSchema.roles
+            ).join(", ")}]`
+          ),
         });
       }
     });
@@ -446,6 +458,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         | AnthropicRequestImageContentType
         | AnthropicRequestToolCallContentType
         | AnthropicRequestToolResponseContentType
+        | AnthropicRequestThinkingContentType
+        | AnthropicRequestRedactedThinkingContentType
       )[];
     }[] = [];
 
@@ -465,7 +479,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           break;
         }
         case AssistantRoleLiteral: {
-          const assistantContent: (AnthropicRequestTextContentType | AnthropicRequestToolCallContentType)[] = [];
+          const assistantContent: (
+            | AnthropicRequestTextContentType
+            | AnthropicRequestToolCallContentType
+            | AnthropicRequestThinkingContentType
+            | AnthropicRequestRedactedThinkingContentType
+          )[] = [];
           message.content.forEach((content) => {
             if (content.modality === TextModalityLiteral) {
               assistantContent.push({ type: "text", text: content.value });
@@ -475,6 +494,17 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                 id: content.id,
                 name: content.name,
                 input: JSON.parse(content.arguments),
+              });
+            } else if (content.modality === ReasoningModalityLiteral && content.value.type === "thinking") {
+              assistantContent.push({
+                type: "thinking",
+                thinking: content.value.thinking,
+                signature: content.value.signature,
+              });
+            } else if (content.modality === ReasoningModalityLiteral && content.value.type === "redacted") {
+              assistantContent.push({
+                type: "redacted_thinking",
+                data: content.value.data,
               });
             } else {
               throw new InvalidMessagesError({
@@ -503,7 +533,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   type: "image",
                   source: {
                     type: "base64",
-                    media_type: `image/${content.value.media_type}`,
+                    media_type: `image/${content.value.media_type}` as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
                     data: base64Data,
                   },
                 });
@@ -564,22 +594,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         info: `Invalid message 'role' for model : ${this.modelName}`,
         cause: new Error(`model : '${this.modelName}' requires first message to be from user`),
       });
-    }
-
-    const getNextExpectedRole = (role: string): string => {
-      if (role === this.modelSchema.roles[UserRoleLiteral]) {
-        return this.modelSchema.roles[AssistantRoleLiteral] as string;
-      }
-      return this.modelSchema.roles[UserRoleLiteral] as string;
-    };
-
-    for (let i = 1; i < nonSystemMessages.length; i++) {
-      if (nonSystemMessages[i].role !== getNextExpectedRole(nonSystemMessages[i - 1].role)) {
-        throw new InvalidMessagesError({
-          info: `Invalid message format for model : ${this.modelName}`,
-          cause: new Error(`model : '${this.modelName}' requires messages to alternate between user and assistant`),
-        });
-      }
     }
 
     return {

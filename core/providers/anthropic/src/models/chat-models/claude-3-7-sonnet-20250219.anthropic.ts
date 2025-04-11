@@ -5,23 +5,23 @@ import { ChatModelSchema } from "@adaline/provider";
 import { AnthropicChatModelConfigs } from "../../configs";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.anthropic";
 import {
-  AnthropicChatModelModalities,
-  AnthropicChatModelModalitiesEnum,
   AnthropicChatModelRoles,
   AnthropicChatModelRolesMap,
+  AnthropicThinkingChatModelModalities,
+  AnthropicThinkingChatModelModalitiesEnum,
 } from "./types";
 
 const Claude3_7Sonnet20250219Literal = "claude-3-7-sonnet-20250219";
 const Claude3_7Sonnet20250219Description = "Most intelligent model. Highest level of intelligence and capability.";
 
-const Claude3_7Sonnet20250219Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicChatModelModalitiesEnum).parse({
+const Claude3_7Sonnet20250219Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: Claude3_7Sonnet20250219Literal,
   description: Claude3_7Sonnet20250219Description,
   maxInputTokens: 200000,
   maxOutputTokens: 128000,
   maxReasoningTokens: 64000,
   roles: AnthropicChatModelRolesMap,
-  modalities: AnthropicChatModelModalities,
+  modalities: AnthropicThinkingChatModelModalities,
   config: {
     def: AnthropicChatModelConfigs.extendedThinking(128000, 4, 64000, 1024).def,
     schema: AnthropicChatModelConfigs.extendedThinking(128000, 4, 64000, 1024).schema,

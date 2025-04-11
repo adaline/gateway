@@ -5,8 +5,8 @@ import { ChatModelBaseConfigDef, ChatModelBaseConfigSchema } from "./base.config
 const maxExtendedThinkingTokens = (maxThinkingTokens: number, minThinkingTokens: number) =>
   RangeConfigItem({
     param: "max_thinking_tokens",
-    title: CHAT_CONFIG.MAX_THINKING_TOKENS.title,
-    description: CHAT_CONFIG.MAX_THINKING_TOKENS.description,
+    title: CHAT_CONFIG.MAX_REASONING_TOKENS.title,
+    description: CHAT_CONFIG.MAX_REASONING_TOKENS.description,
     min: minThinkingTokens,
     max: maxThinkingTokens,
     step: 1,
