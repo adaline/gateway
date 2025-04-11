@@ -8,6 +8,8 @@ import {
   MessageType,
   PartialMessage,
   PartialMessageType,
+  PartialReasoningContent,
+  PartialReasoningModalityLiteral,
   PartialTextContent,
   PartialTextModalityLiteral,
   PartialToolCallContent,
@@ -192,8 +194,40 @@ const createRedactedReasoningMessage = (role: RoleEnumType, data: string): Messa
   });
 };
 
+const createPartialReasoningMessage = (role: RoleEnumType, thinking?: string, signature?: string): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialReasoningContent().parse({
+      modality: PartialReasoningModalityLiteral,
+      value: {
+        type: ReasoningContentTypeLiteral,
+        thinking,
+        signature,
+      },
+      // metadata is optional; omit or provide if needed
+    }),
+  });
+};
+
+// Create a partial redacted reasoning message
+const createPartialRedactedReasoningMessage = (role: RoleEnumType, data: string): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialReasoningContent().parse({
+      modality: PartialReasoningModalityLiteral,
+      value: {
+        type: RedactedReasoningContentTypeLiteral,
+        data,
+      },
+      // metadata is optional; omit or provide if needed
+    }),
+  });
+};
+
 export {
   createBase64ImageMessage,
+  createPartialReasoningMessage,
+  createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
   createReasoningContent,

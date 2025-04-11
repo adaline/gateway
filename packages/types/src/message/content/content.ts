@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ImageContent, ImageModalityLiteral } from "./image-content";
-import { ReasoningContent, ReasoningModalityLiteral } from "./reasoning-content";
+import { PartialReasoningContent, PartialReasoningModalityLiteral, ReasoningContent, ReasoningModalityLiteral } from "./reasoning-content";
 import { PartialTextContent, PartialTextModalityLiteral, TextContent, TextModalityLiteral } from "./text-content";
 import { PartialToolCallContent, PartialToolCallModalityLiteral, ToolCallContent, ToolCallModalityLiteral } from "./tool-call-content";
 import { ToolResponseContent, ToolResponseModalityLiteral } from "./tool-response-content";
@@ -43,17 +43,23 @@ type ContentType<
   RCM extends z.ZodTypeAny = z.ZodUndefined,
 > = z.infer<ReturnType<typeof Content<TCM, ICM, CCM, RCM>>>;
 
-const PartialModalityLiterals = [PartialTextModalityLiteral, PartialToolCallModalityLiteral] as const;
+const PartialModalityLiterals = [PartialTextModalityLiteral, PartialToolCallModalityLiteral, PartialReasoningModalityLiteral] as const;
 const PartialModalityEnum = z.enum(PartialModalityLiterals);
 type PartialModalityEnumType = z.infer<typeof PartialModalityEnum>;
 
-const PartialContent = <TCM extends z.ZodTypeAny = z.ZodUndefined, CCM extends z.ZodTypeAny = z.ZodUndefined>(
+const PartialContent = <
+  TCM extends z.ZodTypeAny = z.ZodUndefined,
+  CCM extends z.ZodTypeAny = z.ZodUndefined,
+  RCM extends z.ZodTypeAny = z.ZodUndefined,
+>(
   PartialTextContentMetadata: TCM = z.undefined() as TCM,
-  PartialToolCallContentMetadata: CCM = z.undefined() as CCM
+  PartialToolCallContentMetadata: CCM = z.undefined() as CCM,
+  PartialReasoningContentMetadata: z.ZodTypeAny = z.undefined() as z.ZodTypeAny as RCM
 ) =>
   z.discriminatedUnion("modality", [
     PartialTextContent(PartialTextContentMetadata),
     PartialToolCallContent(PartialToolCallContentMetadata),
+    PartialReasoningContent(PartialReasoningContentMetadata),
   ]);
 type PartialContentType<TCM extends z.ZodTypeAny = z.ZodUndefined, CCM extends z.ZodTypeAny = z.ZodUndefined> = z.infer<
   ReturnType<typeof PartialContent<TCM, CCM>>

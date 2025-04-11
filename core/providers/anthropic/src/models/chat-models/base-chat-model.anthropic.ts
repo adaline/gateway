@@ -24,6 +24,8 @@ import {
   Config,
   ConfigType,
   ContentType,
+  createPartialReasoningMessage,
+  createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
   createReasoningContent,
@@ -755,7 +757,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         // line contains message
         let structuredLine: any;
         try {
-          // remove the 'data :' prefix from string JSON
+          // remove the 'data: ' prefix from string JSON
           structuredLine = JSON.parse(line.substring("data: ".length));
         } catch (error) {
           // malformed JSON error
@@ -769,8 +771,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           // Invalid JSON error
           throw new ModelResponseError({
             info: "Invalid JSON received in stream",
-            cause: new Error(`Invalid JSON received in stream, expected 'type' property, 
-              received : ${JSON.stringify(structuredLine)}`),
+            cause: new Error(`Invalid JSON received in stream, expected 'type' property, received: ${JSON.stringify(structuredLine)}`),
           });
         } else if (structuredLine.type === "message_stop") {
           return;
@@ -827,6 +828,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   ""
                 )
               );
+            } else if (parsedResponse.content_block.type === "thinking") {
+              partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, parsedResponse.content_block.thinking));
+            } else if (parsedResponse.content_block.type === "redacted_thinking") {
+              partialMessages.push(createPartialRedactedReasoningMessage(AssistantRoleLiteral, parsedResponse.content_block.data));
             }
 
             yield { partialResponse: { partialMessages: partialMessages }, buffer: buffer };
@@ -844,6 +849,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               partialMessages.push(
                 createPartialToolCallMessage(AssistantRoleLiteral, parsedResponse.index, "", "", parsedResponse.delta.partial_json)
               );
+            } else if (parsedResponse.delta.type === "thinking_delta") {
+              partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, parsedResponse.delta.thinking));
+            } else if (parsedResponse.delta.type === "signature_delta") {
+              partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, undefined, parsedResponse.delta.signature));
             }
 
             yield { partialResponse: { partialMessages: partialMessages }, buffer: buffer };
@@ -851,13 +860,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
           }
         } else {
-          // line starts with known event that is not implemented -- ignore
+          // line starts with a known event that is not implemented -- ignore
         }
       } else {
         // line starts with unknown event -- ignore
       }
     }
   }
+
   async *transformProxyStreamChatResponseChunk(
     chunk: string,
     buffer: string,

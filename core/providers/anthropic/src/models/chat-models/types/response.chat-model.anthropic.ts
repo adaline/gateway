@@ -87,12 +87,24 @@ const AnthropicStreamChatContentBlockStartToolResponse = z.object({
   input: z.object({}),
 });
 
+const AnthropicStreamChatContentBlockStartThinkingResponse = z.object({
+  type: z.literal("thinking"),
+  thinking: z.string(),
+});
+
+const AnthropicStreamChatContentBlockStartRedactedThinkingResponse = z.object({
+  type: z.literal("redacted_thinking"),
+  data: z.string(),
+});
+
 const AnthropicStreamChatContentBlockStartResponse = z.object({
   type: z.literal("content_block_start"),
   index: z.number(),
   content_block: z.discriminatedUnion("type", [
     AnthropicStreamChatContentBlockStartTextResponse,
     AnthropicStreamChatContentBlockStartToolResponse,
+    AnthropicStreamChatContentBlockStartThinkingResponse,
+    AnthropicStreamChatContentBlockStartRedactedThinkingResponse,
   ]),
 });
 
@@ -106,10 +118,25 @@ const AnthropicStreamChatContentBlockDeltaToolResponse = z.object({
   partial_json: z.string(),
 });
 
+const AnthropicStreamChatContentBlockDeltaThinkingResponse = z.object({
+  type: z.literal("thinking_delta"),
+  thinking: z.string(),
+});
+
+const AnthropicStreamChatContentBlockDeltaSignatureResponse = z.object({
+  type: z.literal("signature_delta"),
+  signature: z.string(),
+});
+
 const AnthropicStreamChatContentBlockDeltaResponse = z.object({
   type: z.literal("content_block_delta"),
   index: z.number(),
-  delta: z.discriminatedUnion("type", [AnthropicStreamChatContentBlockDeltaTextResponse, AnthropicStreamChatContentBlockDeltaToolResponse]),
+  delta: z.discriminatedUnion("type", [
+    AnthropicStreamChatContentBlockDeltaTextResponse,
+    AnthropicStreamChatContentBlockDeltaToolResponse,
+    AnthropicStreamChatContentBlockDeltaThinkingResponse,
+    AnthropicStreamChatContentBlockDeltaSignatureResponse,
+  ]),
 });
 
 // const AnthropicStreamChatResponse = z
