@@ -285,8 +285,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
     const _toolChoice = config.toolChoice;
-    const _extendedThinking = config.extendedThinking;
-    const _maxExtendedThinkingTokens = config.maxExtendedThinkingTokens;
+    const _reasoningEnabled = config.reasoningEnabled;
+    const _maxReasoningTokens = config.maxReasoningTokens;
 
     const _config = { ...config }; // create a copy to avoid mutating original config
 
@@ -359,8 +359,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    const hasExtendedThinking = _extendedThinking !== undefined;
-    const hasThinkingTokens = _maxExtendedThinkingTokens !== undefined;
+    const hasExtendedThinking = _reasoningEnabled !== undefined;
+    const hasThinkingTokens = _maxReasoningTokens !== undefined;
 
     if (hasExtendedThinking !== hasThinkingTokens) {
       throw new InvalidConfigError({
@@ -372,16 +372,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (hasExtendedThinking && hasThinkingTokens) {
       const maxTokens = transformedConfig.max_tokens;
 
-      if (_extendedThinking) {
-        if (_maxExtendedThinkingTokens < maxTokens) {
+      if (_reasoningEnabled) {
+        if (_maxReasoningTokens < maxTokens) {
           transformedConfig.thinking = {
             type: "enabled",
-            budget_tokens: _maxExtendedThinkingTokens,
+            budget_tokens: _maxReasoningTokens,
           };
         } else {
           throw new InvalidConfigError({
             info: `Invalid extended thinking token budget for model: '${this.modelName}'`,
-            cause: new Error(`maxExtendedThinkingTokens (${_maxExtendedThinkingTokens}) must be less than max_tokens (${maxTokens})`),
+            cause: new Error(`maxExtendedThinkingTokens (${_maxReasoningTokens}) must be less than max_tokens (${maxTokens})`),
           });
         }
       }

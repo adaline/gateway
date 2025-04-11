@@ -19,7 +19,7 @@ const Claude3_7Sonnet20250219Schema = ChatModelSchema(AnthropicChatModelRoles, A
   description: Claude3_7Sonnet20250219Description,
   maxInputTokens: 200000,
   maxOutputTokens: 128000,
-  maxThinkingTokens: 64000,
+  maxReasoningTokens: 64000,
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicChatModelModalities,
   config: {
