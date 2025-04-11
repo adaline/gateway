@@ -12,8 +12,26 @@ const AnthropicCompleteChatToolResponse = z.object({
   input: z.record(z.any()),
 });
 
+const AnthropicCompleteChatThinkingResponse = z.object({
+  type: z.literal("thinking"),
+  thinking: z.string(),
+  signature: z.string(),
+});
+
+const AnthropicCompleteChatRedactedThinkingResponse = z.object({
+  type: z.literal("redacted_thinking"),
+  data: z.string(),
+});
+
 const AnthropicCompleteChatResponse = z.object({
-  content: z.array(z.discriminatedUnion("type", [AnthropicCompleteChatTextResponse, AnthropicCompleteChatToolResponse])),
+  content: z.array(
+    z.discriminatedUnion("type", [
+      AnthropicCompleteChatTextResponse,
+      AnthropicCompleteChatToolResponse,
+      AnthropicCompleteChatThinkingResponse,
+      AnthropicCompleteChatRedactedThinkingResponse,
+    ])
+  ),
   id: z.string(),
   model: z.string(),
   role: z.string(),
@@ -106,9 +124,9 @@ const AnthropicStreamChatContentBlockDeltaResponse = z.object({
 
 export {
   AnthropicCompleteChatResponse,
-  AnthropicStreamChatMessageDeltaResponse,
-  AnthropicStreamChatMessageStartResponse,
   AnthropicStreamChatContentBlockDeltaResponse,
   AnthropicStreamChatContentBlockStartResponse,
+  AnthropicStreamChatMessageDeltaResponse,
+  AnthropicStreamChatMessageStartResponse,
   type AnthropicCompleteChatResponseType,
 };

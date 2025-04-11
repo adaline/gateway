@@ -26,6 +26,8 @@ import {
   ContentType,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createReasoningContent,
+  createRedactedReasoningContent,
   createTextContent,
   createToolCallContent,
   ImageContentType,
@@ -667,6 +669,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           return createTextContent(contentItem.text);
         } else if (contentItem.type === "tool_use") {
           return createToolCallContent(index, contentItem.id, contentItem.name, JSON.stringify(contentItem.input));
+        } else if (contentItem.type === "thinking") {
+          return createReasoningContent(contentItem.thinking, contentItem.signature);
+        } else if (contentItem.type === "redacted_thinking") {
+          return createRedactedReasoningContent(contentItem.data);
         }
       }) as ContentType[];
 
