@@ -15,6 +15,13 @@ const MAX_TOKENS = {
     Setting this to 0 defaults to the model's maximum capacity.",
 } as const;
 
+const MAX_REASONING_TOKENS = {
+  type: "range",
+  title: "Max reasoning tokens",
+  description:
+    "Specify the total tokens for reasoning, where one token approximates four English characters.",
+} as const;
+
 const STOP = (max: number) =>
   ({
     type: "multi",
@@ -159,6 +166,7 @@ const CHAT_CONFIG = {
   RESPONSE_FORMAT,
   RESPONSE_FORMAT_WITH_SCHEMA,
   RESPONSE_SCHEMA,
+  MAX_REASONING_TOKENS,
 };
 
 export { CHAT_CONFIG };
