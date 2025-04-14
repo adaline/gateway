@@ -19,8 +19,7 @@ const MAX_REASONING_TOKENS = {
   type: "range",
   title: "Max reasoning tokens",
   description:
-    "Specify the total tokens for generation, where one token approximates four English characters. \
-    Setting this to 0 defaults to the model's maximum capacity.",
+    "Specify the total tokens for reasoning, where one token approximates four English characters.",
 } as const;
 
 const STOP = (max: number) =>

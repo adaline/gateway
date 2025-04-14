@@ -23,8 +23,8 @@ const Claude3_7Sonnet20250219Schema = ChatModelSchema(AnthropicChatModelRoles, A
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.extendedThinking(128000, 4, 64000, 1024).def,
-    schema: AnthropicChatModelConfigs.extendedThinking(128000, 4, 64000, 1024).schema,
+    def: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 64000).def,
+    schema: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 64000).schema,
   },
 });
 

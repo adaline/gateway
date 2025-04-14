@@ -2,7 +2,7 @@ import { CHAT_CONFIG, RangeConfigItem, SelectBooleanConfigItem } from "@adaline/
 
 import { ChatModelBaseConfigDef, ChatModelBaseConfigSchema } from "./base.config.chat-model.anthropic";
 
-const maxExtendedThinkingTokens = (maxThinkingTokens: number, minThinkingTokens: number) =>
+const maxExtendedThinkingTokens = (minThinkingTokens: number, maxThinkingTokens: number) =>
   RangeConfigItem({
     param: "max_thinking_tokens",
     title: CHAT_CONFIG.MAX_REASONING_TOKENS.title,
@@ -24,23 +24,23 @@ const extendedThinking = SelectBooleanConfigItem({
 const ChatModelExtendedThinkingConfigDef = (
   maxOutputTokens: number,
   maxSequences: number,
+  minThinkingTokens: number,
   maxThinkingTokens: number,
-  minThinkingTokens: number
 ) => ({
   ...ChatModelBaseConfigDef(maxOutputTokens, maxSequences),
   extendedThinking: extendedThinking.def,
-  maxExtendedThinkingTokens: maxExtendedThinkingTokens(maxThinkingTokens, minThinkingTokens).def,
+  maxExtendedThinkingTokens: maxExtendedThinkingTokens(minThinkingTokens, maxThinkingTokens).def,
 });
 
 const ChatModelExtendedThinkingConfigSchema = (
   maxOutputTokens: number,
   maxSequences: number,
+  minThinkingTokens: number,
   maxThinkingTokens: number,
-  minThinkingTokens: number
 ) =>
   ChatModelBaseConfigSchema(maxOutputTokens, maxSequences).extend({
     extendedThinking: extendedThinking.schema,
-    maxExtendedThinkingTokens: maxExtendedThinkingTokens(maxThinkingTokens, minThinkingTokens).schema,
+    maxExtendedThinkingTokens: maxExtendedThinkingTokens(minThinkingTokens, maxThinkingTokens).schema,
   });
 
 export { ChatModelExtendedThinkingConfigDef, ChatModelExtendedThinkingConfigSchema };

@@ -10,9 +10,9 @@ const AnthropicChatModelConfigs = {
     def: ChatModelBaseConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelBaseConfigSchema(maxOutputTokens, maxSequences),
   }),
-  extendedThinking: (maxOutputTokens: number, maxSequences: number, maxThinkingTokens: number, minThinkingTokens: number) => ({
-    def: ChatModelExtendedThinkingConfigDef(maxOutputTokens, maxSequences, maxThinkingTokens, minThinkingTokens),
-    schema: ChatModelExtendedThinkingConfigSchema(maxOutputTokens, maxSequences, maxThinkingTokens, minThinkingTokens),
+  extendedThinking: (maxOutputTokens: number, maxSequences: number, minThinkingTokens: number, maxThinkingTokens: number) => ({
+    def: ChatModelExtendedThinkingConfigDef(maxOutputTokens, maxSequences, minThinkingTokens, maxThinkingTokens),
+    schema: ChatModelExtendedThinkingConfigSchema(maxOutputTokens, maxSequences, minThinkingTokens, maxThinkingTokens),
   }),
 } as const;
 

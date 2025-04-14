@@ -1,32 +1,27 @@
 import { z } from "zod";
 
-// Modality literals
 const ReasoningModalityLiteral = "reasoning" as const;
 const PartialReasoningModalityLiteral = "partial-reasoning" as const;
 
-// Discriminators
 const ReasoningContentTypeLiteral = "thinking" as const;
 const RedactedReasoningContentTypeLiteral = "redacted" as const;
 
-// Value schemas
 const ReasoningContentValue = z.object({
   type: z.literal(ReasoningContentTypeLiteral),
-  thinking: z.string().optional(), // Actual content
-  signature: z.string().optional(), // Signature for validation
+  thinking: z.string(),
+  signature: z.string(),
 });
 type ReasoningContentValueType = z.infer<typeof ReasoningContentValue>;
 
 const RedactedReasoningContentValue = z.object({
   type: z.literal(RedactedReasoningContentTypeLiteral),
-  data: z.string(), // Redacted content
+  data: z.string()
 });
 type RedactedReasoningContentValueType = z.infer<typeof RedactedReasoningContentValue>;
 
-// Union on `type`
-const ReasoningContentValueUnion = z.discriminatedUnion("type", [ReasoningContentValue, RedactedReasoningContentValue]);
+const ReasoningContentValueUnion = z.discriminatedUnion("type", [ ReasoningContentValue, RedactedReasoningContentValue ]);
 type ReasoningContentValueUnionType = z.infer<typeof ReasoningContentValueUnion>;
 
-// Wrapper including modality + metadata
 const ReasoningContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = z.undefined() as M) =>
   z.object({
     modality: z.literal(ReasoningModalityLiteral),
@@ -36,22 +31,33 @@ const ReasoningContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M =
 
 type ReasoningContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof ReasoningContent<M>>>;
 
-// Partial reasoning content, following a similar pattern as for text content
+const PartialReasoningContentValue = z.object({
+  type: z.literal(ReasoningContentTypeLiteral),
+  thinking: ReasoningContentValue.shape.thinking.optional(),
+  signature: ReasoningContentValue.shape.signature.optional(),
+});
+const PartialReasoningContentValueUnion = z.discriminatedUnion("type", [ 
+  PartialReasoningContentValue, 
+  RedactedReasoningContentValue 
+]);
+
 const PartialReasoningContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = z.undefined() as M) =>
   z.object({
     modality: z.literal(PartialReasoningModalityLiteral),
-    value: ReasoningContentValueUnion,
+    value: PartialReasoningContentValueUnion,
     metadata: Metadata,
   });
 type PartialReasoningContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof PartialReasoningContent<M>>>;
 
 export {
+  ReasoningContent,
   PartialReasoningContent,
   PartialReasoningModalityLiteral,
-  ReasoningContent,
   ReasoningContentTypeLiteral,
   ReasoningContentValue,
+  PartialReasoningContentValue,
   ReasoningContentValueUnion,
+  PartialReasoningContentValueUnion,
   ReasoningModalityLiteral,
   RedactedReasoningContentTypeLiteral,
   RedactedReasoningContentValue,
