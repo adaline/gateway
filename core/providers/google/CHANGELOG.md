@@ -1,5 +1,17 @@
 # @adaline/google
 
+## 0.16.0
+
+### Minor Changes
+
+- a17494d: Add unit tests, claude sonnet 3.7 extended thinking
+
+### Patch Changes
+
+- Updated dependencies [a17494d]
+  - @adaline/provider@0.24.0
+  - @adaline/types@0.22.0
+
 ## 0.15.0
 
 ### Minor Changes

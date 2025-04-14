@@ -1,5 +1,18 @@
 # @adaline/custom
 
+## 0.5.0
+
+### Minor Changes
+
+- a17494d: Add unit tests, claude sonnet 3.7 extended thinking
+
+### Patch Changes
+
+- Updated dependencies [a17494d]
+  - @adaline/provider@0.24.0
+  - @adaline/types@0.22.0
+  - @adaline/openai@0.30.0
+
 ## 0.4.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 0.32.0
+
+### Minor Changes
+
+- a17494d: Add unit tests, claude sonnet 3.7 extended thinking
+
 ## 0.31.0
 
 ### Minor Changes
