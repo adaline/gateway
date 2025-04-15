@@ -78,14 +78,12 @@ async function handleCompleteChat(
 
       logger?.debug("handleCompleteChat cache miss");
       const now = Date.now();
-      console.log("Request", JSON.stringify(providerRequest, null, 2));
       const providerResponse = await client.post(
         providerRequest.url,
         providerRequest.data,
         providerRequest.headers,
         handlerTelemetryContext
       );
-      console.log("Response", JSON.stringify(providerResponse, null, 2));
       const latencyInMs = Date.now() - now;
       logger?.debug("handleCompleteChat providerResponse: ", { providerResponse });
 
