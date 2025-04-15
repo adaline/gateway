@@ -641,12 +641,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
-    if (tools && tools.length > 0) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "tools-2024-05-16",
-      };
-    }
+    headers = {
+      ...headers,
+      "anthropic-beta": "output-128k-2025-02-19",
+    };
+
     return new Promise((resolve) => {
       resolve(headers);
     });
@@ -725,12 +724,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
-    if (tools && tools.length > 0) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "tools-2024-05-16",
-      };
-    }
+
+    headers = {
+      ...headers,
+      "anthropic-beta": "output-128k-2025-02-19",
+    };
+
     return new Promise((resolve) => {
       resolve(headers);
     });
