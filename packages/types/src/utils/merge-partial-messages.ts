@@ -1,158 +1,257 @@
+import { PartialChatResponseType } from "./../chat/chat-response";
 import {
   AssistantRoleLiteral,
+  ContentType,
   MessageType,
-  PartialMessageType,
+  PartialContentType,
+  PartialReasoningContentType,
   PartialReasoningModalityLiteral,
   PartialTextContentType,
   PartialTextModalityLiteral,
   PartialToolCallContentType,
   PartialToolCallModalityLiteral,
-  TextContentType,
+  ReasoningContentTypeLiteral,
+  ReasoningContentValueUnionType,
+  ReasoningModalityLiteral,
+  RedactedReasoningContentTypeLiteral,
   TextModalityLiteral,
-  ToolCallContentType,
   ToolCallModalityLiteral,
 } from "./../message";
 
-// TODO: add role sense, currently just assumes 'assistant' role
-// TODO: method and simplified and minified in implementation
-const mergePartialMessages = (messages: MessageType[], partialMessages: PartialMessageType[]): MessageType[] => {
-  if (partialMessages.length === 0) {
-    return messages;
+const mergePartialMessages = (response: PartialChatResponseType[]): MessageType[] => {
+  if (!response || response.length === 0) {
+    return [];
   }
 
-  const mergedMessages: MessageType[] = messages;
+  const mergedMessages: MessageType[] = [];
 
-  let lastMessageModality:
-    | typeof PartialTextModalityLiteral
-    | typeof PartialToolCallModalityLiteral
-    | typeof PartialReasoningModalityLiteral = partialMessages[0].partialContent.modality;
+  // Accumulators for the content *currently being streamed*
+  let lastModality: PartialContentType["modality"] | null = null;
+  let lastReasoningType: ReasoningContentValueUnionType["type"] | null = null; // Track 'thinking' vs 'redacted'
+  let lastToolCallIndex: number | undefined = undefined;
 
-  let lastTextContent: PartialTextContentType = {
-    modality: PartialTextModalityLiteral,
-    value: "",
-  };
+  let currentTextValue: string | null = null;
+  let currentToolCall: { index?: number; id: string; name: string; arguments: string } | null = null;
+  let currentReasoning: PartialReasoningContentType["value"] | null = null; // Store the partial value directly
 
-  let lastToolCallContent: PartialToolCallContentType = {
-    modality: PartialToolCallModalityLiteral,
-    index: 0,
-    id: "",
-    name: "",
-    arguments: "",
-  };
+  // --- Helper Function to Finalize and Add the previous block ---
+  const finalizePreviousBlock = () => {
+    let finalizedContent: ContentType | null = null;
 
-  partialMessages.forEach((message) => {
-    // last message and current message are of the same modality, merge them
-    if (message.partialContent.modality === lastMessageModality) {
-      // always merge text content
-      if (message.partialContent.modality === PartialTextModalityLiteral) {
-        lastTextContent.value += message.partialContent.value;
-      } else if (message.partialContent.modality === PartialToolCallModalityLiteral) {
-        // same tool call index, merge tool call index
-        if (lastToolCallContent.index == message.partialContent.index) {
-          lastToolCallContent.id += message.partialContent.id || "";
-          lastToolCallContent.name += message.partialContent.name || "";
-          lastToolCallContent.arguments += message.partialContent.arguments || "";
+    if (lastModality === PartialTextModalityLiteral && currentTextValue !== null) {
+      finalizedContent = {
+        modality: TextModalityLiteral,
+        value: currentTextValue,
+      };
+    } else if (lastModality === PartialToolCallModalityLiteral && currentToolCall) {
+      // Ensure required fields are present for the final ToolCall
+      if (currentToolCall.id && currentToolCall.name && currentToolCall.arguments !== undefined && currentToolCall.index) {
+        finalizedContent = {
+          modality: ToolCallModalityLiteral,
+          index: currentToolCall.index,
+          id: currentToolCall.id,
+          name: currentToolCall.name,
+          arguments: currentToolCall.arguments,
+        };
+      } else {
+        console.warn("Incomplete tool call data encountered during finalization:", currentToolCall);
+      }
+    } else if (lastModality === PartialReasoningModalityLiteral && currentReasoning) {
+      if (currentReasoning.type === ReasoningContentTypeLiteral) {
+        if (currentReasoning.thinking !== undefined && currentReasoning.signature !== undefined) {
+          finalizedContent = {
+            modality: ReasoningModalityLiteral,
+            value: {
+              type: ReasoningContentTypeLiteral,
+              thinking: currentReasoning.thinking,
+              signature: currentReasoning.signature,
+            },
+          };
         } else {
-          // different tool call index, push last tool call
-          const toolCallContent: ToolCallContentType = {
-            modality: ToolCallModalityLiteral,
-            index: lastToolCallContent.index,
-            id: lastToolCallContent.id as string,
-            name: lastToolCallContent.name as string,
-            arguments: lastToolCallContent.arguments as string,
+          console.warn("Incomplete 'thinking' reasoning data encountered during finalization:", currentReasoning);
+        }
+      } else if (currentReasoning.type === RedactedReasoningContentTypeLiteral) {
+        if (currentReasoning.data !== undefined) {
+          finalizedContent = {
+            modality: ReasoningModalityLiteral,
+            value: {
+              type: RedactedReasoningContentTypeLiteral,
+              data: currentReasoning.data,
+            },
           };
-          mergedMessages.push({
-            role: AssistantRoleLiteral,
-            content: [toolCallContent],
-          });
-          // reset last tool call to current message
-          lastToolCallContent = {
-            modality: PartialToolCallModalityLiteral,
-            index: message.partialContent.index,
-            id: message.partialContent.id || "",
-            name: message.partialContent.name || "",
-            arguments: message.partialContent.arguments || "",
-          };
+        } else {
+          console.warn("Incomplete 'redacted' reasoning data encountered during finalization:", currentReasoning);
         }
       }
-    } else {
-      // last message and current message are of different modalities, push last message
-      if (lastMessageModality === PartialTextModalityLiteral) {
-        const textContent: TextContentType = {
-          modality: TextModalityLiteral,
-          value: lastTextContent.value,
-        };
-        mergedMessages.push({
-          role: AssistantRoleLiteral,
-          content: [textContent],
-        } as MessageType);
-        // reset last text content to blank message
-        lastTextContent = {
-          modality: PartialTextModalityLiteral,
-          value: "",
-        };
-      } else if (lastMessageModality === PartialToolCallModalityLiteral) {
-        // push last tool call
-        const toolCallContent: ToolCallContentType = {
-          modality: ToolCallModalityLiteral,
-          index: lastToolCallContent.index,
-          id: lastToolCallContent.id as string,
-          name: lastToolCallContent.name as string,
-          arguments: lastToolCallContent.arguments as string,
-        };
-        mergedMessages.push({
-          role: AssistantRoleLiteral,
-          content: [toolCallContent],
-        });
-        // reset last tool call to blank message
-        lastToolCallContent = {
-          modality: PartialToolCallModalityLiteral,
-          index: 0,
-          id: "",
-          name: "",
-          arguments: "",
-        };
+    }
+
+    // If content was successfully finalized, add it as a separate message
+    if (finalizedContent) {
+      mergedMessages.push({
+        role: AssistantRoleLiteral, // Assuming role is constant for the stream
+        content: [finalizedContent], // Each finalized block becomes its own message item
+      });
+    }
+
+    // Reset accumulators for the *next* block
+    currentTextValue = null;
+    currentToolCall = null;
+    currentReasoning = null;
+    lastModality = null; // Reset modality marker
+    lastReasoningType = null; // Reset reasoning type marker
+    lastToolCallIndex = undefined; // Reset tool call index marker
+  };
+
+  // --- Main Processing Loop ---
+  response.forEach((chatChunk) => {
+    if (!chatChunk.partialMessages) return;
+
+    chatChunk.partialMessages.forEach((message) => {
+      // Basic validation
+      if (message.role !== AssistantRoleLiteral) {
+        console.warn(`Skipping message with unexpected role: ${message.role}`);
+        return;
+      }
+      if (!message.partialContent) {
+        console.warn(`Skipping message with missing partialContent`);
+        return;
       }
 
-      // update last message modality and content
-      lastMessageModality = message.partialContent.modality;
-      if (message.partialContent.modality === PartialTextModalityLiteral) {
-        lastTextContent.value += message.partialContent.value;
-      } else if (message.partialContent.modality === PartialToolCallModalityLiteral) {
-        lastToolCallContent = {
-          modality: PartialToolCallModalityLiteral,
-          index: message.partialContent.index,
-          id: message.partialContent.id || "",
-          name: message.partialContent.name || "",
-          arguments: message.partialContent.arguments || "",
-        };
+      const currentContent = message.partialContent;
+      const currentModality = currentContent.modality;
+      let currentReasoningType: ReasoningContentValueUnionType["type"] | null = null;
+      let currentToolCallIndex: number | undefined = undefined;
+
+      if (currentModality === PartialReasoningModalityLiteral) {
+        currentReasoningType = (currentContent as PartialReasoningContentType).value.type;
       }
-    }
+      if (currentModality === PartialToolCallModalityLiteral) {
+        currentToolCallIndex = (currentContent as PartialToolCallContentType).index;
+      }
+
+      // --- Check for Block Change ---
+      // A new block starts if:
+      // 1. Modality changes.
+      // 2. Modality is Reasoning, and the *type* of reasoning changes.
+      // 3. Modality is ToolCall, and the *index* changes.
+      const modalityChanged = currentModality !== lastModality;
+      const reasoningTypeChanged =
+        currentModality === PartialReasoningModalityLiteral &&
+        lastModality === PartialReasoningModalityLiteral &&
+        currentReasoningType !== lastReasoningType;
+      const toolCallIndexChanged =
+        currentModality === PartialToolCallModalityLiteral &&
+        lastModality === PartialToolCallModalityLiteral &&
+        currentToolCallIndex !== lastToolCallIndex;
+
+      // If a boundary is detected and we were accumulating something, finalize the previous block.
+      if ((modalityChanged || reasoningTypeChanged || toolCallIndexChanged) && lastModality !== null) {
+        finalizePreviousBlock();
+      }
+
+      // --- Update State & Accumulate Current Part ---
+      // Set the markers for the block *now* being processed
+      if (lastModality === null) {
+        // Only set if we just finalized or it's the first part
+        lastModality = currentModality;
+        if (currentModality === PartialReasoningModalityLiteral) {
+          lastReasoningType = currentReasoningType;
+        }
+        if (currentModality === PartialToolCallModalityLiteral) {
+          lastToolCallIndex = currentToolCallIndex;
+        }
+      }
+
+      // Accumulate based on current modality
+      if (currentModality === PartialTextModalityLiteral) {
+        const textPart = currentContent as PartialTextContentType;
+        currentTextValue = (currentTextValue ?? "") + (textPart.value ?? "");
+      } else if (currentModality === PartialToolCallModalityLiteral) {
+        const toolCallPart = currentContent as PartialToolCallContentType;
+        if (!currentToolCall) {
+          // Initialize if starting a new tool call block
+          currentToolCall = {
+            index: toolCallPart.index,
+            id: toolCallPart.id ?? "",
+            name: toolCallPart.name ?? "",
+            arguments: toolCallPart.arguments ?? "",
+          };
+        } else {
+          // Append to existing tool call block (same index)
+          currentToolCall.id += toolCallPart.id ?? "";
+          currentToolCall.name += toolCallPart.name ?? "";
+          currentToolCall.arguments += toolCallPart.arguments ?? "";
+        }
+      } else if (currentModality === PartialReasoningModalityLiteral) {
+        const reasoningPart = currentContent as PartialReasoningContentType;
+        const valuePart = reasoningPart.value;
+
+        if (!currentReasoning) {
+          // Initialize if starting a new reasoning block
+          if (valuePart.type === ReasoningContentTypeLiteral) {
+            currentReasoning = {
+              type: ReasoningContentTypeLiteral,
+              thinking: valuePart.thinking ?? "",
+              signature: valuePart.signature ?? "",
+            };
+          } else if (valuePart.type === RedactedReasoningContentTypeLiteral) {
+            currentReasoning = {
+              type: RedactedReasoningContentTypeLiteral,
+              data: valuePart.data ?? "",
+            };
+          } else {
+            console.warn("Unknown reasoning type encountered during initialization:", valuePart);
+            finalizePreviousBlock();
+            lastModality = null;
+            return;
+          }
+        } else {
+          // For redacted reasoning, do not accumulate subsequent parts;
+          // finalize the existing block and start a new one.
+          if (currentReasoning.type === RedactedReasoningContentTypeLiteral && valuePart.type === RedactedReasoningContentTypeLiteral) {
+            finalizePreviousBlock();
+            // Start a new redacted reasoning block immediately
+            currentReasoning = {
+              type: RedactedReasoningContentTypeLiteral,
+              data: valuePart.data ?? "",
+            };
+            // Since we finalized, update the state markers accordingly
+            lastModality = currentModality;
+            lastReasoningType = valuePart.type;
+          } else if (currentReasoning.type === ReasoningContentTypeLiteral && valuePart.type === ReasoningContentTypeLiteral) {
+            // Accumulate for "thinking" type reasoning normally
+            currentReasoning.thinking = (currentReasoning.thinking ?? "") + (valuePart.thinking ?? "");
+            currentReasoning.signature = (currentReasoning.signature ?? "") + (valuePart.signature ?? "");
+          } else {
+            // This case shouldn't happen because a different reasoning type should have triggered finalization
+            console.error(
+              "Logic error: Mismatched reasoning types during accumulation. This should have been finalized.",
+              currentReasoning,
+              valuePart
+            );
+            finalizePreviousBlock();
+            lastModality = currentModality;
+            lastReasoningType = valuePart.type;
+            if (valuePart.type === ReasoningContentTypeLiteral) {
+              currentReasoning = {
+                type: ReasoningContentTypeLiteral,
+                thinking: valuePart.thinking ?? "",
+                signature: valuePart.signature ?? "",
+              };
+            } else if (valuePart.type === RedactedReasoningContentTypeLiteral) {
+              currentReasoning = { type: RedactedReasoningContentTypeLiteral, data: valuePart.data ?? "" };
+            } else {
+              currentReasoning = null;
+              lastModality = null;
+            }
+          }
+        }
+      }
+    });
   });
 
-  if (lastMessageModality === PartialTextModalityLiteral) {
-    const textContent: TextContentType = {
-      modality: TextModalityLiteral,
-      value: lastTextContent.value,
-    };
-    mergedMessages.push({
-      role: AssistantRoleLiteral,
-      content: [textContent],
-    } as MessageType);
-  } else if (lastMessageModality === PartialToolCallModalityLiteral) {
-    // push last tool call
-    const toolCallContent: ToolCallContentType = {
-      modality: ToolCallModalityLiteral,
-      index: lastToolCallContent.index,
-      id: lastToolCallContent.id as string,
-      name: lastToolCallContent.name as string,
-      arguments: lastToolCallContent.arguments as string,
-    };
-    mergedMessages.push({
-      role: AssistantRoleLiteral,
-      content: [toolCallContent],
-    });
-  }
+  // Finalize any remaining accumulated content after the loops finish
+  finalizePreviousBlock();
 
   return mergedMessages;
 };
