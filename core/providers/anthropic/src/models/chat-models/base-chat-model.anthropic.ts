@@ -372,7 +372,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (hasExtendedThinking !== hasThinkingTokens) {
       throw new InvalidConfigError({
         info: `Invalid extended thinking config for model: '${this.modelName}'`,
-        cause: new Error(`Both 'extendedThinking' and 'maxReasoningTokens' must be defined together.`),
+        cause: new Error(`Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together.`),
       });
     }
 
@@ -641,10 +641,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
-    headers = {
-      ...headers,
-      "anthropic-beta": "output-128k-2025-02-19",
-    };
+
+    // Only add output-128k beta header for claude-3-7-sonnet model
+    if (this.modelName.startsWith("claude-3-7-sonnet")) {
+      headers = {
+        ...headers,
+        "anthropic-beta": "output-128k-2025-02-19",
+      };
+    }
 
     return new Promise((resolve) => {
       resolve(headers);
@@ -725,10 +729,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
 
-    headers = {
-      ...headers,
-      "anthropic-beta": "output-128k-2025-02-19",
-    };
+    // Only add output-128k beta header for claude-3-7-sonnet model
+    if (this.modelName.startsWith("claude-3-7-sonnet")) {
+      headers = {
+        ...headers,
+        "anthropic-beta": "output-128k-2025-02-19",
+      };
+    }
 
     return new Promise((resolve) => {
       resolve(headers);

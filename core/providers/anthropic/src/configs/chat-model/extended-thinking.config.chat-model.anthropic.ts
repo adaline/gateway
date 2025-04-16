@@ -2,13 +2,13 @@ import { CHAT_CONFIG, RangeConfigItem, SelectBooleanConfigItem } from "@adaline/
 
 import { ChatModelBaseConfigDef, ChatModelBaseConfigSchema } from "./base.config.chat-model.anthropic";
 
-const maxReasoningTokens = (minThinkingTokens: number, maxThinkingTokens: number) =>
+const maxReasoningTokens = (minReasoningToken: number, maxReasoningToken: number) =>
   RangeConfigItem({
     param: "max_reasoning_tokens",
     title: CHAT_CONFIG.MAX_REASONING_TOKENS.title,
     description: CHAT_CONFIG.MAX_REASONING_TOKENS.description,
-    min: minThinkingTokens,
-    max: maxThinkingTokens,
+    min: minReasoningToken,
+    max: maxReasoningToken,
     step: 1,
     default: 0,
   });
@@ -21,26 +21,26 @@ const reasoningEnabled = SelectBooleanConfigItem({
   default: false,
 });
 
-const ChatModelExtendedThinkingConfigDef = (
+const ChatModelReasoningConfigDef = (
   maxOutputTokens: number,
   maxSequences: number,
-  minThinkingTokens: number,
-  maxThinkingTokens: number
+  minReasoningToken: number,
+  maxReasoningToken: number
 ) => ({
   ...ChatModelBaseConfigDef(maxOutputTokens, maxSequences),
   reasoningEnabled: reasoningEnabled.def,
-  maxReasoningTokens: maxReasoningTokens(minThinkingTokens, maxThinkingTokens).def,
+  maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).def,
 });
 
-const ChatModelExtendedThinkingConfigSchema = (
+const ChatModelReasoningConfigSchema = (
   maxOutputTokens: number,
   maxSequences: number,
-  minThinkingTokens: number,
-  maxThinkingTokens: number
+  minReasoningToken: number,
+  maxReasoningToken: number
 ) =>
   ChatModelBaseConfigSchema(maxOutputTokens, maxSequences).extend({
     reasoningEnabled: reasoningEnabled.schema,
-    maxReasoningTokens: maxReasoningTokens(minThinkingTokens, maxThinkingTokens).schema,
+    maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).schema,
   });
 
-export { ChatModelExtendedThinkingConfigDef, ChatModelExtendedThinkingConfigSchema };
+export { ChatModelReasoningConfigDef, ChatModelReasoningConfigSchema };
