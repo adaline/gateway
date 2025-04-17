@@ -1,4 +1,4 @@
-import { PartialChatResponseType } from "./../chat/chat-response";
+import { ChatResponseType, ChatUsageType, PartialChatResponseType } from "./../chat/chat-response";
 import {
   AssistantRoleLiteral,
   ContentType,
@@ -18,11 +18,12 @@ import {
   ToolCallModalityLiteral,
 } from "./../message";
 
-const mergePartialMessages = (response: PartialChatResponseType[]): MessageType[] => {
+const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponseType => {
+  let finalizedResponse: ChatResponseType = { messages: [] };
+  response[0].usage;
   if (!response || response.length === 0) {
-    return [];
+    return finalizedResponse;
   }
-
   const mergedMessages: MessageType[] = [];
 
   // Accumulators for the content *currently being streamed*
@@ -253,7 +254,27 @@ const mergePartialMessages = (response: PartialChatResponseType[]): MessageType[
   // Finalize any remaining accumulated content after the loops finish
   finalizePreviousBlock();
 
-  return mergedMessages;
+  finalizedResponse.messages = mergedMessages;
+
+  // Usage
+  const aggregatedUsage: ChatUsageType = {
+    promptTokens: 0,
+    completionTokens: 0,
+    totalTokens: 0,
+  };
+  let usageFound = false;
+
+  response.forEach((chatChunk) => {
+    if (chatChunk.usage) {
+      usageFound = true;
+      aggregatedUsage.promptTokens += chatChunk.usage.promptTokens ?? 0;
+      aggregatedUsage.completionTokens += chatChunk.usage.completionTokens ?? 0;
+      aggregatedUsage.totalTokens += chatChunk.usage.totalTokens ?? 0;
+    }
+  });
+  // If usage was found, set it in the finalized response
+  finalizedResponse.usage = usageFound ? aggregatedUsage : undefined;
+  return finalizedResponse;
 };
 
 export { mergePartialMessages };
