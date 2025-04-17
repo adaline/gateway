@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ChatModelSchema } from "@adaline/provider";
+import { ChatModelSchema, HeadersType } from "@adaline/provider";
 
 import { AnthropicChatModelConfigs } from "../../configs";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.anthropic";
@@ -34,6 +34,14 @@ type Claude3_7Sonnet20250219OptionsType = z.infer<typeof Claude3_7Sonnet20250219
 class Claude3_7Sonnet20250219 extends BaseChatModel {
   constructor(options: Claude3_7Sonnet20250219OptionsType) {
     super(Claude3_7Sonnet20250219Schema, options);
+  }
+  getDefaultHeaders(): HeadersType {
+    let headers = super.getDefaultHeaders();
+    headers = {
+      ...headers,
+      "anthropic-beta": "output-128k-2025-02-19",
+    };
+    return headers;
   }
 }
 

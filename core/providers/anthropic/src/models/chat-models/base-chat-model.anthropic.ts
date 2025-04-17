@@ -642,14 +642,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
 
-    // Only add output-128k beta header for claude-3-7-sonnet model
-    if (this.modelName.startsWith("claude-3-7-sonnet")) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "output-128k-2025-02-19",
-      };
-    }
-
     return new Promise((resolve) => {
       resolve(headers);
     });
@@ -728,14 +720,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
-
-    // Only add output-128k beta header for claude-3-7-sonnet model
-    if (this.modelName.startsWith("claude-3-7-sonnet")) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "output-128k-2025-02-19",
-      };
-    }
 
     return new Promise((resolve) => {
       resolve(headers);
