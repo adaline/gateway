@@ -257,23 +257,48 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   finalizedResponse.messages = mergedMessages;
 
   // Usage
+  // Initialize accumulators
+  let firstPrompt: number | undefined;
+  let lastPrompt: number | undefined;
+  let totalCompletion = 0;
+  let usageFound = false;
+
   const aggregatedUsage: ChatUsageType = {
     promptTokens: 0,
     completionTokens: 0,
     totalTokens: 0,
   };
-  let usageFound = false;
 
-  response.forEach((chatChunk) => {
-    if (chatChunk.usage) {
-      usageFound = true;
-      aggregatedUsage.promptTokens += chatChunk.usage.promptTokens ?? 0;
-      aggregatedUsage.completionTokens += chatChunk.usage.completionTokens ?? 0;
-      aggregatedUsage.totalTokens += chatChunk.usage.totalTokens ?? 0;
+  for (const chunk of response) {
+    const u = chunk.usage;
+    if (!u) continue;
+
+    usageFound = true;
+
+    // Track first & last promptTokens
+    if (u.promptTokens != null) {
+      if (firstPrompt === undefined) {
+        firstPrompt = u.promptTokens;
+      }
+      lastPrompt = u.promptTokens;
     }
-  });
-  // If usage was found, set it in the finalized response
-  finalizedResponse.usage = usageFound ? aggregatedUsage : undefined;
+
+    // Sum completionTokens
+    if (u.completionTokens != null) {
+      totalCompletion += u.completionTokens;
+    }
+  }
+
+  if (usageFound) {
+    // Use the latest promptTokens if we saw one, otherwise the first
+    aggregatedUsage.promptTokens = lastPrompt ?? firstPrompt ?? 0;
+    aggregatedUsage.completionTokens = totalCompletion;
+    aggregatedUsage.totalTokens = aggregatedUsage.promptTokens + aggregatedUsage.completionTokens;
+
+    finalizedResponse.usage = aggregatedUsage;
+  } else {
+    finalizedResponse.usage = undefined;
+  }
   return finalizedResponse;
 };
 
