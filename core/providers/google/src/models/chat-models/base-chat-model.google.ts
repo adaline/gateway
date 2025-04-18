@@ -859,12 +859,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           }
         }
 
-        if (
-          parsedResponse.usageMetadata &&
-          parsedResponse.usageMetadata.totalTokenCount &&
-          parsedResponse.usageMetadata.promptTokenCount &&
-          parsedResponse.usageMetadata.candidatesTokenCount
-        ) {
+        if (parsedResponse.usageMetadata) {
           partialResponse.usage = {
             promptTokens: parsedResponse.usageMetadata.promptTokenCount,
             completionTokens: parsedResponse.usageMetadata.candidatesTokenCount,
