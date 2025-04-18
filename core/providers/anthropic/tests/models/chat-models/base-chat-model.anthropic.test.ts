@@ -754,7 +754,7 @@ describe("BaseChatModel", () => {
       expect(results[0].buffer).toBe("");
       expect(results[0].partialResponse.partialMessages).toEqual([]); // No content in message_delta
       expect(results[0].partialResponse.usage).toEqual({
-        promptTokens: 0, // Not present in message_delta
+        promptTokens: undefined, // Not present in message_delta
         completionTokens: 55,
         totalTokens: 55, // Calculated in transform
       });
