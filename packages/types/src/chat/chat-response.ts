@@ -31,24 +31,34 @@ const ChatResponse = z.object({
 });
 type ChatResponseType = z.infer<typeof ChatResponse>;
 
+const PartialChatUsage = z.object({
+  promptTokens: z.number().nonnegative().optional(),
+  completionTokens: z.number().nonnegative().optional(),
+  totalTokens: z.number().nonnegative().optional(),
+});
+
+type PartialChatUsageType = z.infer<typeof PartialChatUsage>;
+
 const PartialChatResponse = z.object({
   partialMessages: z.array(PartialMessage()),
-  usage: ChatUsage.optional(),
+  usage: PartialChatUsage.optional(),
   logProbs: ChatLogProbs.optional(),
 });
 type PartialChatResponseType = z.infer<typeof PartialChatResponse>;
 
 export {
-  ChatUsage,
   ChatBaseLogProb,
   ChatLogProb,
   ChatLogProbs,
   ChatResponse,
+  ChatUsage,
   PartialChatResponse,
-  type ChatUsageType,
+  PartialChatUsage,
   type ChatBaseLogProbType,
-  type ChatLogProbType,
   type ChatLogProbsType,
+  type ChatLogProbType,
   type ChatResponseType,
+  type ChatUsageType,
   type PartialChatResponseType,
+  type PartialChatUsageType,
 };
