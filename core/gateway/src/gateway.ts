@@ -5,6 +5,8 @@ import { GatewayError } from "./errors";
 import {
   GatewayCompleteChatRequest,
   GatewayCompleteChatRequestType,
+  GatewayGetChatUsageCostRequest,
+  GatewayGetChatUsageCostRequestType,
   GatewayGetEmbeddingsRequest,
   GatewayGetEmbeddingsRequestType,
   GatewayOptions,
@@ -27,6 +29,7 @@ import {
   StreamChatHandlerResponseType,
 } from "./handlers";
 import { handleCompleteChat } from "./handlers/complete-chat/complete-chat.handler";
+import { handleGetChatUsageCost } from "./handlers/get-chat-usage-cost/get-chat-usage-cost.handler";
 import { handleGetEmbeddings } from "./handlers/get-embeddings/get-embeddings.handler";
 import { handleProxyCompleteChat } from "./handlers/proxy-complete-chat/proxy-complete-chat.handler";
 import { handleProxyGetEmbeddings } from "./handlers/proxy-get-embeddings/proxy-get-embeddings.handler";
@@ -389,6 +392,12 @@ class Gateway {
       this.httpClient,
       telemetryContext
     );
+  }
+
+  static getChatUsageCost(request: GatewayGetChatUsageCostRequestType): number {
+    const data = GatewayGetChatUsageCostRequest.parse(request);
+
+    return handleGetChatUsageCost({ modelPricing: data.modelPricing, usageTokens: data.usageTokens });
   }
 
   static GatewayError = GatewayError;
