@@ -372,7 +372,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (hasExtendedThinking !== hasThinkingTokens) {
       throw new InvalidConfigError({
         info: `Invalid extended thinking config for model: '${this.modelName}'`,
-        cause: new Error(`Both 'extendedThinking' and 'maxExtendedThinkingTokens' must be defined together.`),
+        cause: new Error(`Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together.`),
       });
     }
 
@@ -388,7 +388,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         } else {
           throw new InvalidConfigError({
             info: `Invalid extended thinking token budget for model: '${this.modelName}'`,
-            cause: new Error(`maxExtendedThinkingTokens (${_maxReasoningTokens}) must be less than max_tokens (${maxTokens})`),
+            cause: new Error(`maxReasoningTokens (${_maxReasoningTokens}) must be less than max_tokens (${maxTokens})`),
           });
         }
       }
@@ -641,12 +641,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
-    if (tools && tools.length > 0) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "tools-2024-05-16",
-      };
-    }
+
     return new Promise((resolve) => {
       resolve(headers);
     });
@@ -725,12 +720,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
-    if (tools && tools.length > 0) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "tools-2024-05-16",
-      };
-    }
+
     return new Promise((resolve) => {
       resolve(headers);
     });
