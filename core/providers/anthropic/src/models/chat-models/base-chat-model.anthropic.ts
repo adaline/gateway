@@ -821,7 +821,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               partialResponse: {
                 partialMessages: [],
                 usage: {
-                  promptTokens: 0,
+                  promptTokens: undefined,
                   completionTokens: parsedResponse.usage.output_tokens,
                   totalTokens: parsedResponse.usage.output_tokens,
                 },
