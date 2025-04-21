@@ -49,10 +49,15 @@ async function* handleProxyStreamChat(
             data.headers,
             data.query
           )) {
-            if (transformed.partialResponse.partialMessages.length > 0) {
+            buffer = transformed.buffer;
+
+            // Check if the partial response contains messages or usage information
+            const hasMessages = transformed.partialResponse?.partialMessages?.length > 0;
+            // Assuming usage information might be present in the partialResponse object, e.g., transformed.partialResponse.usage
+            const hasUsage = transformed.partialResponse?.usage != null; // Adjust this check based on the actual structure of usage data
+
+            if (hasMessages || hasUsage) {
               accumulatedPartialResponse.push(transformed.partialResponse);
-            } else {
-              buffer = transformed.buffer;
             }
           }
         } catch (transformationError) {
