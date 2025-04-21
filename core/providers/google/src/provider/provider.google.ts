@@ -93,6 +93,17 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini2_0FlashExpOptions,
       modelSchema: Models.Gemini2_0FlashExpSchema,
     },
+
+    [Models.Gemini2_5FlashPreview0417Literal]: {
+      model: Models.Gemini2_5FlashPreview0417,
+      modelOptions: Models.Gemini2_5FlashPreview0417Options,
+      modelSchema: Models.Gemini2_5FlashPreview0417Schema,
+    },
+    [Models.Gemini2_5ProPreview0325Literal]: {
+      model: Models.Gemini2_5ProPreview0325,
+      modelOptions: Models.Gemini2_5ProPreview0325Options,
+      modelSchema: Models.Gemini2_5ProPreview0325Schema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<
