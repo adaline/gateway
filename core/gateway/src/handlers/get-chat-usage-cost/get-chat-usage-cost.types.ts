@@ -15,4 +15,18 @@ const GetChatUsageCostHandlerRequest = z
   });
 
 type GetChatUsageCostHandlerRequestType = z.infer<typeof GetChatUsageCostHandlerRequest>;
-export { GetChatUsageCostHandlerRequest, type GetChatUsageCostHandlerRequestType };
+
+const GetChatUsageCostHandlerResponse = z.object({
+  cost: z.number(),
+  currency: z.string(),
+  pricingModel: ModelPricing,
+  usageTokens: ChatUsage,
+});
+type GetChatUsageCostHandlerResponseType = z.infer<typeof GetChatUsageCostHandlerResponse>;
+
+export {
+  GetChatUsageCostHandlerRequest,
+  GetChatUsageCostHandlerResponse,
+  type GetChatUsageCostHandlerRequestType,
+  type GetChatUsageCostHandlerResponseType,
+};

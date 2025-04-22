@@ -22,6 +22,7 @@ import {
 } from "./gateway.types";
 import {
   CompleteChatHandlerResponseType,
+  GetChatUsageCostHandlerResponseType,
   GetEmbeddingsHandlerResponseType,
   ProxyCompleteChatHandlerResponseType,
   ProxyGetEmbeddingsHandlerResponseType,
@@ -394,7 +395,7 @@ class Gateway {
     );
   }
 
-  static getChatUsageCost(request: GatewayGetChatUsageCostRequestType): number {
+  static getChatUsageCost(request: GatewayGetChatUsageCostRequestType): GetChatUsageCostHandlerResponseType {
     const data = GatewayGetChatUsageCostRequest.parse(request);
 
     return handleGetChatUsageCost({ customModelPricing: data.customModelPricing, usageTokens: data.usageTokens, model: data.model });
