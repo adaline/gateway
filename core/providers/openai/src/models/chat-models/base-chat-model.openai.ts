@@ -33,6 +33,7 @@ import {
   ImageModalityLiteral,
   Message,
   MessageType,
+  ModelPricingType,
   PartialChatResponseType,
   SystemRoleLiteral,
   TextModalityLiteral,
@@ -48,6 +49,7 @@ import {
 } from "@adaline/types";
 
 import { OpenAI } from "./../../provider/provider.openai";
+import pricingData from "./../pricing.json";
 import {
   OpenAIChatRequest,
   OpenAIChatRequestImageContentType,
@@ -903,6 +905,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
     // Directly delegate to getProxyCompleteChatHeaders for now
     return await this.getProxyCompleteChatHeaders(data, headers, query);
+  }
+
+  getModelPricing(): ModelPricingType {
+    const entry = pricingData.models.find((m) => m.model === this.modelName);
+    if (!entry) {
+      throw new Error(`No pricing configuration found for model "${this.modelName}"`);
+    }
+    return entry as ModelPricingType;
   }
 }
 

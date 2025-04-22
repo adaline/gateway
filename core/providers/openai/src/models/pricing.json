@@ -1,0 +1,264 @@
+{
+  "models": [
+    {
+      "model": "gpt-3.5-turbo-0125",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 0.5, "output": 1.5 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-3.5-turbo-1106",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 0.5, "output": 1.5 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-3.5-turbo",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 0.5, "output": 1.5 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4-0125-preview",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 30.0, "output": 60.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4-0613",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 30.0, "output": 60.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4-1106-preview",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 30.0, "output": 60.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4-turbo-2024-04-09",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 10.0, "output": 30.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4-turbo-preview",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 10.0, "output": 30.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4-turbo",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 10.0, "output": 30.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 30.0, "output": 60.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4o-2024-05-13",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 5.0, "output": 20.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4o-2024-08-06",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 2.5, "output": 10.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4o-mini-2024-07-18",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 0.6, "output": 2.4 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4o-mini",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 0.6, "output": 2.4 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "gpt-4o",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 5.0, "output": 20.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "o1-2024-12-17",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 15.0, "output": 60.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "o1-preview",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 15.0, "output": 60.0 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "o1-mini-2024-09-12",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 1.1, "output": 4.4 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "o1-mini",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 1.1, "output": 4.4 }
+          }
+        }
+      ]
+    },
+    {
+      "model": "o1",
+      "currency": "USD",
+      "tiers": [
+        {
+          "minTokens": 0,
+          "maxTokens": null,
+          "prices": {
+            "base": { "input": 15.0, "output": 60.0 }
+          }
+        }
+      ]
+    }
+  ]
+}
