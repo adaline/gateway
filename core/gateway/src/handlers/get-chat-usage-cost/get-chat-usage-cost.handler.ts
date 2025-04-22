@@ -1,12 +1,22 @@
+import { ModelPricingType } from "@adaline/types";
+
 import { GetChatUsageCostHandlerRequestType } from "./get-chat-usage-cost.types";
 
 function handleGetChatUsageCost(request: GetChatUsageCostHandlerRequestType): number {
   const { promptTokens, completionTokens } = request.usageTokens;
-  const { tiers } = request.modelPricing;
-
+  let tiers: ModelPricingType;
+  if (request.customModelPricing) {
+    tiers = request.customModelPricing;
+  } else if (request.model) {
+    tiers = (request.model as any).getModelPricing(); // ToDo Replace with a proper type as soon as finalized
+  } else {
+    throw new Error("No model pricing provided");
+  }
   // Helper: pick the per‑million rate for either input or output
   function getRate(tokens: number, kind: "input" | "output"): number {
-    const tier = tiers.find((t) => tokens >= t.minTokens && (t.maxTokens === null || tokens < t.maxTokens));
+    const tier = tiers.tiers.find(
+      (t) => tokens >= t.minTokens && (t.maxTokens === null || t.maxTokens === undefined || tokens < t.maxTokens)
+    );
     if (!tier) {
       console.warn(`No pricing tier for ${tokens} ${kind} tokens.`);
       return 0;

@@ -397,7 +397,7 @@ class Gateway {
   static getChatUsageCost(request: GatewayGetChatUsageCostRequestType): number {
     const data = GatewayGetChatUsageCostRequest.parse(request);
 
-    return handleGetChatUsageCost({ modelPricing: data.modelPricing, usageTokens: data.usageTokens });
+    return handleGetChatUsageCost({ customModelPricing: data.customModelPricing, usageTokens: data.usageTokens, model: data.model });
   }
 
   static GatewayError = GatewayError;
