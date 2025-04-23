@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-import { CHAT_CONFIG, MultiStringConfigItem, ObjectSchemaConfigItem, RangeConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import {
+  CHAT_CONFIG,
+  MultiStringConfigItem,
+  ObjectSchemaConfigItem,
+  RangeConfigItem,
+  SelectBooleanConfigItem,
+  SelectStringConfigItem,
+} from "@adaline/provider";
 
 const temperature = (max: number, _default: number) =>
   RangeConfigItem({
@@ -119,4 +126,12 @@ const safetySettings = ObjectSchemaConfigItem({
   ),
 });
 
-export { maxTokens, stop, temperature, toolChoice, topK, topP, seed, frequencyPenalty, presencePenalty, safetySettings };
+const reasoningEnabled = SelectBooleanConfigItem({
+  param: "reasoningEnabled",
+  title: "Reasoning Enabled",
+  description:
+    "Controls whether the model is allowed to think for a longer period of time before generating a response. This can be useful for complex tasks that require more time to think.",
+  default: false,
+});
+
+export { frequencyPenalty, maxTokens, presencePenalty, reasoningEnabled, safetySettings, seed, stop, temperature, toolChoice, topK, topP };
