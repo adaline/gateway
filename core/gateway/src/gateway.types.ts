@@ -2,7 +2,7 @@ import { Meter, Tracer } from "@opentelemetry/api";
 import { z } from "zod";
 
 import { ChatModelV1, EmbeddingModelV1 } from "@adaline/provider";
-import { ChatUsage, Config, EmbeddingRequests, Message, ModelPricing, Tool } from "@adaline/types";
+import { ChatModelPriceType, ChatUsageType, Config, EmbeddingRequests, Message, Tool } from "@adaline/types";
 
 import {
   CompleteChatCallbackType,
@@ -107,8 +107,8 @@ const GatewayProxyGetEmbeddingsRequest = z.object({
 type GatewayProxyGetEmbeddingsRequestType = z.infer<typeof GatewayProxyGetEmbeddingsRequest>;
 
 const GatewayGetChatUsageCostRequest = z.object({
-  usageTokens: ChatUsage,
-  modelPricing: ModelPricing,
+  chatUsage: z.custom<ChatUsageType>(),
+  chatModelPrice: z.custom<ChatModelPriceType>(),
 });
 type GatewayGetChatUsageCostRequestType = z.infer<typeof GatewayGetChatUsageCostRequest>;
 

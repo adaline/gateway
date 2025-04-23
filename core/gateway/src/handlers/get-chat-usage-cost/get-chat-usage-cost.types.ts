@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import { ChatUsage, ModelPricing } from "@adaline/types";
+import { ChatModelPriceType, ChatUsageType } from "@adaline/types";
 
 const GetChatUsageCostHandlerRequest = z.object({
-  usageTokens: ChatUsage,
-  modelPricing: ModelPricing,
+  chatUsage: z.custom<ChatUsageType>(),
+  chatModelPrice: z.custom<ChatModelPriceType>(),
 });
 type GetChatUsageCostHandlerRequestType = z.infer<typeof GetChatUsageCostHandlerRequest>;
 export { GetChatUsageCostHandlerRequest, type GetChatUsageCostHandlerRequestType };
