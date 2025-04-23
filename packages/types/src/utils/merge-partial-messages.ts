@@ -20,11 +20,11 @@ import {
 
 const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponseType => {
   let finalizedResponse: ChatResponseType = { messages: [] };
-  response[0].usage;
+
   if (!response || response.length === 0) {
     return finalizedResponse;
   }
-  const mergedMessages: MessageType[] = [];
+  const mergedContents: ContentType[] = [];
 
   // Accumulators for the content *currently being streamed*
   let lastModality: PartialContentType["modality"] | null = null;
@@ -88,10 +88,7 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
 
     // If content was successfully finalized, add it as a separate message
     if (finalizedContent) {
-      mergedMessages.push({
-        role: AssistantRoleLiteral, // Assuming role is constant for the stream
-        content: [finalizedContent], // Each finalized block becomes its own message item
-      });
+      mergedContents.push(finalizedContent);
     }
 
     // Reset accumulators for the *next* block
@@ -111,10 +108,6 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
       // Basic validation
       if (message.role !== AssistantRoleLiteral) {
         console.warn(`Skipping message with unexpected role: ${message.role}`);
-        return;
-      }
-      if (!message.partialContent) {
-        console.warn(`Skipping message with missing partialContent`);
         return;
       }
 
@@ -179,9 +172,9 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
           };
         } else {
           // Append to existing tool call block (same index)
-          currentToolCall.id += toolCallPart.id ?? "";
-          currentToolCall.name += toolCallPart.name ?? "";
-          currentToolCall.arguments += toolCallPart.arguments ?? "";
+          currentToolCall.id += toolCallPart.id || "";
+          currentToolCall.name += toolCallPart.name || "";
+          currentToolCall.arguments += toolCallPart.arguments || "";
         }
       } else if (currentModality === PartialReasoningModalityLiteral) {
         const reasoningPart = currentContent as PartialReasoningContentType;
@@ -254,7 +247,12 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   // Finalize any remaining accumulated content after the loops finish
   finalizePreviousBlock();
 
-  finalizedResponse.messages = mergedMessages;
+  finalizedResponse.messages = [
+    {
+      role: AssistantRoleLiteral,
+      content: mergedContents,
+    },
+  ] as MessageType[];
 
   // Usage
   // Initialize accumulators
