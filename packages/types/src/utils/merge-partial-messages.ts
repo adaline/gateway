@@ -1,3 +1,4 @@
+import { GatewayBaseError } from "../errors/gateway-base.error";
 import { ChatResponseType, ChatUsageType, PartialChatResponseType } from "./../chat/chat-response";
 import {
   AssistantRoleLiteral,
@@ -20,11 +21,11 @@ import {
 
 const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponseType => {
   let finalizedResponse: ChatResponseType = { messages: [] };
-  response[0].usage;
+
   if (!response || response.length === 0) {
     return finalizedResponse;
   }
-  const mergedMessages: MessageType[] = [];
+  const mergedContents: ContentType[] = [];
 
   // Accumulators for the content *currently being streamed*
   let lastModality: PartialContentType["modality"] | null = null;
@@ -55,7 +56,10 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
           arguments: currentToolCall.arguments,
         };
       } else {
-        console.warn("Incomplete tool call data encountered during finalization:", currentToolCall);
+        throw new GatewayBaseError({
+          info: "Incomplete tool call data encountered during finalization. Required fields (id, name, arguments, index) were missing or incomplete.",
+          cause: { currentToolCall },
+        });
       }
     } else if (lastModality === PartialReasoningModalityLiteral && currentReasoning) {
       if (currentReasoning.type === ReasoningContentTypeLiteral) {
@@ -69,7 +73,10 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
             },
           };
         } else {
-          console.warn("Incomplete 'thinking' reasoning data encountered during finalization:", currentReasoning);
+          throw new GatewayBaseError({
+            info: "Incomplete 'thinking' reasoning data encountered during finalization. Required fields (thinking, signature) were missing or incomplete.",
+            cause: { currentReasoning },
+          });
         }
       } else if (currentReasoning.type === RedactedReasoningContentTypeLiteral) {
         if (currentReasoning.data !== undefined) {
@@ -81,17 +88,17 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
             },
           };
         } else {
-          console.warn("Incomplete 'redacted' reasoning data encountered during finalization:", currentReasoning);
+          throw new GatewayBaseError({
+            info: "Incomplete 'redacted' reasoning data encountered during finalization. Required field (data) was missing or incomplete.",
+            cause: { currentReasoning },
+          });
         }
       }
     }
 
     // If content was successfully finalized, add it as a separate message
     if (finalizedContent) {
-      mergedMessages.push({
-        role: AssistantRoleLiteral, // Assuming role is constant for the stream
-        content: [finalizedContent], // Each finalized block becomes its own message item
-      });
+      mergedContents.push(finalizedContent);
     }
 
     // Reset accumulators for the *next* block
@@ -104,18 +111,15 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   };
 
   // --- Main Processing Loop ---
-  response.forEach((chatChunk) => {
+  response.forEach((chatChunk, chunkIndex) => {
     if (!chatChunk.partialMessages) return;
 
-    chatChunk.partialMessages.forEach((message) => {
-      // Basic validation
+    chatChunk.partialMessages.forEach((message, messageIndex) => {
       if (message.role !== AssistantRoleLiteral) {
-        console.warn(`Skipping message with unexpected role: ${message.role}`);
-        return;
-      }
-      if (!message.partialContent) {
-        console.warn(`Skipping message with missing partialContent`);
-        return;
+        throw new GatewayBaseError({
+          info: `Unexpected message role encountered while merging partial messages. Expected '${AssistantRoleLiteral}'.`,
+          cause: { role: message.role, chunkIndex, messageIndex, message },
+        });
       }
 
       const currentContent = message.partialContent;
@@ -179,9 +183,9 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
           };
         } else {
           // Append to existing tool call block (same index)
-          currentToolCall.id += toolCallPart.id ?? "";
-          currentToolCall.name += toolCallPart.name ?? "";
-          currentToolCall.arguments += toolCallPart.arguments ?? "";
+          currentToolCall.id += toolCallPart.id || "";
+          currentToolCall.name += toolCallPart.name || "";
+          currentToolCall.arguments += toolCallPart.arguments || "";
         }
       } else if (currentModality === PartialReasoningModalityLiteral) {
         const reasoningPart = currentContent as PartialReasoningContentType;
@@ -201,10 +205,10 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
               data: valuePart.data ?? "",
             };
           } else {
-            console.warn("Unknown reasoning type encountered during initialization:", valuePart);
-            finalizePreviousBlock();
-            lastModality = null;
-            return;
+            throw new GatewayBaseError({
+              info: `Unknown reasoning type encountered during initialization. Expected '${ReasoningContentTypeLiteral}' or '${RedactedReasoningContentTypeLiteral}'.`,
+              cause: { valuePart, chunkIndex, messageIndex },
+            });
           }
         } else {
           // For redacted reasoning, do not accumulate subsequent parts;
@@ -224,27 +228,10 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
             currentReasoning.thinking = (currentReasoning.thinking ?? "") + (valuePart.thinking ?? "");
             currentReasoning.signature = (currentReasoning.signature ?? "") + (valuePart.signature ?? "");
           } else {
-            // This case shouldn't happen because a different reasoning type should have triggered finalization
-            console.error(
-              "Logic error: Mismatched reasoning types during accumulation. This should have been finalized.",
-              currentReasoning,
-              valuePart
-            );
-            finalizePreviousBlock();
-            lastModality = currentModality;
-            lastReasoningType = valuePart.type;
-            if (valuePart.type === ReasoningContentTypeLiteral) {
-              currentReasoning = {
-                type: ReasoningContentTypeLiteral,
-                thinking: valuePart.thinking ?? "",
-                signature: valuePart.signature ?? "",
-              };
-            } else if (valuePart.type === RedactedReasoningContentTypeLiteral) {
-              currentReasoning = { type: RedactedReasoningContentTypeLiteral, data: valuePart.data ?? "" };
-            } else {
-              currentReasoning = null;
-              lastModality = null;
-            }
+            throw new GatewayBaseError({
+              info: "Logic error: Mismatched reasoning types during accumulation.",
+              cause: { currentReasoning, valuePart, chunkIndex, messageIndex },
+            });
           }
         }
       }
@@ -254,7 +241,12 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   // Finalize any remaining accumulated content after the loops finish
   finalizePreviousBlock();
 
-  finalizedResponse.messages = mergedMessages;
+  finalizedResponse.messages = [
+    {
+      role: AssistantRoleLiteral,
+      content: mergedContents,
+    },
+  ] as MessageType[];
 
   // Usage
   // Initialize accumulators
