@@ -127,10 +127,10 @@ const safetySettings = ObjectSchemaConfigItem({
 });
 
 const reasoningEnabled = SelectBooleanConfigItem({
-  param: "reasoning_enabled",
+  param: "reasoningEnabled",
   title: "Reasoning Enabled",
   description:
-    "Controls whether the model is allowed to think for a longer period of time before generating a response. \n This can be useful for complex tasks that require more time to think.",
+    "Controls whether the model is allowed to think for a longer period of time before generating a response. This can be useful for complex tasks that require more time to think.",
   default: false,
 });
 
