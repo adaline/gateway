@@ -286,7 +286,6 @@ describe("BaseChatModel", () => {
       const config2 = Config().parse({
         reasoningEnabled: true,
       });
-      console.log(config2);
 
       expect(model.transformConfig(config2, messages, tools)).toEqual({
         generation_config: {
