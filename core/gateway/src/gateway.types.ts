@@ -106,10 +106,16 @@ const GatewayProxyGetEmbeddingsRequest = z.object({
 });
 type GatewayProxyGetEmbeddingsRequestType = z.infer<typeof GatewayProxyGetEmbeddingsRequest>;
 
-const GatewayGetChatUsageCostRequest = z.object({
-  chatUsage: z.custom<ChatUsageType>(),
-  chatModelPrice: z.custom<ChatModelPriceType>(),
-});
+const GatewayGetChatUsageCostRequest = z
+  .object({
+    chatUsage: z.custom<ChatUsageType>(),
+    chatModelPrice: z.custom<ChatModelPriceType>().optional(),
+    model: z.custom<ChatModelV1>().optional(),
+  })
+  .refine((data) => data.chatModelPrice || data.model, {
+    message: "Either chatModelPrice or model must be provided.",
+    path: ["chatModelPrice", "model"],
+  });
 type GatewayGetChatUsageCostRequestType = z.infer<typeof GatewayGetChatUsageCostRequest>;
 
 export {

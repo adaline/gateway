@@ -3,5 +3,8 @@
   "display": "Adaline Gateway",
   "extends": "./node_modules/@adaline/tsconfig/core.json",
   "include": ["src", "tests"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "resolveJsonModule": true
+  }
 }
