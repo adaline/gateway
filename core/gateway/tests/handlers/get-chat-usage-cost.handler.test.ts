@@ -117,7 +117,7 @@ describe("Gateway.getChatUsageCost", () => {
     expect(resultTier1.currency).toBe("EUR");
 
     // Usage within the second tier
-    const usageTier2: ChatUsageType = { promptTokens: 15000, completionTokens: 20000 };
+    const usageTier2: ChatUsageType = { promptTokens: 15000, completionTokens: 20000, totalTokens: 35000 };
     const resultTier2 = Gateway.getChatUsageCost({
       chatUsage: usageTier2,
       chatModelPrice: tieredChatModelPrice,
