@@ -112,10 +112,16 @@ const GatewayGetChatUsageCostRequest = z
     chatModelPrice: z.custom<ChatModelPriceType>().optional(),
     model: z.custom<ChatModelV1>().optional(),
   })
-  .refine((data) => data.chatModelPrice || data.model, {
-    message: "Either chatModelPrice or model must be provided.",
-    path: ["chatModelPrice", "model"],
-  });
+  .refine(
+    (data) => {
+      // Ensure exactly one of chatModelPrice or model is provided
+      return (data.chatModelPrice !== undefined) !== (data.model !== undefined);
+    },
+    {
+      message: "Exactly one of chatModelPrice or model must be provided, not both.",
+      path: ["chatModelPrice", "model"],
+    }
+  );
 type GatewayGetChatUsageCostRequestType = z.infer<typeof GatewayGetChatUsageCostRequest>;
 
 export {
