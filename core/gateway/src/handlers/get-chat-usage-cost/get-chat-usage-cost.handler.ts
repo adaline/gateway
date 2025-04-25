@@ -9,7 +9,7 @@ function handleGetChatUsageCost(request: GetChatUsageCostHandlerRequestType): Ge
   if (request.chatModelPrice) {
     tokenRanges = request.chatModelPrice;
   } else if (request.model) {
-    tokenRanges = (request.model as any).getModelPricing(); // ToDo Replace with a proper type as soon as finalized
+    tokenRanges = request.model.getModelPricing();
   } else {
     throw new GatewayError("No chatModelPrice or model provided");
   }
