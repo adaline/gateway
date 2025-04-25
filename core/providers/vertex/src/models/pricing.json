@@ -62,7 +62,7 @@
         }
       },
       {
-        "minTokens": 128000,
+        "minTokens": 128001,
         "maxTokens": null,
         "prices": {
           "base": {
@@ -88,7 +88,7 @@
         }
       },
       {
-        "minTokens": 128000,
+        "minTokens": 128001,
         "maxTokens": null,
         "prices": {
           "base": {
@@ -114,7 +114,7 @@
         }
       },
       {
-        "minTokens": 128000,
+        "minTokens": 128001,
         "maxTokens": null,
         "prices": {
           "base": {
@@ -140,7 +140,7 @@
         }
       },
       {
-        "minTokens": 128000,
+        "minTokens": 128001,
         "maxTokens": null,
         "prices": {
           "base": {
@@ -166,7 +166,7 @@
         }
       },
       {
-        "minTokens": 128000,
+        "minTokens": 128001,
         "maxTokens": null,
         "prices": {
           "base": {
@@ -178,7 +178,7 @@
     ]
   },
   {
-    "modelName": "gemini-1-5-pro",
+    "modelName": "gemini-1.5-pro",
     "currency": "USD",
     "tokenRanges": [
       {
@@ -192,7 +192,7 @@
         }
       },
       {
-        "minTokens": 128000,
+        "minTokens": 128001,
         "maxTokens": null,
         "prices": {
           "base": {
