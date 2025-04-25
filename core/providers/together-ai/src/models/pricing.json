@@ -1,0 +1,1234 @@
+[
+  {
+    "modelName": "WhereIsAI/UAE-Large-V1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.016,
+            "outputPricePerMillion": 0.016
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.27,
+            "outputPricePerMillion": 0.85
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "togethercomputer/m2-bert-80M-32k-retrieval",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.008,
+            "outputPricePerMillion": 0.008
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "google/gemma-2-9b-it",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.3,
+            "outputPricePerMillion": 0.3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "cartesia/sonic",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 65,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "BAAI/bge-large-en-v1.5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.016,
+            "outputPricePerMillion": 0.016
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 0.6
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-schnell-Free",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1.1-pro",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Qwen/Qwen2.5-7B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.3,
+            "outputPricePerMillion": 0.3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama-llama-2-70b-hf",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.9,
+            "outputPricePerMillion": 0.9
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "BAAI/bge-base-en-v1.5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.008,
+            "outputPricePerMillion": 0.008
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Gryphe/MythoMax-L2-13b",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.3,
+            "outputPricePerMillion": 0.3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "google/gemma-2-27b-it",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.8,
+            "outputPricePerMillion": 0.8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Qwen/Qwen2-VL-72B-Instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.2,
+            "outputPricePerMillion": 1.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/LlamaGuard-2-8b",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "cartesia/sonic-2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 65,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "togethercomputer/m2-bert-80M-8k-retrieval",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.008,
+            "outputPricePerMillion": 0.008
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "togethercomputer/MoA-1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.88,
+            "outputPricePerMillion": 0.88
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "mistralai/Mistral-7B-Instruct-v0.2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "togethercomputer/m2-bert-80M-2k-retrieval",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.008,
+            "outputPricePerMillion": 0.008
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "google/gemma-2b-it",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.1,
+            "outputPricePerMillion": 0.1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-pro",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "mistralai/Mistral-Small-24B-Instruct-2501",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.8,
+            "outputPricePerMillion": 0.8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Gryphe/MythoMax-L2-13b-Lite",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.1,
+            "outputPricePerMillion": 0.1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "scb10x/scb10x-llama3-1-typhoon2-70b-instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.88,
+            "outputPricePerMillion": 0.88
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-redux",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Meta-Llama-Guard-3-8B",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-depth",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-canny",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-3-8b-chat-hf",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "arcee-ai/caller",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.55,
+            "outputPricePerMillion": 0.85
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "togethercomputer/MoA-1-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "mistralai/Mistral-7B-Instruct-v0.1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "scb10x/scb10x-llama3-1-typhoon2-8b-instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18000000000000002,
+            "outputPricePerMillion": 0.18000000000000002
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "mistralai/Mixtral-8x7B-v0.1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 0.6
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-dev-lora",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "deepseek-ai/DeepSeek-R1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 7
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "arcee-ai/arcee-blitz",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.45,
+            "outputPricePerMillion": 0.75
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "deepseek-ai/DeepSeek-V3-p-dp",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.25,
+            "outputPricePerMillion": 1.25
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.6,
+            "outputPricePerMillion": 1.6
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "deepseek-ai/DeepSeek-V3",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.25,
+            "outputPricePerMillion": 1.25
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Qwen/Qwen2.5-VL-72B-Instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.95,
+            "outputPricePerMillion": 8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Qwen/Qwen2.5-Coder-32B-Instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.8,
+            "outputPricePerMillion": 0.8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.88,
+            "outputPricePerMillion": 0.88
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Qwen/Qwen2-72B-Instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.9,
+            "outputPricePerMillion": 0.9
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "microsoft/WizardLM-2-8x22B",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.2,
+            "outputPricePerMillion": 1.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2,
+            "outputPricePerMillion": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18000000000000002,
+            "outputPricePerMillion": 0.18000000000000002
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18000000000000002,
+            "outputPricePerMillion": 0.18000000000000002
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.2,
+            "outputPricePerMillion": 1.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Meta-Llama-3-8B-Instruct-Lite",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.1,
+            "outputPricePerMillion": 0.1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-schnell",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 0.6
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-3-70b-chat-hf",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.88,
+            "outputPricePerMillion": 0.88
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "mistralai/Mistral-7B-Instruct-v0.3",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Salesforce/Llama-Rank-V1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.1,
+            "outputPricePerMillion": 0.1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "nvidia/Llama-3.1-Nemotron-70B-Instruct-HF",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.88,
+            "outputPricePerMillion": 0.88
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-Vision-Free",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-Guard-3-11B-Vision-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18000000000000002,
+            "outputPricePerMillion": 0.18000000000000002
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-3.2-3B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.060000000000000005,
+            "outputPricePerMillion": 0.060000000000000005
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "black-forest-labs/FLUX.1-dev",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0,
+            "outputPricePerMillion": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Qwen/Qwen2.5-72B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.2,
+            "outputPricePerMillion": 1.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "arcee-ai/virtuoso-medium-v2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 0.8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "arcee-ai/virtuoso-large",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.75,
+            "outputPricePerMillion": 1.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "arcee-ai/maestro-reasoning",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.9,
+            "outputPricePerMillion": 3.3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "arcee-ai/coder-large",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 0.8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "arcee_ai/arcee-spotlight",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18000000000000002,
+            "outputPricePerMillion": 0.18000000000000002
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "Qwen/QwQ-32B",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.2,
+            "outputPricePerMillion": 1.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18000000000000002,
+            "outputPricePerMillion": 0.5900000000000001
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Llama-2-70b-hf",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.9,
+            "outputPricePerMillion": 0.9
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3.5,
+            "outputPricePerMillion": 3.5
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.88,
+            "outputPricePerMillion": 0.88
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18000000000000002,
+            "outputPricePerMillion": 0.18000000000000002
+          }
+        }
+      }
+    ]
+  }
+]

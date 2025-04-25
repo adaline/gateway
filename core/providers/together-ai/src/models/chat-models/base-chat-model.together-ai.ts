@@ -18,6 +18,7 @@ import {
 import {
   AssistantRoleLiteral,
   ChatLogProbsType,
+  ChatModelPriceType,
   ChatResponseType,
   ChatUsageType,
   Config,
@@ -43,6 +44,7 @@ import {
 } from "@adaline/types";
 
 import { TogetherAI } from "../../provider/provider.together-ai";
+import pricingData from "./../pricing.json";
 import {
   TogetherAICompleteChatResponse,
   TogetherAICompleteChatResponseType,
@@ -788,6 +790,17 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
     // Directly delegate to getProxyCompleteChatHeaders for now
     return await this.getProxyCompleteChatHeaders(data, headers, query);
+  }
+
+  getModelPricing(): ChatModelPriceType {
+    const entry = pricingData.find((m) => m.modelName === this.modelName);
+    if (!entry) {
+      throw new ModelResponseError({
+        info: `Invalid model pricing for model : '${this.modelName}'`,
+        cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
+      });
+    }
+    return entry as ChatModelPriceType;
   }
 }
 
