@@ -325,7 +325,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       const paramKey = def.param;
       const paramValue = (parsedConfig as ConfigType)[key];
 
-      if (paramKey === "maxOutputTokens" && def.type === "range" && paramValue === 0) {
+      if (key === "reasoningEnabled") {
+        // Handle reasoningEnabled specially
+        acc.thinkingConfig = {
+          includeThoughts: paramValue,
+        };
+      } else if (paramKey === "maxOutputTokens" && def.type === "range" && paramValue === 0) {
         acc[paramKey] = def.max;
       } else {
         acc[paramKey] = paramValue;
@@ -859,12 +864,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           }
         }
 
-        if (
-          parsedResponse.usageMetadata &&
-          parsedResponse.usageMetadata.totalTokenCount &&
-          parsedResponse.usageMetadata.promptTokenCount &&
-          parsedResponse.usageMetadata.candidatesTokenCount
-        ) {
+        if (parsedResponse.usageMetadata) {
           partialResponse.usage = {
             promptTokens: parsedResponse.usageMetadata.promptTokenCount,
             completionTokens: parsedResponse.usageMetadata.candidatesTokenCount,

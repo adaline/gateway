@@ -2,7 +2,7 @@ import { Meter, Tracer } from "@opentelemetry/api";
 import { z } from "zod";
 
 import { ChatModelV1, EmbeddingModelV1 } from "@adaline/provider";
-import { Config, EmbeddingRequests, Message, Tool } from "@adaline/types";
+import { ChatModelPriceType, ChatUsageType, Config, EmbeddingRequests, Message, Tool } from "@adaline/types";
 
 import {
   CompleteChatCallbackType,
@@ -106,9 +106,28 @@ const GatewayProxyGetEmbeddingsRequest = z.object({
 });
 type GatewayProxyGetEmbeddingsRequestType = z.infer<typeof GatewayProxyGetEmbeddingsRequest>;
 
+const GatewayGetChatUsageCostRequest = z
+  .object({
+    chatUsage: z.custom<ChatUsageType>(),
+    chatModelPrice: z.custom<ChatModelPriceType>().optional(),
+    model: z.custom<ChatModelV1>().optional(),
+  })
+  .refine(
+    (data) => {
+      // Ensure exactly one of chatModelPrice or model is provided
+      return (data.chatModelPrice !== undefined) !== (data.model !== undefined);
+    },
+    {
+      message: "Exactly one of chatModelPrice or model must be provided, not both.",
+      path: ["chatModelPrice", "model"],
+    }
+  );
+type GatewayGetChatUsageCostRequestType = z.infer<typeof GatewayGetChatUsageCostRequest>;
+
 export {
   GatewayCompleteChatRequest,
   GatewayCompleteChatRequestOptions,
+  GatewayGetChatUsageCostRequest,
   GatewayGetEmbeddingsRequest,
   GatewayGetEmbeddingsRequestOptions,
   GatewayOptions,
@@ -119,6 +138,7 @@ export {
   GatewayStreamChatRequestOptions,
   type GatewayCompleteChatRequestOptionsType,
   type GatewayCompleteChatRequestType,
+  type GatewayGetChatUsageCostRequestType,
   type GatewayGetEmbeddingsRequestOptionsType,
   type GatewayGetEmbeddingsRequestType,
   type GatewayOptionsType,

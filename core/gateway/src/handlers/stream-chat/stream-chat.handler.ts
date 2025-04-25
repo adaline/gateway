@@ -66,7 +66,16 @@ async function* handleStreamChat<M>(
         handlerTelemetryContext
       )) {
         for await (const transformed of data.model.transformStreamChatResponseChunk(chunk as string, buffer)) {
-          if (transformed.partialResponse.partialMessages.length > 0) {
+          // Update the buffer with the remainder returned by the transformer
+          buffer = transformed.buffer;
+
+          // Check if the partial response contains messages or usage information
+          const hasMessages = transformed.partialResponse?.partialMessages?.length > 0;
+          // Assuming usage information might be present in the partialResponse object, e.g., transformed.partialResponse.usage
+          const hasUsage = transformed.partialResponse?.usage != null; // Adjust this check based on the actual structure of usage data
+
+          // Yield the response if it contains messages or usage data
+          if (hasMessages || hasUsage) {
             const streamResponse = {
               request: stable,
               response: transformed.partialResponse,
@@ -90,9 +99,9 @@ async function* handleStreamChat<M>(
 
             logger?.debug("handleStreamChat streamResponse: ", { streamResponse });
             yield streamResponse;
-          } else {
-            buffer = transformed.buffer;
           }
+          // If the transformed part contains neither messages nor usage,
+          // we simply continue with the updated buffer to process the next part or chunk.
         }
       }
 

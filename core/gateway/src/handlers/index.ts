@@ -1,4 +1,5 @@
 export * from "./complete-chat";
+export * from "./get-chat-usage-cost";
 export * from "./get-embeddings";
 export * from "./proxy-complete-chat";
 export * from "./proxy-get-embeddings";

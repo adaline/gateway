@@ -235,6 +235,91 @@ describe("BaseChatModel", () => {
         model.transformConfig(config, messages, tools);
       }).toThrowError();
     });
+
+    // ReasoningEnabled tests
+    it("should transform config with reasoningEnabled correctly", () => {
+      const config = Config().parse({
+        maxTokens: 2000,
+        reasoningEnabled: true,
+        maxReasoningTokens: 500,
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        max_tokens: 2000,
+        thinking: {
+          type: "enabled",
+          budget_tokens: 500,
+        },
+      });
+    });
+
+    it("should throw  if reasoningEnabled is true but maxReasoningTokens is missing", () => {
+      const config = Config().parse({
+        maxTokens: 2000,
+        reasoningEnabled: true,
+        // maxReasoningTokens is missing
+      });
+      expect(() => model.transformConfig(config, messages, tools)).toThrow();
+      try {
+        model.transformConfig(config, messages, tools);
+      } catch (e: any) {
+        expect(e.info).toContain("Invalid extended thinking config");
+        expect(e.cause?.message).toContain("Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together");
+      }
+    });
+
+    it("should throw  if maxReasoningTokens is defined but reasoningEnabled is missing or false", () => {
+      const config = Config().parse({
+        maxTokens: 2000,
+        maxReasoningTokens: 500,
+        // reasoningEnabled is missing
+      });
+      expect(() => model.transformConfig(config, messages, tools)).toThrow();
+      try {
+        model.transformConfig(config, messages, tools);
+      } catch (e: any) {
+        expect(e.info).toContain("Invalid extended thinking config");
+        expect(e.cause?.message).toContain("Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together");
+      }
+    });
+
+    it("should throw  if maxReasoningTokens is greater than or equal to maxTokens", () => {
+      const config = Config().parse({
+        maxTokens: 500,
+        reasoningEnabled: true,
+        maxReasoningTokens: 500, // Equal to maxTokens
+      });
+      expect(() => model.transformConfig(config, messages, tools)).toThrow();
+      try {
+        model.transformConfig(config, messages, tools);
+      } catch (e: any) {
+        expect(e.info).toContain("Invalid extended thinking token budget");
+        expect(e.cause?.message).toContain("maxReasoningTokens (500) must be less than max_tokens (500)");
+      }
+
+      const config2 = Config().parse({
+        maxTokens: 500,
+        reasoningEnabled: true,
+        maxReasoningTokens: 600, // Greater than maxTokens
+      });
+      expect(() => model.transformConfig(config2, messages, tools)).toThrow();
+      try {
+        model.transformConfig(config2, messages, tools);
+      } catch (e: any) {
+        expect(e.info).toContain("Invalid extended thinking token budget");
+        expect(e.cause?.message).toContain("maxReasoningTokens (600) must be less than max_tokens (500)");
+      }
+    });
+
+    it("should not include thinking object if reasoningEnabled is undefined", () => {
+      const config = Config().parse({
+        maxTokens: 2000,
+        // reasoningEnabled is undefined
+        // maxReasoningTokens is undefined
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        max_tokens: 2000,
+      });
+    });
   });
 
   describe("BaseChatModel transformMessages", () => {
@@ -754,7 +839,7 @@ describe("BaseChatModel", () => {
       expect(results[0].buffer).toBe("");
       expect(results[0].partialResponse.partialMessages).toEqual([]); // No content in message_delta
       expect(results[0].partialResponse.usage).toEqual({
-        promptTokens: 0, // Not present in message_delta
+        promptTokens: undefined, // Not present in message_delta
         completionTokens: 55,
         totalTokens: 55, // Calculated in transform
       });

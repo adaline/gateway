@@ -1,0 +1,262 @@
+[
+  {
+    "modelName": "gpt-3.5-turbo-0125",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 0.5, "outputPricePerMillion": 1.5 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-3.5-turbo-1106",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 0.5, "outputPricePerMillion": 1.5 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-3.5-turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 0.5, "outputPricePerMillion": 1.5 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4-0125-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4-0613",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4-1106-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4-turbo-2024-04-09",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 30.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4-turbo-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 30.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4-turbo",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 30.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4o-2024-05-13",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 5.0, "outputPricePerMillion": 20.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4o-2024-08-06",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 2.5, "outputPricePerMillion": 10.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4o-mini-2024-07-18",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 0.6, "outputPricePerMillion": 2.4 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4o-mini",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 0.6, "outputPricePerMillion": 2.4 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "gpt-4o",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 5.0, "outputPricePerMillion": 20.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o1-2024-12-17",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 15.0, "outputPricePerMillion": 60.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o1-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 15.0, "outputPricePerMillion": 60.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o1-mini-2024-09-12",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 1.1, "outputPricePerMillion": 4.4 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o1-mini",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 1.1, "outputPricePerMillion": 4.4 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 15.0, "outputPricePerMillion": 60.0 }
+        }
+      }
+    ]
+  }
+]
