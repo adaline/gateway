@@ -30,7 +30,7 @@ function handleGetChatUsageCost(request: GetChatUsageCostHandlerRequestType): Ge
   }
 
   const inputRatePerMillion = getRate(promptTokens, "inputPricePerMillion");
-  const outputRatePerMillion = getRate(completionTokens, "outputPricePerMillion");
+  const outputRatePerMillion = getRate(promptTokens, "outputPricePerMillion");
 
   // rates are per‑1,000,000 tokens
   const inputCost = Number(((promptTokens / 1_000_000) * inputRatePerMillion).toFixed(6));
