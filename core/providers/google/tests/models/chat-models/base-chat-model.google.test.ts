@@ -86,8 +86,8 @@ describe("BaseChatModel", () => {
     roles: mockRolesMap,
     modalities: mockModalities,
     config: {
-      def: GoogleChatModelConfigs.base(2.0, 1.0, 8192, 4, 0.95).def,
-      schema: GoogleChatModelConfigs.base(2.0, 1.0, 8192, 4, 0.95).schema,
+      def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 0).def,
+      schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 0).schema,
     },
   });
 
@@ -281,6 +281,63 @@ describe("BaseChatModel", () => {
       });
     });
 
+    // ReasoningEnabled tests
+    it("should transform reasoningEnabled: true correctly", () => {
+      const config2 = Config().parse({
+        reasoningEnabled: true,
+      });
+
+      expect(model.transformConfig(config2, messages, tools)).toEqual({
+        generation_config: {
+          thinkingConfig: {
+            includeThoughts: true,
+          },
+        },
+      });
+    });
+
+    it("should transform reasoningEnabled: false correctly", () => {
+      const config = Config().parse({
+        reasoningEnabled: false,
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          thinkingConfig: {
+            includeThoughts: false,
+          },
+        },
+      });
+    });
+
+    it("should not include thinkingConfig when reasoningEnabled is not provided", () => {
+      const config = Config().parse({
+        temperature: 0.5, // Add another config to ensure generation_config is not empty
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          temperature: 0.5,
+        },
+        // No thinkingConfig expected
+      });
+    });
+
+    it("should transform reasoningEnabled along with other configs", () => {
+      const config = Config().parse({
+        temperature: 0.5,
+        maxTokens: 100,
+        reasoningEnabled: true,
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          temperature: 0.5,
+          maxOutputTokens: 100,
+          thinkingConfig: {
+            includeThoughts: true,
+          },
+        },
+      });
+    });
+
     it("should throw error if tool is defined", () => {
       expect(() => {
         const config = Config().parse({
@@ -385,6 +442,7 @@ describe("BaseChatModel", () => {
         model.transformMessages(messages);
       } catch (e: any) {
         expect(e).toBeInstanceOf(InvalidMessagesError);
+        expect(e.info).toBe("Invalid messages");
         expect(JSON.parse(e.cause?.message)).toEqual([
           {
             received: "guest",
