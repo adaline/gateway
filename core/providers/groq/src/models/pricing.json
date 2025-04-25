@@ -1,0 +1,146 @@
+[
+  {
+    "modelName": "gemma2-9b-it",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama-3.1-8b-instant",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.05,
+            "outputPricePerMillion": 0.08
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama-3.2-11b-vision-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.18,
+            "outputPricePerMillion": 0.18
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama-3.2-1b-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.04,
+            "outputPricePerMillion": 0.04
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama-3.2-3b-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.06,
+            "outputPricePerMillion": 0.06
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama-3.2-90b-vision-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.7,
+            "outputPricePerMillion": 0.8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama3-70b-8192",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.59,
+            "outputPricePerMillion": 0.79
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama3-8b-8192",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.05,
+            "outputPricePerMillion": 0.08
+          }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "llama-guard-3-8b",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.2
+          }
+        }
+      }
+    ]
+  }
+]
