@@ -118,6 +118,26 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.O1_Mini_2024_09_12Options,
       modelSchema: Models.O1_Mini_2024_09_12Schema,
     },
+    [Models.O3_2025_04_16Literal]: {
+      model: Models.O3_2025_04_16,
+      modelOptions: Models.O3_2025_04_16Options,
+      modelSchema: Models.O3_2025_04_16Schema,
+    },
+    [Models.O3Literal]: {
+      model: Models.O3,
+      modelOptions: Models.O3Options,
+      modelSchema: Models.O3Schema,
+    },
+    [Models.O4_Mini_2025_04_16Literal]: {
+      model: Models.O4_Mini_2025_04_16,
+      modelOptions: Models.O4_Mini_2025_04_16Options,
+      modelSchema: Models.O4_Mini_2025_04_16Schema,
+    },
+    [Models.O4_MiniLiteral]: {
+      model: Models.O4_Mini,
+      modelOptions: Models.O4_MiniOptions,
+      modelSchema: Models.O4_MiniSchema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<

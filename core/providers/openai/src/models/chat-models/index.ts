@@ -20,4 +20,9 @@ export * from "./o1-mini-2024-09-12.openai";
 export * from "./o1-mini.openai";
 export * from "./o1-preview.openai";
 export * from "./o1.openai";
+export * from "./o3-2025-04-16.openai";
+export * from "./o3.openai";
+export * from "./o4-mini-2025-04-16.openai";
+export * from "./o4-mini.openai";
 export * from "./types";
+
