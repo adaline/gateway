@@ -1,5 +1,17 @@
 # @adaline/open-router
 
+## 0.16.0
+
+### Minor Changes
+
+- 4d02433: Add model pricing to all providers
+
+### Patch Changes
+
+- Updated dependencies [4d02433]
+  - @adaline/provider@0.25.0
+  - @adaline/types@0.23.0
+
 ## 0.15.0
 
 ### Minor Changes

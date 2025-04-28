@@ -1,5 +1,16 @@
 # @adaline/provider
 
+## 0.25.0
+
+### Minor Changes
+
+- 4d02433: Add model pricing to all providers
+
+### Patch Changes
+
+- Updated dependencies [4d02433]
+  - @adaline/types@0.23.0
+
 ## 0.24.0
 
 ### Minor Changes

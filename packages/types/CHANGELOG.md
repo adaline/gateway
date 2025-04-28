@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 0.23.0
+
+### Minor Changes
+
+- 4d02433: Add model pricing to all providers
+
 ## 0.22.0
 
 ### Minor Changes

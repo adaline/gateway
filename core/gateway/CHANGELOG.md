@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 0.33.0
+
+### Minor Changes
+
+- 4d02433: Add model pricing to all providers
+
 ## 0.32.0
 
 ### Minor Changes

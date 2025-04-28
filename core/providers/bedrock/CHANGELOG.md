@@ -1,5 +1,18 @@
 # @adaline/bedrock
 
+## 0.22.0
+
+### Minor Changes
+
+- 4d02433: Add model pricing to all providers
+
+### Patch Changes
+
+- Updated dependencies [4d02433]
+  - @adaline/anthropic@0.28.0
+  - @adaline/provider@0.25.0
+  - @adaline/types@0.23.0
+
 ## 0.21.0
 
 ### Minor Changes
