@@ -1,5 +1,5 @@
-[
-  {
+{
+  "gpt-3.5-turbo-0125": {
     "modelName": "gpt-3.5-turbo-0125",
     "currency": "USD",
     "tokenRanges": [
@@ -7,12 +7,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 0.5, "outputPricePerMillion": 1.5 }
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 1.5
+          }
         }
       }
     ]
   },
-  {
+  "gpt-3.5-turbo-1106": {
     "modelName": "gpt-3.5-turbo-1106",
     "currency": "USD",
     "tokenRanges": [
@@ -20,12 +23,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 0.5, "outputPricePerMillion": 1.5 }
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 1.5
+          }
         }
       }
     ]
   },
-  {
+  "gpt-3.5-turbo": {
     "modelName": "gpt-3.5-turbo",
     "currency": "USD",
     "tokenRanges": [
@@ -33,12 +39,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 0.5, "outputPricePerMillion": 1.5 }
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 1.5
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4-0125-preview": {
     "modelName": "gpt-4-0125-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -46,12 +55,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+          "base": {
+            "inputPricePerMillion": 30,
+            "outputPricePerMillion": 60
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4-0613": {
     "modelName": "gpt-4-0613",
     "currency": "USD",
     "tokenRanges": [
@@ -59,12 +71,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+          "base": {
+            "inputPricePerMillion": 30,
+            "outputPricePerMillion": 60
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4-1106-preview": {
     "modelName": "gpt-4-1106-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -72,12 +87,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+          "base": {
+            "inputPricePerMillion": 30,
+            "outputPricePerMillion": 60
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4-turbo-2024-04-09": {
     "modelName": "gpt-4-turbo-2024-04-09",
     "currency": "USD",
     "tokenRanges": [
@@ -85,12 +103,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 30.0 }
+          "base": {
+            "inputPricePerMillion": 10,
+            "outputPricePerMillion": 30
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4-turbo-preview": {
     "modelName": "gpt-4-turbo-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -98,12 +119,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 30.0 }
+          "base": {
+            "inputPricePerMillion": 10,
+            "outputPricePerMillion": 30
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4-turbo": {
     "modelName": "gpt-4-turbo",
     "currency": "USD",
     "tokenRanges": [
@@ -111,12 +135,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 30.0 }
+          "base": {
+            "inputPricePerMillion": 10,
+            "outputPricePerMillion": 30
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4": {
     "modelName": "gpt-4",
     "currency": "USD",
     "tokenRanges": [
@@ -124,12 +151,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 30.0, "outputPricePerMillion": 60.0 }
+          "base": {
+            "inputPricePerMillion": 30,
+            "outputPricePerMillion": 60
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4o-2024-05-13": {
     "modelName": "gpt-4o-2024-05-13",
     "currency": "USD",
     "tokenRanges": [
@@ -137,12 +167,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 5.0, "outputPricePerMillion": 20.0 }
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 20
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4o-2024-08-06": {
     "modelName": "gpt-4o-2024-08-06",
     "currency": "USD",
     "tokenRanges": [
@@ -150,12 +183,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 2.5, "outputPricePerMillion": 10.0 }
+          "base": {
+            "inputPricePerMillion": 2.5,
+            "outputPricePerMillion": 10
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4o-mini-2024-07-18": {
     "modelName": "gpt-4o-mini-2024-07-18",
     "currency": "USD",
     "tokenRanges": [
@@ -163,12 +199,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 0.6, "outputPricePerMillion": 2.4 }
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 2.4
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4o-mini": {
     "modelName": "gpt-4o-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -176,12 +215,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 0.6, "outputPricePerMillion": 2.4 }
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 2.4
+          }
         }
       }
     ]
   },
-  {
+  "gpt-4o": {
     "modelName": "gpt-4o",
     "currency": "USD",
     "tokenRanges": [
@@ -189,12 +231,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 5.0, "outputPricePerMillion": 20.0 }
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 20
+          }
         }
       }
     ]
   },
-  {
+  "o1-2024-12-17": {
     "modelName": "o1-2024-12-17",
     "currency": "USD",
     "tokenRanges": [
@@ -202,12 +247,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 15.0, "outputPricePerMillion": 60.0 }
+          "base": {
+            "inputPricePerMillion": 15,
+            "outputPricePerMillion": 60
+          }
         }
       }
     ]
   },
-  {
+  "o1-preview": {
     "modelName": "o1-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -215,12 +263,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 15.0, "outputPricePerMillion": 60.0 }
+          "base": {
+            "inputPricePerMillion": 15,
+            "outputPricePerMillion": 60
+          }
         }
       }
     ]
   },
-  {
+  "o1-mini-2024-09-12": {
     "modelName": "o1-mini-2024-09-12",
     "currency": "USD",
     "tokenRanges": [
@@ -228,12 +279,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 1.1, "outputPricePerMillion": 4.4 }
+          "base": {
+            "inputPricePerMillion": 1.1,
+            "outputPricePerMillion": 4.4
+          }
         }
       }
     ]
   },
-  {
+  "o1-mini": {
     "modelName": "o1-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -241,12 +295,15 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 1.1, "outputPricePerMillion": 4.4 }
+          "base": {
+            "inputPricePerMillion": 1.1,
+            "outputPricePerMillion": 4.4
+          }
         }
       }
     ]
   },
-  {
+  "o1": {
     "modelName": "o1",
     "currency": "USD",
     "tokenRanges": [
@@ -254,9 +311,12 @@
         "minTokens": 0,
         "maxTokens": null,
         "prices": {
-          "base": { "inputPricePerMillion": 15.0, "outputPricePerMillion": 60.0 }
+          "base": {
+            "inputPricePerMillion": 15,
+            "outputPricePerMillion": 60
+          }
         }
       }
     ]
   }
-]
+}
