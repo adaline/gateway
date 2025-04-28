@@ -4,7 +4,6 @@ import { ChatModelPriceType } from "@adaline/types";
 
 import { Azure } from "../../../provider";
 import { BaseChatModelOptions, BaseChatModelOptionsType } from "../chat-model-options.azure";
-import pricingData from "./../pricing.json";
 
 class BaseChatModelOpenAI extends BaseChatModel {
   readonly version = "v1" as const;
@@ -53,16 +52,10 @@ class BaseChatModelOpenAI extends BaseChatModel {
     };
   }
   getModelPricing(): ChatModelPriceType {
-    const entry = pricingData.find((m) => m.modelName === this.modelName);
-    if (!entry) {
-      throw new ModelResponseError({
-        info: `Invalid model pricing for model : '${this.modelName}'`,
-        cause: new Error(
-          `No pricing configuration found for model "${this.modelName}". If you are using a custom model, please provide the pricing information in the configuration.`
-        ),
-      });
-    }
-    return entry as ChatModelPriceType;
+    throw new ModelResponseError({
+      info: `Invalid model pricing for model : '${this.modelName}'`,
+      cause: new Error(`Pricing configuration not supported azure provider.`),
+    });
   }
 }
 

@@ -5,7 +5,7 @@ import { ChatModelSchemaType, HeadersType, ModelError, ModelResponseError } from
 import { ChatModelPriceType } from "@adaline/types";
 
 import { Vertex } from "../../provider/provider.vertex";
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 
 const BaseChatModelOptions = z.object({
   accessToken: z.string(),
@@ -64,13 +64,15 @@ class BaseChatModelVertex extends BaseChatModel {
     };
   }
   getModelPricing(): ChatModelPriceType {
-    const entry = pricingData.find((m) => m.modelName === this.modelName);
-    if (!entry) {
+    // Check if the modelName exists in pricingData before accessing it
+    if (!(this.modelName in pricingData)) {
       throw new ModelResponseError({
         info: `Invalid model pricing for model : '${this.modelName}'`,
         cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
       });
     }
+
+    const entry = pricingData[this.modelName as keyof typeof pricingData];
     return entry as ChatModelPriceType;
   }
 }

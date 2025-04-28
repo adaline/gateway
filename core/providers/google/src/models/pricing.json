@@ -1,5 +1,5 @@
-[
-  {
+{
+  "base-gemini-1-chat-model": {
     "modelName": "base-gemini-1-chat-model",
     "currency": "USD",
     "tokenRanges": [
@@ -15,7 +15,7 @@
       }
     ]
   },
-  {
+  "gemini-1.0-pro-001": {
     "modelName": "gemini-1.0-pro-001",
     "currency": "USD",
     "tokenRanges": [
@@ -31,7 +31,7 @@
       }
     ]
   },
-  {
+  "gemini-1.0-pro-latest": {
     "modelName": "gemini-1.0-pro-latest",
     "currency": "USD",
     "tokenRanges": [
@@ -47,7 +47,7 @@
       }
     ]
   },
-  {
+  "gemini-1.0-pro-vision": {
     "modelName": "gemini-1.0-pro-vision",
     "currency": "USD",
     "tokenRanges": [
@@ -63,7 +63,7 @@
       }
     ]
   },
-  {
+  "gemini-1.0-pro": {
     "modelName": "gemini-1.0-pro",
     "currency": "USD",
     "tokenRanges": [
@@ -79,7 +79,7 @@
       }
     ]
   },
-  {
+  "gemini-1.5-flash-001": {
     "modelName": "gemini-1.5-flash-001",
     "currency": "USD",
     "tokenRanges": [
@@ -105,7 +105,7 @@
       }
     ]
   },
-  {
+  "gemini-1.5-flash-002": {
     "modelName": "gemini-1.5-flash-002",
     "currency": "USD",
     "tokenRanges": [
@@ -131,7 +131,7 @@
       }
     ]
   },
-  {
+  "gemini-1.5-flash-latest": {
     "modelName": "gemini-1.5-flash-latest",
     "currency": "USD",
     "tokenRanges": [
@@ -157,7 +157,7 @@
       }
     ]
   },
-  {
+  "gemini-1.5-flash": {
     "modelName": "gemini-1.5-flash",
     "currency": "USD",
     "tokenRanges": [
@@ -183,7 +183,7 @@
       }
     ]
   },
-  {
+  "gemini-1.5-pro-001": {
     "modelName": "gemini-1.5-pro-001",
     "currency": "USD",
     "tokenRanges": [
@@ -193,7 +193,7 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 1.25,
-            "outputPricePerMillion": 5.0
+            "outputPricePerMillion": 5
           }
         }
       },
@@ -203,13 +203,13 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 2.5,
-            "outputPricePerMillion": 10.0
+            "outputPricePerMillion": 10
           }
         }
       }
     ]
   },
-  {
+  "gemini-1.5-pro-002": {
     "modelName": "gemini-1.5-pro-002",
     "currency": "USD",
     "tokenRanges": [
@@ -219,7 +219,7 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 1.25,
-            "outputPricePerMillion": 5.0
+            "outputPricePerMillion": 5
           }
         }
       },
@@ -229,13 +229,13 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 2.5,
-            "outputPricePerMillion": 10.0
+            "outputPricePerMillion": 10
           }
         }
       }
     ]
   },
-  {
+  "gemini-1.5-pro-latest": {
     "modelName": "gemini-1.5-pro-latest",
     "currency": "USD",
     "tokenRanges": [
@@ -245,7 +245,7 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 1.25,
-            "outputPricePerMillion": 5.0
+            "outputPricePerMillion": 5
           }
         }
       },
@@ -255,13 +255,13 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 2.5,
-            "outputPricePerMillion": 10.0
+            "outputPricePerMillion": 10
           }
         }
       }
     ]
   },
-  {
+  "gemini-1.5-pro": {
     "modelName": "gemini-1.5-pro",
     "currency": "USD",
     "tokenRanges": [
@@ -271,7 +271,7 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 1.25,
-            "outputPricePerMillion": 5.0
+            "outputPricePerMillion": 5
           }
         }
       },
@@ -281,13 +281,13 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 2.5,
-            "outputPricePerMillion": 10.0
+            "outputPricePerMillion": 10
           }
         }
       }
     ]
   },
-  {
+  "gemini-2.0-flash-exp": {
     "modelName": "gemini-2.0-flash-exp",
     "currency": "USD",
     "tokenRanges": [
@@ -303,7 +303,7 @@
       }
     ]
   },
-  {
+  "gemini-2.5-flash-preview-04-17": {
     "modelName": "gemini-2.5-flash-preview-04-17",
     "currency": "USD",
     "tokenRanges": [
@@ -319,7 +319,7 @@
       }
     ]
   },
-  {
+  "gemini-2.5-pro-preview-03-25": {
     "modelName": "gemini-2.5-pro-preview-03-25",
     "currency": "USD",
     "tokenRanges": [
@@ -329,7 +329,7 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 1.25,
-            "outputPricePerMillion": 10.0
+            "outputPricePerMillion": 10
           }
         }
       },
@@ -339,13 +339,13 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 2.5,
-            "outputPricePerMillion": 15.0
+            "outputPricePerMillion": 15
           }
         }
       }
     ]
   },
-  {
+  "gemini-pro-vision": {
     "modelName": "gemini-pro-vision",
     "currency": "USD",
     "tokenRanges": [
@@ -361,7 +361,7 @@
       }
     ]
   },
-  {
+  "gemini-pro": {
     "modelName": "gemini-pro",
     "currency": "USD",
     "tokenRanges": [
@@ -377,4 +377,4 @@
       }
     ]
   }
-]
+}

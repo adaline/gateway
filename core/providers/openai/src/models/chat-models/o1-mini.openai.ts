@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { OpenAIChatModelConfigs } from "../../configs";
+import pricingData from "../pricing.json";
 import { BaseChatModelOptions } from "./base-chat-model.openai";
 import { BaseOSeriesChatModel } from "./base-o-series-chat-model.openai";
 import {
@@ -27,6 +28,7 @@ const O1_MiniSchema = ChatModelSchema(OpenAIChatModelOSSeriesRoles, OpenAIChatMo
     def: OpenAIChatModelConfigs.oSeries(4092, 4).def,
     schema: OpenAIChatModelConfigs.oSeries(4092, 4).schema,
   },
+  price: pricingData[O1_MiniLiteral],
 });
 
 const O1_MiniOptions = BaseChatModelOptions;
@@ -38,4 +40,4 @@ class O1_Mini extends BaseOSeriesChatModel {
   }
 }
 
-export { O1_Mini, O1_MiniOptions, O1_MiniSchema, O1_MiniLiteral, type O1_MiniOptionsType };
+export { O1_Mini, O1_MiniLiteral, O1_MiniOptions, O1_MiniSchema, type O1_MiniOptionsType };
