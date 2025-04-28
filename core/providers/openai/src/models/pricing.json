@@ -258,5 +258,57 @@
         }
       }
     ]
+  },
+  {
+    "modelName": "o3-2025-04-16",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 40.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o3",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 10.0, "outputPricePerMillion": 40.0 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o4-mini-2025-04-16",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 1.1, "outputPricePerMillion": 4.4 }
+        }
+      }
+    ]
+  },
+  {
+    "modelName": "o4-mini",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": { "inputPricePerMillion": 1.1, "outputPricePerMillion": 4.4 }
+        }
+      }
+    ]
   }
 ]
