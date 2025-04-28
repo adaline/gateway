@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { AnthropicChatModelConfigs } from "../../configs";
+import pricingData from "./../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.anthropic";
 import {
   AnthropicChatModelModalities,
@@ -25,6 +26,7 @@ const Claude3_5Sonnet20240620Schema = ChatModelSchema(AnthropicChatModelRoles, A
     def: AnthropicChatModelConfigs.base(8192, 4).def,
     schema: AnthropicChatModelConfigs.base(8192, 4).schema,
   },
+  price: pricingData[Claude3_5Sonnet20240620Literal],
 });
 
 const Claude3_5Sonnet20240620Options = BaseChatModelOptions;
@@ -38,8 +40,8 @@ class Claude3_5Sonnet20240620 extends BaseChatModel {
 
 export {
   Claude3_5Sonnet20240620,
+  Claude3_5Sonnet20240620Literal,
   Claude3_5Sonnet20240620Options,
   Claude3_5Sonnet20240620Schema,
-  Claude3_5Sonnet20240620Literal,
   type Claude3_5Sonnet20240620OptionsType,
 };

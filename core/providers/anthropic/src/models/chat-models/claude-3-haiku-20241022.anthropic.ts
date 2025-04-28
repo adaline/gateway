@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { AnthropicChatModelConfigs } from "../../configs";
+import pricingData from "./../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.anthropic";
 import {
   AnthropicChatModelModalities,
@@ -25,6 +26,7 @@ const Claude3_5Haiku20241022Schema = ChatModelSchema(AnthropicChatModelRoles, An
     def: AnthropicChatModelConfigs.base(8192, 4).def,
     schema: AnthropicChatModelConfigs.base(8192, 4).schema,
   },
+  price: pricingData[Claude3_5Haiku20241022Literal],
 });
 
 const Claude3_5Haiku20241022Options = BaseChatModelOptions;
