@@ -4,6 +4,7 @@ import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatMod
 import { ChatModelSchema } from "@adaline/provider";
 
 import { GroqChatModelConfigs } from "../../configs";
+import pricingData from "../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 const Llama_3_2_11b_VisionLiteral = "llama-3.2-11b-vision-preview" as const;
@@ -24,6 +25,7 @@ const Llama_3_2_11b_VisionSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIC
     def: GroqChatModelConfigs.base(8192).def,
     schema: GroqChatModelConfigs.base(8192).schema,
   },
+  price: pricingData[Llama_3_2_11b_VisionLiteral],
 });
 
 const Llama_3_2_11b_VisionOptions = BaseChatModelOptions;
@@ -37,8 +39,8 @@ class Llama_3_2_11b_Vision extends BaseChatModelGroq {
 
 export {
   Llama_3_2_11b_Vision,
+  Llama_3_2_11b_VisionLiteral,
   Llama_3_2_11b_VisionOptions,
   Llama_3_2_11b_VisionSchema,
-  Llama_3_2_11b_VisionLiteral,
   type Llama_3_2_11b_VisionOptionsType,
 };

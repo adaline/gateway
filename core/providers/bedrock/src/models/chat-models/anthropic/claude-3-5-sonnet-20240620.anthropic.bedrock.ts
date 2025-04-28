@@ -10,6 +10,7 @@ import { ChatModelSchema } from "@adaline/provider";
 
 import { BedrockAnthropicChatModelConfigs } from "../../../configs";
 import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
+import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
 const BedrockClaude3_5Sonnet20240620Literal = "anthropic.claude-3-5-sonnet-20240620-v1:0";
@@ -26,6 +27,7 @@ const BedrockClaude3_5Sonnet20240620Schema = ChatModelSchema(AnthropicChatModelR
     def: BedrockAnthropicChatModelConfigs.base(8192, 4).def,
     schema: BedrockAnthropicChatModelConfigs.base(8192, 4).schema,
   },
+  price: pricingData[BedrockClaude3_5Sonnet20240620Literal],
 });
 
 const BedrockClaude3_5Sonnet20240620Options = BaseChatModelOptions;

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { OpenAIChatModelConfigs } from "../../configs";
+import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
 import {
   OpenAIChatModelRoles,
@@ -27,6 +28,7 @@ const GPT_3_5_Turbo_1106Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAICha
     def: OpenAIChatModelConfigs.responseFormat(16385, 4).def,
     schema: OpenAIChatModelConfigs.responseFormat(16385, 4).schema,
   },
+  price: pricingData[GPT_3_5_Turbo_1106Literal], // Added price definition
 });
 
 const GPT_3_5_Turbo_1106Options = BaseChatModelOptions;
@@ -40,8 +42,8 @@ class GPT_3_5_Turbo_1106 extends BaseChatModel {
 
 export {
   GPT_3_5_Turbo_1106,
+  GPT_3_5_Turbo_1106Literal,
   GPT_3_5_Turbo_1106Options,
   GPT_3_5_Turbo_1106Schema,
-  GPT_3_5_Turbo_1106Literal,
   type GPT_3_5_Turbo_1106OptionsType,
 };

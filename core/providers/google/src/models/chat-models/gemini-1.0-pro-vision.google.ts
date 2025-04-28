@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { GoogleChatModelConfigs } from "../../configs";
+import pricingData from "../pricing.json";
 import { BaseChatModelOptions } from "./base-chat-model.google";
 import { BaseChatModelGemini1 } from "./base-gemini-1-chat-model.google";
 import {
@@ -27,6 +28,7 @@ const Gemini1_0ProVisionSchema = ChatModelSchema(GoogleChatModelRoles, GoogleCha
     def: GoogleChatModelConfigs.c1(1.0, 0.4, 4096, 4, 1.0, 32).def,
     schema: GoogleChatModelConfigs.c1(1.0, 0.4, 4096, 4, 1.0, 32).schema,
   },
+  price: pricingData[Gemini1_0ProVisionLiteral],
 });
 
 const Gemini1_0ProVisionOptions = BaseChatModelOptions;
@@ -40,8 +42,8 @@ class Gemini1_0ProVision extends BaseChatModelGemini1 {
 
 export {
   Gemini1_0ProVision,
+  Gemini1_0ProVisionLiteral,
   Gemini1_0ProVisionOptions,
   Gemini1_0ProVisionSchema,
-  Gemini1_0ProVisionLiteral,
   type Gemini1_0ProVisionOptionsType,
 };

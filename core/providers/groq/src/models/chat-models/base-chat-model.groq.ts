@@ -1,10 +1,11 @@
 import { z } from "zod";
 
 import { BaseChatModel, OpenAIChatRequestMessageType } from "@adaline/openai";
-import { ChatModelSchemaType, InvalidMessagesError, ParamsType } from "@adaline/provider";
-import { MessageType } from "@adaline/types";
+import { ChatModelSchemaType, InvalidMessagesError, ModelResponseError, ParamsType } from "@adaline/provider";
+import { ChatModelPriceType, MessageType } from "@adaline/types";
 
 import { Groq } from "../../provider";
+import pricingData from "../pricing.json";
 
 const BaseChatModelOptions = z.object({
   modelName: z.string().min(1),
@@ -62,6 +63,18 @@ class BaseChatModelGroq extends BaseChatModel {
     });
 
     return transformedMessages;
+  }
+  getModelPricing(): ChatModelPriceType {
+    // Check if the modelName exists in pricingData before accessing it
+    if (!(this.modelName in pricingData)) {
+      throw new ModelResponseError({
+        info: `Invalid model pricing for model : '${this.modelName}'`,
+        cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
+      });
+    }
+
+    const entry = pricingData[this.modelName as keyof typeof pricingData];
+    return entry as ChatModelPriceType;
   }
 }
 
