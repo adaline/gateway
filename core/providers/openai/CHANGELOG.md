@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.1.0
+
+### Minor Changes
+
+- 76beeca: add 03, o4-mini models
+
 ## 1.0.0
 
 ### Major Changes
