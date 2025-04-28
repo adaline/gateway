@@ -10,6 +10,7 @@ import { ChatModelSchema } from "@adaline/provider";
 
 import { BedrockAnthropicChatModelConfigs } from "../../../configs";
 import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
+import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
 const BedrockClaude3Haiku20240307Literal = "anthropic.claude-3-haiku-20240307-v1:0";
@@ -28,6 +29,7 @@ const BedrockClaude3Haiku20240307Schema = ChatModelSchema(AnthropicChatModelRole
     def: BedrockAnthropicChatModelConfigs.base(4096, 4).def,
     schema: BedrockAnthropicChatModelConfigs.base(4096, 4).schema,
   },
+  price: pricingData[BedrockClaude3Haiku20240307Literal],
 });
 
 const BedrockClaude3Haiku20240307Options = BaseChatModelOptions;
