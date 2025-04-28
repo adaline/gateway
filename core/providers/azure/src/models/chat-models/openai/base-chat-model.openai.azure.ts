@@ -54,7 +54,7 @@ class BaseChatModelOpenAI extends BaseChatModel {
   getModelPricing(): ChatModelPriceType {
     throw new ModelResponseError({
       info: `Invalid model pricing for model : '${this.modelName}'`,
-      cause: new Error(`No pricing configuration for azure`),
+      cause: new Error(`Pricing configuration not supported azure provider.`),
     });
   }
 }

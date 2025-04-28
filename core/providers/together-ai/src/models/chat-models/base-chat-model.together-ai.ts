@@ -44,7 +44,7 @@ import {
 } from "@adaline/types";
 
 import { TogetherAI } from "../../provider/provider.together-ai";
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import {
   TogetherAICompleteChatResponse,
   TogetherAICompleteChatResponseType,
@@ -793,14 +793,15 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   }
 
   getModelPricing(): ChatModelPriceType {
-    const entry = pricingData[this.modelName as keyof typeof pricingData];
-
-    if (!entry) {
+    // Check if the modelName exists in pricingData before accessing it
+    if (!(this.modelName in pricingData)) {
       throw new ModelResponseError({
         info: `Invalid model pricing for model : '${this.modelName}'`,
         cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
       });
     }
+
+    const entry = pricingData[this.modelName as keyof typeof pricingData];
     return entry as ChatModelPriceType;
   }
 }
