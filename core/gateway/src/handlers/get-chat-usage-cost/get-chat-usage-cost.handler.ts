@@ -9,7 +9,7 @@ function handleGetChatUsageCost(request: GetChatUsageCostHandlerRequestType): Ge
   if (request.chatModelPrice) {
     tokenRanges = request.chatModelPrice;
   } else if (request.model) {
-    tokenRanges = (request.model as any).getModelPricing(); // ToDo Replace with a proper type as soon as finalized
+    tokenRanges = request.model.getModelPricing();
   } else {
     throw new GatewayError("No chatModelPrice or model provided");
   }
@@ -30,7 +30,7 @@ function handleGetChatUsageCost(request: GetChatUsageCostHandlerRequestType): Ge
   }
 
   const inputRatePerMillion = getRate(promptTokens, "inputPricePerMillion");
-  const outputRatePerMillion = getRate(completionTokens, "outputPricePerMillion");
+  const outputRatePerMillion = getRate(promptTokens, "outputPricePerMillion");
 
   // rates are per‑1,000,000 tokens
   const inputCost = Number(((promptTokens / 1_000_000) * inputRatePerMillion).toFixed(6));

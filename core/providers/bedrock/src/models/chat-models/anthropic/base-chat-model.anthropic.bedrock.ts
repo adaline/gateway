@@ -5,10 +5,11 @@ import { SignatureV4 } from "@smithy/signature-v4";
 
 import { BaseChatModel } from "@adaline/anthropic";
 import { ChatModelSchemaType, encodedBase64ToString, HeadersType, ModelResponseError, ParamsType, UrlType } from "@adaline/provider";
-import { ConfigType, MessageType, PartialChatResponseType, ToolType } from "@adaline/types";
+import { ChatModelPriceType, ConfigType, MessageType, PartialChatResponseType, ToolType } from "@adaline/types";
 
 import { Bedrock } from "../../../provider";
 import { BaseChatModelOptions, type BaseChatModelOptionsType } from "../base-chat-model-options.bedrock";
+import pricingData from "./../../pricing.json";
 
 class BaseChatModelAnthropic extends BaseChatModel {
   readonly version = "v1" as const;
@@ -296,6 +297,19 @@ class BaseChatModelAnthropic extends BaseChatModel {
   // Use the helper function for stream chat headers
   async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
     return this.getProxyChatHeaders(() => this.getProxyStreamChatUrl(data, headers, query), data, headers, query);
+  }
+
+  getModelPricing(): ChatModelPriceType {
+    // Check if the modelName exists in pricingData before accessing it
+    if (!(this.modelName in pricingData)) {
+      throw new ModelResponseError({
+        info: `Invalid model pricing for model : '${this.modelName}'`,
+        cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
+      });
+    }
+
+    const entry = pricingData[this.modelName as keyof typeof pricingData];
+    return entry as ChatModelPriceType;
   }
 }
 

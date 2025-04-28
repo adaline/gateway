@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ModalityEnum, RoleEnum } from "@adaline/types";
+import { ChatModelPriceType, ModalityEnum, RoleEnum } from "@adaline/types";
 
 import { ConfigItemDef } from "../../types/config";
 
@@ -34,6 +34,7 @@ const ChatModelSchema = <
           message: "Keys in 'config.def' must exactly match keys in 'config.schema'",
         }
       ),
+    price: z.custom<ChatModelPriceType>(),
   });
 type ChatModelSchemaType<
   R extends z.ZodEnum<[string, ...string[]]> = typeof RoleEnum,

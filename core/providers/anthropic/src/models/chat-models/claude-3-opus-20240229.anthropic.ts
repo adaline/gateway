@@ -39,8 +39,8 @@ class Claude3Opus20240229 extends BaseChatModel {
 
 export {
   Claude3Opus20240229,
+  Claude3Opus20240229Literal,
   Claude3Opus20240229Options,
   Claude3Opus20240229Schema,
-  Claude3Opus20240229Literal,
   type Claude3Opus20240229OptionsType,
 };

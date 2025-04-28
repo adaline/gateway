@@ -1,5 +1,6 @@
 import { BaseChatModel } from "@adaline/openai";
-import { ChatModelSchemaType, HeadersType, ModelError } from "@adaline/provider";
+import { ChatModelSchemaType, HeadersType, ModelError, ModelResponseError } from "@adaline/provider";
+import { ChatModelPriceType } from "@adaline/types";
 
 import { Azure } from "../../../provider";
 import { BaseChatModelOptions, BaseChatModelOptionsType } from "../chat-model-options.azure";
@@ -49,6 +50,12 @@ class BaseChatModelOpenAI extends BaseChatModel {
       "api-key": this.azureApiKey,
       source: "adaline",
     };
+  }
+  getModelPricing(): ChatModelPriceType {
+    throw new ModelResponseError({
+      info: `Invalid model pricing for model : '${this.modelName}'`,
+      cause: new Error(`Pricing configuration not supported azure provider.`),
+    });
   }
 }
 

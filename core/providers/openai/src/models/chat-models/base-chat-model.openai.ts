@@ -48,8 +48,8 @@ import {
   UserRoleLiteral,
 } from "@adaline/types";
 
+import pricingData from "../pricing.json";
 import { OpenAI } from "./../../provider/provider.openai";
-import pricingData from "./../pricing.json";
 import {
   OpenAIChatRequest,
   OpenAIChatRequestImageContentType,
@@ -908,13 +908,15 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   }
 
   getModelPricing(): ChatModelPriceType {
-    const entry = pricingData.find((m) => m.modelName === this.modelName);
-    if (!entry) {
+    // Check if the modelName exists in pricingData before accessing it
+    if (!(this.modelName in pricingData)) {
       throw new ModelResponseError({
         info: `Invalid model pricing for model : '${this.modelName}'`,
         cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
       });
     }
+
+    const entry = pricingData[this.modelName as keyof typeof pricingData];
     return entry as ChatModelPriceType;
   }
 }

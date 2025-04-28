@@ -1,5 +1,5 @@
-[
-  {
+{
+  "microsoft/mai-ds-r1:free": {
     "modelName": "microsoft/mai-ds-r1:free",
     "currency": "USD",
     "tokenRanges": [
@@ -15,7 +15,7 @@
       }
     ]
   },
-  {
+  "google/gemini-2.5-pro-preview-03-25": {
     "modelName": "google/gemini-2.5-pro-preview-03-25",
     "currency": "USD",
     "tokenRanges": [
@@ -31,7 +31,7 @@
       }
     ]
   },
-  {
+  "thudm/glm-z1-32b:free": {
     "modelName": "thudm/glm-z1-32b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -47,7 +47,7 @@
       }
     ]
   },
-  {
+  "thudm/glm-4-32b:free": {
     "modelName": "thudm/glm-4-32b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -63,7 +63,7 @@
       }
     ]
   },
-  {
+  "google/gemini-2.5-flash-preview": {
     "modelName": "google/gemini-2.5-flash-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -79,7 +79,7 @@
       }
     ]
   },
-  {
+  "google/gemini-2.5-flash-preview:thinking": {
     "modelName": "google/gemini-2.5-flash-preview:thinking",
     "currency": "USD",
     "tokenRanges": [
@@ -95,7 +95,7 @@
       }
     ]
   },
-  {
+  "openai/o4-mini-high": {
     "modelName": "openai/o4-mini-high",
     "currency": "USD",
     "tokenRanges": [
@@ -111,7 +111,7 @@
       }
     ]
   },
-  {
+  "openai/o3": {
     "modelName": "openai/o3",
     "currency": "USD",
     "tokenRanges": [
@@ -127,7 +127,7 @@
       }
     ]
   },
-  {
+  "openai/o4-mini": {
     "modelName": "openai/o4-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -143,7 +143,7 @@
       }
     ]
   },
-  {
+  "shisa-ai/shisa-v2-llama3.3-70b:free": {
     "modelName": "shisa-ai/shisa-v2-llama3.3-70b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -159,7 +159,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen2.5-coder-7b-instruct": {
     "modelName": "qwen/qwen2.5-coder-7b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -175,7 +175,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4.1": {
     "modelName": "openai/gpt-4.1",
     "currency": "USD",
     "tokenRanges": [
@@ -191,7 +191,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4.1-mini": {
     "modelName": "openai/gpt-4.1-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -207,7 +207,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4.1-nano": {
     "modelName": "openai/gpt-4.1-nano",
     "currency": "USD",
     "tokenRanges": [
@@ -223,7 +223,7 @@
       }
     ]
   },
-  {
+  "eleutherai/llemma_7b": {
     "modelName": "eleutherai/llemma_7b",
     "currency": "USD",
     "tokenRanges": [
@@ -239,7 +239,7 @@
       }
     ]
   },
-  {
+  "alfredpros/codellama-7b-instruct-solidity": {
     "modelName": "alfredpros/codellama-7b-instruct-solidity",
     "currency": "USD",
     "tokenRanges": [
@@ -255,7 +255,7 @@
       }
     ]
   },
-  {
+  "arliai/qwq-32b-arliai-rpr-v1:free": {
     "modelName": "arliai/qwq-32b-arliai-rpr-v1:free",
     "currency": "USD",
     "tokenRanges": [
@@ -271,7 +271,7 @@
       }
     ]
   },
-  {
+  "agentica-org/deepcoder-14b-preview:free": {
     "modelName": "agentica-org/deepcoder-14b-preview:free",
     "currency": "USD",
     "tokenRanges": [
@@ -287,7 +287,7 @@
       }
     ]
   },
-  {
+  "moonshotai/kimi-vl-a3b-thinking:free": {
     "modelName": "moonshotai/kimi-vl-a3b-thinking:free",
     "currency": "USD",
     "tokenRanges": [
@@ -303,7 +303,7 @@
       }
     ]
   },
-  {
+  "x-ai/grok-3-mini-beta": {
     "modelName": "x-ai/grok-3-mini-beta",
     "currency": "USD",
     "tokenRanges": [
@@ -319,7 +319,7 @@
       }
     ]
   },
-  {
+  "x-ai/grok-3-beta": {
     "modelName": "x-ai/grok-3-beta",
     "currency": "USD",
     "tokenRanges": [
@@ -335,7 +335,7 @@
       }
     ]
   },
-  {
+  "nvidia/llama-3.1-nemotron-nano-8b-v1:free": {
     "modelName": "nvidia/llama-3.1-nemotron-nano-8b-v1:free",
     "currency": "USD",
     "tokenRanges": [
@@ -351,7 +351,7 @@
       }
     ]
   },
-  {
+  "nvidia/llama-3.3-nemotron-super-49b-v1:free": {
     "modelName": "nvidia/llama-3.3-nemotron-super-49b-v1:free",
     "currency": "USD",
     "tokenRanges": [
@@ -367,7 +367,7 @@
       }
     ]
   },
-  {
+  "nvidia/llama-3.1-nemotron-ultra-253b-v1:free": {
     "modelName": "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
     "currency": "USD",
     "tokenRanges": [
@@ -383,7 +383,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-4-maverick:free": {
     "modelName": "meta-llama/llama-4-maverick:free",
     "currency": "USD",
     "tokenRanges": [
@@ -399,7 +399,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-4-maverick": {
     "modelName": "meta-llama/llama-4-maverick",
     "currency": "USD",
     "tokenRanges": [
@@ -415,7 +415,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-4-scout:free": {
     "modelName": "meta-llama/llama-4-scout:free",
     "currency": "USD",
     "tokenRanges": [
@@ -431,7 +431,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-4-scout": {
     "modelName": "meta-llama/llama-4-scout",
     "currency": "USD",
     "tokenRanges": [
@@ -447,7 +447,7 @@
       }
     ]
   },
-  {
+  "all-hands/openhands-lm-32b-v0.1": {
     "modelName": "all-hands/openhands-lm-32b-v0.1",
     "currency": "USD",
     "tokenRanges": [
@@ -463,7 +463,7 @@
       }
     ]
   },
-  {
+  "mistral/ministral-8b": {
     "modelName": "mistral/ministral-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -479,7 +479,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-v3-base:free": {
     "modelName": "deepseek/deepseek-v3-base:free",
     "currency": "USD",
     "tokenRanges": [
@@ -495,7 +495,7 @@
       }
     ]
   },
-  {
+  "scb10x/llama3.1-typhoon2-8b-instruct": {
     "modelName": "scb10x/llama3.1-typhoon2-8b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -511,7 +511,7 @@
       }
     ]
   },
-  {
+  "scb10x/llama3.1-typhoon2-70b-instruct": {
     "modelName": "scb10x/llama3.1-typhoon2-70b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -527,7 +527,7 @@
       }
     ]
   },
-  {
+  "allenai/molmo-7b-d:free": {
     "modelName": "allenai/molmo-7b-d:free",
     "currency": "USD",
     "tokenRanges": [
@@ -543,7 +543,7 @@
       }
     ]
   },
-  {
+  "bytedance-research/ui-tars-72b:free": {
     "modelName": "bytedance-research/ui-tars-72b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -559,7 +559,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen2.5-vl-3b-instruct:free": {
     "modelName": "qwen/qwen2.5-vl-3b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -575,7 +575,7 @@
       }
     ]
   },
-  {
+  "google/gemini-2.5-pro-exp-03-25:free": {
     "modelName": "google/gemini-2.5-pro-exp-03-25:free",
     "currency": "USD",
     "tokenRanges": [
@@ -591,7 +591,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen2.5-vl-32b-instruct:free": {
     "modelName": "qwen/qwen2.5-vl-32b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -607,7 +607,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen2.5-vl-32b-instruct": {
     "modelName": "qwen/qwen2.5-vl-32b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -623,7 +623,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-chat-v3-0324:free": {
     "modelName": "deepseek/deepseek-chat-v3-0324:free",
     "currency": "USD",
     "tokenRanges": [
@@ -639,7 +639,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-chat-v3-0324": {
     "modelName": "deepseek/deepseek-chat-v3-0324",
     "currency": "USD",
     "tokenRanges": [
@@ -655,7 +655,7 @@
       }
     ]
   },
-  {
+  "featherless/qwerky-72b:free": {
     "modelName": "featherless/qwerky-72b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -671,7 +671,7 @@
       }
     ]
   },
-  {
+  "openai/o1-pro": {
     "modelName": "openai/o1-pro",
     "currency": "USD",
     "tokenRanges": [
@@ -687,7 +687,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-small-3.1-24b-instruct:free": {
     "modelName": "mistralai/mistral-small-3.1-24b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -703,7 +703,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-small-3.1-24b-instruct": {
     "modelName": "mistralai/mistral-small-3.1-24b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -719,7 +719,7 @@
       }
     ]
   },
-  {
+  "open-r1/olympiccoder-32b:free": {
     "modelName": "open-r1/olympiccoder-32b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -735,7 +735,7 @@
       }
     ]
   },
-  {
+  "steelskull/l3.3-electra-r1-70b": {
     "modelName": "steelskull/l3.3-electra-r1-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -751,7 +751,7 @@
       }
     ]
   },
-  {
+  "google/gemma-3-1b-it:free": {
     "modelName": "google/gemma-3-1b-it:free",
     "currency": "USD",
     "tokenRanges": [
@@ -767,7 +767,7 @@
       }
     ]
   },
-  {
+  "google/gemma-3-4b-it:free": {
     "modelName": "google/gemma-3-4b-it:free",
     "currency": "USD",
     "tokenRanges": [
@@ -783,7 +783,7 @@
       }
     ]
   },
-  {
+  "google/gemma-3-4b-it": {
     "modelName": "google/gemma-3-4b-it",
     "currency": "USD",
     "tokenRanges": [
@@ -799,7 +799,7 @@
       }
     ]
   },
-  {
+  "ai21/jamba-1.6-large": {
     "modelName": "ai21/jamba-1.6-large",
     "currency": "USD",
     "tokenRanges": [
@@ -815,7 +815,7 @@
       }
     ]
   },
-  {
+  "ai21/jamba-1.6-mini": {
     "modelName": "ai21/jamba-1.6-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -831,7 +831,7 @@
       }
     ]
   },
-  {
+  "google/gemma-3-12b-it:free": {
     "modelName": "google/gemma-3-12b-it:free",
     "currency": "USD",
     "tokenRanges": [
@@ -847,7 +847,7 @@
       }
     ]
   },
-  {
+  "google/gemma-3-12b-it": {
     "modelName": "google/gemma-3-12b-it",
     "currency": "USD",
     "tokenRanges": [
@@ -863,7 +863,7 @@
       }
     ]
   },
-  {
+  "cohere/command-a": {
     "modelName": "cohere/command-a",
     "currency": "USD",
     "tokenRanges": [
@@ -879,7 +879,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o-mini-search-preview": {
     "modelName": "openai/gpt-4o-mini-search-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -895,7 +895,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o-search-preview": {
     "modelName": "openai/gpt-4o-search-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -911,7 +911,7 @@
       }
     ]
   },
-  {
+  "rekaai/reka-flash-3:free": {
     "modelName": "rekaai/reka-flash-3:free",
     "currency": "USD",
     "tokenRanges": [
@@ -927,7 +927,7 @@
       }
     ]
   },
-  {
+  "google/gemma-3-27b-it:free": {
     "modelName": "google/gemma-3-27b-it:free",
     "currency": "USD",
     "tokenRanges": [
@@ -943,7 +943,7 @@
       }
     ]
   },
-  {
+  "google/gemma-3-27b-it": {
     "modelName": "google/gemma-3-27b-it",
     "currency": "USD",
     "tokenRanges": [
@@ -959,7 +959,7 @@
       }
     ]
   },
-  {
+  "thedrummer/anubis-pro-105b-v1": {
     "modelName": "thedrummer/anubis-pro-105b-v1",
     "currency": "USD",
     "tokenRanges": [
@@ -975,7 +975,7 @@
       }
     ]
   },
-  {
+  "latitudegames/wayfarer-large-70b-llama-3.3": {
     "modelName": "latitudegames/wayfarer-large-70b-llama-3.3",
     "currency": "USD",
     "tokenRanges": [
@@ -991,7 +991,7 @@
       }
     ]
   },
-  {
+  "thedrummer/skyfall-36b-v2": {
     "modelName": "thedrummer/skyfall-36b-v2",
     "currency": "USD",
     "tokenRanges": [
@@ -1007,7 +1007,7 @@
       }
     ]
   },
-  {
+  "microsoft/phi-4-multimodal-instruct": {
     "modelName": "microsoft/phi-4-multimodal-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -1023,7 +1023,7 @@
       }
     ]
   },
-  {
+  "perplexity/sonar-reasoning-pro": {
     "modelName": "perplexity/sonar-reasoning-pro",
     "currency": "USD",
     "tokenRanges": [
@@ -1039,7 +1039,7 @@
       }
     ]
   },
-  {
+  "perplexity/sonar-pro": {
     "modelName": "perplexity/sonar-pro",
     "currency": "USD",
     "tokenRanges": [
@@ -1055,7 +1055,7 @@
       }
     ]
   },
-  {
+  "perplexity/sonar-deep-research": {
     "modelName": "perplexity/sonar-deep-research",
     "currency": "USD",
     "tokenRanges": [
@@ -1071,7 +1071,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-zero:free": {
     "modelName": "deepseek/deepseek-r1-zero:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1087,7 +1087,7 @@
       }
     ]
   },
-  {
+  "qwen/qwq-32b:free": {
     "modelName": "qwen/qwq-32b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1103,7 +1103,7 @@
       }
     ]
   },
-  {
+  "qwen/qwq-32b": {
     "modelName": "qwen/qwq-32b",
     "currency": "USD",
     "tokenRanges": [
@@ -1119,7 +1119,7 @@
       }
     ]
   },
-  {
+  "moonshotai/moonlight-16b-a3b-instruct:free": {
     "modelName": "moonshotai/moonlight-16b-a3b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1135,7 +1135,7 @@
       }
     ]
   },
-  {
+  "nousresearch/deephermes-3-llama-3-8b-preview:free": {
     "modelName": "nousresearch/deephermes-3-llama-3-8b-preview:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1151,7 +1151,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4.5-preview": {
     "modelName": "openai/gpt-4.5-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -1167,7 +1167,7 @@
       }
     ]
   },
-  {
+  "google/gemini-2.0-flash-lite-001": {
     "modelName": "google/gemini-2.0-flash-lite-001",
     "currency": "USD",
     "tokenRanges": [
@@ -1183,7 +1183,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.7-sonnet": {
     "modelName": "anthropic/claude-3.7-sonnet",
     "currency": "USD",
     "tokenRanges": [
@@ -1199,7 +1199,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.7-sonnet:thinking": {
     "modelName": "anthropic/claude-3.7-sonnet:thinking",
     "currency": "USD",
     "tokenRanges": [
@@ -1215,7 +1215,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.7-sonnet:beta": {
     "modelName": "anthropic/claude-3.7-sonnet:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -1231,7 +1231,7 @@
       }
     ]
   },
-  {
+  "perplexity/r1-1776": {
     "modelName": "perplexity/r1-1776",
     "currency": "USD",
     "tokenRanges": [
@@ -1247,7 +1247,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-saba": {
     "modelName": "mistralai/mistral-saba",
     "currency": "USD",
     "tokenRanges": [
@@ -1263,7 +1263,7 @@
       }
     ]
   },
-  {
+  "cognitivecomputations/dolphin3.0-r1-mistral-24b:free": {
     "modelName": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1279,7 +1279,7 @@
       }
     ]
   },
-  {
+  "cognitivecomputations/dolphin3.0-mistral-24b:free": {
     "modelName": "cognitivecomputations/dolphin3.0-mistral-24b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1295,7 +1295,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-guard-3-8b": {
     "modelName": "meta-llama/llama-guard-3-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -1311,7 +1311,7 @@
       }
     ]
   },
-  {
+  "openai/o3-mini-high": {
     "modelName": "openai/o3-mini-high",
     "currency": "USD",
     "tokenRanges": [
@@ -1327,7 +1327,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-llama-8b": {
     "modelName": "deepseek/deepseek-r1-distill-llama-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -1343,7 +1343,7 @@
       }
     ]
   },
-  {
+  "google/gemini-2.0-flash-001": {
     "modelName": "google/gemini-2.0-flash-001",
     "currency": "USD",
     "tokenRanges": [
@@ -1359,7 +1359,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-vl-plus": {
     "modelName": "qwen/qwen-vl-plus",
     "currency": "USD",
     "tokenRanges": [
@@ -1375,7 +1375,7 @@
       }
     ]
   },
-  {
+  "aion-labs/aion-1.0": {
     "modelName": "aion-labs/aion-1.0",
     "currency": "USD",
     "tokenRanges": [
@@ -1391,7 +1391,7 @@
       }
     ]
   },
-  {
+  "aion-labs/aion-1.0-mini": {
     "modelName": "aion-labs/aion-1.0-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -1407,7 +1407,7 @@
       }
     ]
   },
-  {
+  "aion-labs/aion-rp-llama-3.1-8b": {
     "modelName": "aion-labs/aion-rp-llama-3.1-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -1423,7 +1423,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-vl-max": {
     "modelName": "qwen/qwen-vl-max",
     "currency": "USD",
     "tokenRanges": [
@@ -1439,7 +1439,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-turbo": {
     "modelName": "qwen/qwen-turbo",
     "currency": "USD",
     "tokenRanges": [
@@ -1455,7 +1455,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen2.5-vl-72b-instruct:free": {
     "modelName": "qwen/qwen2.5-vl-72b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1471,7 +1471,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen2.5-vl-72b-instruct": {
     "modelName": "qwen/qwen2.5-vl-72b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -1487,7 +1487,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-plus": {
     "modelName": "qwen/qwen-plus",
     "currency": "USD",
     "tokenRanges": [
@@ -1503,7 +1503,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-max": {
     "modelName": "qwen/qwen-max",
     "currency": "USD",
     "tokenRanges": [
@@ -1519,7 +1519,7 @@
       }
     ]
   },
-  {
+  "openai/o3-mini": {
     "modelName": "openai/o3-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -1535,7 +1535,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-qwen-1.5b": {
     "modelName": "deepseek/deepseek-r1-distill-qwen-1.5b",
     "currency": "USD",
     "tokenRanges": [
@@ -1551,7 +1551,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-small-24b-instruct-2501:free": {
     "modelName": "mistralai/mistral-small-24b-instruct-2501:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1567,7 +1567,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-small-24b-instruct-2501": {
     "modelName": "mistralai/mistral-small-24b-instruct-2501",
     "currency": "USD",
     "tokenRanges": [
@@ -1583,7 +1583,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-qwen-32b:free": {
     "modelName": "deepseek/deepseek-r1-distill-qwen-32b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1599,7 +1599,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-qwen-32b": {
     "modelName": "deepseek/deepseek-r1-distill-qwen-32b",
     "currency": "USD",
     "tokenRanges": [
@@ -1615,7 +1615,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-qwen-14b:free": {
     "modelName": "deepseek/deepseek-r1-distill-qwen-14b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1631,7 +1631,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-qwen-14b": {
     "modelName": "deepseek/deepseek-r1-distill-qwen-14b",
     "currency": "USD",
     "tokenRanges": [
@@ -1647,7 +1647,7 @@
       }
     ]
   },
-  {
+  "perplexity/sonar-reasoning": {
     "modelName": "perplexity/sonar-reasoning",
     "currency": "USD",
     "tokenRanges": [
@@ -1663,7 +1663,7 @@
       }
     ]
   },
-  {
+  "perplexity/sonar": {
     "modelName": "perplexity/sonar",
     "currency": "USD",
     "tokenRanges": [
@@ -1679,7 +1679,7 @@
       }
     ]
   },
-  {
+  "liquid/lfm-7b": {
     "modelName": "liquid/lfm-7b",
     "currency": "USD",
     "tokenRanges": [
@@ -1695,7 +1695,7 @@
       }
     ]
   },
-  {
+  "liquid/lfm-3b": {
     "modelName": "liquid/lfm-3b",
     "currency": "USD",
     "tokenRanges": [
@@ -1711,7 +1711,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-llama-70b:free": {
     "modelName": "deepseek/deepseek-r1-distill-llama-70b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1727,7 +1727,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1-distill-llama-70b": {
     "modelName": "deepseek/deepseek-r1-distill-llama-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -1743,7 +1743,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1:free": {
     "modelName": "deepseek/deepseek-r1:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1759,7 +1759,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-r1": {
     "modelName": "deepseek/deepseek-r1",
     "currency": "USD",
     "tokenRanges": [
@@ -1775,7 +1775,7 @@
       }
     ]
   },
-  {
+  "sophosympatheia/rogue-rose-103b-v0.2:free": {
     "modelName": "sophosympatheia/rogue-rose-103b-v0.2:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1791,7 +1791,7 @@
       }
     ]
   },
-  {
+  "minimax/minimax-01": {
     "modelName": "minimax/minimax-01",
     "currency": "USD",
     "tokenRanges": [
@@ -1807,7 +1807,7 @@
       }
     ]
   },
-  {
+  "mistralai/codestral-2501": {
     "modelName": "mistralai/codestral-2501",
     "currency": "USD",
     "tokenRanges": [
@@ -1823,7 +1823,7 @@
       }
     ]
   },
-  {
+  "microsoft/phi-4": {
     "modelName": "microsoft/phi-4",
     "currency": "USD",
     "tokenRanges": [
@@ -1839,7 +1839,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-chat:free": {
     "modelName": "deepseek/deepseek-chat:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1855,7 +1855,7 @@
       }
     ]
   },
-  {
+  "deepseek/deepseek-chat": {
     "modelName": "deepseek/deepseek-chat",
     "currency": "USD",
     "tokenRanges": [
@@ -1871,7 +1871,7 @@
       }
     ]
   },
-  {
+  "sao10k/l3.3-euryale-70b": {
     "modelName": "sao10k/l3.3-euryale-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -1887,7 +1887,7 @@
       }
     ]
   },
-  {
+  "openai/o1": {
     "modelName": "openai/o1",
     "currency": "USD",
     "tokenRanges": [
@@ -1903,7 +1903,7 @@
       }
     ]
   },
-  {
+  "eva-unit-01/eva-llama-3.33-70b": {
     "modelName": "eva-unit-01/eva-llama-3.33-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -1919,7 +1919,7 @@
       }
     ]
   },
-  {
+  "x-ai/grok-2-vision-1212": {
     "modelName": "x-ai/grok-2-vision-1212",
     "currency": "USD",
     "tokenRanges": [
@@ -1935,7 +1935,7 @@
       }
     ]
   },
-  {
+  "x-ai/grok-2-1212": {
     "modelName": "x-ai/grok-2-1212",
     "currency": "USD",
     "tokenRanges": [
@@ -1951,7 +1951,7 @@
       }
     ]
   },
-  {
+  "cohere/command-r7b-12-2024": {
     "modelName": "cohere/command-r7b-12-2024",
     "currency": "USD",
     "tokenRanges": [
@@ -1967,7 +1967,7 @@
       }
     ]
   },
-  {
+  "google/gemini-2.0-flash-exp:free": {
     "modelName": "google/gemini-2.0-flash-exp:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1983,7 +1983,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.3-70b-instruct:free": {
     "modelName": "meta-llama/llama-3.3-70b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -1999,7 +1999,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.3-70b-instruct": {
     "modelName": "meta-llama/llama-3.3-70b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2015,7 +2015,7 @@
       }
     ]
   },
-  {
+  "amazon/nova-lite-v1": {
     "modelName": "amazon/nova-lite-v1",
     "currency": "USD",
     "tokenRanges": [
@@ -2031,7 +2031,7 @@
       }
     ]
   },
-  {
+  "amazon/nova-micro-v1": {
     "modelName": "amazon/nova-micro-v1",
     "currency": "USD",
     "tokenRanges": [
@@ -2047,7 +2047,7 @@
       }
     ]
   },
-  {
+  "amazon/nova-pro-v1": {
     "modelName": "amazon/nova-pro-v1",
     "currency": "USD",
     "tokenRanges": [
@@ -2063,7 +2063,7 @@
       }
     ]
   },
-  {
+  "qwen/qwq-32b-preview:free": {
     "modelName": "qwen/qwq-32b-preview:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2079,7 +2079,7 @@
       }
     ]
   },
-  {
+  "qwen/qwq-32b-preview": {
     "modelName": "qwen/qwq-32b-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -2095,7 +2095,7 @@
       }
     ]
   },
-  {
+  "google/learnlm-1.5-pro-experimental:free": {
     "modelName": "google/learnlm-1.5-pro-experimental:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2111,7 +2111,7 @@
       }
     ]
   },
-  {
+  "eva-unit-01/eva-qwen-2.5-72b": {
     "modelName": "eva-unit-01/eva-qwen-2.5-72b",
     "currency": "USD",
     "tokenRanges": [
@@ -2127,7 +2127,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o-2024-11-20": {
     "modelName": "openai/gpt-4o-2024-11-20",
     "currency": "USD",
     "tokenRanges": [
@@ -2143,7 +2143,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-large-2411": {
     "modelName": "mistralai/mistral-large-2411",
     "currency": "USD",
     "tokenRanges": [
@@ -2159,7 +2159,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-large-2407": {
     "modelName": "mistralai/mistral-large-2407",
     "currency": "USD",
     "tokenRanges": [
@@ -2175,7 +2175,7 @@
       }
     ]
   },
-  {
+  "mistralai/pixtral-large-2411": {
     "modelName": "mistralai/pixtral-large-2411",
     "currency": "USD",
     "tokenRanges": [
@@ -2191,7 +2191,7 @@
       }
     ]
   },
-  {
+  "x-ai/grok-vision-beta": {
     "modelName": "x-ai/grok-vision-beta",
     "currency": "USD",
     "tokenRanges": [
@@ -2207,7 +2207,7 @@
       }
     ]
   },
-  {
+  "infermatic/mn-inferor-12b": {
     "modelName": "infermatic/mn-inferor-12b",
     "currency": "USD",
     "tokenRanges": [
@@ -2223,7 +2223,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-coder-32b-instruct:free": {
     "modelName": "qwen/qwen-2.5-coder-32b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2239,7 +2239,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-coder-32b-instruct": {
     "modelName": "qwen/qwen-2.5-coder-32b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2255,7 +2255,7 @@
       }
     ]
   },
-  {
+  "raifle/sorcererlm-8x22b": {
     "modelName": "raifle/sorcererlm-8x22b",
     "currency": "USD",
     "tokenRanges": [
@@ -2271,7 +2271,7 @@
       }
     ]
   },
-  {
+  "eva-unit-01/eva-qwen-2.5-32b": {
     "modelName": "eva-unit-01/eva-qwen-2.5-32b",
     "currency": "USD",
     "tokenRanges": [
@@ -2287,7 +2287,7 @@
       }
     ]
   },
-  {
+  "thedrummer/unslopnemo-12b": {
     "modelName": "thedrummer/unslopnemo-12b",
     "currency": "USD",
     "tokenRanges": [
@@ -2303,7 +2303,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-haiku:beta": {
     "modelName": "anthropic/claude-3.5-haiku:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -2319,7 +2319,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-haiku": {
     "modelName": "anthropic/claude-3.5-haiku",
     "currency": "USD",
     "tokenRanges": [
@@ -2335,7 +2335,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-haiku-20241022:beta": {
     "modelName": "anthropic/claude-3.5-haiku-20241022:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -2351,7 +2351,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-haiku-20241022": {
     "modelName": "anthropic/claude-3.5-haiku-20241022",
     "currency": "USD",
     "tokenRanges": [
@@ -2367,7 +2367,7 @@
       }
     ]
   },
-  {
+  "neversleep/llama-3.1-lumimaid-70b": {
     "modelName": "neversleep/llama-3.1-lumimaid-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -2383,7 +2383,7 @@
       }
     ]
   },
-  {
+  "anthracite-org/magnum-v4-72b": {
     "modelName": "anthracite-org/magnum-v4-72b",
     "currency": "USD",
     "tokenRanges": [
@@ -2399,7 +2399,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-sonnet:beta": {
     "modelName": "anthropic/claude-3.5-sonnet:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -2415,7 +2415,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-sonnet": {
     "modelName": "anthropic/claude-3.5-sonnet",
     "currency": "USD",
     "tokenRanges": [
@@ -2431,7 +2431,7 @@
       }
     ]
   },
-  {
+  "x-ai/grok-beta": {
     "modelName": "x-ai/grok-beta",
     "currency": "USD",
     "tokenRanges": [
@@ -2447,7 +2447,7 @@
       }
     ]
   },
-  {
+  "mistralai/ministral-8b": {
     "modelName": "mistralai/ministral-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -2463,7 +2463,7 @@
       }
     ]
   },
-  {
+  "mistralai/ministral-3b": {
     "modelName": "mistralai/ministral-3b",
     "currency": "USD",
     "tokenRanges": [
@@ -2479,7 +2479,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-7b-instruct:free": {
     "modelName": "qwen/qwen-2.5-7b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2495,7 +2495,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-7b-instruct": {
     "modelName": "qwen/qwen-2.5-7b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2511,7 +2511,7 @@
       }
     ]
   },
-  {
+  "nvidia/llama-3.1-nemotron-70b-instruct:free": {
     "modelName": "nvidia/llama-3.1-nemotron-70b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2527,7 +2527,7 @@
       }
     ]
   },
-  {
+  "nvidia/llama-3.1-nemotron-70b-instruct": {
     "modelName": "nvidia/llama-3.1-nemotron-70b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2543,7 +2543,7 @@
       }
     ]
   },
-  {
+  "inflection/inflection-3-productivity": {
     "modelName": "inflection/inflection-3-productivity",
     "currency": "USD",
     "tokenRanges": [
@@ -2559,7 +2559,7 @@
       }
     ]
   },
-  {
+  "inflection/inflection-3-pi": {
     "modelName": "inflection/inflection-3-pi",
     "currency": "USD",
     "tokenRanges": [
@@ -2575,7 +2575,7 @@
       }
     ]
   },
-  {
+  "google/gemini-flash-1.5-8b": {
     "modelName": "google/gemini-flash-1.5-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -2591,7 +2591,7 @@
       }
     ]
   },
-  {
+  "thedrummer/rocinante-12b": {
     "modelName": "thedrummer/rocinante-12b",
     "currency": "USD",
     "tokenRanges": [
@@ -2607,7 +2607,7 @@
       }
     ]
   },
-  {
+  "anthracite-org/magnum-v2-72b": {
     "modelName": "anthracite-org/magnum-v2-72b",
     "currency": "USD",
     "tokenRanges": [
@@ -2623,7 +2623,7 @@
       }
     ]
   },
-  {
+  "liquid/lfm-40b": {
     "modelName": "liquid/lfm-40b",
     "currency": "USD",
     "tokenRanges": [
@@ -2639,7 +2639,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.2-3b-instruct:free": {
     "modelName": "meta-llama/llama-3.2-3b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2655,7 +2655,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.2-3b-instruct": {
     "modelName": "meta-llama/llama-3.2-3b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2671,7 +2671,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.2-1b-instruct:free": {
     "modelName": "meta-llama/llama-3.2-1b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2687,7 +2687,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.2-1b-instruct": {
     "modelName": "meta-llama/llama-3.2-1b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2703,7 +2703,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.2-90b-vision-instruct": {
     "modelName": "meta-llama/llama-3.2-90b-vision-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2719,7 +2719,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.2-11b-vision-instruct:free": {
     "modelName": "meta-llama/llama-3.2-11b-vision-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2735,7 +2735,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.2-11b-vision-instruct": {
     "modelName": "meta-llama/llama-3.2-11b-vision-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2751,7 +2751,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-72b-instruct:free": {
     "modelName": "qwen/qwen-2.5-72b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2767,7 +2767,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-72b-instruct": {
     "modelName": "qwen/qwen-2.5-72b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2783,7 +2783,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-vl-72b-instruct": {
     "modelName": "qwen/qwen-2.5-vl-72b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2799,7 +2799,7 @@
       }
     ]
   },
-  {
+  "neversleep/llama-3.1-lumimaid-8b": {
     "modelName": "neversleep/llama-3.1-lumimaid-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -2815,7 +2815,7 @@
       }
     ]
   },
-  {
+  "openai/o1-preview": {
     "modelName": "openai/o1-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -2831,7 +2831,7 @@
       }
     ]
   },
-  {
+  "openai/o1-preview-2024-09-12": {
     "modelName": "openai/o1-preview-2024-09-12",
     "currency": "USD",
     "tokenRanges": [
@@ -2847,7 +2847,7 @@
       }
     ]
   },
-  {
+  "openai/o1-mini": {
     "modelName": "openai/o1-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -2863,7 +2863,7 @@
       }
     ]
   },
-  {
+  "openai/o1-mini-2024-09-12": {
     "modelName": "openai/o1-mini-2024-09-12",
     "currency": "USD",
     "tokenRanges": [
@@ -2879,7 +2879,7 @@
       }
     ]
   },
-  {
+  "mistralai/pixtral-12b": {
     "modelName": "mistralai/pixtral-12b",
     "currency": "USD",
     "tokenRanges": [
@@ -2895,7 +2895,7 @@
       }
     ]
   },
-  {
+  "cohere/command-r-plus-08-2024": {
     "modelName": "cohere/command-r-plus-08-2024",
     "currency": "USD",
     "tokenRanges": [
@@ -2911,7 +2911,7 @@
       }
     ]
   },
-  {
+  "cohere/command-r-08-2024": {
     "modelName": "cohere/command-r-08-2024",
     "currency": "USD",
     "tokenRanges": [
@@ -2927,7 +2927,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-vl-7b-instruct:free": {
     "modelName": "qwen/qwen-2.5-vl-7b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -2943,7 +2943,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2.5-vl-7b-instruct": {
     "modelName": "qwen/qwen-2.5-vl-7b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -2959,7 +2959,7 @@
       }
     ]
   },
-  {
+  "sao10k/l3.1-euryale-70b": {
     "modelName": "sao10k/l3.1-euryale-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -2975,7 +2975,7 @@
       }
     ]
   },
-  {
+  "google/gemini-flash-1.5-8b-exp": {
     "modelName": "google/gemini-flash-1.5-8b-exp",
     "currency": "USD",
     "tokenRanges": [
@@ -2991,7 +2991,7 @@
       }
     ]
   },
-  {
+  "ai21/jamba-1-5-mini": {
     "modelName": "ai21/jamba-1-5-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -3007,7 +3007,7 @@
       }
     ]
   },
-  {
+  "ai21/jamba-1-5-large": {
     "modelName": "ai21/jamba-1-5-large",
     "currency": "USD",
     "tokenRanges": [
@@ -3023,7 +3023,7 @@
       }
     ]
   },
-  {
+  "microsoft/phi-3.5-mini-128k-instruct": {
     "modelName": "microsoft/phi-3.5-mini-128k-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3039,7 +3039,7 @@
       }
     ]
   },
-  {
+  "nousresearch/hermes-3-llama-3.1-70b": {
     "modelName": "nousresearch/hermes-3-llama-3.1-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -3055,7 +3055,7 @@
       }
     ]
   },
-  {
+  "nousresearch/hermes-3-llama-3.1-405b": {
     "modelName": "nousresearch/hermes-3-llama-3.1-405b",
     "currency": "USD",
     "tokenRanges": [
@@ -3071,7 +3071,7 @@
       }
     ]
   },
-  {
+  "openai/chatgpt-4o-latest": {
     "modelName": "openai/chatgpt-4o-latest",
     "currency": "USD",
     "tokenRanges": [
@@ -3087,7 +3087,7 @@
       }
     ]
   },
-  {
+  "sao10k/l3-lunaris-8b": {
     "modelName": "sao10k/l3-lunaris-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -3103,7 +3103,7 @@
       }
     ]
   },
-  {
+  "aetherwiing/mn-starcannon-12b": {
     "modelName": "aetherwiing/mn-starcannon-12b",
     "currency": "USD",
     "tokenRanges": [
@@ -3119,7 +3119,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o-2024-08-06": {
     "modelName": "openai/gpt-4o-2024-08-06",
     "currency": "USD",
     "tokenRanges": [
@@ -3135,7 +3135,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.1-405b:free": {
     "modelName": "meta-llama/llama-3.1-405b:free",
     "currency": "USD",
     "tokenRanges": [
@@ -3151,7 +3151,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.1-405b": {
     "modelName": "meta-llama/llama-3.1-405b",
     "currency": "USD",
     "tokenRanges": [
@@ -3167,7 +3167,7 @@
       }
     ]
   },
-  {
+  "nothingiisreal/mn-celeste-12b": {
     "modelName": "nothingiisreal/mn-celeste-12b",
     "currency": "USD",
     "tokenRanges": [
@@ -3183,7 +3183,7 @@
       }
     ]
   },
-  {
+  "perplexity/llama-3.1-sonar-small-128k-online": {
     "modelName": "perplexity/llama-3.1-sonar-small-128k-online",
     "currency": "USD",
     "tokenRanges": [
@@ -3199,7 +3199,7 @@
       }
     ]
   },
-  {
+  "perplexity/llama-3.1-sonar-large-128k-online": {
     "modelName": "perplexity/llama-3.1-sonar-large-128k-online",
     "currency": "USD",
     "tokenRanges": [
@@ -3215,7 +3215,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.1-8b-instruct:free": {
     "modelName": "meta-llama/llama-3.1-8b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -3231,7 +3231,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.1-8b-instruct": {
     "modelName": "meta-llama/llama-3.1-8b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3247,7 +3247,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.1-405b-instruct": {
     "modelName": "meta-llama/llama-3.1-405b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3263,7 +3263,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3.1-70b-instruct": {
     "modelName": "meta-llama/llama-3.1-70b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3279,7 +3279,7 @@
       }
     ]
   },
-  {
+  "mistralai/codestral-mamba": {
     "modelName": "mistralai/codestral-mamba",
     "currency": "USD",
     "tokenRanges": [
@@ -3295,7 +3295,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-nemo:free": {
     "modelName": "mistralai/mistral-nemo:free",
     "currency": "USD",
     "tokenRanges": [
@@ -3311,7 +3311,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-nemo": {
     "modelName": "mistralai/mistral-nemo",
     "currency": "USD",
     "tokenRanges": [
@@ -3327,7 +3327,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o-mini": {
     "modelName": "openai/gpt-4o-mini",
     "currency": "USD",
     "tokenRanges": [
@@ -3343,7 +3343,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o-mini-2024-07-18": {
     "modelName": "openai/gpt-4o-mini-2024-07-18",
     "currency": "USD",
     "tokenRanges": [
@@ -3359,7 +3359,7 @@
       }
     ]
   },
-  {
+  "google/gemma-2-27b-it": {
     "modelName": "google/gemma-2-27b-it",
     "currency": "USD",
     "tokenRanges": [
@@ -3375,7 +3375,7 @@
       }
     ]
   },
-  {
+  "alpindale/magnum-72b": {
     "modelName": "alpindale/magnum-72b",
     "currency": "USD",
     "tokenRanges": [
@@ -3391,7 +3391,7 @@
       }
     ]
   },
-  {
+  "google/gemma-2-9b-it:free": {
     "modelName": "google/gemma-2-9b-it:free",
     "currency": "USD",
     "tokenRanges": [
@@ -3407,7 +3407,7 @@
       }
     ]
   },
-  {
+  "google/gemma-2-9b-it": {
     "modelName": "google/gemma-2-9b-it",
     "currency": "USD",
     "tokenRanges": [
@@ -3423,7 +3423,7 @@
       }
     ]
   },
-  {
+  "01-ai/yi-large": {
     "modelName": "01-ai/yi-large",
     "currency": "USD",
     "tokenRanges": [
@@ -3439,7 +3439,7 @@
       }
     ]
   },
-  {
+  "ai21/jamba-instruct": {
     "modelName": "ai21/jamba-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3455,7 +3455,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-sonnet-20240620:beta": {
     "modelName": "anthropic/claude-3.5-sonnet-20240620:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -3471,7 +3471,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3.5-sonnet-20240620": {
     "modelName": "anthropic/claude-3.5-sonnet-20240620",
     "currency": "USD",
     "tokenRanges": [
@@ -3487,7 +3487,7 @@
       }
     ]
   },
-  {
+  "sao10k/l3-euryale-70b": {
     "modelName": "sao10k/l3-euryale-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -3503,7 +3503,7 @@
       }
     ]
   },
-  {
+  "cognitivecomputations/dolphin-mixtral-8x22b": {
     "modelName": "cognitivecomputations/dolphin-mixtral-8x22b",
     "currency": "USD",
     "tokenRanges": [
@@ -3519,7 +3519,7 @@
       }
     ]
   },
-  {
+  "qwen/qwen-2-72b-instruct": {
     "modelName": "qwen/qwen-2-72b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3535,7 +3535,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-7b-instruct:free": {
     "modelName": "mistralai/mistral-7b-instruct:free",
     "currency": "USD",
     "tokenRanges": [
@@ -3551,7 +3551,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-7b-instruct": {
     "modelName": "mistralai/mistral-7b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3567,7 +3567,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-7b-instruct-v0.3": {
     "modelName": "mistralai/mistral-7b-instruct-v0.3",
     "currency": "USD",
     "tokenRanges": [
@@ -3583,7 +3583,7 @@
       }
     ]
   },
-  {
+  "nousresearch/hermes-2-pro-llama-3-8b": {
     "modelName": "nousresearch/hermes-2-pro-llama-3-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -3599,7 +3599,7 @@
       }
     ]
   },
-  {
+  "microsoft/phi-3-mini-128k-instruct": {
     "modelName": "microsoft/phi-3-mini-128k-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3615,7 +3615,7 @@
       }
     ]
   },
-  {
+  "microsoft/phi-3-medium-128k-instruct": {
     "modelName": "microsoft/phi-3-medium-128k-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3631,7 +3631,7 @@
       }
     ]
   },
-  {
+  "neversleep/llama-3-lumimaid-70b": {
     "modelName": "neversleep/llama-3-lumimaid-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -3647,7 +3647,7 @@
       }
     ]
   },
-  {
+  "google/gemini-flash-1.5": {
     "modelName": "google/gemini-flash-1.5",
     "currency": "USD",
     "tokenRanges": [
@@ -3663,7 +3663,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o": {
     "modelName": "openai/gpt-4o",
     "currency": "USD",
     "tokenRanges": [
@@ -3679,7 +3679,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o:extended": {
     "modelName": "openai/gpt-4o:extended",
     "currency": "USD",
     "tokenRanges": [
@@ -3695,7 +3695,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-guard-2-8b": {
     "modelName": "meta-llama/llama-guard-2-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -3711,7 +3711,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4o-2024-05-13": {
     "modelName": "openai/gpt-4o-2024-05-13",
     "currency": "USD",
     "tokenRanges": [
@@ -3727,7 +3727,7 @@
       }
     ]
   },
-  {
+  "neversleep/llama-3-lumimaid-8b:extended": {
     "modelName": "neversleep/llama-3-lumimaid-8b:extended",
     "currency": "USD",
     "tokenRanges": [
@@ -3743,7 +3743,7 @@
       }
     ]
   },
-  {
+  "neversleep/llama-3-lumimaid-8b": {
     "modelName": "neversleep/llama-3-lumimaid-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -3759,7 +3759,7 @@
       }
     ]
   },
-  {
+  "sao10k/fimbulvetr-11b-v2": {
     "modelName": "sao10k/fimbulvetr-11b-v2",
     "currency": "USD",
     "tokenRanges": [
@@ -3775,7 +3775,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3-8b-instruct": {
     "modelName": "meta-llama/llama-3-8b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3791,7 +3791,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-3-70b-instruct": {
     "modelName": "meta-llama/llama-3-70b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3807,7 +3807,7 @@
       }
     ]
   },
-  {
+  "mistralai/mixtral-8x22b-instruct": {
     "modelName": "mistralai/mixtral-8x22b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -3823,7 +3823,7 @@
       }
     ]
   },
-  {
+  "microsoft/wizardlm-2-8x22b": {
     "modelName": "microsoft/wizardlm-2-8x22b",
     "currency": "USD",
     "tokenRanges": [
@@ -3839,7 +3839,7 @@
       }
     ]
   },
-  {
+  "microsoft/wizardlm-2-7b": {
     "modelName": "microsoft/wizardlm-2-7b",
     "currency": "USD",
     "tokenRanges": [
@@ -3855,7 +3855,7 @@
       }
     ]
   },
-  {
+  "google/gemini-pro-1.5": {
     "modelName": "google/gemini-pro-1.5",
     "currency": "USD",
     "tokenRanges": [
@@ -3871,7 +3871,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4-turbo": {
     "modelName": "openai/gpt-4-turbo",
     "currency": "USD",
     "tokenRanges": [
@@ -3887,7 +3887,7 @@
       }
     ]
   },
-  {
+  "cohere/command-r-plus": {
     "modelName": "cohere/command-r-plus",
     "currency": "USD",
     "tokenRanges": [
@@ -3903,7 +3903,7 @@
       }
     ]
   },
-  {
+  "cohere/command-r-plus-04-2024": {
     "modelName": "cohere/command-r-plus-04-2024",
     "currency": "USD",
     "tokenRanges": [
@@ -3919,7 +3919,7 @@
       }
     ]
   },
-  {
+  "sophosympatheia/midnight-rose-70b": {
     "modelName": "sophosympatheia/midnight-rose-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -3935,7 +3935,7 @@
       }
     ]
   },
-  {
+  "cohere/command": {
     "modelName": "cohere/command",
     "currency": "USD",
     "tokenRanges": [
@@ -3951,7 +3951,7 @@
       }
     ]
   },
-  {
+  "cohere/command-r": {
     "modelName": "cohere/command-r",
     "currency": "USD",
     "tokenRanges": [
@@ -3967,7 +3967,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3-haiku:beta": {
     "modelName": "anthropic/claude-3-haiku:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -3983,7 +3983,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3-haiku": {
     "modelName": "anthropic/claude-3-haiku",
     "currency": "USD",
     "tokenRanges": [
@@ -3999,7 +3999,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3-opus:beta": {
     "modelName": "anthropic/claude-3-opus:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -4015,7 +4015,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3-opus": {
     "modelName": "anthropic/claude-3-opus",
     "currency": "USD",
     "tokenRanges": [
@@ -4031,7 +4031,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3-sonnet:beta": {
     "modelName": "anthropic/claude-3-sonnet:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -4047,7 +4047,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-3-sonnet": {
     "modelName": "anthropic/claude-3-sonnet",
     "currency": "USD",
     "tokenRanges": [
@@ -4063,7 +4063,7 @@
       }
     ]
   },
-  {
+  "cohere/command-r-03-2024": {
     "modelName": "cohere/command-r-03-2024",
     "currency": "USD",
     "tokenRanges": [
@@ -4079,7 +4079,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-large": {
     "modelName": "mistralai/mistral-large",
     "currency": "USD",
     "tokenRanges": [
@@ -4095,7 +4095,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-3.5-turbo-0613": {
     "modelName": "openai/gpt-3.5-turbo-0613",
     "currency": "USD",
     "tokenRanges": [
@@ -4111,7 +4111,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4-turbo-preview": {
     "modelName": "openai/gpt-4-turbo-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -4127,7 +4127,7 @@
       }
     ]
   },
-  {
+  "nousresearch/nous-hermes-2-mixtral-8x7b-dpo": {
     "modelName": "nousresearch/nous-hermes-2-mixtral-8x7b-dpo",
     "currency": "USD",
     "tokenRanges": [
@@ -4143,7 +4143,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-medium": {
     "modelName": "mistralai/mistral-medium",
     "currency": "USD",
     "tokenRanges": [
@@ -4159,7 +4159,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-small": {
     "modelName": "mistralai/mistral-small",
     "currency": "USD",
     "tokenRanges": [
@@ -4175,7 +4175,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-tiny": {
     "modelName": "mistralai/mistral-tiny",
     "currency": "USD",
     "tokenRanges": [
@@ -4191,7 +4191,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-7b-instruct-v0.2": {
     "modelName": "mistralai/mistral-7b-instruct-v0.2",
     "currency": "USD",
     "tokenRanges": [
@@ -4207,7 +4207,7 @@
       }
     ]
   },
-  {
+  "cognitivecomputations/dolphin-mixtral-8x7b": {
     "modelName": "cognitivecomputations/dolphin-mixtral-8x7b",
     "currency": "USD",
     "tokenRanges": [
@@ -4223,7 +4223,7 @@
       }
     ]
   },
-  {
+  "google/gemini-pro-vision": {
     "modelName": "google/gemini-pro-vision",
     "currency": "USD",
     "tokenRanges": [
@@ -4239,7 +4239,7 @@
       }
     ]
   },
-  {
+  "mistralai/mixtral-8x7b-instruct": {
     "modelName": "mistralai/mixtral-8x7b-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -4255,7 +4255,7 @@
       }
     ]
   },
-  {
+  "openchat/openchat-7b": {
     "modelName": "openchat/openchat-7b",
     "currency": "USD",
     "tokenRanges": [
@@ -4271,7 +4271,7 @@
       }
     ]
   },
-  {
+  "neversleep/noromaid-20b": {
     "modelName": "neversleep/noromaid-20b",
     "currency": "USD",
     "tokenRanges": [
@@ -4287,7 +4287,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-2.1:beta": {
     "modelName": "anthropic/claude-2.1:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -4303,7 +4303,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-2.1": {
     "modelName": "anthropic/claude-2.1",
     "currency": "USD",
     "tokenRanges": [
@@ -4319,7 +4319,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-2:beta": {
     "modelName": "anthropic/claude-2:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -4335,7 +4335,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-2": {
     "modelName": "anthropic/claude-2",
     "currency": "USD",
     "tokenRanges": [
@@ -4351,7 +4351,7 @@
       }
     ]
   },
-  {
+  "undi95/toppy-m-7b": {
     "modelName": "undi95/toppy-m-7b",
     "currency": "USD",
     "tokenRanges": [
@@ -4367,7 +4367,7 @@
       }
     ]
   },
-  {
+  "alpindale/goliath-120b": {
     "modelName": "alpindale/goliath-120b",
     "currency": "USD",
     "tokenRanges": [
@@ -4383,7 +4383,7 @@
       }
     ]
   },
-  {
+  "openrouter/auto": {
     "modelName": "openrouter/auto",
     "currency": "USD",
     "tokenRanges": [
@@ -4399,7 +4399,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-3.5-turbo-1106": {
     "modelName": "openai/gpt-3.5-turbo-1106",
     "currency": "USD",
     "tokenRanges": [
@@ -4415,7 +4415,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4-1106-preview": {
     "modelName": "openai/gpt-4-1106-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -4431,7 +4431,7 @@
       }
     ]
   },
-  {
+  "google/palm-2-chat-bison-32k": {
     "modelName": "google/palm-2-chat-bison-32k",
     "currency": "USD",
     "tokenRanges": [
@@ -4447,7 +4447,7 @@
       }
     ]
   },
-  {
+  "google/palm-2-codechat-bison-32k": {
     "modelName": "google/palm-2-codechat-bison-32k",
     "currency": "USD",
     "tokenRanges": [
@@ -4463,7 +4463,7 @@
       }
     ]
   },
-  {
+  "jondurbin/airoboros-l2-70b": {
     "modelName": "jondurbin/airoboros-l2-70b",
     "currency": "USD",
     "tokenRanges": [
@@ -4479,7 +4479,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-3.5-turbo-instruct": {
     "modelName": "openai/gpt-3.5-turbo-instruct",
     "currency": "USD",
     "tokenRanges": [
@@ -4495,7 +4495,7 @@
       }
     ]
   },
-  {
+  "mistralai/mistral-7b-instruct-v0.1": {
     "modelName": "mistralai/mistral-7b-instruct-v0.1",
     "currency": "USD",
     "tokenRanges": [
@@ -4511,7 +4511,7 @@
       }
     ]
   },
-  {
+  "pygmalionai/mythalion-13b": {
     "modelName": "pygmalionai/mythalion-13b",
     "currency": "USD",
     "tokenRanges": [
@@ -4527,7 +4527,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-3.5-turbo-16k": {
     "modelName": "openai/gpt-3.5-turbo-16k",
     "currency": "USD",
     "tokenRanges": [
@@ -4543,7 +4543,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4-32k": {
     "modelName": "openai/gpt-4-32k",
     "currency": "USD",
     "tokenRanges": [
@@ -4559,7 +4559,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4-32k-0314": {
     "modelName": "openai/gpt-4-32k-0314",
     "currency": "USD",
     "tokenRanges": [
@@ -4575,7 +4575,7 @@
       }
     ]
   },
-  {
+  "nousresearch/nous-hermes-llama2-13b": {
     "modelName": "nousresearch/nous-hermes-llama2-13b",
     "currency": "USD",
     "tokenRanges": [
@@ -4591,7 +4591,7 @@
       }
     ]
   },
-  {
+  "mancer/weaver": {
     "modelName": "mancer/weaver",
     "currency": "USD",
     "tokenRanges": [
@@ -4607,7 +4607,7 @@
       }
     ]
   },
-  {
+  "huggingfaceh4/zephyr-7b-beta:free": {
     "modelName": "huggingfaceh4/zephyr-7b-beta:free",
     "currency": "USD",
     "tokenRanges": [
@@ -4623,7 +4623,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-2.0:beta": {
     "modelName": "anthropic/claude-2.0:beta",
     "currency": "USD",
     "tokenRanges": [
@@ -4639,7 +4639,7 @@
       }
     ]
   },
-  {
+  "anthropic/claude-2.0": {
     "modelName": "anthropic/claude-2.0",
     "currency": "USD",
     "tokenRanges": [
@@ -4655,7 +4655,7 @@
       }
     ]
   },
-  {
+  "undi95/remm-slerp-l2-13b": {
     "modelName": "undi95/remm-slerp-l2-13b",
     "currency": "USD",
     "tokenRanges": [
@@ -4671,7 +4671,7 @@
       }
     ]
   },
-  {
+  "google/palm-2-chat-bison": {
     "modelName": "google/palm-2-chat-bison",
     "currency": "USD",
     "tokenRanges": [
@@ -4687,7 +4687,7 @@
       }
     ]
   },
-  {
+  "google/palm-2-codechat-bison": {
     "modelName": "google/palm-2-codechat-bison",
     "currency": "USD",
     "tokenRanges": [
@@ -4703,7 +4703,7 @@
       }
     ]
   },
-  {
+  "gryphe/mythomax-l2-13b": {
     "modelName": "gryphe/mythomax-l2-13b",
     "currency": "USD",
     "tokenRanges": [
@@ -4719,7 +4719,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-2-13b-chat": {
     "modelName": "meta-llama/llama-2-13b-chat",
     "currency": "USD",
     "tokenRanges": [
@@ -4735,7 +4735,7 @@
       }
     ]
   },
-  {
+  "meta-llama/llama-2-70b-chat": {
     "modelName": "meta-llama/llama-2-70b-chat",
     "currency": "USD",
     "tokenRanges": [
@@ -4751,7 +4751,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-3.5-turbo": {
     "modelName": "openai/gpt-3.5-turbo",
     "currency": "USD",
     "tokenRanges": [
@@ -4767,7 +4767,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-3.5-turbo-0125": {
     "modelName": "openai/gpt-3.5-turbo-0125",
     "currency": "USD",
     "tokenRanges": [
@@ -4783,7 +4783,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4": {
     "modelName": "openai/gpt-4",
     "currency": "USD",
     "tokenRanges": [
@@ -4799,7 +4799,7 @@
       }
     ]
   },
-  {
+  "openai/gpt-4-0314": {
     "modelName": "openai/gpt-4-0314",
     "currency": "USD",
     "tokenRanges": [
@@ -4815,4 +4815,4 @@
       }
     ]
   }
-]
+}

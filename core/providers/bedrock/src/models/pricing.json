@@ -1,0 +1,98 @@
+{
+  "anthropic.claude-3-5-haiku-20241022-v1:0": {
+    "modelName": "anthropic.claude-3-5-haiku-20241022-v1:0",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1,
+            "outputPricePerMillion": 5
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-3-5-sonnet-20240620-v1:0": {
+    "modelName": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-3-5-sonnet-20241022-v2:0": {
+    "modelName": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-3-haiku-20240307-v1:0": {
+    "modelName": "anthropic.claude-3-haiku-20240307-v1:0",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.25,
+            "outputPricePerMillion": 1.25
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-3-opus-20240229-v1:0": {
+    "modelName": "anthropic.claude-3-opus-20240229-v1:0",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 15,
+            "outputPricePerMillion": 75
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-3-sonnet-20240229-v1:0": {
+    "modelName": "anthropic.claude-3-sonnet-20240229-v1:0",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  }
+}

@@ -39,8 +39,8 @@ class Claude3Haiku20240307 extends BaseChatModel {
 
 export {
   Claude3Haiku20240307,
+  Claude3Haiku20240307Literal,
   Claude3Haiku20240307Options,
   Claude3Haiku20240307Schema,
-  Claude3Haiku20240307Literal,
   type Claude3Haiku20240307OptionsType,
 };

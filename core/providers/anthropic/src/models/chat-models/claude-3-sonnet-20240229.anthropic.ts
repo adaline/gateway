@@ -38,8 +38,8 @@ class Claude3Sonnet20240229 extends BaseChatModel {
 
 export {
   Claude3Sonnet20240229,
+  Claude3Sonnet20240229Literal,
   Claude3Sonnet20240229Options,
   Claude3Sonnet20240229Schema,
-  Claude3Sonnet20240229Literal,
   type Claude3Sonnet20240229OptionsType,
 };

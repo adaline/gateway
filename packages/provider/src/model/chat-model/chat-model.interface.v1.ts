@@ -1,4 +1,4 @@
-import { ChatResponseType, ConfigType, MessageType, PartialChatResponseType, ToolType } from "@adaline/types";
+import { ChatModelPriceType, ChatResponseType, ConfigType, MessageType, PartialChatResponseType, ToolType } from "@adaline/types";
 
 import { HeadersType, ParamsType, UrlType } from "../../types";
 import { ChatModelSchemaType } from "./chat-model.schema.v1";
@@ -56,6 +56,7 @@ interface ChatModelV1<MS extends ChatModelSchemaType = ChatModelSchemaType> {
   }>;
   getProxyCompleteChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType>;
   getProxyCompleteChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType>;
+  getModelPricing(): ChatModelPriceType;
 }
 
 export { type ChatModelV1 };

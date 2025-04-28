@@ -1,5 +1,6 @@
 import { BaseChatModel } from "@adaline/openai";
-import { ChatModelSchemaType } from "@adaline/provider";
+import { ChatModelSchemaType, ModelResponseError } from "@adaline/provider";
+import { ChatModelPriceType } from "@adaline/types";
 
 import { BaseChatModelOptions, BaseChatModelOptionsType } from "./chat-model-options.custom";
 
@@ -15,6 +16,12 @@ class BaseChatModelOpenAI extends BaseChatModel {
       baseUrl: parsedOptions.baseUrl,
       completeChatUrl: parsedOptions.completeChatUrl,
       streamChatUrl: parsedOptions.streamChatUrl,
+    });
+  }
+  getModelPricing(): ChatModelPriceType {
+    throw new ModelResponseError({
+      info: `Invalid model pricing for model : '${this.modelName}'`,
+      cause: new Error(`No pricing configuration for custom provider`),
     });
   }
 }
