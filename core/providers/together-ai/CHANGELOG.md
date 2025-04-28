@@ -1,5 +1,17 @@
 # @adaline/together-ai
 
+## 1.0.0
+
+### Major Changes
+
+- e74908d: first stable, major release
+
+### Patch Changes
+
+- Updated dependencies [e74908d]
+  - @adaline/provider@1.0.0
+  - @adaline/types@1.0.0
+
 ## 0.16.0
 
 ### Minor Changes

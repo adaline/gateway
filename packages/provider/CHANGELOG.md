@@ -1,5 +1,16 @@
 # @adaline/provider
 
+## 1.0.0
+
+### Major Changes
+
+- e74908d: first stable, major release
+
+### Patch Changes
+
+- Updated dependencies [e74908d]
+  - @adaline/types@1.0.0
+
 ## 0.25.0
 
 ### Minor Changes

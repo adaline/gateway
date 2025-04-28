@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.0.0
+
+### Major Changes
+
+- e74908d: first stable, major release
+
 ## 0.33.0
 
 ### Minor Changes
