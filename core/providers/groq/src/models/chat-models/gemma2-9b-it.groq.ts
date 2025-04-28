@@ -9,6 +9,7 @@ import {
 import { ChatModelSchema } from "@adaline/provider";
 
 import { GroqChatModelConfigs } from "../../configs";
+import pricingData from "./../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 const Gemma2_9b_ITLiteral = "gemma2-9b-it" as const;
@@ -28,6 +29,7 @@ const Gemma2_9b_ITSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModel
     def: GroqChatModelConfigs.base(4096).def,
     schema: GroqChatModelConfigs.base(4096).schema,
   },
+  price: pricingData[Gemma2_9b_ITLiteral],
 });
 
 const Gemma2_9b_ITOptions = BaseChatModelOptions;
@@ -39,4 +41,4 @@ class Gemma2_9b_IT extends BaseChatModelGroq {
   }
 }
 
-export { Gemma2_9b_IT, Gemma2_9b_ITOptions, Gemma2_9b_ITSchema, Gemma2_9b_ITLiteral, type Gemma2_9b_ITOptionsType };
+export { Gemma2_9b_IT, Gemma2_9b_ITLiteral, Gemma2_9b_ITOptions, Gemma2_9b_ITSchema, type Gemma2_9b_ITOptionsType };

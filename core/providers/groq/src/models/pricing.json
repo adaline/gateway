@@ -1,5 +1,5 @@
-[
-  {
+{
+  "gemma2-9b-it": {
     "modelName": "gemma2-9b-it",
     "currency": "USD",
     "tokenRanges": [
@@ -15,7 +15,7 @@
       }
     ]
   },
-  {
+  "llama-3.1-8b-instant": {
     "modelName": "llama-3.1-8b-instant",
     "currency": "USD",
     "tokenRanges": [
@@ -31,7 +31,7 @@
       }
     ]
   },
-  {
+  "llama-3.2-11b-vision-preview": {
     "modelName": "llama-3.2-11b-vision-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -47,7 +47,7 @@
       }
     ]
   },
-  {
+  "llama-3.2-1b-preview": {
     "modelName": "llama-3.2-1b-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -63,7 +63,7 @@
       }
     ]
   },
-  {
+  "llama-3.2-3b-preview": {
     "modelName": "llama-3.2-3b-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -79,7 +79,7 @@
       }
     ]
   },
-  {
+  "llama-3.2-90b-vision-preview": {
     "modelName": "llama-3.2-90b-vision-preview",
     "currency": "USD",
     "tokenRanges": [
@@ -95,7 +95,7 @@
       }
     ]
   },
-  {
+  "llama3-70b-8192": {
     "modelName": "llama3-70b-8192",
     "currency": "USD",
     "tokenRanges": [
@@ -111,7 +111,7 @@
       }
     ]
   },
-  {
+  "llama3-8b-8192": {
     "modelName": "llama3-8b-8192",
     "currency": "USD",
     "tokenRanges": [
@@ -127,7 +127,7 @@
       }
     ]
   },
-  {
+  "llama-guard-3-8b": {
     "modelName": "llama-guard-3-8b",
     "currency": "USD",
     "tokenRanges": [
@@ -143,4 +143,4 @@
       }
     ]
   }
-]
+}

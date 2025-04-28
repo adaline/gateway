@@ -9,6 +9,7 @@ import {
 import { ChatModelSchema } from "@adaline/provider";
 
 import { GroqChatModelConfigs } from "../../configs";
+import pricingData from "./../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 const Llama_3_1_8bLiteral = "llama-3.1-8b-instant" as const;
@@ -28,6 +29,7 @@ const Llama_3_1_8bSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModel
     def: GroqChatModelConfigs.base(8192).def,
     schema: GroqChatModelConfigs.base(8192).schema,
   },
+  price: pricingData[Llama_3_1_8bLiteral],
 });
 
 const Llama_3_1_8b_Options = BaseChatModelOptions;
@@ -39,4 +41,4 @@ class Llama_3_1_8b extends BaseChatModelGroq {
   }
 }
 
-export { Llama_3_1_8b, Llama_3_1_8b_Options, Llama_3_1_8bSchema, Llama_3_1_8bLiteral, type Llama_3_1_8b_OptionsType };
+export { Llama_3_1_8b, Llama_3_1_8b_Options, Llama_3_1_8bLiteral, Llama_3_1_8bSchema, type Llama_3_1_8b_OptionsType };
