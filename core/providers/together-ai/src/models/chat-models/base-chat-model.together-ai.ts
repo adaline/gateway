@@ -793,7 +793,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   }
 
   getModelPricing(): ChatModelPriceType {
-    const entry = pricingData.find((m) => m.modelName === this.modelName);
+    const entry = pricingData[this.modelName as keyof typeof pricingData];
+
     if (!entry) {
       throw new ModelResponseError({
         info: `Invalid model pricing for model : '${this.modelName}'`,
