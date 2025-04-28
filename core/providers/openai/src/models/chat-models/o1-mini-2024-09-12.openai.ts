@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { OpenAIChatModelConfigs } from "../../configs";
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import { BaseChatModelOptions } from "./base-chat-model.openai";
 import { BaseOSeriesChatModel } from "./base-o-series-chat-model.openai";
 import {

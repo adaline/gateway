@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema, HeadersType } from "@adaline/provider";
 
 import { AnthropicChatModelConfigs } from "../../configs";
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.anthropic";
 import {
   AnthropicChatModelRoles,

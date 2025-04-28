@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { Gemini1_5Flash002Schema as Google_Gemini1_5Flash002Schema } from "@adaline/google";
 
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import { BaseChatModelOptions, BaseChatModelVertex } from "./base-chat-model.vertex";
 
 const Gemini1_5Flash002Literal = "gemini-1.5-flash-002" as const;

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { Gemini1_0ProVisionSchema as Google_Gemini1_0ProVisionSchema } from "@adaline/google";
 
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import { BaseChatModelOptions, BaseChatModelVertex } from "./base-chat-model.vertex";
 
 const Gemini1_0ProVisionLiteral = "gemini-1.0-pro-vision" as const;

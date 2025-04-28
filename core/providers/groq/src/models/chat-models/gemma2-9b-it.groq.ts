@@ -9,7 +9,7 @@ import {
 import { ChatModelSchema } from "@adaline/provider";
 
 import { GroqChatModelConfigs } from "../../configs";
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 const Gemma2_9b_ITLiteral = "gemma2-9b-it" as const;

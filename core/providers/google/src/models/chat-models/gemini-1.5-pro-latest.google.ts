@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { GoogleChatModelConfigs } from "../../configs";
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.google";
 import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatModelRoles, GoogleChatModelRolesMap } from "./types";
 

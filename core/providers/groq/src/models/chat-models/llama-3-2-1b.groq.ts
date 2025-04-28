@@ -9,7 +9,7 @@ import {
 import { ChatModelSchema } from "@adaline/provider";
 
 import { GroqChatModelConfigs } from "../../configs";
-import pricingData from "./../pricing.json";
+import pricingData from "../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 const Llama_3_2_1bLiteral = "llama-3.2-1b-preview" as const;
