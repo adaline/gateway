@@ -209,11 +209,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   return { modality: TextModalityLiteral, value: c.text };
                 } else if (c.type === "image") {
                   const defaultDetail = "auto" as ImageContentType["detail"];
-                  const mediaType = c.source.media_type.split("/")[1] as Base64ImageContentValueType["media_type"];
+                  const mediaType = c.source.mediaType.split("/")[1] as Base64ImageContentValueType["mediaType"];
                   return {
                     modality: ImageModalityLiteral,
                     detail: defaultDetail,
-                    value: { type: Base64ImageContentTypeLiteral, media_type: mediaType, base64: c.source.data },
+                    value: { type: Base64ImageContentTypeLiteral, mediaType, base64: c.source.data },
                   };
                 } else {
                   return {
@@ -535,7 +535,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   type: "image",
                   source: {
                     type: "base64",
-                    media_type: `image/${content.value.media_type}` as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+                    mediaType: `image/${content.value.mediaType}` as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
                     data: base64Data,
                   },
                 });

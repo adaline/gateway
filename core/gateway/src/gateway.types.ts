@@ -29,7 +29,7 @@ const GatewayOptions = z.object({
       meter: z.custom<Meter>().optional(),
     })
     .optional(),
-  analyticsEnabled: z.boolean().optional(),
+  enableAnalytics: z.boolean().optional(),
   enableProxyAgent: z.boolean().optional(),
 });
 type GatewayOptionsType = z.infer<typeof GatewayOptions>;

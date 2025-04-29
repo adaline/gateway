@@ -8,20 +8,19 @@ import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.google";
 import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatModelRoles, GoogleChatModelRolesMap } from "./types";
 
 const Gemini2_5FlashPreview0417Literal = "gemini-2.5-flash-preview-04-17";
-const Gemini2_5FlashPreview0417Description = "Google's fast and cost-efficient multimodal model for adaptive thinking.";
+const Gemini2_5FlashPreview0417Description =
+  "Google's best model in Gemini 2.5 family in terms of price-performance, offering well-rounded capabilities.";
 
-// Assuming standard token limits, adjust if specific limits are known
 const Gemini2_5FlashPreview0417Schema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5FlashPreview0417Literal,
   description: Gemini2_5FlashPreview0417Description,
-  maxInputTokens: 1000000, // Common for Flash models
-  maxOutputTokens: 8192, // Standard output limit
+  maxInputTokens: 1048576,
+  maxOutputTokens: 65536,
   roles: GoogleChatModelRolesMap,
-  modalities: GoogleChatModelModalities, // Supports text, image, audio, video input
+  modalities: GoogleChatModelModalities,
   config: {
-    // Using default config structure, adjust parameters if needed
-    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 64).def,
-    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 64).schema,
+    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 64).def,
+    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 64).schema,
   },
   price: pricingData[Gemini2_5FlashPreview0417Literal],
 });

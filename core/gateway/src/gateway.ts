@@ -78,7 +78,7 @@ class Gateway {
     this.logger = options.logger;
 
     this.analytics = AnalyticsManager.getAnalyticsRecorder(
-      this.options.analyticsEnabled === undefined ? true : this.options.analyticsEnabled
+      this.options.enableAnalytics === undefined ? true : this.options.enableAnalytics
     );
 
     TelemetryManager.setTracer(options.telemetry?.tracer);

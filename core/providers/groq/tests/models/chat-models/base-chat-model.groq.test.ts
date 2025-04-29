@@ -681,7 +681,7 @@ describe("BaseChatModelGroq", () => {
           content: [
             {
               modality: ImageModalityLiteral,
-              value: { type: "base64", base64: "data:image/png;base64,iVBORw0KG...", media_type: "png" },
+              value: { type: "base64", base64: "data:image/png;base64,iVBORw0KG...", mediaType: "png" },
               detail: "low",
             },
           ],
