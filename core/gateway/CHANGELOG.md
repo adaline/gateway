@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.1.0
+
+### Minor Changes
+
+- fe8d747: Rename image modality media_type to mediaType
+
 ## 1.0.0
 
 ### Major Changes

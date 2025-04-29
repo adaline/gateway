@@ -1,5 +1,17 @@
 # @adaline/openai
 
+## 1.2.0
+
+### Minor Changes
+
+- fe8d747: Rename image modality media_type to mediaType
+
+### Patch Changes
+
+- Updated dependencies [fe8d747]
+  - @adaline/provider@1.1.0
+  - @adaline/types@1.1.0
+
 ## 1.1.0
 
 ### Minor Changes
