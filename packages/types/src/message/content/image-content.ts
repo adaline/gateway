@@ -7,7 +7,7 @@ const Base64ImageContentMediaTypeLiterals = ["png", "jpeg", "webp", "gif"] as co
 const Base64ImageContentValue = z.object({
   type: z.literal(Base64ImageContentTypeLiteral),
   base64: z.string(),
-  media_type: z.enum(Base64ImageContentMediaTypeLiterals),
+  mediaType: z.enum(Base64ImageContentMediaTypeLiterals),
 });
 type Base64ImageContentValueType = z.infer<typeof Base64ImageContentValue>;
 

@@ -530,7 +530,7 @@ describe("BaseChatModelAnthropic", () => {
           content: [
             {
               modality: ImageModalityLiteral,
-              value: { type: "base64", base64: "data:image/png;base64,iVBORw0KG...", media_type: "png" },
+              value: { type: "base64", base64: "data:image/png;base64,iVBORw0KG...", mediaType: "png" },
               detail: "low",
             },
           ],
@@ -545,7 +545,7 @@ describe("BaseChatModelAnthropic", () => {
               {
                 source: {
                   data: "iVBORw0KG...",
-                  media_type: "image/png",
+                  mediaType: "image/png",
                   type: "base64",
                 },
                 type: "image",
@@ -566,7 +566,7 @@ describe("BaseChatModelAnthropic", () => {
             { modality: TextModalityLiteral, value: "Look at this:" },
             {
               modality: ImageModalityLiteral,
-              value: { type: "base64", base64: "data:image/png;base64,iVBORw0KG...", media_type: "png" },
+              value: { type: "base64", base64: "data:image/png;base64,iVBORw0KG...", mediaType: "png" },
               detail: "low",
             },
             { modality: TextModalityLiteral, value: "What do you see?" },
@@ -582,7 +582,7 @@ describe("BaseChatModelAnthropic", () => {
           {
             source: {
               data: "iVBORw0KG...",
-              media_type: "image/png",
+              mediaType: "image/png",
               type: "base64",
             },
             type: "image",

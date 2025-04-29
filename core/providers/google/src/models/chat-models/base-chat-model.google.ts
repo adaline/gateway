@@ -219,7 +219,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   value: {
                     type: Base64ImageContentTypeLiteral,
                     base64: c.inline_data.data,
-                    media_type: c.inline_data.mime_type.split("/")[1] as Base64ImageContentValueType["media_type"],
+                    mediaType: c.inline_data.mime_type.split("/")[1] as Base64ImageContentValueType["mediaType"],
                   },
                 };
               }
@@ -519,7 +519,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   base64Data = stripBase64Prefix(base64Data);
                   userContent.push({
                     inline_data: {
-                      mime_type: `image/${content.value.media_type}`,
+                      mime_type: `image/${content.value.mediaType}`,
                       data: base64Data,
                     },
                   });

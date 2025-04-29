@@ -258,7 +258,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                       value: {
                         type: Base64ImageContentTypeLiteral,
                         base64: c.image_url.url,
-                        media_type: getMimeTypeFromBase64(c.image_url.url) as Base64ImageContentValueType["media_type"],
+                        mediaType: getMimeTypeFromBase64(c.image_url.url) as Base64ImageContentValueType["mediaType"],
                       },
                     };
                   } else {

@@ -12,17 +12,8 @@ const ToolCallContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = 
     metadata: Metadata,
   });
 type ToolCallContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof ToolCallContent<M>>>;
-
 const PartialToolCallModalityLiteral = "partial-tool-call" as const;
 
-// const PartialToolCallContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = z.undefined() as M) =>
-//   ToolCallContent(Metadata).partial({
-//     id: true,
-//     name: true,
-//     arguments: true,
-//   }).merge(z.object({
-//     modality: z.literal(PartialToolCallModalityLiteral),
-//   }));
 const PartialToolCallContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = z.undefined() as M) =>
   z.object({
     modality: z.literal(PartialToolCallModalityLiteral),

@@ -638,7 +638,7 @@ describe("BaseChatModelVertex", () => {
           content: [
             {
               modality: ImageModalityLiteral,
-              value: { type: "base64", base64: base64DataWithPrefix, media_type: "png" },
+              value: { type: "base64", base64: base64DataWithPrefix, mediaType: "png" },
               detail: "auto",
             },
           ],
@@ -676,7 +676,7 @@ describe("BaseChatModelVertex", () => {
             // Changed to Base64 as URL is not supported
             {
               modality: ImageModalityLiteral,
-              value: { type: "base64", base64: base64DataWithPrefix, media_type: "jpeg" },
+              value: { type: "base64", base64: base64DataWithPrefix, mediaType: "jpeg" },
               detail: "auto",
             },
             { modality: TextModalityLiteral, value: "What do you see?" },
@@ -877,7 +877,7 @@ describe("BaseChatModelVertex", () => {
           content: [
             {
               modality: ImageModalityLiteral,
-              value: { type: "base64", base64: `data:image/png;base64,${base64ImageData}`, media_type: "png" },
+              value: { type: "base64", base64: `data:image/png;base64,${base64ImageData}`, mediaType: "png" },
               detail: "auto",
             },
           ],
