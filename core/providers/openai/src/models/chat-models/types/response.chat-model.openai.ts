@@ -95,7 +95,7 @@ const OpenAIStreamChatResponse = z.object({
           refusal: z.string().nullable().optional(),
         })
         .or(z.object({})),
-      logprobs: OpenAILogProb,
+      logprobs: OpenAILogProb.optional(),
       finish_reason: z.string().nullable(),
     })
   ),
