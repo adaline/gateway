@@ -3,8 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { OpenAIChatModelConfigs } from "../../configs";
-import { BaseChatModelOptions } from "./base-chat-model.openai";
-import { BaseOSeriesChatModel } from "./base-o-series-chat-model.openai";
+import { BaseChatModelOptions, BaseChatModel } from "./base-chat-model.openai";
 import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
 
 const O3_2025_04_16Literal = "o3-2025-04-16";
@@ -27,7 +26,7 @@ const O3_2025_04_16Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatMode
 const O3_2025_04_16Options = BaseChatModelOptions;
 type O3_2025_04_16OptionsType = z.infer<typeof O3_2025_04_16Options>;
 
-class O3_2025_04_16 extends BaseOSeriesChatModel {
+class O3_2025_04_16 extends BaseChatModel {
   constructor(options: O3_2025_04_16OptionsType) {
     super(O3_2025_04_16Schema, options);
   }

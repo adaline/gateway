@@ -93,16 +93,6 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_4o_2024_05_13Options,
       modelSchema: Models.GPT_4o_2024_05_13Schema,
     },
-    [Models.O1_MiniLiteral]: {
-      model: Models.O1_Mini,
-      modelOptions: Models.O1_MiniOptions,
-      modelSchema: Models.O1_MiniSchema,
-    },
-    [Models.O1_PreviewLiteral]: {
-      model: Models.O1_Preview,
-      modelOptions: Models.O1_PreviewOptions,
-      modelSchema: Models.O1_PreviewSchema,
-    },
     [Models.O1Literal]: {
       model: Models.O1,
       modelOptions: Models.O1Options,
@@ -113,10 +103,15 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.O1_2024_12_17Options,
       modelSchema: Models.O1_2024_12_17Schema,
     },
-    [Models.O1_Mini_2024_09_12Literal]: {
-      model: Models.O1_Mini_2024_09_12,
-      modelOptions: Models.O1_Mini_2024_09_12Options,
-      modelSchema: Models.O1_Mini_2024_09_12Schema,
+    [Models.O3Mini2025_01_31Literal]: {
+      model: Models.O3Mini2025_01_31,
+      modelOptions: Models.O3Mini2025_01_31Options,
+      modelSchema: Models.O3Mini2025_01_31Schema,
+    },
+    [Models.O3MiniLiteral]: {
+      model: Models.O3Mini,
+      modelOptions: Models.O3MiniOptions,
+      modelSchema: Models.O3MiniSchema,
     },
     [Models.O3_2025_04_16Literal]: {
       model: Models.O3_2025_04_16,

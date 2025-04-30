@@ -11,11 +11,4 @@ const OpenAIChatModelRolesMap = {
   tool: ToolRoleLiteral,
 } as const;
 
-const OpenAIChatModelOSSeriesRoles = z.enum([UserRoleLiteral, AssistantRoleLiteral]);
-
-const OpenAIChatModelOSSeriesRolesMap = {
-  user: UserRoleLiteral,
-  assistant: AssistantRoleLiteral,
-} as const;
-
-export { OpenAIChatModelRoles, OpenAIChatModelRolesMap, OpenAIChatModelOSSeriesRoles, OpenAIChatModelOSSeriesRolesMap };
+export { OpenAIChatModelRoles, OpenAIChatModelRolesMap };
