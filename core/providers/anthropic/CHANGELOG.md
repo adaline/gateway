@@ -1,5 +1,11 @@
 # @adaline/anthropic
 
+## 1.2.0
+
+### Minor Changes
+
+- 07e196a: Fix openai o-series models stream complete chat
+
 ## 1.1.0
 
 ### Minor Changes
