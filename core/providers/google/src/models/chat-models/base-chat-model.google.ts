@@ -332,6 +332,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         acc.thinkingConfig = {
           includeThoughts: paramValue,
         };
+      } else if (key === "maxReasoningTokens") {
+        acc.thinkingConfig = acc.thinkingConfig && typeof acc.thinkingConfig === "object"
+          ? { ...acc.thinkingConfig, thinkingBudget: paramValue }
+          : { thinkingBudget: paramValue };
       } else if (paramKey === "maxOutputTokens" && def.type === "range" && paramValue === 0) {
         acc[paramKey] = def.max;
       } else {
