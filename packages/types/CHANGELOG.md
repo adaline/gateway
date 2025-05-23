@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.2.0
+
+### Minor Changes
+
+- bfa8adf: Add Claude 4 models, new docs
+
 ## 1.1.0
 
 ### Minor Changes

@@ -1,5 +1,18 @@
 # @adaline/custom
 
+## 1.2.0
+
+### Minor Changes
+
+- bfa8adf: Add Claude 4 models, new docs
+
+### Patch Changes
+
+- Updated dependencies [bfa8adf]
+  - @adaline/types@1.2.0
+  - @adaline/openai@1.4.0
+  - @adaline/provider@1.2.0
+
 ## 1.1.1
 
 ### Patch Changes

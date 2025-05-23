@@ -1,5 +1,17 @@
 # @adaline/anthropic
 
+## 1.3.0
+
+### Minor Changes
+
+- bfa8adf: Add Claude 4 models, new docs
+
+### Patch Changes
+
+- Updated dependencies [bfa8adf]
+  - @adaline/types@1.2.0
+  - @adaline/provider@1.2.0
+
 ## 1.2.0
 
 ### Minor Changes
