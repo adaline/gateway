@@ -37,7 +37,7 @@ module.exports = {
       files: ["*.js?(x)", "*.ts?(x)"],
     },
   ],
-  ignorePatterns: ["/lib/**/*", "/dist/**/*", "/e2e/**/*", "node_modules/", "tsup.config.ts", ".*.js"],
+  ignorePatterns: ["/lib/**/*", "/dist/**/*", "/e2e/**/*", "node_modules/", "tsup.config.ts", ".*.js", "/exp-react-app/**/*"],
   rules: {
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/explicit-function-return-type": "off",

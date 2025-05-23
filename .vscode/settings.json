@@ -34,5 +34,18 @@
   "eslint.lintTask.enable": true,
 
   "typescript.inlayHints.parameterNames.enabled": "literals",
-  "cSpell.words": ["Adaline", "cxrx", "ianvs", "logprobs", "nextra", "openai", "opentelemetry", "svgr", "treeshake", "tsup", "uuidv4"]
+  "cSpell.words": [
+    "Adaline",
+    "cxrx",
+    "Groq",
+    "ianvs",
+    "logprobs",
+    "nextra",
+    "openai",
+    "opentelemetry",
+    "svgr",
+    "treeshake",
+    "tsup",
+    "uuidv4"
+  ]
 }
