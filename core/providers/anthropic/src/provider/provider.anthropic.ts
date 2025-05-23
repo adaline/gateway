@@ -49,20 +49,20 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       modelOptions: Models.Claude3_5Haiku20241022Options,
       modelSchema: Models.Claude3_5Haiku20241022Schema,
     },
-    [Models.Claude3_5SonnetLatestLiteral]: {
-      model: Models.Claude3_5SonnetLatest,
-      modelOptions: Models.Claude3_5SonnetLatestOptions,
-      modelSchema: Models.Claude3_5SonnetLatestSchema,
-    },
-    [Models.Claude3_5HaikuLatestLiteral]: {
-      model: Models.Claude3_5HaikuLatest,
-      modelOptions: Models.Claude3_5HaikuLatestOptions,
-      modelSchema: Models.Claude3_5HaikuLatestSchema,
-    },
     [Models.Claude3_7Sonnet20250219Literal]: {
       model: Models.Claude3_7Sonnet20250219,
       modelOptions: Models.Claude3_7Sonnet20250219Options,
       modelSchema: Models.Claude3_7Sonnet20250219Schema,
+    },
+    [Models.Claude4Sonnet20250514Literal]: {
+      model: Models.Claude4Sonnet20250514,
+      modelOptions: Models.Claude4Sonnet20250514Options,
+      modelSchema: Models.Claude4Sonnet20250514Schema,
+    },
+    [Models.Claude4Opus20250514Literal]: {
+      model: Models.Claude4Opus20250514,
+      modelOptions: Models.Claude4Opus20250514Options,
+      modelSchema: Models.Claude4Opus20250514Schema,
     },
   };
 

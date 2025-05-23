@@ -104,7 +104,7 @@ class Gateway {
       proxyGetEmbeddings: new SimpleQueue(queueOptions),
     };
 
-    this.options.enableProxyAgent === undefined ? true : this.options.enableProxyAgent;
+    this.options.enableProxyAgent = this.options.enableProxyAgent === undefined ? true : this.options.enableProxyAgent;
 
     // httpClient timeout is 90% of queue timeout
     this.httpClient =

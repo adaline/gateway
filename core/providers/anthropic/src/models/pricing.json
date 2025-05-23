@@ -63,22 +63,6 @@
       }
     ]
   },
-  "claude-3-5-sonnet-latest": {
-    "modelName": "claude-3-5-sonnet-latest",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 3,
-            "outputPricePerMillion": 15
-          }
-        }
-      }
-    ]
-  },
   "claude-3-7-sonnet-20250219": {
     "modelName": "claude-3-7-sonnet-20250219",
     "currency": "USD",
@@ -127,22 +111,6 @@
       }
     ]
   },
-  "claude-3-haiku-latest": {
-    "modelName": "claude-3-haiku-latest",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.25,
-            "outputPricePerMillion": 1.25
-          }
-        }
-      }
-    ]
-  },
   "claude-3-5-haiku-20241022": {
     "modelName": "claude-3-5-haiku-20241022",
     "currency": "USD",
@@ -159,8 +127,8 @@
       }
     ]
   },
-  "claude-3-5-haiku-latest": {
-    "modelName": "claude-3-5-haiku-20241022",
+  "claude-4-sonnet-20250514": {
+    "modelName": "claude-4-sonnet-20250514",
     "currency": "USD",
     "tokenRanges": [
       {
@@ -168,8 +136,24 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 0.8,
-            "outputPricePerMillion": 4
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  },
+  "claude-4-opus-20250514": {
+    "modelName": "claude-4-opus-20250514",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 15,
+            "outputPricePerMillion": 75
           }
         }
       }
