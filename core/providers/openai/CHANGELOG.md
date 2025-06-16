@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.5.0
+
+### Minor Changes
+
+- 4bc1952: Add GPT-4.1 models
+
 ## 1.4.0
 
 ### Minor Changes

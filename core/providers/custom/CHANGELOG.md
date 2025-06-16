@@ -1,5 +1,12 @@
 # @adaline/custom
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [4bc1952]
+  - @adaline/openai@1.5.0
+
 ## 1.2.0
 
 ### Minor Changes
