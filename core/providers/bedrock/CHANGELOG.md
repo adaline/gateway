@@ -1,5 +1,16 @@
 # @adaline/bedrock
 
+## 1.4.0
+
+### Minor Changes
+
+- 4aabd6c: Fix anthropic media_type request field
+
+### Patch Changes
+
+- Updated dependencies [4aabd6c]
+  - @adaline/anthropic@1.4.0
+
 ## 1.3.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @adaline/anthropic
 
+## 1.4.0
+
+### Minor Changes
+
+- 4aabd6c: Fix anthropic media_type request field
+
 ## 1.3.0
 
 ### Minor Changes
