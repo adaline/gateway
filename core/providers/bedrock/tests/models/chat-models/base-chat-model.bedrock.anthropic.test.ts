@@ -545,7 +545,7 @@ describe("BaseChatModelAnthropic", () => {
               {
                 source: {
                   data: "iVBORw0KG...",
-                  mediaType: "image/png",
+                  media_type: "image/png",
                   type: "base64",
                 },
                 type: "image",
@@ -582,7 +582,7 @@ describe("BaseChatModelAnthropic", () => {
           {
             source: {
               data: "iVBORw0KG...",
-              mediaType: "image/png",
+              media_type: "image/png",
               type: "base64",
             },
             type: "image",
