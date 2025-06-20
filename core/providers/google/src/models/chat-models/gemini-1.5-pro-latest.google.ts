@@ -20,8 +20,8 @@ const Gemini1_5ProLatestSchema = ChatModelSchema(GoogleChatModelRoles, GoogleCha
   roles: GoogleChatModelRolesMap,
   modalities: GoogleChatModelModalities,
   config: {
-    def: GoogleChatModelConfigs.c1(2.0, 1.0, 8192, 4, 0.95, 64).def,
-    schema: GoogleChatModelConfigs.c1(2.0, 1.0, 8192, 4, 0.95, 64).schema,
+    def: GoogleChatModelConfigs.responseSchema(2.0, 1.0, 8192, 4, 0.95).def,
+    schema: GoogleChatModelConfigs.responseSchema(2.0, 1.0, 8192, 4, 0.95).schema,
   },
   price: pricingData[Gemini1_5ProLatestLiteral],
 });

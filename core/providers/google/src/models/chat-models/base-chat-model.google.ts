@@ -34,6 +34,7 @@ import {
   Message,
   MessageType,
   PartialChatResponseType,
+  ResponseSchemaType,
   SystemRoleLiteral,
   TextModalityLiteral,
   Tool,
@@ -395,25 +396,29 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // if ("response_format" in transformedConfig && transformedConfig.response_format !== undefined) {
-    //   const responseFormat = transformedConfig.response_format as string;
-    //   if (responseFormat === "json_schema") {
-    //     if (!("response_schema" in transformedConfig)) {
-    //       throw new InvalidConfigError({
-    //         info: `Invalid config for model : '${this.modelName}'`,
-    //         cause: new Error("'responseSchema' is required in config when 'responseFormat' is 'json_schema'")
-    //       });
-    //     } else {
-    //       transformedConfig.response_format = {
-    //         type: "json_schema",
-    //         json_schema: transformedConfig.response_schema,
-    //       };
-    //       delete transformedConfig.response_schema;
-    //     }
-    //   } else {
-    //     transformedConfig.response_format = { type: responseFormat };
-    //   }
-    // }
+    if ("response_format" in transformedConfig && transformedConfig.response_format !== undefined) {
+      const responseFormat = transformedConfig.response_format as string;
+      if (responseFormat === "json_schema") {
+        const responseSchemaConfig = transformedConfig.response_schema as ResponseSchemaType;
+        if (!("response_schema" in transformedConfig) || !responseSchemaConfig?.schema) {
+          throw new InvalidConfigError({
+            info: `Invalid config for model : '${this.modelName}'`,
+            cause: new Error("'responseSchema' is required in config when 'responseFormat' is 'json_schema'"),
+          });
+        } else {
+          transformedConfig.responseSchema = responseSchemaConfig.schema;
+          delete transformedConfig.response_format;
+          delete transformedConfig.response_schema;
+        }
+      } else if (responseFormat === "json_object") {
+        transformedConfig.responseSchema = {
+          type: "object"
+        };
+        delete transformedConfig.response_format;
+      } else if (responseFormat === "text") {
+        delete transformedConfig.response_format;
+      }
+    }
 
     return {
       generation_config: transformedConfig,
