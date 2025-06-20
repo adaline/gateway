@@ -346,6 +346,151 @@ describe("BaseChatModel", () => {
         model.transformConfig(config, messages, tools);
       }).toThrowError();
     });
+
+    describe("response schema tests", () => {
+      const responseSchemaModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
+        name: "test-response-schema-model",
+        description: "test-description",
+        maxInputTokens: 128000,
+        maxOutputTokens: 128000,
+        roles: mockRolesMap,
+        modalities: mockModalities,
+        config: {
+          def: GoogleChatModelConfigs.responseSchema(2.0, 1.0, 8192, 4, 0.95).def,
+          schema: GoogleChatModelConfigs.responseSchema(2.0, 1.0, 8192, 4, 0.95).schema,
+        },
+      });
+
+      const responseSchemaModel = new BaseChatModel(responseSchemaModelSchema, {
+        apiKey: "test-api-key",
+        baseUrl: "https://generativelanguage.googleapis.com",
+        modelName: "test-response-schema-model",
+      });
+
+      it("should transform json_schema response format with responseSchema correctly", () => {
+        const config = Config().parse({
+          responseFormat: "json_schema",
+          responseSchema: {
+            name: "test_schema",
+            description: "A test schema",
+            schema: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                age: { type: "number" }
+              },
+              required: ["name"],
+              additionalProperties: false
+            }
+          }
+        });
+        expect(responseSchemaModel.transformConfig(config, messages, tools)).toEqual({
+          generation_config: {
+            responseSchema: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                age: { type: "number" }
+              },
+              required: ["name"],
+              additionalProperties: false
+            }
+          }
+        });
+      });
+
+      it("should transform json_object response format correctly", () => {
+        const config = Config().parse({
+          responseFormat: "json_object"
+        });
+        expect(responseSchemaModel.transformConfig(config, messages, tools)).toEqual({
+          generation_config: {
+            responseSchema: {
+              type: "object"
+            }
+          }
+        });
+      });
+
+      it("should handle text response format by removing it", () => {
+        const config = Config().parse({
+          responseFormat: "text",
+          temperature: 0.5
+        });
+        expect(responseSchemaModel.transformConfig(config, messages, tools)).toEqual({
+          generation_config: {
+            temperature: 0.5
+          }
+        });
+      });
+
+      it("should throw error when responseSchema is missing for json_schema format", () => {
+        const config = Config().parse({
+          responseFormat: "json_schema"
+        });
+        expect(() => responseSchemaModel.transformConfig(config, messages, tools)).toThrowError(
+          "'responseSchema' is required in config when 'responseFormat' is 'json_schema'"
+        );
+      });
+
+      it("should transform complex responseSchema correctly", () => {
+        const config = Config().parse({
+          responseFormat: "json_schema",
+          responseSchema: {
+            name: "complex_schema",
+            description: "A complex test schema",
+            schema: {
+              type: "object",
+              properties: {
+                users: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      name: { type: "string" },
+                      email: { type: "string" }
+                    },
+                    required: ["id", "name"],
+                    additionalProperties: false
+                  }
+                },
+                total: { type: "number" }
+              },
+              required: ["users", "total"],
+              additionalProperties: false
+            }
+          },
+          temperature: 0.7
+        });
+        expect(responseSchemaModel.transformConfig(config, messages, tools)).toEqual({
+          generation_config: {
+            responseSchema: {
+              type: "object",
+              properties: {
+                users: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number" },
+                      name: { type: "string" },
+                      email: { type: "string" }
+                    },
+                    required: ["id", "name"],
+                    additionalProperties: false
+                  }
+                },
+                total: { type: "number" }
+              },
+              required: ["users", "total"],
+              additionalProperties: false
+            },
+            temperature: 0.7
+          }
+        });
+      });
+    });
   });
 
   describe("BaseChatModel transformMessages", () => {
