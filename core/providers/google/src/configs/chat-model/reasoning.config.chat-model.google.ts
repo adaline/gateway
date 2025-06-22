@@ -1,18 +1,9 @@
-import { z } from "zod";
+import { reasoningEnabled } from "./common.config.chat-model.google";
 
 import {
-  frequencyPenalty,
-  maxTokens,
-  presencePenalty,
-  reasoningEnabled,
-  safetySettings,
-  seed,
-  stop,
-  temperature,
-  toolChoice,
-  topK,
-  topP,
-} from "./common.config.chat-model.google";
+  GoogleChatModelResponseSchemaConfigDef,
+  GoogleChatModelResponseSchemaConfigSchema,
+} from "./response-schema.config.chat-model.google";
 
 const ChatModelReasoningConfigSchema = (
   maxTemperature: number,
@@ -20,19 +11,8 @@ const ChatModelReasoningConfigSchema = (
   maxOutputTokens: number,
   maxSequences: number,
   defaultTopP: number,
-  defaultTopK: number
 ) =>
-  z.object({
-    temperature: temperature(maxTemperature, defaultTemperature).schema,
-    maxTokens: maxTokens(maxOutputTokens).schema,
-    stop: stop(maxSequences).schema,
-    topP: topP(defaultTopP).schema,
-    topK: topK(defaultTopK).schema,
-    frequencyPenalty: frequencyPenalty.schema,
-    presencePenalty: presencePenalty.schema,
-    seed: seed.schema.transform((value) => (value === 0 ? undefined : value)),
-    toolChoice: toolChoice.schema,
-    safetySettings: safetySettings.schema,
+  GoogleChatModelResponseSchemaConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP).extend({
     reasoningEnabled: reasoningEnabled.schema,
   });
 
@@ -42,20 +22,10 @@ const ChatModelReasoningConfigDef = (
   maxOutputTokens: number,
   maxSequences: number,
   defaultTopP: number,
-  defaultTopK: number
 ) =>
   ({
-    temperature: temperature(maxTemperature, defaultTemperature).def,
-    maxTokens: maxTokens(maxOutputTokens).def,
-    stop: stop(maxSequences).def,
-    topP: topP(defaultTopP).def,
-    topK: topK(defaultTopK).def,
-    frequencyPenalty: frequencyPenalty.def,
-    presencePenalty: presencePenalty.def,
-    seed: seed.def,
-    toolChoice: toolChoice.def,
-    safetySettings: safetySettings.def,
+    ...GoogleChatModelResponseSchemaConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
     reasoningEnabled: reasoningEnabled.def,
-  }) as const;
+  });
 
 export { ChatModelReasoningConfigDef, ChatModelReasoningConfigSchema };

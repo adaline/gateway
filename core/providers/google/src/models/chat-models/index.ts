@@ -1,9 +1,4 @@
 export * from "./base-chat-model.google";
-export * from "./base-gemini-1-chat-model.google";
-export * from "./gemini-1.0-pro-001.google";
-export * from "./gemini-1.0-pro-latest.google";
-export * from "./gemini-1.0-pro-vision.google";
-export * from "./gemini-1.0-pro.google";
 export * from "./gemini-1.5-flash-001.google";
 export * from "./gemini-1.5-flash-002.google";
 export * from "./gemini-1.5-flash-latest.google";
@@ -15,6 +10,4 @@ export * from "./gemini-1.5-pro.google";
 export * from "./gemini-2.0-flash-exp.google";
 export * from "./gemini-2.5-flash-preview-04-17.google";
 export * from "./gemini-2.5-pro-preview-03-25.google";
-export * from "./gemini-pro-vision.google";
-export * from "./gemini-pro.google";
 export * from "./types";

@@ -1,10 +1,10 @@
 import {
   ChatModelBaseConfigDef,
   ChatModelBaseConfigSchema,
-  ChatModelC1ConfigDef,
-  ChatModelC1ConfigSchema,
   ChatModelReasoningConfigDef,
   ChatModelReasoningConfigSchema,
+  GoogleChatModelResponseSchemaConfigDef,
+  GoogleChatModelResponseSchemaConfigSchema,
 } from "./chat-model";
 import { EmbeddingModelBaseConfigDef, EmbeddingModelBaseConfigSchema } from "./embedding-model";
 
@@ -13,16 +13,9 @@ const GoogleChatModelConfigs = {
     def: ChatModelBaseConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
     schema: ChatModelBaseConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
   }),
-  c1: (
-    maxTemperature: number,
-    defaultTemperature: number,
-    maxOutputTokens: number,
-    maxSequences: number,
-    defaultTopP: number,
-    defaultTopK: number
-  ) => ({
-    def: ChatModelC1ConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, defaultTopK),
-    schema: ChatModelC1ConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, defaultTopK),
+  responseSchema: (maxTemperature: number, defaultTemperature: number, maxOutputTokens: number, maxSequences: number, defaultTopP: number) => ({
+    def: GoogleChatModelResponseSchemaConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
+    schema: GoogleChatModelResponseSchemaConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
   }),
   reasoning: (
     maxTemperature: number,
@@ -30,10 +23,9 @@ const GoogleChatModelConfigs = {
     maxOutputTokens: number,
     maxSequences: number,
     defaultTopP: number,
-    defaultTopK: number
   ) => ({
-    def: ChatModelReasoningConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, defaultTopK),
-    schema: ChatModelReasoningConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, defaultTopK),
+    def: ChatModelReasoningConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
+    schema: ChatModelReasoningConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
   }),
 } as const;
 
