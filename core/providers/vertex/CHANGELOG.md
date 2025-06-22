@@ -1,5 +1,16 @@
 # @adaline/vertex
 
+## 1.3.0
+
+### Minor Changes
+
+- c885d34: Add response schema support for Gemini models
+
+### Patch Changes
+
+- Updated dependencies [c885d34]
+  - @adaline/google@1.3.0
+
 ## 1.2.0
 
 ### Minor Changes

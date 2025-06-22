@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.3.0
+
+### Minor Changes
+
+- c885d34: Add response schema support for Gemini models
+
 ## 1.2.0
 
 ### Minor Changes
