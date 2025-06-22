@@ -18,16 +18,6 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelSchema: ChatModelSchemaType;
     }
   > = {
-    [Models.GeminiProLiteral]: {
-      model: Models.GeminiPro,
-      modelOptions: Models.GeminiProOptions,
-      modelSchema: Models.GeminiProSchema,
-    },
-    [Models.GeminiProVisionLiteral]: {
-      model: Models.GeminiProVision,
-      modelOptions: Models.GeminiProVisionOptions,
-      modelSchema: Models.GeminiProVisionSchema,
-    },
     [Models.Gemini1_5Flash001Literal]: {
       model: Models.Gemini1_5Flash001,
       modelOptions: Models.Gemini1_5Flash001Options,
@@ -67,26 +57,6 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.Gemini1_5Pro,
       modelOptions: Models.Gemini1_5ProOptions,
       modelSchema: Models.Gemini1_5ProSchema,
-    },
-    [Models.Gemini1_0ProLiteral]: {
-      model: Models.Gemini1_0Pro,
-      modelOptions: Models.Gemini1_0ProOptions,
-      modelSchema: Models.Gemini1_0ProSchema,
-    },
-    [Models.Gemini1_0ProVisionLiteral]: {
-      model: Models.Gemini1_0ProVision,
-      modelOptions: Models.Gemini1_0ProVisionOptions,
-      modelSchema: Models.Gemini1_0ProVisionSchema,
-    },
-    [Models.Gemini1_0ProLatestLiteral]: {
-      model: Models.Gemini1_0ProLatest,
-      modelOptions: Models.Gemini1_0ProLatestOptions,
-      modelSchema: Models.Gemini1_0ProLatestSchema,
-    },
-    [Models.Gemini1_0Pro_001Literal]: {
-      model: Models.Gemini1_0Pro_001,
-      modelOptions: Models.Gemini1_0Pro_001Options,
-      modelSchema: Models.Gemini1_0Pro_001Schema,
     },
     [Models.Gemini2_0FlashExpLiteral]: {
       model: Models.Gemini2_0FlashExp,

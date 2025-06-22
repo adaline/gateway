@@ -19,8 +19,8 @@ const Gemini2_5ProPreview0325Schema = ChatModelSchema(GoogleChatModelRoles, Goog
   roles: GoogleChatModelRolesMap,
   modalities: GoogleChatModelModalities,
   config: {
-    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 64).def,
-    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 64).schema,
+    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95).def,
+    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95).schema,
   },
   price: pricingData[Gemini2_5ProPreview0325Literal],
 });

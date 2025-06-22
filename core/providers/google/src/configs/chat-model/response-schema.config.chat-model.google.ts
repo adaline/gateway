@@ -15,7 +15,7 @@ const responseFormat = SelectStringConfigItem({
   title: CHAT_CONFIG.RESPONSE_FORMAT_WITH_SCHEMA.title,
   description: CHAT_CONFIG.RESPONSE_FORMAT_WITH_SCHEMA.description,
   default: "text",
-  choices: ["text", "json_object", "json_schema"],
+  choices: ["text", "json_schema"],
 });
 
 const GoogleChatModelResponseSchemaConfigDef = (
