@@ -1,7 +1,19 @@
 import { CHAT_CONFIG, ObjectSchemaConfigItem, SelectStringConfigItem } from "@adaline/provider";
 import { ResponseSchema } from "@adaline/types";
+import { z } from "zod";
 
-import { ChatModelBaseConfigDef, ChatModelBaseConfigSchema } from "./base.config.chat-model.google";
+import {
+  frequencyPenalty,
+  maxTokens,
+  presencePenalty,
+  safetySettings,
+  seed,
+  stop,
+  temperature,
+  toolChoice,
+  topK,
+  topP,
+} from "./common.config.chat-model.google";
 
 const responseSchema = ObjectSchemaConfigItem({
   param: "response_schema",
@@ -18,28 +30,50 @@ const responseFormat = SelectStringConfigItem({
   choices: ["text", "json_object", "json_schema"],
 });
 
-const GoogleChatModelResponseSchemaConfigDef = (
+const ChatModelResponseSchemaConfigDef = (
   maxTemperature: number,
   defaultTemperature: number,
   maxOutputTokens: number,
   maxSequences: number,
-  defaultTopP: number
-) => ({
-  ...ChatModelBaseConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
-  responseFormat: responseFormat.def,
-  responseSchema: responseSchema.def,
-});
-
-const GoogleChatModelResponseSchemaConfigSchema = (
-  maxTemperature: number,
-  defaultTemperature: number,
-  maxOutputTokens: number,
-  maxSequences: number,
-  defaultTopP: number
+  defaultTopP: number,
+  defaultTopK: number
 ) =>
-  ChatModelBaseConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP).extend({
+  ({
+    temperature: temperature(maxTemperature, defaultTemperature).def,
+    maxTokens: maxTokens(maxOutputTokens).def,
+    stop: stop(maxSequences).def,
+    topP: topP(defaultTopP).def,
+    topK: topK(defaultTopK).def,
+    frequencyPenalty: frequencyPenalty.def,
+    presencePenalty: presencePenalty.def,
+    seed: seed.def,
+    toolChoice: toolChoice.def,
+    safetySettings: safetySettings.def,
+    responseFormat: responseFormat.def,
+    responseSchema: responseSchema.def,
+  }) as const;
+
+const ChatModelResponseSchemaConfigSchema = (
+  maxTemperature: number,
+  defaultTemperature: number,
+  maxOutputTokens: number,
+  maxSequences: number,
+  defaultTopP: number,
+  defaultTopK: number
+) =>
+  z.object({
+    temperature: temperature(maxTemperature, defaultTemperature).schema,
+    maxTokens: maxTokens(maxOutputTokens).schema,
+    stop: stop(maxSequences).schema,
+    topP: topP(defaultTopP).schema,
+    topK: topK(defaultTopK).schema,
+    frequencyPenalty: frequencyPenalty.schema,
+    presencePenalty: presencePenalty.schema,
+    seed: seed.schema.transform((value) => (value === 0 ? undefined : value)),
+    toolChoice: toolChoice.schema,
+    safetySettings: safetySettings.schema,
     responseFormat: responseFormat.schema,
     responseSchema: responseSchema.schema,
   });
 
-export { GoogleChatModelResponseSchemaConfigDef, GoogleChatModelResponseSchemaConfigSchema };
+export { ChatModelResponseSchemaConfigDef, ChatModelResponseSchemaConfigSchema };

@@ -5,8 +5,8 @@ import {
   ChatModelC1ConfigSchema,
   ChatModelReasoningConfigDef,
   ChatModelReasoningConfigSchema,
-  GoogleChatModelResponseSchemaConfigDef,
-  GoogleChatModelResponseSchemaConfigSchema,
+  ChatModelResponseSchemaConfigDef,
+  ChatModelResponseSchemaConfigSchema,
 } from "./chat-model";
 import { EmbeddingModelBaseConfigDef, EmbeddingModelBaseConfigSchema } from "./embedding-model";
 
@@ -15,9 +15,9 @@ const GoogleChatModelConfigs = {
     def: ChatModelBaseConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
     schema: ChatModelBaseConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
   }),
-  responseSchema: (maxTemperature: number, defaultTemperature: number, maxOutputTokens: number, maxSequences: number, defaultTopP: number) => ({
-    def: GoogleChatModelResponseSchemaConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
-    schema: GoogleChatModelResponseSchemaConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
+  responseSchema: (maxTemperature: number, defaultTemperature: number, maxOutputTokens: number, maxSequences: number, defaultTopP: number, defaultTopK: number) => ({
+    def: ChatModelResponseSchemaConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, defaultTopK),
+    schema: ChatModelResponseSchemaConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, defaultTopK),
   }),
   c1: (
     maxTemperature: number,
