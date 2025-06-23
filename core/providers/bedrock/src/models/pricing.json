@@ -95,8 +95,8 @@
       }
     ]
   },
-  "anthropic.claude-4-opus-20250514-v1:0": {
-    "modelName": "anthropic.claude-4-opus-20250514-v1:0",
+  "anthropic.claude-opus-4-20250514-v1:0": {
+    "modelName": "anthropic.claude-opus-4-20250514-v1:0",
     "currency": "USD",
     "tokenRanges": [
       {
@@ -111,8 +111,8 @@
       }
     ]
   },
-  "anthropic.claude-4-sonnet-20250514-v1:0": {
-    "modelName": "anthropic.claude-4-sonnet-20250514-v1:0",
+  "anthropic.claude-sonnet-4-20250514-v1:0": {
+    "modelName": "anthropic.claude-sonnet-4-20250514-v1:0",
     "currency": "USD",
     "tokenRanges": [
       {

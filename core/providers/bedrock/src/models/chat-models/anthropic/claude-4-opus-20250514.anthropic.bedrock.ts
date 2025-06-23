@@ -13,7 +13,7 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-const BedrockClaude4Opus20250514Literal = "anthropic.claude-4-opus-20250514-v1:0";
+const BedrockClaude4Opus20250514Literal = "anthropic.claude-opus-4-20250514-v1:0";
 const BedrockClaude4Opus20250514Description =
   "Our high-performance model with exceptional reasoning and efficiency. Training cutoff: March 2025.";
 
