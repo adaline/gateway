@@ -1,5 +1,11 @@
 # @adaline/bedrock
 
+## 1.5.0
+
+### Minor Changes
+
+- ad98872: Fix missing default aws region in aws v4 request signer; add claude 4-opus, 4-sonnet, 3.7-sonnet
+
 ## 1.4.0
 
 ### Minor Changes
