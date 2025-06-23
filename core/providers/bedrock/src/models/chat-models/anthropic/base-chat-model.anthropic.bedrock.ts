@@ -69,7 +69,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     const completeChatUrl = new URL(await this.getCompleteChatUrl(config, messages, tools));
     const credentials: AwsCredentialIdentity = { accessKeyId: this.awsAccessKeyId, secretAccessKey: this.awsSecretAccessKey };
-    const awsRegion = Bedrock.awsUrl(config?.awsRegion);
+    const awsRegion = config?.awsRegion || Bedrock.awsDefaultRegion;
 
     let headers = this.getDefaultHeaders();
     headers = {
@@ -119,7 +119,7 @@ class BaseChatModelAnthropic extends BaseChatModel {
   async getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     const streamChatUrl = new URL(await this.getStreamChatUrl(config, messages, tools));
     const credentials: AwsCredentialIdentity = { accessKeyId: this.awsAccessKeyId, secretAccessKey: this.awsSecretAccessKey };
-    const awsRegion = Bedrock.awsUrl(config?.awsRegion);
+    const awsRegion = config?.awsRegion || Bedrock.awsDefaultRegion;
 
     let headers = this.getDefaultHeaders();
     headers = {
