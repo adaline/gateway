@@ -1,5 +1,11 @@
 # @adaline/bedrock
 
+## 1.7.0
+
+### Minor Changes
+
+- 29dd76f: Fix aws bedrock model ids for claude 4-opus, 4-sonnet
+
 ## 1.6.0
 
 ### Minor Changes
