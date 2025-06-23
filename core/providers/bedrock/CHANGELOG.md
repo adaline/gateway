@@ -1,5 +1,11 @@
 # @adaline/bedrock
 
+## 1.6.0
+
+### Minor Changes
+
+- c3a21ac: Fix default aws region for aws v4 request signer
+
 ## 1.5.0
 
 ### Minor Changes
