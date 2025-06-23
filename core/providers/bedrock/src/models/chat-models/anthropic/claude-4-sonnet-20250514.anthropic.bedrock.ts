@@ -13,7 +13,7 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-const BedrockClaude4Sonnet20250514Literal = "anthropic.claude-4-sonnet-20250514-v1:0";
+const BedrockClaude4Sonnet20250514Literal = "anthropic.claude-sonnet-4-20250514-v1:0";
 const BedrockClaude4Sonnet20250514Description = "Our most capable and intelligent model yet. Training cutoff: March 2025.";
 
 const BedrockClaude4Sonnet20250514Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicChatModelModalitiesEnum).parse({
