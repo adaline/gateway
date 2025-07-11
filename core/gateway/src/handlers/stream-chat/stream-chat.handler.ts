@@ -1,8 +1,10 @@
 import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
+import { mergePartialMessages } from "@adaline/types";
+
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
+import { castToError, executeToolCalls, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
 import {
   StreamChatCallbackType,
   StreamChatHandlerRequest,
@@ -55,6 +57,8 @@ async function* handleStreamChat<M>(
 
       let buffer = "";
       let isFirstResponse = true;
+      const allPartialResponses: StreamChatHandlerResponseType[] = [];
+      
       for await (const chunk of client.stream(
         providerRequest.url,
         "post",
@@ -98,10 +102,59 @@ async function* handleStreamChat<M>(
             }
 
             logger?.debug("handleStreamChat streamResponse: ", { streamResponse });
+            allPartialResponses.push(streamResponse);
             yield streamResponse;
           }
           // If the transformed part contains neither messages nor usage,
           // we simply continue with the updated buffer to process the next part or chunk.
+        }
+      }
+      
+      if (data.enableAutoToolCalls && allPartialResponses.length > 0) {
+        const partialResponses = allPartialResponses.map(r => r.response);
+        const mergedResponse = mergePartialMessages(partialResponses);
+        
+        if (mergedResponse.messages.length > 0) {
+          const lastMessage = mergedResponse.messages[mergedResponse.messages.length - 1];
+          if (lastMessage.role === "assistant") {
+            const toolCalls = lastMessage.content.filter(content => content.modality === "tool-call");
+            
+            if (toolCalls.length > 0 && data.tools) {
+              const toolsWithSettings = data.tools.filter(tool => tool.requestSettings?.type === "http");
+              const toolCallsWithSettings = toolCalls.filter(toolCall => 
+                toolsWithSettings.some(tool => tool.definition.schema.name === toolCall.name)
+              );
+              
+              if (toolCallsWithSettings.length === toolCalls.length) {
+                logger?.debug("handleStreamChat executing tool calls: ", { toolCalls: toolCallsWithSettings });
+                
+                const toolResponses = await executeToolCalls(
+                  toolCallsWithSettings,
+                  data.tools,
+                  client,
+                  handlerTelemetryContext
+                );
+                
+                const updatedMessages = [
+                  ...data.messages,
+                  lastMessage,
+                  {
+                    role: "tool" as const,
+                    content: toolResponses,
+                  },
+                ];
+                
+                logger?.debug("handleStreamChat re-running with tool responses");
+                
+                yield* handleStreamChat(
+                  { ...request, messages: updatedMessages, enableAutoToolCalls: false },
+                  client,
+                  telemetryContext
+                );
+                return;
+              }
+            }
+          }
         }
       }
 

@@ -13,6 +13,7 @@ const CompleteChatHandlerRequest = z.object({
   messages: z.array(Message()),
   tools: z.array(Tool()).optional(),
   enableCache: z.boolean(),
+  enableAutoToolCalls: z.boolean().optional(),
   customHeaders: z.record(z.string()).optional(),
   callbacks: z.array(z.custom<CompleteChatCallbackType>()).nonempty().optional(),
   metadataForCallbacks: z.any().optional(),

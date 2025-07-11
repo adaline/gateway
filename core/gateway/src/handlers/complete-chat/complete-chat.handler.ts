@@ -2,7 +2,7 @@ import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, getCacheKeyHash, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
+import { castToError, executeToolCalls, getCacheKeyHash, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
 import {
   CompleteChatCallbackType,
   CompleteChatHandlerRequest,
@@ -100,6 +100,49 @@ async function handleCompleteChat(
       };
 
       logger?.debug("handleCompleteChat response: ", { response });
+      
+      if (data.enableAutoToolCalls && response.response.messages.length > 0) {
+        const lastMessage = response.response.messages[response.response.messages.length - 1];
+        if (lastMessage.role === "assistant") {
+          const toolCalls = lastMessage.content.filter(content => content.modality === "tool-call");
+          
+          if (toolCalls.length > 0 && data.tools) {
+            const toolsWithSettings = data.tools.filter(tool => tool.requestSettings?.type === "http");
+            const toolCallsWithSettings = toolCalls.filter(toolCall => 
+              toolsWithSettings.some(tool => tool.definition.schema.name === toolCall.name)
+            );
+            
+            if (toolCallsWithSettings.length === toolCalls.length) {
+              logger?.debug("handleCompleteChat executing tool calls: ", { toolCalls: toolCallsWithSettings });
+              
+              const toolResponses = await executeToolCalls(
+                toolCallsWithSettings,
+                data.tools,
+                client,
+                handlerTelemetryContext
+              );
+              
+              const updatedMessages = [
+                ...data.messages,
+                lastMessage,
+                {
+                  role: "tool" as const,
+                  content: toolResponses,
+                },
+              ];
+              
+              logger?.debug("handleCompleteChat re-running with tool responses");
+              
+              return await handleCompleteChat(
+                { ...request, messages: updatedMessages, enableAutoToolCalls: false },
+                client,
+                telemetryContext
+              );
+            }
+          }
+        }
+      }
+      
       if (data.enableCache) {
         await request.cache.set(cacheKey, response);
         logger?.debug("handleCompleteChat response cached");

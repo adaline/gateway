@@ -73,11 +73,24 @@ const ToolTypes = ["function"];
 const ToolTypesLiteral = z.enum(["function"]);
 type ToolTypesType = z.infer<typeof ToolTypesLiteral>;
 
+const HttpRequestSettings = z.object({
+  type: z.literal("http"),
+  method: z.enum(["get", "post"]),
+  url: z.string().url(),
+  headers: z.record(z.string()).optional(),
+  query: z.record(z.string()).optional(),
+  body: z.record(z.any()).optional(),
+  proxyUrl: z.string().url().optional(),
+});
+
+const RequestSettings = z.discriminatedUnion("type", [HttpRequestSettings]);
+
 const FunctionTool = z.object({
   type: ToolTypesLiteral,
   definition: z.object({
     schema: Function, // TODO: convert to union with more tool types
   }),
+  requestSettings: RequestSettings.optional(),
 });
 type FunctionToolType = z.infer<typeof FunctionTool>;
 
@@ -90,6 +103,8 @@ export {
   FunctionParameters,
   FunctionParameterTypes,
   FunctionParameterTypesLiteral,
+  HttpRequestSettings,
+  RequestSettings,
   ToolTypes,
   ToolTypesLiteral,
   type FunctionParametersType,
