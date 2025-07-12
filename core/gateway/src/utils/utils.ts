@@ -1,5 +1,12 @@
+// import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 import sha256 from "crypto-js/sha256.js";
+
+// import { ToolCallContentType, ToolResponseContentType, ToolType } from "@adaline/types";
+
 import { GatewayError } from "../errors/errors";
+// import { CompleteChatCallbackType } from "../handlers/complete-chat/complete-chat.types";
+// import { StreamChatCallbackType } from "../handlers/stream-chat/stream-chat.types";
+// import { HttpClient, LoggerManager, TelemetryManager } from "../plugins";
 import { HttpClientError } from "../plugins/http-client/http-client.error";
 
 const getCacheKeyHash = (prefix: string, object: object): string => {
@@ -123,6 +130,95 @@ const defaultShouldRetry = (status: number) => {
   return false;
 };
 
+// const executeToolCalls = async (
+//   toolCalls: ToolCallContentType[],
+//   tools: ToolType[],
+//   client: HttpClient,
+//   callbacks?: CompleteChatCallbackType[] | StreamChatCallbackType[],
+//   metadataForCallbacks?: any,
+//   telemetryContext?: Context
+// ): Promise<ToolResponseContentType[]> => {
+//   const logger = LoggerManager.getLogger();
+
+//   const toolCallPromises = toolCalls.map(async (toolCall) => {
+//     const tool = tools.find((t) => t.definition.schema.name === toolCall.name);
+//     if (!tool?.requestSettings || tool.requestSettings.type !== "http") {
+//       return null;
+//     }
+
+//     const settings = tool.requestSettings;
+//     const handlerTelemetryContext = telemetryContext || context.active();
+//     return await context.with(handlerTelemetryContext, async () => {
+//       const tracer = TelemetryManager.getTracer();
+//       return await tracer.startActiveSpan(`tool-call.${toolCall.name}`, async (span: Span) => {
+//         try {
+//           span.setAttribute("tool.name", toolCall.name);
+//           span.setAttribute("tool.id", toolCall.id);
+
+//           if (callbacks) {
+//             await safelyInvokeCallbacks(callbacks, "onToolCallStart", metadataForCallbacks, toolCall);
+//           }
+
+//           let dataOrParams: Record<string, unknown> | undefined;
+//           try {
+//             dataOrParams = JSON.parse(toolCall.arguments);
+//           } catch (error) {
+//             const warningMessage =
+//               `executeToolCalls: Error parsing arguments for tool call: ${toolCall.name},` +
+//               ` arguments: ${toolCall.arguments}, error: ${error instanceof Error ? error.message : String(error)}`;
+//             logger?.warn(warningMessage);
+//           }
+
+//           let response;
+//           if (settings.method === "get") {
+//             response = await client.get(settings.url, dataOrParams, settings.headers, handlerTelemetryContext);
+//           } else {
+//             response = await client.post(settings.url, dataOrParams, settings.headers, handlerTelemetryContext);
+//           }
+
+//           span.setStatus({ code: SpanStatusCode.OK });
+
+//           const toolResponse = {
+//             modality: "tool-response" as const,
+//             index: toolCall.index,
+//             id: toolCall.id,
+//             name: toolCall.name,
+//             data: JSON.stringify(response.data),
+//           } as ToolResponseContentType;
+
+//           if (callbacks) {
+//             await safelyInvokeCallbacks(callbacks, "onToolCallComplete", metadataForCallbacks, toolCall, toolResponse);
+//           }
+
+//           return toolResponse;
+//         } catch (error) {
+//           span.setStatus({ code: SpanStatusCode.ERROR, message: (error as Error).message });
+//           logger?.warn(`executeToolCalls: Tool call ${toolCall.name} failed:`, error);
+
+//           const toolResponse = {
+//             modality: "tool-response" as const,
+//             index: toolCall.index,
+//             id: toolCall.id,
+//             name: toolCall.name,
+//             data: "{}",
+//             error: error instanceof Error ? error.message : String(error),
+//           } as ToolResponseContentType;
+
+//           if (callbacks) {
+//             await safelyInvokeCallbacks(callbacks, "onToolCallError", metadataForCallbacks, toolCall, toolResponse);
+//           }
+
+//           return toolResponse;
+//         } finally {
+//           span.end();
+//         }
+//       });
+//     });
+//   });
+
+//   const results = await Promise.all(toolCallPromises);
+//   return results.filter((result) => result !== null);
+// };
 
 export {
   calcRateLimitRetryTimeout,
