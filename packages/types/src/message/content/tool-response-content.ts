@@ -9,6 +9,7 @@ const ToolResponseContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: 
     id: z.string().min(1),
     name: z.string().min(1),
     data: z.string(),
+    error: z.string().optional(),
     metadata: Metadata,
   });
 type ToolResponseContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof ToolResponseContent<M>>>;

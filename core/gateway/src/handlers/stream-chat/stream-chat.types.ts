@@ -40,6 +40,9 @@ type StreamChatCallbackType<M = any> = {
   onStreamNewResponse?: (metadata?: M, response?: StreamChatHandlerResponseType, chunk?: unknown) => Promise<void> | void;
   onStreamEnd?: (metadata?: M, response?: StreamChatHandlerResponseType) => Promise<void> | void;
   onStreamError?: (metadata?: M, error?: GatewayError | HttpRequestError) => Promise<void> | void;
+  onToolCallStart?: (metadata?: M, toolCall?: any) => Promise<void> | void;
+  onToolCallComplete?: (metadata?: M, toolCall?: any, toolResponse?: any) => Promise<void> | void;
+  onToolCallError?: (metadata?: M, toolCall?: any, error?: any) => Promise<void> | void;
 };
 
 export {

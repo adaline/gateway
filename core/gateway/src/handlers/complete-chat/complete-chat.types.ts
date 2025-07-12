@@ -42,6 +42,9 @@ type CompleteChatCallbackType<M = any> = {
   onChatCached?: (metadata?: M, response?: CompleteChatHandlerResponseType) => Promise<void> | void;
   onChatComplete?: (metadata?: M, response?: CompleteChatHandlerResponseType) => Promise<void> | void;
   onChatError?: (metadata?: M, error?: GatewayError | HttpRequestError) => Promise<void> | void;
+  onToolCallStart?: (metadata?: M, toolCall?: any) => Promise<void> | void;
+  onToolCallComplete?: (metadata?: M, toolCall?: any, toolResponse?: any) => Promise<void> | void;
+  onToolCallError?: (metadata?: M, toolCall?: any, error?: any) => Promise<void> | void;
 };
 
 export {

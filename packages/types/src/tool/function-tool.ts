@@ -80,7 +80,6 @@ const HttpRequestSettings = z.object({
   headers: z.record(z.string()).optional(),
   query: z.record(z.string()).optional(),
   body: z.record(z.any()).optional(),
-  proxyUrl: z.string().url().optional(),
 });
 
 const RequestSettings = z.discriminatedUnion("type", [HttpRequestSettings]);

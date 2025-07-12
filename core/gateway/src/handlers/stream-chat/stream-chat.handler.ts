@@ -115,29 +115,45 @@ async function* handleStreamChat<M>(
         const mergedResponse = mergePartialMessages(partialResponses);
         
         if (mergedResponse.messages.length > 0) {
-          const lastMessage = mergedResponse.messages[mergedResponse.messages.length - 1];
-          if (lastMessage.role === "assistant") {
-            const toolCalls = lastMessage.content.filter(content => content.modality === "tool-call");
+          const allToolCalls = [];
+          const assistantMessages = [];
+          
+          for (const message of mergedResponse.messages) {
+            if (message.role === "assistant") {
+              assistantMessages.push(message);
+              const toolCalls = message.content.filter(content => content.modality === "tool-call");
+              allToolCalls.push(...toolCalls);
+            }
+          }
+          
+          if (allToolCalls.length > 0 && data.tools) {
+            const toolCallsWithSettings = allToolCalls.filter(toolCall => 
+              data.tools!.some(tool => 
+                tool.requestSettings?.type === "http" && 
+                tool.definition.schema.name === toolCall.name
+              )
+            );
             
-            if (toolCalls.length > 0 && data.tools) {
-              const toolsWithSettings = data.tools.filter(tool => tool.requestSettings?.type === "http");
-              const toolCallsWithSettings = toolCalls.filter(toolCall => 
-                toolsWithSettings.some(tool => tool.definition.schema.name === toolCall.name)
+            if (toolCallsWithSettings.length > 0) {
+              logger?.debug("handleStreamChat executing tool calls: ", { toolCalls: toolCallsWithSettings });
+              
+              const toolResponses = await executeToolCalls(
+                toolCallsWithSettings,
+                data.tools,
+                client,
+                data.callbacks,
+                data.metadataForCallbacks,
+                handlerTelemetryContext
               );
               
-              if (toolCallsWithSettings.length === toolCalls.length) {
-                logger?.debug("handleStreamChat executing tool calls: ", { toolCalls: toolCallsWithSettings });
-                
-                const toolResponses = await executeToolCalls(
-                  toolCallsWithSettings,
-                  data.tools,
-                  client,
-                  handlerTelemetryContext
-                );
-                
+              const toolCallsWithResponses = allToolCalls.filter(toolCall =>
+                toolResponses.some(response => response.id === toolCall.id)
+              );
+              
+              if (toolCallsWithResponses.length === allToolCalls.length) {
                 const updatedMessages = [
                   ...data.messages,
-                  lastMessage,
+                  ...assistantMessages,
                   {
                     role: "tool" as const,
                     content: toolResponses,
@@ -152,6 +168,8 @@ async function* handleStreamChat<M>(
                   telemetryContext
                 );
                 return;
+              } else {
+                logger?.debug("handleStreamChat not all tool calls have responses, returning partial results");
               }
             }
           }

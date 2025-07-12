@@ -131,17 +131,11 @@ const executeToolCalls = async (
   toolCalls: ToolCallContentType[],
   tools: ToolType[],
   client: HttpClient,
+  callbacks?: any[],
+  metadataForCallbacks?: any,
   telemetryContext?: Context
 ): Promise<ToolResponseContentType[]> => {
   const logger = LoggerManager.getLogger();
-  
-  const needsProxy = isRunningInBrowser() && tools.some(tool => 
-    tool.requestSettings?.type === "http" && !tool.requestSettings.proxyUrl
-  );
-  
-  if (needsProxy) {
-    throw new GatewayError("proxyUrl is required for HTTP tool calls in browser environment");
-  }
 
   const toolCallPromises = toolCalls.map(async (toolCall) => {
     const tool = tools.find(t => t.definition.schema.name === toolCall.name);
@@ -150,7 +144,6 @@ const executeToolCalls = async (
     }
 
     const settings = tool.requestSettings;
-    const url = isRunningInBrowser() && settings.proxyUrl ? settings.proxyUrl : settings.url;
     
     return await context.with(telemetryContext || context.active(), async () => {
       const tracer = TelemetryManager.getTracer();
@@ -159,35 +152,52 @@ const executeToolCalls = async (
           span.setAttribute("tool.name", toolCall.name);
           span.setAttribute("tool.id", toolCall.id);
           
+          if (callbacks) {
+            await safelyInvokeCallbacks(callbacks, "onToolCallStart", metadataForCallbacks, toolCall);
+          }
+          
           let response;
           if (settings.method === "get") {
             const params = settings.query || {};
-            response = await client.get(url, params, settings.headers, context.active());
+            response = await client.get(settings.url, params, settings.headers, context.active());
           } else {
             const body = settings.body || JSON.parse(toolCall.arguments || "{}");
-            response = await client.post(url, body, settings.headers, context.active());
+            response = await client.post(settings.url, body, settings.headers, context.active());
           }
 
           span.setStatus({ code: SpanStatusCode.OK });
           
-          return {
+          const toolResponse = {
             modality: "tool-response" as const,
             index: toolCall.index,
             id: toolCall.id,
             name: toolCall.name,
             data: JSON.stringify(response.data),
           } as ToolResponseContentType;
+          
+          if (callbacks) {
+            await safelyInvokeCallbacks(callbacks, "onToolCallComplete", metadataForCallbacks, toolCall, toolResponse);
+          }
+          
+          return toolResponse;
         } catch (error) {
           span.setStatus({ code: SpanStatusCode.ERROR, message: (error as Error).message });
           logger?.warn(`Tool call ${toolCall.name} failed:`, error);
           
-          return {
+          const toolResponse = {
             modality: "tool-response" as const,
             index: toolCall.index,
             id: toolCall.id,
             name: toolCall.name,
-            data: JSON.stringify({ error: (error as Error).message }),
+            data: "",
+            error: (error as Error).message,
           } as ToolResponseContentType;
+          
+          if (callbacks) {
+            await safelyInvokeCallbacks(callbacks, "onToolCallError", metadataForCallbacks, toolCall, error);
+          }
+          
+          return toolResponse;
         } finally {
           span.end();
         }
