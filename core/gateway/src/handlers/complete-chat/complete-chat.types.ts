@@ -17,7 +17,10 @@ const CompleteChatHandlerRequest = z.object({
   customHeaders: z.record(z.string()).optional(),
   callbacks: z.array(z.custom<CompleteChatCallbackType>()).nonempty().optional(),
   metadataForCallbacks: z.any().optional(),
-});
+}).refine(
+  (data) => !data.enableAutoToolCalls || (data.enableAutoToolCalls && data.tools),
+  "Tools must be provided when enableAutoToolCalls is true"
+);
 type CompleteChatHandlerRequestType = z.infer<typeof CompleteChatHandlerRequest>;
 
 const CompleteChatHandlerResponse = z.object({
