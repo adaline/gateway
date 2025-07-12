@@ -11,7 +11,10 @@ const StreamChatHandlerRequest = z.object({
   config: Config(),
   messages: z.array(Message()),
   tools: z.array(Tool()).optional(),
-  enableAutoToolCalls: z.boolean().optional(),
+  enableAutoToolCalls: z.boolean().optional().refine(
+    (val, ctx) => !val || (val && ctx.path.includes('tools')),
+    'Tools must be provided when enableAutoToolCalls is true'
+  ),
   customHeaders: z.record(z.string()).optional(),
   callbacks: z.array(z.custom<StreamChatCallbackType>()).nonempty().optional(),
   metadataForCallbacks: z.any().optional(),
