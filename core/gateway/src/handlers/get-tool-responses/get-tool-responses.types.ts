@@ -5,18 +5,6 @@ import { Tool, ToolCallContent, ToolResponseContent } from "@adaline/types";
 import { GatewayError } from "../../errors";
 import { Cache, HttpRequestError } from "../../plugins";
 
-const GetToolResponsesHandlerRequest = z.object({
-  cache: z.custom<Cache<GetToolResponsesHandlerResponseType>>(),
-  tools: z.array(Tool()),
-  toolCalls: z.array(ToolCallContent()),
-  enableCache: z.boolean(),
-  customHeaders: z.record(z.string()).optional(),
-  callbacks: z.array(z.custom<GetToolResponsesCallbackType>()).nonempty().optional(),
-  metadataForCallbacks: z.any().optional(),
-  abortSignal: z.instanceof(AbortSignal).optional(),
-});
-type GetToolResponsesHandlerRequestType = z.infer<typeof GetToolResponsesHandlerRequest>;
-
 const GetToolResponsesHandlerResponse = z.object({
   request: z.object({
     tools: z.array(Tool()),
@@ -35,6 +23,18 @@ type GetToolResponsesCallbackType<M = any> = {
   onGetToolResponsesComplete?: (metadata?: M, response?: GetToolResponsesHandlerResponseType) => Promise<void> | void;
   onGetToolResponsesError?: (metadata?: M, error?: GatewayError | HttpRequestError) => Promise<void> | void;
 };
+
+const GetToolResponsesHandlerRequest = z.object({
+  cache: z.custom<Cache<GetToolResponsesHandlerResponseType>>(),
+  tools: z.array(Tool()),
+  toolCalls: z.array(ToolCallContent()),
+  enableCache: z.boolean(),
+  customHeaders: z.record(z.string()).optional(),
+  callbacks: z.array(z.custom<GetToolResponsesCallbackType>()).nonempty().optional(),
+  metadataForCallbacks: z.any().optional(),
+  abortSignal: z.instanceof(AbortSignal).optional(),
+});
+type GetToolResponsesHandlerRequestType = z.infer<typeof GetToolResponsesHandlerRequest>;
 
 export {
   GetToolResponsesHandlerRequest,
