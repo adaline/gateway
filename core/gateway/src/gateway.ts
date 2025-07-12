@@ -64,6 +64,7 @@ class Gateway {
   private caches: {
     completeChat: Cache<CompleteChatHandlerResponseType>;
     getEmbeddings: Cache<GetEmbeddingsHandlerResponseType>;
+    getToolResponses: Cache<GetToolResponsesHandlerResponseType>;
   };
 
   constructor(options: GatewayOptionsType = {}) {
