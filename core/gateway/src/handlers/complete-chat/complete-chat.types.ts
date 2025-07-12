@@ -13,14 +13,10 @@ const CompleteChatHandlerRequest = z.object({
   messages: z.array(Message()),
   tools: z.array(Tool()).optional(),
   enableCache: z.boolean(),
-  enableAutoToolCalls: z.boolean().optional(),
   customHeaders: z.record(z.string()).optional(),
   callbacks: z.array(z.custom<CompleteChatCallbackType>()).nonempty().optional(),
   metadataForCallbacks: z.any().optional(),
-}).refine(
-  (data) => !data.enableAutoToolCalls || (data.enableAutoToolCalls && data.tools),
-  "Tools must be provided when enableAutoToolCalls is true"
-);
+});
 type CompleteChatHandlerRequestType = z.infer<typeof CompleteChatHandlerRequest>;
 
 const CompleteChatHandlerResponse = z.object({
@@ -45,9 +41,6 @@ type CompleteChatCallbackType<M = any> = {
   onChatCached?: (metadata?: M, response?: CompleteChatHandlerResponseType) => Promise<void> | void;
   onChatComplete?: (metadata?: M, response?: CompleteChatHandlerResponseType) => Promise<void> | void;
   onChatError?: (metadata?: M, error?: GatewayError | HttpRequestError) => Promise<void> | void;
-  onToolCallStart?: (metadata?: M, toolCall?: any) => Promise<void> | void;
-  onToolCallComplete?: (metadata?: M, toolCall?: any, toolResponse?: any) => Promise<void> | void;
-  onToolCallError?: (metadata?: M, toolCall?: any, error?: any) => Promise<void> | void;
 };
 
 export {

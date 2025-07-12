@@ -9,6 +9,8 @@ import {
   GatewayGetChatUsageCostRequestType,
   GatewayGetEmbeddingsRequest,
   GatewayGetEmbeddingsRequestType,
+  GatewayGetToolResponsesRequest,
+  GatewayGetToolResponsesRequestType,
   GatewayOptions,
   GatewayOptionsType,
   GatewayProxyCompleteChatRequest,
@@ -24,6 +26,7 @@ import {
   CompleteChatHandlerResponseType,
   GetChatUsageCostHandlerResponseType,
   GetEmbeddingsHandlerResponseType,
+  GetToolResponsesHandlerResponseType,
   ProxyCompleteChatHandlerResponseType,
   ProxyGetEmbeddingsHandlerResponseType,
   ProxyStreamChatHandlerResponseType,
@@ -32,6 +35,7 @@ import {
 import { handleCompleteChat } from "./handlers/complete-chat/complete-chat.handler";
 import { handleGetChatUsageCost } from "./handlers/get-chat-usage-cost/get-chat-usage-cost.handler";
 import { handleGetEmbeddings } from "./handlers/get-embeddings/get-embeddings.handler";
+import { handleGetToolResponses } from "./handlers/get-tool-responses/get-tool-responses.handler";
 import { handleProxyCompleteChat } from "./handlers/proxy-complete-chat/proxy-complete-chat.handler";
 import { handleProxyGetEmbeddings } from "./handlers/proxy-get-embeddings/proxy-get-embeddings.handler";
 import { handleProxyStreamChat } from "./handlers/proxy-stream-chat/proxy-stream-chat.handler";
@@ -114,6 +118,7 @@ class Gateway {
     this.caches = {
       completeChat: options.completeChatCache || new LRUCache<CompleteChatHandlerResponseType>(),
       getEmbeddings: options.getEmbeddingsCache || new LRUCache<GetEmbeddingsHandlerResponseType>(),
+      getToolResponses: options.getToolResponsesCache || new LRUCache<GetToolResponsesHandlerResponseType>(),
     };
     this.logger?.debug("gateway initialized");
   }
@@ -393,6 +398,44 @@ class Gateway {
       this.httpClient,
       telemetryContext
     );
+  }
+
+  async getToolResponses(request: GatewayGetToolResponsesRequestType): Promise<GetToolResponsesHandlerResponseType> {
+    this.logger?.info("gateway.getToolResponses invoked");
+    this.logger?.debug("request: ", { request });
+    const data = GatewayGetToolResponsesRequest.parse(request);
+
+    let status = "success";
+    const span = this.tracer.startSpan("get-tool-responses");
+    const activeContext = trace.setSpan(context.active(), span);
+
+    try {
+      return await context.with(activeContext, async () => {
+        return handleGetToolResponses(
+          {
+            cache: this.caches.getToolResponses,
+            tools: data.tools,
+            toolCalls: data.toolCalls,
+            enableCache: data.options?.enableCache ?? true,
+            customHeaders: data.options?.customHeaders,
+            callbacks: this.options.getToolResponsesCallbacks,
+            metadataForCallbacks: data.options?.metadataForCallbacks,
+            abortSignal: data.abortSignal,
+          },
+          this.httpClient,
+          activeContext
+        );
+      });
+    } catch (error) {
+      status = "error";
+      span.setStatus({ code: SpanStatusCode.ERROR, message: "get tool responses failed" });
+      this.logger?.error("gateway.getToolResponses error: ", { error });
+      if (error instanceof GatewayError) throw error;
+      else throw new GatewayError((error as any)?.message, 500, (error as any)?.response?.data);
+    } finally {
+      this.analytics.record("getToolResponses", status, {});
+      span.end();
+    }
   }
 
   static getChatUsageCost(request: GatewayGetChatUsageCostRequestType): GetChatUsageCostHandlerResponseType {

@@ -6,22 +6,16 @@ import { Config, Message, PartialChatResponse, Tool } from "@adaline/types";
 import { GatewayError } from "../../errors";
 import { HttpRequestError } from "../../plugins";
 
-const StreamChatHandlerRequest = z
-  .object({
-    model: z.custom<ChatModelV1>(),
-    config: Config(),
-    messages: z.array(Message()),
-    tools: z.array(Tool()).optional(),
-    enableAutoToolCalls: z.boolean().optional(),
-    customHeaders: z.record(z.string()).optional(),
-    callbacks: z.array(z.custom<StreamChatCallbackType>()).nonempty().optional(),
-    metadataForCallbacks: z.any().optional(),
-    abortSignal: z.instanceof(AbortSignal).optional(),
-  })
-  .refine(
-    (data) => !data.enableAutoToolCalls || (data.enableAutoToolCalls && data.tools),
-    "Tools must be provided when enableAutoToolCalls is true"
-  );
+const StreamChatHandlerRequest = z.object({
+  model: z.custom<ChatModelV1>(),
+  config: Config(),
+  messages: z.array(Message()),
+  tools: z.array(Tool()).optional(),
+  customHeaders: z.record(z.string()).optional(),
+  callbacks: z.array(z.custom<StreamChatCallbackType>()).nonempty().optional(),
+  metadataForCallbacks: z.any().optional(),
+  abortSignal: z.instanceof(AbortSignal).optional(),
+});
 type StreamChatHandlerRequestType = z.infer<typeof StreamChatHandlerRequest>;
 
 const StreamChatHandlerResponse = z.object({
@@ -45,9 +39,6 @@ type StreamChatCallbackType<M = any> = {
   onStreamNewResponse?: (metadata?: M, response?: StreamChatHandlerResponseType, chunk?: unknown) => Promise<void> | void;
   onStreamEnd?: (metadata?: M, response?: StreamChatHandlerResponseType) => Promise<void> | void;
   onStreamError?: (metadata?: M, error?: GatewayError | HttpRequestError) => Promise<void> | void;
-  onToolCallStart?: (metadata?: M, toolCall?: any) => Promise<void> | void;
-  onToolCallComplete?: (metadata?: M, toolCall?: any, toolResponse?: any) => Promise<void> | void;
-  onToolCallError?: (metadata?: M, toolCall?: any, error?: any) => Promise<void> | void;
 };
 
 export {

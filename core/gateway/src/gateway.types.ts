@@ -2,13 +2,15 @@ import { Meter, Tracer } from "@opentelemetry/api";
 import { z } from "zod";
 
 import { ChatModelV1, EmbeddingModelV1 } from "@adaline/provider";
-import { ChatModelPriceType, ChatUsageType, Config, EmbeddingRequests, Message, Tool } from "@adaline/types";
+import { ChatModelPriceType, ChatUsageType, Config, EmbeddingRequests, Message, Tool, ToolCallContent } from "@adaline/types";
 
 import {
   CompleteChatCallbackType,
   CompleteChatHandlerResponseType,
   GetEmbeddingsCallbackType,
   GetEmbeddingsHandlerResponseType,
+  GetToolResponsesCallbackType,
+  GetToolResponsesHandlerResponseType,
   StreamChatCallbackType,
 } from "./handlers";
 import { Cache, HttpClient, Logger, QueueOptions } from "./plugins";
@@ -21,6 +23,8 @@ const GatewayOptions = z.object({
   completeChatCallbacks: z.array(z.custom<CompleteChatCallbackType>()).nonempty().optional(),
   getEmbeddingsCache: z.custom<Cache<GetEmbeddingsHandlerResponseType>>().optional(),
   getEmbeddingsCallbacks: z.array(z.custom<GetEmbeddingsCallbackType>()).nonempty().optional(),
+  getToolResponsesCache: z.custom<Cache<GetToolResponsesHandlerResponseType>>().optional(),
+  getToolResponsesCallbacks: z.array(z.custom<GetToolResponsesCallbackType>()).nonempty().optional(),
   streamChatCallbacks: z.array(z.custom<StreamChatCallbackType>()).nonempty().optional(),
   logger: z.custom<Logger>().optional(),
   telemetry: z
@@ -124,12 +128,28 @@ const GatewayGetChatUsageCostRequest = z
   );
 type GatewayGetChatUsageCostRequestType = z.infer<typeof GatewayGetChatUsageCostRequest>;
 
+const GatewayGetToolResponsesRequestOptions = z.object({
+  enableCache: z.boolean().optional().default(true),
+  customHeaders: z.record(z.string()).optional(),
+  metadataForCallbacks: z.any().optional(),
+});
+type GatewayGetToolResponsesRequestOptionsType = z.infer<typeof GatewayGetToolResponsesRequestOptions>;
+
+const GatewayGetToolResponsesRequest = z.object({
+  tools: z.array(Tool()),
+  toolCalls: z.array(ToolCallContent()),
+  options: GatewayGetToolResponsesRequestOptions.optional(),
+  abortSignal: z.instanceof(AbortSignal).optional(),
+});
+type GatewayGetToolResponsesRequestType = z.infer<typeof GatewayGetToolResponsesRequest>;
+
 export {
   GatewayCompleteChatRequest,
   GatewayCompleteChatRequestOptions,
   GatewayGetChatUsageCostRequest,
   GatewayGetEmbeddingsRequest,
   GatewayGetEmbeddingsRequestOptions,
+  GatewayGetToolResponsesRequest,
   GatewayOptions,
   GatewayProxyCompleteChatRequest,
   GatewayProxyGetEmbeddingsRequest,
@@ -141,6 +161,8 @@ export {
   type GatewayGetChatUsageCostRequestType,
   type GatewayGetEmbeddingsRequestOptionsType,
   type GatewayGetEmbeddingsRequestType,
+  type GatewayGetToolResponsesRequestOptionsType,
+  type GatewayGetToolResponsesRequestType,
   type GatewayOptionsType,
   type GatewayProxyCompleteChatRequestType,
   type GatewayProxyGetEmbeddingsRequestType,
