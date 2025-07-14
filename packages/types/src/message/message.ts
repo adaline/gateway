@@ -37,26 +37,6 @@ type MessageType<
   RTCM extends z.ZodTypeAny = z.ZodUndefined,
 > = z.infer<ReturnType<typeof Message<R, TCM, ICM, CCM, RCM, MM, RTCM>>>;
 
-// const PartialMessage = <
-//   R extends z.ZodEnum<[string, ...string[]]> = typeof PartialRoleEnum,
-//   TCM extends z.ZodTypeAny = z.ZodUndefined,
-//   CCM extends z.ZodTypeAny = z.ZodUndefined,
-//   MM extends z.ZodTypeAny = z.ZodUndefined,
-// >(
-//   Role: R = PartialRoleEnum as unknown as R,
-//   TextContentMetadata: TCM = z.undefined() as TCM,
-//   ToolCallContentMetadata: CCM = z.undefined() as CCM,
-//   MessageMetadata: MM = z.undefined() as MM,
-// ) => Message(
-//   Role,
-//   TextContentMetadata,
-//   undefined,
-//   ToolCallContentMetadata,
-//   undefined,
-//   MessageMetadata
-// ).omit({ content: true }).merge(z.object({
-//   partialContent: PartialContent(TextContentMetadata, ToolCallContentMetadata),
-// }));
 const PartialMessage = <
   R extends z.ZodEnum<[string, ...string[]]> = typeof PartialRoleEnum,
   TCM extends z.ZodTypeAny = z.ZodUndefined,

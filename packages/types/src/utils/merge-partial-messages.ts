@@ -20,7 +20,7 @@ import {
 } from "./../message";
 
 const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponseType => {
-  let finalizedResponse: ChatResponseType = { messages: [] };
+  const finalizedResponse: ChatResponseType = { messages: [] };
 
   if (!response || response.length === 0) {
     return finalizedResponse;
@@ -47,7 +47,7 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
       };
     } else if (lastModality === PartialToolCallModalityLiteral && currentToolCall) {
       // Ensure required fields are present for the final ToolCall
-      if (currentToolCall.id && currentToolCall.name && currentToolCall.arguments !== undefined && currentToolCall.index) {
+      if (currentToolCall.id && currentToolCall.name && currentToolCall.arguments !== undefined && currentToolCall.index !== undefined) {
         finalizedContent = {
           modality: ToolCallModalityLiteral,
           index: currentToolCall.index,
