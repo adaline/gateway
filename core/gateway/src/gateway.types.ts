@@ -9,6 +9,8 @@ import {
   CompleteChatHandlerResponseType,
   GetEmbeddingsCallbackType,
   GetEmbeddingsHandlerResponseType,
+  GetToolResponsesCallbackType,
+  GetToolResponsesHandlerResponseType,
   StreamChatCallbackType,
 } from "./handlers";
 import { Cache, HttpClient, Logger, QueueOptions } from "./plugins";
@@ -21,6 +23,8 @@ const GatewayOptions = z.object({
   completeChatCallbacks: z.array(z.custom<CompleteChatCallbackType>()).nonempty().optional(),
   getEmbeddingsCache: z.custom<Cache<GetEmbeddingsHandlerResponseType>>().optional(),
   getEmbeddingsCallbacks: z.array(z.custom<GetEmbeddingsCallbackType>()).nonempty().optional(),
+  getToolResponsesCache: z.custom<Cache<GetToolResponsesHandlerResponseType>>().optional(),
+  getToolResponsesCallbacks: z.array(z.custom<GetToolResponsesCallbackType>()).nonempty().optional(),
   streamChatCallbacks: z.array(z.custom<StreamChatCallbackType>()).nonempty().optional(),
   logger: z.custom<Logger>().optional(),
   telemetry: z
@@ -124,12 +128,27 @@ const GatewayGetChatUsageCostRequest = z
   );
 type GatewayGetChatUsageCostRequestType = z.infer<typeof GatewayGetChatUsageCostRequest>;
 
+const GatewayGetToolResponsesRequestOptions = z.object({
+  customHeaders: z.record(z.string()).optional(),
+  metadataForCallbacks: z.any().optional(),
+});
+type GatewayGetToolResponsesRequestOptionsType = z.infer<typeof GatewayGetToolResponsesRequestOptions>;
+
+const GatewayGetToolResponsesRequest = z.object({
+  tools: z.array(Tool()),
+  messages: z.array(Message()),
+  options: GatewayGetToolResponsesRequestOptions.optional(),
+  abortSignal: z.instanceof(AbortSignal).optional(),
+});
+type GatewayGetToolResponsesRequestType = z.infer<typeof GatewayGetToolResponsesRequest>;
+
 export {
   GatewayCompleteChatRequest,
   GatewayCompleteChatRequestOptions,
   GatewayGetChatUsageCostRequest,
   GatewayGetEmbeddingsRequest,
   GatewayGetEmbeddingsRequestOptions,
+  GatewayGetToolResponsesRequest,
   GatewayOptions,
   GatewayProxyCompleteChatRequest,
   GatewayProxyGetEmbeddingsRequest,
@@ -141,6 +160,8 @@ export {
   type GatewayGetChatUsageCostRequestType,
   type GatewayGetEmbeddingsRequestOptionsType,
   type GatewayGetEmbeddingsRequestType,
+  type GatewayGetToolResponsesRequestOptionsType,
+  type GatewayGetToolResponsesRequestType,
   type GatewayOptionsType,
   type GatewayProxyCompleteChatRequestType,
   type GatewayProxyGetEmbeddingsRequestType,
