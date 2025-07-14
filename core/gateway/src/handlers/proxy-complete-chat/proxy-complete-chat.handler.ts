@@ -32,6 +32,7 @@ async function handleProxyCompleteChat(
         providerRequest.url,
         providerRequest.data,
         providerRequest.headers,
+        undefined,
         handlerTelemetryContext
       );
       logger?.debug("handleProxyCompleteChat providerResponse: ", { providerResponse });

@@ -1,7 +1,7 @@
 import sha256 from "crypto-js/sha256.js";
 
 import { GatewayError } from "../errors/errors";
-import { HttpClientError } from "../plugins/http-client/http-client.error";
+import { HttpClientError, HttpRequestError } from "../plugins/http-client/http-client.error";
 
 const getCacheKeyHash = (prefix: string, object: object): string => {
   return sha256(prefix + JSON.stringify(object)).toString();
@@ -9,8 +9,9 @@ const getCacheKeyHash = (prefix: string, object: object): string => {
 
 const castToError = (err: any): GatewayError => {
   if (err instanceof GatewayError) return err;
-  if (HttpClientError.isHttpClientError(err)) return new GatewayError(err.message as string);
-  if (err instanceof Error) return new GatewayError(err.message as string);
+  if (HttpClientError.isHttpClientError(err)) return new GatewayError(err.message);
+  if (HttpRequestError.isHttpRequestError(err)) return new GatewayError(err.message, err.cause.status, err.cause.data);
+  if (err instanceof Error) return new GatewayError(err.message);
   return new GatewayError(err);
 };
 

@@ -82,6 +82,7 @@ async function handleCompleteChat(
         providerRequest.url,
         providerRequest.data,
         providerRequest.headers,
+        undefined,
         handlerTelemetryContext
       );
       const latencyInMs = Date.now() - now;

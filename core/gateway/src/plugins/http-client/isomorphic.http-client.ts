@@ -7,7 +7,7 @@ import { z } from "zod";
 import { LoggerManager } from "../../plugins";
 import { TelemetryManager } from "../../plugins/telemetry";
 import { HttpClientError, HttpRequestError } from "./http-client.error";
-import { HttpClient, HttpClientResponse } from "./http-client.interface";
+import { HttpClient, HttpClientOptions, HttpClientResponse } from "./http-client.interface";
 
 const convertHeadersToRecord = (headers: any): Record<string, string> => {
   const headerRecord: Record<string, string> = {};
@@ -81,58 +81,103 @@ class IsomorphicHttpClient implements HttpClient {
     url: string,
     dataOrParams: Record<string, unknown>,
     additionalConfig: AxiosRequestConfig = {},
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>> {
     const logger = LoggerManager.getLogger();
-    const _makeRequest = async <T>(span?: Span): Promise<HttpClientResponse<T>> => {
-      try {
-        const config: AxiosRequestConfig = {
-          ...(method === "get" || method === "delete" ? { params: dataOrParams } : { data: dataOrParams }),
-          ...additionalConfig,
-          timeout: this.defaultTimeout,
-          ...(this.enableProxyAgent
-            ? {
-                httpAgent: this.httpProxyAgent,
-                httpsAgent: this.httpsProxyAgent,
-              }
-            : {}),
-        };
 
-        if (method === "get" || method === "delete") {
-          const resp = await this.client[method]<T>(url, config);
-          span?.setStatus({ code: SpanStatusCode.OK, message: "request successful" });
-          const response = {
-            data: resp.data,
-            headers: convertHeadersToRecord(resp.headers),
-            status: {
-              code: resp.status,
-              text: resp.statusText,
-            },
+    const _makeRequest = async <T>(span?: Span): Promise<HttpClientResponse<T>> => {
+      const executeRequest = async (): Promise<HttpClientResponse<T>> => {
+        try {
+          const config: AxiosRequestConfig = {
+            ...(method === "get" || method === "delete" ? { params: dataOrParams } : { data: dataOrParams }),
+            ...additionalConfig,
+            timeout: this.defaultTimeout,
+            ...(this.enableProxyAgent
+              ? {
+                  httpAgent: this.httpProxyAgent,
+                  httpsAgent: this.httpsProxyAgent,
+                }
+              : {}),
           };
-          logger?.debug("IsomorphicHttpClient.makeRequest response: ", response);
-          return response;
-        } else {
-          const resp = await this.client[method]<T>(url, config.data, {
-            ...config,
-            params: config.params,
-          });
-          span?.setStatus({ code: SpanStatusCode.OK, message: "request successful" });
-          const response = {
-            data: resp.data,
-            headers: convertHeadersToRecord(resp.headers),
-            status: {
-              code: resp.status,
-              text: resp.statusText,
-            },
-          };
-          logger?.debug("IsomorphicHttpClient.makeRequest response: ", response);
-          return response;
+
+          if (method === "get" || method === "delete") {
+            const resp = await this.client[method]<T>(url, config);
+            const response = {
+              data: resp.data,
+              headers: convertHeadersToRecord(resp.headers),
+              status: {
+                code: resp.status,
+                text: resp.statusText,
+              },
+            };
+            logger?.debug("IsomorphicHttpClient.makeRequest response: ", response);
+            return response;
+          } else {
+            const resp = await this.client[method]<T>(url, config.data, {
+              ...config,
+              params: config.params,
+            });
+            const response = {
+              data: resp.data,
+              headers: convertHeadersToRecord(resp.headers),
+              status: {
+                code: resp.status,
+                text: resp.statusText,
+              },
+            };
+            logger?.debug("IsomorphicHttpClient.makeRequest response: ", response);
+            return response;
+          }
+        } catch (error) {
+          logger?.warn("IsomorphicHttpClient.makeRequest error: ", error);
+          if (axios.isAxiosError(error)) throw axiosToHttpRequestError(error);
+          throw new HttpClientError({ info: "An unexpected error occurred", cause: error });
         }
+      };
+
+      try {
+        // If no retry configuration, execute once
+        if (!options?.retry) {
+          const result = await executeRequest();
+          span?.setStatus({ code: SpanStatusCode.OK, message: "request successful" });
+          return result;
+        }
+
+        // Retry logic with exponential backoff
+        const retryConfig = options.retry;
+        let lastError: any;
+
+        for (let attempt = 1; attempt <= retryConfig.maxAttempts; attempt++) {
+          try {
+            const result = await executeRequest();
+            // If successful, return the result
+            span?.setStatus({ code: SpanStatusCode.OK, message: "request successful" });
+            return result;
+          } catch (error) {
+            lastError = error;
+            logger?.warn(`IsomorphicHttpClient.makeRequest attempt ${attempt} failed: `, error);
+
+            // If this is the last attempt, don't wait and throw the error
+            if (attempt === retryConfig.maxAttempts) {
+              break;
+            }
+
+            // Calculate delay with exponential backoff
+            const delay = retryConfig.initialDelay * Math.pow(retryConfig.exponentialFactor, attempt - 1);
+            logger?.debug(`IsomorphicHttpClient.makeRequest retrying after ${delay}ms (attempt ${attempt}/${retryConfig.maxAttempts})`);
+
+            // Wait before retrying
+            await new Promise((resolve) => setTimeout(resolve, delay));
+          }
+        }
+
+        // If we get here, all attempts failed
+        span?.setStatus({ code: SpanStatusCode.ERROR, message: "request failed after all retry attempts" });
+        throw lastError;
       } catch (error) {
-        logger?.warn("IsomorphicHttpClient.makeRequest error: ", error);
         span?.setStatus({ code: SpanStatusCode.ERROR, message: "request failed" });
-        if (axios.isAxiosError(error)) throw axiosToHttpRequestError(error);
-        throw new HttpClientError({ info: "An unexpected error occurred", cause: error });
+        throw error;
       } finally {
         span?.end();
       }
@@ -152,7 +197,6 @@ class IsomorphicHttpClient implements HttpClient {
     });
   }
 
-  // TODO: needs testing for with context and without context
   async *stream<T>(
     url: string,
     method: "get" | "post",
@@ -287,55 +331,60 @@ class IsomorphicHttpClient implements HttpClient {
     url: string,
     params?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>> {
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient.GET request to ${url}`, { params, headers });
-    return this.makeRequest<T>("get", url, params || {}, { headers }, telemetryContext);
+    return this.makeRequest<T>("get", url, params || {}, { headers }, options, telemetryContext);
   }
 
   async post<T>(
     url: string,
     data?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>> {
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient.POST request to ${url}`, { data, headers });
-    return this.makeRequest<T>("post", url, data || {}, { headers }, telemetryContext);
+    return this.makeRequest<T>("post", url, data || {}, { headers }, options, telemetryContext);
   }
 
   async put<T>(
     url: string,
     data?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>> {
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient.PUT request to ${url}`, { data, headers });
-    return this.makeRequest<T>("put", url, data || {}, { headers }, telemetryContext);
+    return this.makeRequest<T>("put", url, data || {}, { headers }, options, telemetryContext);
   }
 
   async delete<T>(
     url: string,
     params?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>> {
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient.DELETE request to ${url}`, { params, headers });
-    return this.makeRequest<T>("delete", url, params || {}, { headers }, telemetryContext);
+    return this.makeRequest<T>("delete", url, params || {}, { headers }, options, telemetryContext);
   }
 
   async patch<T>(
     url: string,
     data?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>> {
     const logger = LoggerManager.getLogger();
     logger?.debug(`IsomorphicHttpClient.PATCH request to ${url}`, { data, headers });
-    return this.makeRequest<T>("patch", url, data || {}, { headers }, telemetryContext);
+    return this.makeRequest<T>("patch", url, data || {}, { headers }, options, telemetryContext);
   }
 }
 
