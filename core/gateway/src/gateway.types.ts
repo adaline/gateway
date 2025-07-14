@@ -2,7 +2,7 @@ import { Meter, Tracer } from "@opentelemetry/api";
 import { z } from "zod";
 
 import { ChatModelV1, EmbeddingModelV1 } from "@adaline/provider";
-import { ChatModelPriceType, ChatUsageType, Config, EmbeddingRequests, Message, Tool, ToolCallContent } from "@adaline/types";
+import { ChatModelPriceType, ChatUsageType, Config, EmbeddingRequests, Message, Tool } from "@adaline/types";
 
 import {
   CompleteChatCallbackType,
@@ -129,7 +129,6 @@ const GatewayGetChatUsageCostRequest = z
 type GatewayGetChatUsageCostRequestType = z.infer<typeof GatewayGetChatUsageCostRequest>;
 
 const GatewayGetToolResponsesRequestOptions = z.object({
-  enableCache: z.boolean().optional().default(true),
   customHeaders: z.record(z.string()).optional(),
   metadataForCallbacks: z.any().optional(),
 });
@@ -137,7 +136,7 @@ type GatewayGetToolResponsesRequestOptionsType = z.infer<typeof GatewayGetToolRe
 
 const GatewayGetToolResponsesRequest = z.object({
   tools: z.array(Tool()),
-  toolCalls: z.array(ToolCallContent()),
+  messages: z.array(Message()),
   options: GatewayGetToolResponsesRequestOptions.optional(),
   abortSignal: z.instanceof(AbortSignal).optional(),
 });

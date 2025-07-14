@@ -414,10 +414,9 @@ class Gateway {
       return await context.with(activeContext, async () => {
         return handleGetToolResponses(
           {
-            cache: this.caches.getToolResponses,
+            // cache: this.caches.getToolResponses,
             tools: data.tools,
-            toolCalls: data.toolCalls,
-            enableCache: data.options?.enableCache ?? true,
+            messages: data.messages,
             customHeaders: data.options?.customHeaders,
             callbacks: this.options.getToolResponsesCallbacks,
             metadataForCallbacks: data.options?.metadataForCallbacks,

@@ -82,6 +82,7 @@ async function handleGetEmbeddings(
         providerRequest.url,
         providerRequest.data,
         providerRequest.headers,
+        undefined,
         handlerTelemetryContext
       );
       const latencyInMs = Date.now() - now;

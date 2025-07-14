@@ -601,23 +601,23 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       });
     }
 
-    const getNextExpectedRoles = (role: string): string[] => {
-      if (role === this.modelSchema.roles[UserRoleLiteral] || role === this.modelSchema.roles[ToolRoleLiteral]) {
-        return [this.modelSchema.roles[AssistantRoleLiteral] as string];
-      }
-      return [this.modelSchema.roles[UserRoleLiteral] as string, this.modelSchema.roles[ToolRoleLiteral] as string];
-    };
+    // const getNextExpectedRoles = (role: string): string[] => {
+    //   if (role === this.modelSchema.roles[UserRoleLiteral] || role === this.modelSchema.roles[ToolRoleLiteral]) {
+    //     return [this.modelSchema.roles[AssistantRoleLiteral] as string];
+    //   }
+    //   return [this.modelSchema.roles[UserRoleLiteral] as string, this.modelSchema.roles[ToolRoleLiteral] as string];
+    // };
 
-    for (let i = 1; i < nonSystemMessages.length; i++) {
-      if (!getNextExpectedRoles(nonSystemMessages[i - 1].role).includes(nonSystemMessages[i].role)) {
-        throw new InvalidMessagesError({
-          info: `Invalid message format for model : ${this.modelName}`,
-          cause: new Error(
-            `model : '${this.modelName}' cannot have message with role : '${nonSystemMessages[i].role}' after message with role : '${nonSystemMessages[i - 1].role}'`
-          ),
-        });
-      }
-    }
+    // for (let i = 1; i < nonSystemMessages.length; i++) {
+    //   if (!getNextExpectedRoles(nonSystemMessages[i - 1].role).includes(nonSystemMessages[i].role)) {
+    //     throw new InvalidMessagesError({
+    //       info: `Invalid message format for model : ${this.modelName}`,
+    //       cause: new Error(
+    //         `model : '${this.modelName}' cannot have message with role : '${nonSystemMessages[i].role}' after message with role : '${nonSystemMessages[i - 1].role}'`
+    //       ),
+    //     });
+    //   }
+    // }
 
     if (
       nonSystemMessages[nonSystemMessages.length - 1].role !== this.modelSchema.roles[UserRoleLiteral] &&

@@ -40,6 +40,7 @@ async function handleProxyGetEmbeddings(
         sanitizedProviderRequest.url,
         sanitizedProviderRequest.data,
         sanitizedProviderRequest.headers,
+        undefined,
         handlerTelemetryContext
       );
       logger?.debug("handleProxyGetEmbeddings providerResponse: ", { providerResponse });

@@ -1,35 +1,11 @@
-// import { JSONSchema7 } from "json-schema";
-// import { Validator } from "jsonschema";
 import { z } from "zod";
 
 const FunctionToolLiteral = "function" as const;
-
-// TODO: fix 'name' property not allowed in JSONSchema7
-// const FunctionTool = z.object({
-//   type: z.literal(FunctionToolLiteral),
-//   definition: z.object({
-//     schema: z.object({}).refine((schema) => {
-//       const validator = new Validator();
-//       return validator.validate(schema, { type: "object" }).valid;
-//     }),
-//   }),
-//   callback: z.function().args(z.string().min(0)).returns(z.promise(z.any())).optional(),
-// });
-
-// const FunctionTool = z.object({
-//   type: z.literal(FunctionToolLiteral),
-//   definition: z.object({
-//     schema: z.object({}),
-//   }),
-//   callback: z.function().args(z.string().min(0)).returns(z.promise(z.any())).optional(),
-// });
-// type FunctionToolType = z.infer<typeof FunctionTool>;
 
 const FunctionParameterTypes = ["object", "array", "number", "string", "boolean", "null"];
 const FunctionParameterTypesLiteral = z.enum(["object", "array", "number", "string", "boolean", "null"]);
 type FunctionParameterTypesType = z.infer<typeof FunctionParameterTypesLiteral>;
 
-// TODO: make a proper fix here
 const FunctionParameter = z.object({
   anyOf: z.array(z.any()).optional(),
   type: FunctionParameterTypesLiteral.optional(),
@@ -73,28 +49,33 @@ const ToolTypes = ["function"];
 const ToolTypesLiteral = z.enum(["function"]);
 type ToolTypesType = z.infer<typeof ToolTypesLiteral>;
 
+const ApiRetrySettings = z.object({
+  maxAttempts: z.number().int().positive(),
+  initialDelay: z.number().int().positive(),
+  exponentialFactor: z.number().int().positive(),
+});
+
 const HttpRequestSettings = z.object({
   type: z.literal("http"),
   method: z.enum(["get", "post"]),
   url: z.string().url(),
+  proxyUrl: z.string().url().optional(),
   headers: z.record(z.string()).optional(),
   query: z.record(z.string()).optional(),
   body: z.record(z.any()).optional(),
+  retry: ApiRetrySettings.optional(),
 });
 
-const RequestSettings = z.discriminatedUnion("type", [HttpRequestSettings]);
+const ApiSettings = z.discriminatedUnion("type", [HttpRequestSettings]);
 
 const FunctionTool = z.object({
   type: ToolTypesLiteral,
   definition: z.object({
-    schema: Function, // TODO: convert to union with more tool types
+    schema: Function,
   }),
-  requestSettings: RequestSettings.optional(),
+  apiSettings: ApiSettings.optional(),
 });
 type FunctionToolType = z.infer<typeof FunctionTool>;
-
-// const Tools = z.array(Tool).nonempty().optional();
-// type ToolsType = z.infer<typeof Tools>;
 
 export {
   Function,
@@ -103,7 +84,8 @@ export {
   FunctionParameterTypes,
   FunctionParameterTypesLiteral,
   HttpRequestSettings,
-  RequestSettings,
+  ApiSettings,
+  ApiRetrySettings,
   ToolTypes,
   ToolTypesLiteral,
   type FunctionParametersType,
