@@ -1,5 +1,13 @@
 import { Context } from "@opentelemetry/api";
 
+type HttpClientOptions = {
+  retry?: {
+    maxAttempts: number;
+    initialDelay: number;
+    exponentialFactor: number;
+  };
+};
+
 interface HttpClient {
   stream<T>(
     url: string,
@@ -15,30 +23,35 @@ interface HttpClient {
     url: string,
     params?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>>;
   post<T>(
     url: string,
     data?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>>;
   put<T>(
     url: string,
     data?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>>;
   delete<T>(
     url: string,
     params?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>>;
   patch<T>(
     url: string,
     data?: Record<string, unknown>,
     headers?: Record<string, string | undefined>,
+    options?: HttpClientOptions,
     telemetryContext?: Context
   ): Promise<HttpClientResponse<T>>;
 }
@@ -52,4 +65,4 @@ interface HttpClientResponse<T> {
   };
 }
 
-export { type HttpClient, type HttpClientResponse };
+export { type HttpClient, type HttpClientOptions, type HttpClientResponse };
