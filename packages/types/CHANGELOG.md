@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.3.0
+
+### Minor Changes
+
+- 84a5ff4: support auto tool calls with custom tool api, proxy routing, telemetry, etc.
+
 ## 1.2.0
 
 ### Minor Changes

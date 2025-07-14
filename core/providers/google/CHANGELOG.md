@@ -1,5 +1,13 @@
 # @adaline/google
 
+## 1.3.1
+
+### Patch Changes
+
+- Updated dependencies [84a5ff4]
+  - @adaline/types@1.3.0
+  - @adaline/provider@1.2.1
+
 ## 1.3.0
 
 ### Minor Changes

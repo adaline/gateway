@@ -1,5 +1,12 @@
 # @adaline/provider
 
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [84a5ff4]
+  - @adaline/types@1.3.0
+
 ## 1.2.0
 
 ### Minor Changes
