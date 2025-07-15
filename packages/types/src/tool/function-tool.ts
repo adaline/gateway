@@ -59,10 +59,11 @@ const HttpRequestSettings = z.object({
   type: z.literal("http"),
   method: z.enum(["get", "post"]),
   url: z.string().url(),
-  proxyUrl: z.string().url().optional(),
   headers: z.record(z.string()).optional(),
   query: z.record(z.string()).optional(),
   body: z.record(z.any()).optional(),
+  proxyUrl: z.string().url().optional(),
+  proxyHeaders: z.record(z.string()).optional(),
   retry: ApiRetrySettings.optional(),
 });
 

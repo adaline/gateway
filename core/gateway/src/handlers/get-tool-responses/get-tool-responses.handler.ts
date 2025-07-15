@@ -82,10 +82,7 @@ async function handleGetToolResponses(
 
               let response;
               const url = apiSettings.url;
-              const headers = {
-                ...apiSettings.headers,
-                "Content-Type": "application/json",
-              }
+              const headers = apiSettings.headers || {};
 
               if (apiSettings.proxyUrl) {
                 // encapsulate the original request for the proxy request
@@ -95,12 +92,10 @@ async function handleGetToolResponses(
                     method: apiSettings.method,
                     url,
                     headers,
-                    ...(apiSettings.method === "get" ? { query: queryParams } : {}),
+                    ...(apiSettings.method === "get" ? { params: queryParams } : {}),
                     ...(apiSettings.method === "post" ? { body } : {}),
                   },
-                  {
-                    "Content-Type": "application/json",
-                  },
+                  apiSettings.proxyHeaders,
                   { retry: retrySettings },
                   handlerTelemetryContext
                 );
