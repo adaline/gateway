@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.4.0
+
+### Minor Changes
+
+- 239ebe7: Add proxyHeaders in tools for routing get responses request via a proxy
+
 ## 1.3.0
 
 ### Minor Changes
