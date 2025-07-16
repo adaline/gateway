@@ -42,12 +42,13 @@ async function handleGetToolResponses(
 
       const toolCallPromises = toolCalls.map(async (toolCall) => {
         const tool = tools.find((t) => t.definition.schema.name === toolCall.name);
-        if (!tool?.apiSettings || tool.apiSettings.type !== "http") {
+        if (!tool?.request || tool.request.type !== "http") {
           return null;
         }
 
-        const apiSettings = tool.apiSettings;
-        const retrySettings = apiSettings.retry || {
+        const requestSettings = tool.request;
+        const requestMethod = requestSettings.method.toLowerCase();
+        const retrySettings = requestSettings.retry || {
           maxAttempts: 3,
           initialDelay: 1000,
           exponentialFactor: 2,
@@ -68,7 +69,7 @@ async function handleGetToolResponses(
               let body: Record<string, unknown> | undefined;
               try {
                 const bodyOrQuery = JSON.parse(toolCall.arguments);
-                if (apiSettings.method === "get") {
+                if (requestMethod === "get") {
                   queryParams = bodyOrQuery as Record<string, string>;
                 } else {
                   body = bodyOrQuery as Record<string, unknown>;
@@ -81,26 +82,31 @@ async function handleGetToolResponses(
               }
 
               let response;
-              const url = apiSettings.url;
-              const headers = apiSettings.headers || {};
+              const url = requestSettings.url;
+              const headers = {
+                ...requestSettings.headers,
+                "Content-Type": "application/json",
+              }
 
-              if (apiSettings.proxyUrl) {
+              if (requestSettings.proxyUrl) {
                 // encapsulate the original request for the proxy request
                 response = await client.post(
-                  apiSettings.proxyUrl,
+                  requestSettings.proxyUrl,
                   {
-                    method: apiSettings.method,
+                    method: requestMethod,
                     url,
                     headers,
-                    ...(apiSettings.method === "get" ? { params: queryParams } : {}),
-                    ...(apiSettings.method === "post" ? { body } : {}),
+                    ...(requestMethod === "get" ? { query: queryParams } : {}),
+                    ...(requestMethod === "post" ? { body } : {}),
                   },
-                  apiSettings.proxyHeaders,
+                  {
+                    "Content-Type": "application/json",
+                  },
                   { retry: retrySettings },
                   handlerTelemetryContext
                 );
               } else {
-                if (apiSettings.method === "get") {
+                if (requestMethod === "get") {
                   response = await client.get(
                     url,
                     queryParams,
@@ -108,7 +114,7 @@ async function handleGetToolResponses(
                     { retry: retrySettings },
                     handlerTelemetryContext
                   );
-                } else if (apiSettings.method === "post") {
+                } else if (requestMethod === "post") {
                   response = await client.post(
                     url,
                     body,
@@ -117,7 +123,7 @@ async function handleGetToolResponses(
                     handlerTelemetryContext
                   );
                 } else {
-                  throw new GatewayError(`Unsupported HTTP method: ${apiSettings.method}`, 400);
+                  throw new GatewayError(`Unsupported HTTP method: ${requestSettings.method}`, 400);
                 }
               }
               span.setStatus({ code: SpanStatusCode.OK });

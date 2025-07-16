@@ -49,13 +49,13 @@ const ToolTypes = ["function"];
 const ToolTypesLiteral = z.enum(["function"]);
 type ToolTypesType = z.infer<typeof ToolTypesLiteral>;
 
-const ApiRetrySettings = z.object({
+const FunctionRequestRetry = z.object({
   maxAttempts: z.number().int().positive(),
   initialDelay: z.number().int().positive(),
   exponentialFactor: z.number().int().positive(),
 });
 
-const HttpRequestSettings = z.object({
+const FunctionRequestHttp = z.object({
   type: z.literal("http"),
   method: z.enum(["get", "post"]),
   url: z.string().url(),
@@ -64,17 +64,17 @@ const HttpRequestSettings = z.object({
   body: z.record(z.any()).optional(),
   proxyUrl: z.string().url().optional(),
   proxyHeaders: z.record(z.string()).optional(),
-  retry: ApiRetrySettings.optional(),
+  retry: FunctionRequestRetry.optional(),
 });
 
-const ApiSettings = z.discriminatedUnion("type", [HttpRequestSettings]);
+const FunctionRequest = z.discriminatedUnion("type", [FunctionRequestHttp]);
 
 const FunctionTool = z.object({
   type: ToolTypesLiteral,
   definition: z.object({
     schema: Function,
   }),
-  apiSettings: ApiSettings.optional(),
+  request: FunctionRequest.optional(),
 });
 type FunctionToolType = z.infer<typeof FunctionTool>;
 
@@ -84,9 +84,9 @@ export {
   FunctionParameters,
   FunctionParameterTypes,
   FunctionParameterTypesLiteral,
-  HttpRequestSettings,
-  ApiSettings,
-  ApiRetrySettings,
+  FunctionRequestHttp,
+  FunctionRequest,
+  FunctionRequestRetry,
   ToolTypes,
   ToolTypesLiteral,
   type FunctionParametersType,
