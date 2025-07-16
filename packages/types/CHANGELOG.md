@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.5.0
+
+### Minor Changes
+
+- c7af267: Update schema for tool request
+
 ## 1.4.0
 
 ### Minor Changes
