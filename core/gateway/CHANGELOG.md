@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.6.0
+
+### Minor Changes
+
+- 60cf332: Add proxyHeaders for proxy get-tool-responses
+
 ## 1.5.0
 
 ### Minor Changes
