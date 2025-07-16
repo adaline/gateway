@@ -99,9 +99,7 @@ async function handleGetToolResponses(
                     ...(requestMethod === "get" ? { query: queryParams } : {}),
                     ...(requestMethod === "post" ? { body } : {}),
                   },
-                  {
-                    "Content-Type": "application/json",
-                  },
+                  requestSettings.proxyHeaders,
                   { retry: retrySettings },
                   handlerTelemetryContext
                 );
