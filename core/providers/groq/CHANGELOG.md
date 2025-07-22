@@ -1,5 +1,11 @@
 # @adaline/groq
 
+## 1.3.0
+
+### Minor Changes
+
+- 3dfe48c: add latest gemini, groq models, remove deprecated ones
+
 ## 1.2.4
 
 ### Patch Changes

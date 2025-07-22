@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.4.0
+
+### Minor Changes
+
+- 3dfe48c: add latest gemini, groq models, remove deprecated ones
+
 ## 1.3.3
 
 ### Patch Changes
