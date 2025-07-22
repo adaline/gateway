@@ -74,6 +74,16 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini2_5ProPreview0325Options,
       modelSchema: Models.Gemini2_5ProPreview0325Schema,
     },
+    [Models.Gemini2_5FlashLiteral]: {
+      model: Models.Gemini2_5Flash,
+      modelOptions: Models.Gemini2_5FlashOptions,
+      modelSchema: Models.Gemini2_5FlashSchema,
+    },
+    [Models.Gemini2_5ProLiteral]: {
+      model: Models.Gemini2_5Pro,
+      modelOptions: Models.Gemini2_5ProOptions,
+      modelSchema: Models.Gemini2_5ProSchema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<

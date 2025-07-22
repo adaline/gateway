@@ -23,45 +23,35 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Gemma2_9b_ITOptions,
       modelSchema: Models.Gemma2_9b_ITSchema,
     },
-    [Models.LlamaGuard_3_8bLiteral]: {
-      model: Models.LlamaGuard_3_8b,
-      modelOptions: Models.LlamaGuard_3_8bOptions,
-      modelSchema: Models.LlamaGuard_3_8bSchema,
-    },
-    [Models.Llama_3_8bLiteral]: {
-      model: Models.Llama_3_8b,
-      modelOptions: Models.Llama_3_8bOptions,
-      modelSchema: Models.Llama_3_8bSchema,
-    },
-    [Models.Llama_3_70bLiteral]: {
-      model: Models.Llama_3_70b,
-      modelOptions: Models.Llama_3_70bOptions,
-      modelSchema: Models.Llama_3_70bSchema,
-    },
     [Models.Llama_3_1_8bLiteral]: {
       model: Models.Llama_3_1_8b,
       modelOptions: Models.Llama_3_1_8b_Options,
       modelSchema: Models.Llama_3_1_8bSchema,
     },
-    [Models.Llama_3_2_11b_VisionLiteral]: {
-      model: Models.Llama_3_2_11b_Vision,
-      modelOptions: Models.Llama_3_2_11b_VisionOptions,
-      modelSchema: Models.Llama_3_2_11b_VisionSchema,
+    [Models.Llama_3_3_70b_VersatileLiteral]: {
+      model: Models.Llama_3_3_70b_Versatile,
+      modelOptions: Models.Llama_3_3_70b_Versatile_Options,
+      modelSchema: Models.Llama_3_3_70b_VersatileSchema,
     },
-    [Models.Llama_3_2_90b_VisionLiteral]: {
-      model: Models.Llama_3_2_90b_Vision,
-      modelOptions: Models.Llama_3_2_90b_VisionOptions,
-      modelSchema: Models.Llama_3_2_90b_VisionSchema,
+    [Models.Llama_Guard_4_12bLiteral]: {
+      model: Models.Llama_Guard_4_12b,
+      modelOptions: Models.Llama_Guard_4_12b_Options,
+      modelSchema: Models.Llama_Guard_4_12bSchema,
     },
-    [Models.Llama_3_2_3bLiteral]: {
-      model: Models.Llama_3_2_3b,
-      modelOptions: Models.Llama_3_2_3b_Options,
-      modelSchema: Models.Llama_3_2_3bSchema,
+    [Models.Qwen3_32bLiteral]: {
+      model: Models.Qwen3_32b,
+      modelOptions: Models.Qwen3_32b_Options,
+      modelSchema: Models.Qwen3_32bSchema,
     },
-    [Models.Llama_3_2_1bLiteral]: {
-      model: Models.Llama_3_2_1b,
-      modelOptions: Models.Llama_3_2_1b_Options,
-      modelSchema: Models.Llama_3_2_1bSchema,
+    [Models.Deepseek_R1_Distill_Llama_70bLiteral]: {
+      model: Models.Deepseek_R1_Distill_Llama_70b,
+      modelOptions: Models.Deepseek_R1_Distill_Llama_70b_Options,
+      modelSchema: Models.Deepseek_R1_Distill_Llama_70bSchema,
+    },
+    [Models.Kimi_K2_InstructLiteral]: {
+      model: Models.Kimi_K2_Instruct,
+      modelOptions: Models.Kimi_K2_Instruct_Options,
+      modelSchema: Models.Kimi_K2_InstructSchema,
     },
   };
 
