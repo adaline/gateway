@@ -1,5 +1,11 @@
 # @adaline/groq
 
+## 1.4.0
+
+### Minor Changes
+
+- 74c55f1: Add Llama 4 Maverick and Scout models to Groq provider
+
 ## 1.3.0
 
 ### Minor Changes
