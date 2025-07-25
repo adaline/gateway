@@ -222,5 +222,37 @@
         }
       }
     ]
+  },
+  "meta-llama/llama-4-maverick-17b-128e-instruct": {
+    "modelName": "meta-llama/llama-4-maverick-17b-128e-instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.2,
+            "outputPricePerMillion": 0.6
+          }
+        }
+      }
+    ]
+  },
+  "meta-llama/llama-4-scout-17b-16e-instruct": {
+    "modelName": "meta-llama/llama-4-scout-17b-16e-instruct",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.11,
+            "outputPricePerMillion": 0.34
+          }
+        }
+      }
+    ]
   }
 }

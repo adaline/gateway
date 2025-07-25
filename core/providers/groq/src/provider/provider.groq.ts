@@ -53,6 +53,16 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Kimi_K2_Instruct_Options,
       modelSchema: Models.Kimi_K2_InstructSchema,
     },
+    [Models.Llama_4_Maverick_17b_128e_InstructLiteral]: {
+      model: Models.Llama_4_Maverick_17b_128e_Instruct,
+      modelOptions: Models.Llama_4_Maverick_17b_128e_Instruct_Options,
+      modelSchema: Models.Llama_4_Maverick_17b_128e_InstructSchema,
+    },
+    [Models.Llama_4_Scout_17b_16e_InstructLiteral]: {
+      model: Models.Llama_4_Scout_17b_16e_Instruct,
+      modelOptions: Models.Llama_4_Scout_17b_16e_Instruct_Options,
+      modelSchema: Models.Llama_4_Scout_17b_16e_InstructSchema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<
