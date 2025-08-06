@@ -1,5 +1,7 @@
 export * from "./base-chat-model.groq";
 export * from "./gemma2-9b-it.groq";
+export * from "./gpt-oss-20b.groq";
+export * from "./gpt-oss-120b.groq";
 export * from "./llama-3-1-8b.groq";
 export * from "./llama-3-3-70b-versatile.groq";
 export * from "./llama-guard-4-12b.groq";
