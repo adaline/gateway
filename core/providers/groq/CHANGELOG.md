@@ -1,5 +1,11 @@
 # @adaline/groq
 
+## 1.5.0
+
+### Minor Changes
+
+- 6c34df9: Add GPT-OSS 20B and 120B models to Groq provider
+
 ## 1.4.0
 
 ### Minor Changes
