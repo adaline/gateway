@@ -63,6 +63,26 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_4_1_NanoOptions,
       modelSchema: Models.GPT_4_1_NanoSchema,
     },
+    [Models.GPT_5Literal]: {
+      model: Models.GPT_5,
+      modelOptions: Models.GPT_5Options,
+      modelSchema: Models.GPT_5Schema,
+    },
+    [Models.GPT_5_MiniLiteral]: {
+      model: Models.GPT_5_Mini,
+      modelOptions: Models.GPT_5_MiniOptions,
+      modelSchema: Models.GPT_5_MiniSchema,
+    },
+    [Models.GPT_5_NanoLiteral]: {
+      model: Models.GPT_5_Nano,
+      modelOptions: Models.GPT_5_NanoOptions,
+      modelSchema: Models.GPT_5_NanoSchema,
+    },
+    [Models.GPT_5_ChatLatestLiteral]: {
+      model: Models.GPT_5_ChatLatest,
+      modelOptions: Models.GPT_5_ChatLatestOptions,
+      modelSchema: Models.GPT_5_ChatLatestSchema,
+    },
     [Models.GPT_4_Turbo_2024_04_09Literal]: {
       model: Models.GPT_4_Turbo_2024_04_09,
       modelOptions: Models.GPT_4_Turbo_2024_04_09Options,
