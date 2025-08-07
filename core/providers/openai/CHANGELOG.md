@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.6.0
+
+### Minor Changes
+
+- c02e3f3: Add GPT-5 model family support (gpt-5, gpt-5-mini, gpt-5-nano, gpt-5-chat-latest)
+
 ## 1.5.3
 
 ### Patch Changes
