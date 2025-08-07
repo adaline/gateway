@@ -414,5 +414,69 @@
         }
       }
     ]
+  },
+  "gpt-5": {
+    "modelName": "gpt-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.25,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5-mini": {
+    "modelName": "gpt-5-mini",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.25,
+            "outputPricePerMillion": 2.0
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5-nano": {
+    "modelName": "gpt-5-nano",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.05,
+            "outputPricePerMillion": 0.4
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5-chat-latest": {
+    "modelName": "gpt-5-chat-latest",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.25,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
   }
 }
