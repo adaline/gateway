@@ -3,11 +3,13 @@ import { z } from "zod";
 import {
   ChatModelSchemaType,
   ChatModelV1,
+  convertBase64ToUint8Array,
   HeadersType,
   InvalidConfigError,
   InvalidMessagesError,
   InvalidModelRequestError,
   InvalidToolsError,
+  isRunningInBrowser,
   ModelResponseError,
   ParamsType,
   removeUndefinedEntries,
@@ -126,14 +128,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
   private async transformPdfMessages(messages: MessageType[]): Promise<MessageType[]> {
     // Helper method to download a PDF from a URL
-    const downloadPdf = async (url: string): Promise<Buffer> => {
+    const downloadPdf = async (url: string): Promise<Uint8Array> => {
       // TODO: ideally use the isomorphic http client here but it's not available in the provider package, only in the gateway package.
       // TODO: currently using fetch since it'll work in the browser and node.js (v18+) for this simple use case.
-      const response = await fetch(url, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; GoogleFilesAPI/1.0)",
-        },
-      });
+      const headers: Record<string, string> = {};
+      if (!isRunningInBrowser()) {
+        headers["User-Agent"] = "Mozilla/5.0 (compatible; GoogleFilesAPI/1.0)";
+      }
+      const response = await fetch(url, { headers });
 
       if (!response.ok) {
         throw new InvalidMessagesError({
@@ -143,7 +145,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
 
       const arrayBuffer = await response.arrayBuffer();
-      return Buffer.from(arrayBuffer);
+      return new Uint8Array(arrayBuffer);
     };
 
     // Helper method to check if a file exists in Google Files API
@@ -173,7 +175,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     };
 
     // Helper method to upload a PDF to Google Files API
-    const uploadPdfToGoogleFiles = async (pdfBuffer: Buffer, fileName: string): Promise<string> => {
+    const uploadPdfToGoogleFiles = async (pdfBuffer: Uint8Array, fileName: string): Promise<string> => {
       // Start resumable upload
       const uploadResponse = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${this.apiKey}`, {
         method: "POST",
@@ -208,13 +210,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
 
       // Upload the actual file content
+      const uploadHeaders: Record<string, string> = {
+        "X-Goog-Upload-Offset": "0",
+        "X-Goog-Upload-Command": "upload, finalize",
+      };
+      if (!isRunningInBrowser()) {
+        uploadHeaders["Content-Length"] = pdfBuffer.length.toString();
+      }
       const fileUploadResponse = await fetch(uploadUrl, {
         method: "POST",
-        headers: {
-          "Content-Length": pdfBuffer.length.toString(),
-          "X-Goog-Upload-Offset": "0",
-          "X-Goog-Upload-Command": "upload, finalize",
-        },
+        headers: uploadHeaders,
         body: pdfBuffer,
       });
 
@@ -236,22 +241,22 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         return existingFileUri;
       }
 
-      let pdfBuffer: Buffer;
+      let pdfBuffer: Uint8Array;
       if (content.value.type === "url") {
         pdfBuffer = await downloadPdf(content.value.url);
       } else {
         let base64Data = content.value.base64;
         const pdfBase64Prefix = "data:application/pdf;base64,";
         base64Data = base64Data.startsWith(pdfBase64Prefix) ? base64Data.substring(pdfBase64Prefix.length) : base64Data;
-        pdfBuffer = Buffer.from(base64Data, "base64");
+        pdfBuffer = convertBase64ToUint8Array(base64Data);
 
-        const pdfHeader = pdfBuffer.toString("ascii", 0, 4);
-        if (pdfHeader !== "%PDF") {
-          throw new InvalidMessagesError({
-            info: `Base64 content is not a valid PDF. Header: ${pdfHeader}`,
-            cause: new Error(`Expected PDF header '%PDF', got '${pdfHeader}'`),
-          });
-        }
+        // const pdfHeader = String.fromCharCode(pdfBuffer[0] ?? 0, pdfBuffer[1] ?? 0, pdfBuffer[2] ?? 0, pdfBuffer[3] ?? 0);
+        // if (pdfHeader !== "%PDF") {
+        //   throw new InvalidMessagesError({
+        //     info: `Base64 content is not a valid PDF. Header: ${pdfHeader}`,
+        //     cause: new Error(`Expected PDF header '%PDF', got '${pdfHeader}'`),
+        //   });
+        // }
       }
       return await uploadPdfToGoogleFiles(pdfBuffer, content.providerCacheKey);
     };
