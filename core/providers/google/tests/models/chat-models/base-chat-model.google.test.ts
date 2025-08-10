@@ -76,7 +76,7 @@ describe("BaseChatModel", () => {
     tool: "tool",
   };
   const mockRoles = ["system", "user", "assistant", "tool"] as const;
-  const mockModalities = ["text", "image", "tool-call", "tool-response"] as const;
+  const mockModalities = ["text", "image", "pdf", "tool-call", "tool-response"] as const;
 
   const mockModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
     name: "test-model",
@@ -86,8 +86,8 @@ describe("BaseChatModel", () => {
     roles: mockRolesMap,
     modalities: mockModalities,
     config: {
-      def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 0).def,
-      schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 0).schema,
+      def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95).def,
+      schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95).schema,
     },
   });
 
@@ -902,6 +902,111 @@ describe("BaseChatModel", () => {
       };
 
       // Use simple toEqual for direct comparison
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a User message with PDF Base64", () => {
+      const base64DataWithPrefix = "data:application/pdf;base64,JVBERi0xLjQK...";
+      const base64DataWithoutPrefix = "JVBERi0xLjQK...";
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            {
+              modality: "pdf" as const,
+              value: { type: "base64", base64: base64DataWithPrefix },
+              providerCacheKey: "some_pdf.pdf",
+            },
+          ],
+        },
+      ];
+
+      const expected: GoogleChatRequestType = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                inline_data: {
+                  mime_type: "application/pdf",
+                  data: base64DataWithoutPrefix,
+                },
+              },
+            ],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a User message with PDF URL", () => {
+      const pdfUrl = "https://example.com/document.pdf";
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            {
+              modality: "pdf" as const,
+              value: { type: "url", url: pdfUrl },
+              providerCacheKey: "some_pdf.pdf",
+            },
+          ],
+        },
+      ];
+
+      const expected: GoogleChatRequestType = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                file_data: {
+                  mime_type: "application/pdf",
+                  file_uri: pdfUrl,
+                },
+              },
+            ],
+          },
+        ],
+      };
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
+    it("should correctly transform a User message with mixed text and PDF content", () => {
+      const base64DataWithPrefix = "data:application/pdf;base64,JVBERi0xLjQK...";
+      const base64DataWithoutPrefix = "JVBERi0xLjQK...";
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            { modality: TextModalityLiteral, value: "Please analyze this document:" },
+            {
+              modality: "pdf" as const,
+              value: { type: "base64", base64: base64DataWithPrefix },
+              providerCacheKey: "some_pdf.pdf",
+            },
+            { modality: TextModalityLiteral, value: "What are the key points?" },
+          ],
+        },
+      ];
+
+      const expected: GoogleChatRequestType = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: "Please analyze this document:" },
+              {
+                inline_data: {
+                  mime_type: "application/pdf",
+                  data: base64DataWithoutPrefix,
+                },
+              },
+              { text: "What are the key points?" },
+            ],
+          },
+        ],
+      };
       expect(model.transformMessages(messages)).toEqual(expected);
     });
 

@@ -438,6 +438,23 @@ describe("BaseChatModelGroq", () => {
       expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
     });
 
+    it("should throw InvalidMessagesError for PDF modality (not supported by Groq)", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            {
+              modality: "pdf" as const,
+              value: { type: "base64", base64: "JVBERi0xLjQK..." },
+              providerCacheKey: "some_pdf.pdf",
+            },
+          ],
+        },
+      ];
+
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+    });
+
     it("should throw InvalidMessagesError for unsupported role", () => {
       const messages: MessageType[] = [
         {

@@ -307,6 +307,35 @@ describe("BaseChatModelAnthropic", () => {
           content: [{ modality: "audio", value: "some_audio.mp3" }] as any, // audio is not in modalities
         },
       ];
+
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e.info).toBe("Invalid messages");
+      }
+    });
+
+    it("should throw InvalidMessagesError for PDF modality (not supported by Bedrock)", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            {
+              modality: "pdf" as const,
+              value: { type: "base64", base64: "JVBERi0xLjQK..." },
+              providerCacheKey: "some_pdf.pdf",
+            },
+          ],
+        },
+      ];
+
+      try {
+        model.transformMessages(messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(Error);
+        expect(e.info).toBe("Invalid message content for model : 'test-model'");
+      }
     });
 
     it("should throw InvalidMessagesError for unsupported role", () => {
