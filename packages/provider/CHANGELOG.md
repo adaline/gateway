@@ -1,5 +1,12 @@
 # @adaline/provider
 
+## 1.2.4
+
+### Patch Changes
+
+- Updated dependencies [7732146]
+  - @adaline/types@1.6.0
+
 ## 1.2.3
 
 ### Patch Changes

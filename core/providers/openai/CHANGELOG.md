@@ -1,5 +1,17 @@
 # @adaline/openai
 
+## 1.7.0
+
+### Minor Changes
+
+- 7732146: Support PDF modality content, add Google provider support
+
+### Patch Changes
+
+- Updated dependencies [7732146]
+  - @adaline/types@1.6.0
+  - @adaline/provider@1.2.4
+
 ## 1.6.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.6.0
+
+### Minor Changes
+
+- 7732146: Support PDF modality content, add Google provider support
+
 ## 1.5.0
 
 ### Minor Changes
