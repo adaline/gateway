@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.7.0
+
+### Minor Changes
+
+- 349b6d6: Update 'pdf' modality support across Gateway
+
 ## 1.6.0
 
 ### Minor Changes

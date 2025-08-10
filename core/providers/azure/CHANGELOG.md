@@ -1,5 +1,18 @@
 # @adaline/azure
 
+## 1.4.0
+
+### Minor Changes
+
+- 349b6d6: Update 'pdf' modality support across Gateway
+
+### Patch Changes
+
+- Updated dependencies [349b6d6]
+  - @adaline/types@1.7.0
+  - @adaline/provider@1.3.0
+  - @adaline/openai@1.7.1
+
 ## 1.3.0
 
 ### Minor Changes
