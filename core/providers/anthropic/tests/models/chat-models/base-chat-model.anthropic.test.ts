@@ -410,7 +410,7 @@ describe("BaseChatModel", () => {
           content: [
             {
               modality: "pdf" as const,
-              value: { type: "base64", base64: "JVBERi0xLjQK...", mediaType: "pdf" },
+              value: { type: "base64", base64: "JVBERi0xLjQK..." },
             },
           ],
         },

@@ -3,11 +3,9 @@ import { z } from "zod";
 const PdfModalityLiteral = "pdf" as const;
 
 const Base64PdfContentTypeLiteral = "base64" as const;
-const Base64PdfContentMediaTypeLiterals = ["pdf"] as const;
 const Base64PdfContentValue = z.object({
   type: z.literal(Base64PdfContentTypeLiteral),
   base64: z.string(),
-  mediaType: z.enum(Base64PdfContentMediaTypeLiterals),
 });
 type Base64PdfContentValueType = z.infer<typeof Base64PdfContentValue>;
 
@@ -36,7 +34,6 @@ export {
   UrlPdfContentValue,
   UrlPdfContentTypeLiteral,
   Base64PdfContentTypeLiteral,
-  Base64PdfContentMediaTypeLiterals,
   type Base64PdfContentValueType,
   type PdfContentType,
   type PdfContentValueType,

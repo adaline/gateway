@@ -914,7 +914,7 @@ describe("BaseChatModel", () => {
           content: [
             {
               modality: "pdf" as const,
-              value: { type: "base64", base64: base64DataWithPrefix, mediaType: "pdf" },
+              value: { type: "base64", base64: base64DataWithPrefix },
             },
           ],
         },
@@ -980,7 +980,7 @@ describe("BaseChatModel", () => {
             { modality: TextModalityLiteral, value: "Please analyze this document:" },
             {
               modality: "pdf" as const,
-              value: { type: "base64", base64: base64DataWithPrefix, mediaType: "pdf" },
+              value: { type: "base64", base64: base64DataWithPrefix },
             },
             { modality: TextModalityLiteral, value: "What are the key points?" },
           ],

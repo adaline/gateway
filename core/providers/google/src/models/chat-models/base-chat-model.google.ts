@@ -553,7 +553,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   base64Data = stripBase64Prefix(base64Data);
                   userContent.push({
                     inline_data: {
-                      mime_type: `application/${content.value.mediaType}`,
+                      mime_type: "application/pdf",
                       data: base64Data,
                     },
                   });
