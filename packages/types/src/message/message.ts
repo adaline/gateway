@@ -9,21 +9,30 @@ const Message = <
   ICM extends z.ZodTypeAny = z.ZodUndefined,
   CCM extends z.ZodTypeAny = z.ZodUndefined,
   RCM extends z.ZodTypeAny = z.ZodUndefined,
-  MM extends z.ZodTypeAny = z.ZodUndefined,
   RTCM extends z.ZodTypeAny = z.ZodUndefined,
+  PCCM extends z.ZodTypeAny = z.ZodUndefined,
+  MM extends z.ZodTypeAny = z.ZodUndefined,
 >(
   Role: R = RoleEnum as unknown as R,
   TextContentMetadata: TCM = z.undefined() as TCM,
   ImageContentMetadata: ICM = z.undefined() as ICM,
   ToolCallContentMetadata: CCM = z.undefined() as CCM,
   ToolResponseContentMetadata: RCM = z.undefined() as RCM,
+  PdfContentMetadata: PCCM = z.undefined() as PCCM,
+  ReasoningContentMetadata: z.ZodTypeAny = z.undefined() as RTCM,
   MessageMetadata: MM = z.undefined() as MM,
-  ReasoningContentMetadata: z.ZodTypeAny = z.undefined() as RTCM
 ) =>
   z.object({
     role: Role,
     content: z.array(
-      Content(TextContentMetadata, ImageContentMetadata, ToolCallContentMetadata, ToolResponseContentMetadata, ReasoningContentMetadata)
+      Content(
+        TextContentMetadata,
+        ImageContentMetadata,
+        ToolCallContentMetadata,
+        ToolResponseContentMetadata,
+        ReasoningContentMetadata,
+        PdfContentMetadata,
+      )
     ),
     metadata: MessageMetadata,
   });
@@ -33,9 +42,10 @@ type MessageType<
   ICM extends z.ZodTypeAny = z.ZodUndefined,
   CCM extends z.ZodTypeAny = z.ZodUndefined,
   RCM extends z.ZodTypeAny = z.ZodUndefined,
-  MM extends z.ZodTypeAny = z.ZodUndefined,
   RTCM extends z.ZodTypeAny = z.ZodUndefined,
-> = z.infer<ReturnType<typeof Message<R, TCM, ICM, CCM, RCM, MM, RTCM>>>;
+  PCCM extends z.ZodTypeAny = z.ZodUndefined,
+  MM extends z.ZodTypeAny = z.ZodUndefined,
+> = z.infer<ReturnType<typeof Message<R, TCM, ICM, CCM, RCM, PCCM, RTCM, MM>>>;
 
 const PartialMessage = <
   R extends z.ZodEnum<[string, ...string[]]> = typeof PartialRoleEnum,
