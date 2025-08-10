@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ImageContent, ImageModalityLiteral } from "./image-content";
+import { PdfContent, PdfModalityLiteral } from "./pdf-content";
 import { PartialReasoningContent, PartialReasoningModalityLiteral, ReasoningContent, ReasoningModalityLiteral } from "./reasoning-content";
 import { PartialTextContent, PartialTextModalityLiteral, TextContent, TextModalityLiteral } from "./text-content";
 import { PartialToolCallContent, PartialToolCallModalityLiteral, ToolCallContent, ToolCallModalityLiteral } from "./tool-call-content";
@@ -9,6 +10,7 @@ import { ToolResponseContent, ToolResponseModalityLiteral } from "./tool-respons
 const ModalityLiterals = [
   TextModalityLiteral,
   ImageModalityLiteral,
+  PdfModalityLiteral,
   ToolCallModalityLiteral,
   ToolResponseModalityLiteral,
   ReasoningModalityLiteral,
@@ -19,12 +21,14 @@ type ModalityEnumType = z.infer<typeof ModalityEnum>;
 const Content = <
   TCM extends z.ZodTypeAny = z.ZodUndefined,
   ICM extends z.ZodTypeAny = z.ZodUndefined,
+  PCM extends z.ZodTypeAny = z.ZodUndefined,
   CCM extends z.ZodTypeAny = z.ZodUndefined,
   RCM extends z.ZodTypeAny = z.ZodUndefined,
   TCCM extends z.ZodTypeAny = z.ZodUndefined,
 >(
   TextContentMetadata: TCM = z.undefined() as TCM,
   ImageContentMetadata: ICM = z.undefined() as ICM,
+  PdfContentMetadata: PCM = z.undefined() as PCM,
   ToolCallContentMetadata: CCM = z.undefined() as CCM,
   ToolResponseContentMetadata: RCM = z.undefined() as RCM,
   ReasoningContentMetadata: TCCM = z.undefined() as TCCM
@@ -32,6 +36,7 @@ const Content = <
   z.discriminatedUnion("modality", [
     TextContent(TextContentMetadata),
     ImageContent(ImageContentMetadata),
+    PdfContent(PdfContentMetadata),
     ToolCallContent(ToolCallContentMetadata),
     ToolResponseContent(ToolResponseContentMetadata),
     ReasoningContent(ReasoningContentMetadata),

@@ -13,6 +13,14 @@ const GoogleChatContentPartInlineData = z.object({
 });
 type GoogleChatContentPartInlineDataType = z.infer<typeof GoogleChatContentPartInlineData>;
 
+const GoogleChatContentPartFileData = z.object({
+  file_data: z.object({
+    mime_type: z.string().min(1),
+    file_uri: z.string().min(1),
+  }),
+});
+type GoogleChatContentPartFileDataType = z.infer<typeof GoogleChatContentPartFileData>;
+
 const GoogleChatContentPartFunctionCall = z.object({
   function_call: z.object({
     name: z.string().min(1),
@@ -35,6 +43,7 @@ const GoogleChatContent = z.object({
     z.union([
       GoogleChatContentPartText,
       GoogleChatContentPartInlineData,
+      GoogleChatContentPartFileData,
       GoogleChatContentPartFunctionCall,
       GoogleChatContentPartFunctionResponse,
     ])
@@ -117,6 +126,7 @@ export {
   GoogleChatContentPartFunctionCall,
   GoogleChatContentPartFunctionResponse,
   GoogleChatContentPartInlineData,
+  GoogleChatContentPartFileData,
   GoogleChatContentPartText,
   GoogleChatGenerationConfig,
   GoogleChatRequest,
@@ -128,6 +138,7 @@ export {
   type GoogleChatContentPartFunctionCallType,
   type GoogleChatContentPartFunctionResponseType,
   type GoogleChatContentPartInlineDataType,
+  type GoogleChatContentPartFileDataType,
   type GoogleChatToolType,
   type GoogleChatToolConfigType,
   type GoogleChatGenerationConfigType,

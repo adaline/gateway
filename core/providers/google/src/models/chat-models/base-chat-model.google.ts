@@ -31,6 +31,7 @@ import {
   createToolCallContent,
   ImageContentType,
   ImageModalityLiteral,
+  PdfModalityLiteral,
   Message,
   MessageType,
   PartialChatResponseType,
@@ -438,7 +439,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       return { messages: [] };
     }
     const stripBase64Prefix = (data: string): string => {
-      const prefixMatch = data.match(/^data:image\/[a-zA-Z]+;base64,/);
+      const prefixMatch = data.match(/^data:(image\/[a-zA-Z]+|application\/pdf);base64,/);
       if (prefixMatch) {
         return data.substring(prefixMatch[0].length);
       }
@@ -543,6 +544,25 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   throw new InvalidMessagesError({
                     info: `Invalid message 'modality' for model : ${this.modelName}`,
                     cause: new Error(`model: '${this.modelName}' does not support image content type: '${content.value.type}'`),
+                  });
+                }
+              } else if (content.modality === PdfModalityLiteral) {
+                if (content.value.type === "base64") {
+                  let base64Data = content.value.base64;
+                  // Check and strip the data URL prefix if it exists.
+                  base64Data = stripBase64Prefix(base64Data);
+                  userContent.push({
+                    inline_data: {
+                      mime_type: `application/${content.value.mediaType}`,
+                      data: base64Data,
+                    },
+                  });
+                } else if (content.value.type === "url") {
+                  userContent.push({
+                    file_data: {
+                      mime_type: "application/pdf",
+                      file_uri: content.value.url,
+                    },
                   });
                 }
               } else {
