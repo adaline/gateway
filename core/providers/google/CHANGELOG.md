@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.6.0
+
+### Minor Changes
+
+- 7b42304: Support isomorphic pdf content fetching
+
 ## 1.5.1
 
 ### Patch Changes
