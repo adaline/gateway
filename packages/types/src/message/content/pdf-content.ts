@@ -23,6 +23,7 @@ const PdfContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = z.und
   z.object({
     modality: z.literal(PdfModalityLiteral),
     value: PdfContentValue,
+    providerCacheKey: z.string(),
     metadata: Metadata,
   });
 type PdfContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof PdfContent<M>>>;

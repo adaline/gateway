@@ -915,6 +915,7 @@ describe("BaseChatModel", () => {
             {
               modality: "pdf" as const,
               value: { type: "base64", base64: base64DataWithPrefix },
+              providerCacheKey: "some_pdf.pdf",
             },
           ],
         },
@@ -947,6 +948,7 @@ describe("BaseChatModel", () => {
             {
               modality: "pdf" as const,
               value: { type: "url", url: pdfUrl },
+              providerCacheKey: "some_pdf.pdf",
             },
           ],
         },
@@ -981,6 +983,7 @@ describe("BaseChatModel", () => {
             {
               modality: "pdf" as const,
               value: { type: "base64", base64: base64DataWithPrefix },
+              providerCacheKey: "some_pdf.pdf",
             },
             { modality: TextModalityLiteral, value: "What are the key points?" },
           ],

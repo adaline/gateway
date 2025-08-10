@@ -31,10 +31,11 @@ import {
   createToolCallContent,
   ImageContentType,
   ImageModalityLiteral,
-  PdfModalityLiteral,
   Message,
   MessageType,
   PartialChatResponseType,
+  PdfContentType,
+  PdfModalityLiteral,
   ResponseSchemaType,
   SystemRoleLiteral,
   TextModalityLiteral,
@@ -121,6 +122,166 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     return messages.reduce((acc, message) => {
       return acc + message.content.map((content) => (content.modality === "text" ? content.value : "")).join(" ").length;
     }, 0);
+  }
+
+  private async transformPdfMessages(messages: MessageType[]): Promise<MessageType[]> {
+    // Helper method to download a PDF from a URL
+    const downloadPdf = async (url: string): Promise<Buffer> => {
+      // TODO: ideally use the isomorphic http client here but it's not available in the provider package, only in the gateway package.
+      // TODO: currently using fetch since it'll work in the browser and node.js (v18+) for this simple use case.
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; GoogleFilesAPI/1.0)",
+        },
+      });
+
+      if (!response.ok) {
+        throw new InvalidMessagesError({
+          info: `Failed to download PDF from URL: ${url}`,
+          cause: new Error(`HTTP ${response.status}: ${response.statusText}`),
+        });
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      return Buffer.from(arrayBuffer);
+    };
+
+    // Helper method to check if a file exists in Google Files API
+    const existsInGoogleFiles = async (fileName: string): Promise<string | null> => {
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/files?key=${this.apiKey}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = await response.json();
+        const files = data.files || [];
+
+        // Find file by display name (which is our hash)
+        const existingFile = files.find((file: any) => file.displayName === fileName);
+        return existingFile ? existingFile.uri : null;
+      } catch (error) {
+        // If there's an error checking, we'll just upload the file
+        return null;
+      }
+    };
+
+    // Helper method to upload a PDF to Google Files API
+    const uploadPdfToGoogleFiles = async (pdfBuffer: Buffer, fileName: string): Promise<string> => {
+      // Start resumable upload
+      const uploadResponse = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${this.apiKey}`, {
+        method: "POST",
+        headers: {
+          "X-Goog-Upload-Protocol": "resumable",
+          "X-Goog-Upload-Command": "start",
+          "X-Goog-Upload-Header-Content-Length": pdfBuffer.length.toString(),
+          "X-Goog-Upload-Header-Content-Type": "application/pdf",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          file: {
+            display_name: fileName,
+          },
+        }),
+      });
+
+      if (!uploadResponse.ok) {
+        throw new InvalidMessagesError({
+          info: "Failed to start PDF upload to Google Files API",
+          cause: new Error(`HTTP ${uploadResponse.status}: ${uploadResponse.statusText}`),
+        });
+      }
+
+      // Get upload URL from response headers
+      const uploadUrl = uploadResponse.headers.get("x-goog-upload-url");
+      if (!uploadUrl) {
+        throw new InvalidMessagesError({
+          info: "No upload URL received from Google Files API",
+          cause: new Error("Missing x-goog-upload-url header"),
+        });
+      }
+
+      // Upload the actual file content
+      const fileUploadResponse = await fetch(uploadUrl, {
+        method: "POST",
+        headers: {
+          "Content-Length": pdfBuffer.length.toString(),
+          "X-Goog-Upload-Offset": "0",
+          "X-Goog-Upload-Command": "upload, finalize",
+        },
+        body: pdfBuffer,
+      });
+
+      if (!fileUploadResponse.ok) {
+        throw new InvalidMessagesError({
+          info: "Failed to upload PDF content to Google Files API",
+          cause: new Error(`HTTP ${fileUploadResponse.status}: ${fileUploadResponse.statusText}`),
+        });
+      }
+
+      const fileInfo = await fileUploadResponse.json();
+      return fileInfo.file.uri;
+    };
+
+    // Helper method to get the URL of a PDF from Google Files API
+    const getGoogleFilesUrl = async (content: PdfContentType): Promise<string> => {
+      const existingFileUri = await existsInGoogleFiles(content.providerCacheKey);
+      if (existingFileUri) {
+        return existingFileUri;
+      }
+
+      let pdfBuffer: Buffer;
+      if (content.value.type === "url") {
+        pdfBuffer = await downloadPdf(content.value.url);
+      } else {
+        let base64Data = content.value.base64;
+        const pdfBase64Prefix = "data:application/pdf;base64,";
+        base64Data = base64Data.startsWith(pdfBase64Prefix) ? base64Data.substring(pdfBase64Prefix.length) : base64Data;
+        pdfBuffer = Buffer.from(base64Data, "base64");
+
+        const pdfHeader = pdfBuffer.toString("ascii", 0, 4);
+        if (pdfHeader !== "%PDF") {
+          throw new InvalidMessagesError({
+            info: `Base64 content is not a valid PDF. Header: ${pdfHeader}`,
+            cause: new Error(`Expected PDF header '%PDF', got '${pdfHeader}'`),
+          });
+        }
+      }
+      return await uploadPdfToGoogleFiles(pdfBuffer, content.providerCacheKey);
+    };
+
+    // Process the messages to add the Google Files API URL to the PDF content
+    const processedMessages: MessageType[] = [];
+    for (const message of messages) {
+      const processedContent = [];
+      for (const content of message.content) {
+        if (content.modality === PdfModalityLiteral) {
+          const fileUri = await getGoogleFilesUrl(content);
+          processedContent.push({
+            ...content,
+            value: {
+              type: "url" as const,
+              url: fileUri,
+            },
+          });
+        } else {
+          processedContent.push(content);
+        }
+      }
+
+      processedMessages.push({
+        ...message,
+        content: processedContent,
+      });
+    }
+
+    return processedMessages;
   }
 
   transformModelRequest(request: GoogleChatRequestType): {
@@ -419,7 +580,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         }
       } else if (responseFormat === "json_object") {
         transformedConfig.responseSchema = {
-          type: "object"
+          type: "object",
         };
         delete transformedConfig.response_format;
       } else if (responseFormat === "text") {
@@ -706,7 +867,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
   async getCompleteChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
     const transformedConfig = this.transformConfig(config, messages, tools);
-    const transformedMessages = this.transformMessages(messages);
+
+    // Process PDF content through Google Files API before transforming messages
+    const processedMessages = await this.transformPdfMessages(messages);
+    const transformedMessages = this.transformMessages(processedMessages);
+
     if (transformedMessages.messages && (transformedMessages.messages as MessageType[]).length === 0) {
       throw new InvalidMessagesError({
         info: "Messages are required",
@@ -716,14 +881,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     const transformedTools = tools ? this.transformTools(tools) : {};
 
-    return new Promise((resolve) => {
-      resolve({
-        ...this.getDefaultParams(),
-        ...transformedConfig,
-        ...transformedMessages,
-        ...transformedTools,
-      });
-    });
+    return {
+      ...this.getDefaultParams(),
+      ...transformedConfig,
+      ...transformedMessages,
+      ...transformedTools,
+    };
   }
 
   transformCompleteChatResponse(response: any): ChatResponseType {
@@ -814,7 +977,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
   async getStreamChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
     const transformedConfig = this.transformConfig(config, messages, tools);
-    const transformedMessages = this.transformMessages(messages);
+
+    // Process PDF content through Google Files API before transforming messages
+    const processedMessages = await this.transformPdfMessages(messages);
+    const transformedMessages = this.transformMessages(processedMessages);
+
     if (transformedMessages.messages && (transformedMessages.messages as MessageType[]).length === 0) {
       throw new InvalidMessagesError({
         info: "Messages are required",
@@ -824,14 +991,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     const transformedTools = tools ? this.transformTools(tools) : {};
 
-    return new Promise((resolve) => {
-      resolve({
-        ...this.getDefaultParams(),
-        ...transformedConfig,
-        ...transformedMessages,
-        ...transformedTools,
-      });
-    });
+    return {
+      ...this.getDefaultParams(),
+      ...transformedConfig,
+      ...transformedMessages,
+      ...transformedTools,
+    };
   }
 
   async *transformStreamChatResponseChunk(
