@@ -502,7 +502,10 @@ describe("BaseChatModelOpenAI", () => {
             {
               modality: "pdf" as const,
               value: { type: "base64", base64: "JVBERi0xLjQK..." },
-              providerCacheKey: "test.pdf",
+              file: {
+                name: "test.pdf",
+                id: "test.pdf",
+              },
             },
           ],
         },
