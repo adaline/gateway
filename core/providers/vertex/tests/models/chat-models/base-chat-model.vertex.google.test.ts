@@ -378,22 +378,25 @@ describe("BaseChatModelVertex", () => {
       expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
     });
 
-    // it("should throw InvalidMessagesError for PDF modality (not in test modalities)", () => {
-    //   const messages: MessageType[] = [
-    //     {
-    //       role: UserRoleLiteral,
-    //       content: [
-    //         {
-    //           modality: "pdf" as const,
-    //           value: { type: "base64", base64: "JVBERi0xLjQK..." },
-    //           providerCacheKey: "some_pdf.pdf",
-    //         },
-    //       ],
-    //     },
-    //   ];
+    it("should throw InvalidMessagesError for PDF modality (not in test modalities)", () => {
+      const messages: MessageType[] = [
+        {
+          role: UserRoleLiteral,
+          content: [
+            {
+              modality: "pdf" as const,
+              value: { type: "base64", base64: "JVBERi0xLjQK..." },
+              file: {
+              name: "somie_pdf.pdf",
+                id: "some_pdf.pdf",
+              },
+            },
+          ],
+        },
+      ];
 
-    //   expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
-    // });
+      expect(() => model.transformMessages(messages)).toThrow(InvalidMessagesError);
+    });
 
     it("should throw InvalidMessagesError for unsupported role", () => {
       const messages: MessageType[] = [

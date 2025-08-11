@@ -149,7 +149,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     };
 
     // Helper method to check if a file exists in Google Files API
-    const existsInGoogleFiles = async (fileName: string): Promise<string | null> => {
+    const existsInGoogleFiles = async (fileId: string): Promise<string | null> => {
       try {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/files?key=${this.apiKey}`, {
           method: "GET",
@@ -166,7 +166,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         const files = data.files || [];
 
         // Find file by display name (which is our hash)
-        const existingFile = files.find((file: any) => file.displayName === fileName);
+        const existingFile = files.find((file: any) => file.displayName === fileId);
         return existingFile ? existingFile.uri : null;
       } catch (error) {
         // If there's an error checking, we'll just upload the file
@@ -175,7 +175,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     };
 
     // Helper method to upload a PDF to Google Files API
-    const uploadPdfToGoogleFiles = async (pdfBuffer: Uint8Array, fileName: string): Promise<string> => {
+    const uploadPdfToGoogleFiles = async (pdfBuffer: Uint8Array, fileId: string): Promise<string> => {
       // Start resumable upload
       const uploadResponse = await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${this.apiKey}`, {
         method: "POST",
@@ -188,7 +188,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         },
         body: JSON.stringify({
           file: {
-            display_name: fileName,
+            display_name: fileId,
           },
         }),
       });
@@ -236,7 +236,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Helper method to get the URL of a PDF from Google Files API
     const getGoogleFilesUrl = async (content: PdfContentType): Promise<string> => {
-      const existingFileUri = await existsInGoogleFiles(content.providerCacheKey);
+      const existingFileUri = await existsInGoogleFiles(content.file.id);
       if (existingFileUri) {
         return existingFileUri;
       }
@@ -249,16 +249,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         const pdfBase64Prefix = "data:application/pdf;base64,";
         base64Data = base64Data.startsWith(pdfBase64Prefix) ? base64Data.substring(pdfBase64Prefix.length) : base64Data;
         pdfBuffer = convertBase64ToUint8Array(base64Data);
-
-        // const pdfHeader = String.fromCharCode(pdfBuffer[0] ?? 0, pdfBuffer[1] ?? 0, pdfBuffer[2] ?? 0, pdfBuffer[3] ?? 0);
-        // if (pdfHeader !== "%PDF") {
-        //   throw new InvalidMessagesError({
-        //     info: `Base64 content is not a valid PDF. Header: ${pdfHeader}`,
-        //     cause: new Error(`Expected PDF header '%PDF', got '${pdfHeader}'`),
-        //   });
-        // }
       }
-      return await uploadPdfToGoogleFiles(pdfBuffer, content.providerCacheKey);
+      return await uploadPdfToGoogleFiles(pdfBuffer, content.file.id);
     };
 
     // Process the messages to add the Google Files API URL to the PDF content

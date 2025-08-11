@@ -446,7 +446,10 @@ describe("BaseChatModelGroq", () => {
             {
               modality: "pdf" as const,
               value: { type: "base64", base64: "JVBERi0xLjQK..." },
-              providerCacheKey: "some_pdf.pdf",
+              file: {
+                name: "some_pdf.pdf",
+                id: "some_pdf.pdf",
+              },
             },
           ],
         },
