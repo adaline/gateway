@@ -1,5 +1,14 @@
 # @adaline/custom
 
+## 1.3.2
+
+### Patch Changes
+
+- Updated dependencies [ce81194]
+  - @adaline/openai@1.8.0
+  - @adaline/types@1.8.0
+  - @adaline/provider@1.4.0
+
 ## 1.3.1
 
 ### Patch Changes

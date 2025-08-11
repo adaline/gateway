@@ -1,5 +1,18 @@
 # @adaline/vertex
 
+## 1.5.0
+
+### Minor Changes
+
+- ce81194: Add file name in PDF modality
+
+### Patch Changes
+
+- Updated dependencies [ce81194]
+  - @adaline/google@1.7.0
+  - @adaline/types@1.8.0
+  - @adaline/provider@1.4.0
+
 ## 1.4.2
 
 ### Patch Changes

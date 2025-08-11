@@ -1,5 +1,17 @@
 # @adaline/open-router
 
+## 1.4.0
+
+### Minor Changes
+
+- ce81194: Add file name in PDF modality
+
+### Patch Changes
+
+- Updated dependencies [ce81194]
+  - @adaline/types@1.8.0
+  - @adaline/provider@1.4.0
+
 ## 1.3.1
 
 ### Patch Changes

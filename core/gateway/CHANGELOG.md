@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.8.0
+
+### Minor Changes
+
+- ce81194: Add file name in PDF modality
+
 ## 1.7.0
 
 ### Minor Changes
