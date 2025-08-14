@@ -1,0 +1,162 @@
+---
+globs: packages/provider/**
+alwaysApply: false
+---
+
+# Provider Package Rules
+
+## Package Overview
+
+The provider package defines the core interfaces and base classes that all AI providers must implement. It provides a unified abstraction layer for different AI services.
+
+## Provider Interface Rules
+
+### 1. ProviderV1 Interface
+
+- **ALWAYS** implement the `ProviderV1` interface for new providers
+- **ALWAYS** use generic constraints for configuration types
+- **ALWAYS** provide both chat and embedding model support
+- **ALWAYS** implement version tracking with `readonly version = "v1"`
+- **ALWAYS** use descriptive provider names
+
+### 2. Model Factory Methods
+
+- **ALWAYS** implement `chatModelLiterals()` returning available model names
+- **ALWAYS** implement `chatModelSchemas()` returning Zod schemas
+- **ALWAYS** implement `chatModel(options)` returning configured instances
+- **ALWAYS** implement `embeddingModelLiterals()` returning available model names
+- **ALWAYS** implement `embeddingModelSchemas()` returning Zod schemas
+- **ALWAYS** implement `embeddingModel(options)` returning configured instances
+
+## Model Implementation Rules
+
+### 1. Chat Model Implementation
+
+- **ALWAYS** implement the `ChatModelV1` interface
+- **ALWAYS** provide model schema with name, provider, and capabilities
+- **ALWAYS** implement `completeChat()` method for synchronous responses
+- **ALWAYS** implement `streamChat()` method for streaming responses
+- **ALWAYS** implement `getModelPricing()` for cost calculation
+- **ALWAYS** implement `getCompleteChatUrl()`, `getCompleteChatHeaders()`, `getCompleteChatData()`
+- **ALWAYS** implement `transformCompleteChatResponse()` for response normalization
+
+### 2. Embedding Model Implementation
+
+- **ALWAYS** implement the `EmbeddingModelV1` interface
+- **ALWAYS** provide model schema with name, provider, and capabilities
+- **ALWAYS** implement `getEmbeddings()` method
+- **ALWAYS** implement `getEmbeddingsUrl()`, `getEmbeddingsHeaders()`, `getEmbeddingsData()`
+- **ALWAYS** implement `transformEmbeddingsResponse()` for response normalization
+
+### 3. Model Schema Definition
+
+- **ALWAYS** use Zod schemas for model configuration validation
+- **ALWAYS** include model name, provider, and version information
+- **ALWAYS** define input/output token limits
+- **ALWAYS** specify supported features (streaming, tools, etc.)
+- **ALWAYS** include pricing information when available
+
+## Configuration Management Rules
+
+### 1. Configuration Schemas
+
+- **ALWAYS** use Zod for configuration validation
+- **ALWAYS** provide sensible defaults for optional parameters
+- **ALWAYS** validate API keys and endpoints
+- **ALWAYS** support environment variable overrides
+- **ALWAYS** include configuration examples in documentation
+
+### 2. Configuration Types
+
+- **ALWAYS** use descriptive type names ending with `OptionsType`
+- **ALWAYS** extend base configuration interfaces when appropriate
+- **ALWAYS** use union types for model-specific options
+- **ALWAYS** provide configuration builders for complex setups
+
+## Error Handling Rules
+
+### 1. Provider Errors
+
+- **ALWAYS** extend `ProviderError` for provider-specific errors
+- **ALWAYS** include provider name and context in error messages
+- **ALWAYS** handle API rate limits and quotas gracefully
+- **ALWAYS** provide retry guidance when appropriate
+- **ALWAYS** log errors with full context
+
+### 2. Validation Errors
+
+- **ALWAYS** validate configuration before making API calls
+- **ALWAYS** provide clear error messages for invalid configurations
+- **ALWAYS** suggest fixes for common configuration issues
+- **ALWAYS** validate model options before instantiation
+
+## Response Transformation Rules
+
+### 1. Chat Response Transformation
+
+- **ALWAYS** normalize provider responses to standard format
+- **ALWAYS** handle different response structures consistently
+- **ALWAYS** preserve all relevant information from provider
+- **ALWAYS** implement proper error handling for malformed responses
+- **ALWAYS** support streaming response transformation
+
+### 2. Embedding Response Transformation
+
+- **ALWAYS** normalize embedding vectors to standard format
+- **ALWAYS** handle different vector dimensions consistently
+- **ALWAYS** preserve metadata and usage information
+- **ALWAYS** implement proper error handling for malformed responses
+
+## Testing Rules
+
+### 1. Provider Testing
+
+- **ALWAYS** test provider instantiation with valid configurations
+- **ALWAYS** test provider instantiation with invalid configurations
+- **ALWAYS** test model factory methods
+- **ALWAYS** test error handling scenarios
+- **ALWAYS** mock external API calls
+
+### 2. Model Testing
+
+- **ALWAYS** test model instantiation with valid options
+- **ALWAYS** test model instantiation with invalid options
+- **ALWAYS** test response transformation methods
+- **ALWAYS** test error handling for API failures
+- **ALWAYS** test configuration validation
+
+## Performance Considerations
+
+### 1. Resource Management
+
+- **ALWAYS** implement proper cleanup for resources
+- **ALWAYS** use connection pooling for HTTP clients
+- **ALWAYS** implement request batching when possible
+- **ALWAYS** cache frequently used configurations
+
+### 2. Error Recovery
+
+- **ALWAYS** implement exponential backoff for retries
+- **ALWAYS** implement circuit breakers for failing endpoints
+- **ALWAYS** provide fallback mechanisms when possible
+- **ALWAYS** monitor provider health and performance
+
+## Security Considerations
+
+### 1. API Key Management
+
+- **ALWAYS** validate API keys before use
+- **ALWAYS** never log API keys or sensitive credentials
+- **ALWAYS** support secure credential storage
+- **ALWAYS** implement proper access controls
+
+### 2. Input Validation
+
+- **ALWAYS** validate all input parameters
+- **ALWAYS** sanitize user inputs before API calls
+- **ALWAYS** implement rate limiting for user requests
+- **ALWAYS** monitor for suspicious activity patterns
+  globs: packages/provider/\*\*
+  alwaysApply: false
+
+---
