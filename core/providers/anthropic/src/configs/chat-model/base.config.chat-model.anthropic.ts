@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { maxTokens, stop, temperature, toolChoice, topK, topP } from "./common.config.chat-model.anthropic";
+import { maxTokens, mcpServers, stop, temperature, toolChoice, topK, topP } from "./common.config.chat-model.anthropic";
 
 const ChatModelBaseConfigSchema = (maxOutputTokens: number, maxSequences: number) =>
   z.object({
@@ -10,6 +10,7 @@ const ChatModelBaseConfigSchema = (maxOutputTokens: number, maxSequences: number
     topP: topP.schema,
     topK: topK.schema,
     toolChoice: toolChoice.schema,
+    mcpServers: mcpServers.schema,
   });
 
 const ChatModelBaseConfigDef = (maxOutputTokens: number, maxSequences: number) =>
@@ -20,6 +21,7 @@ const ChatModelBaseConfigDef = (maxOutputTokens: number, maxSequences: number) =
     topP: topP.def,
     topK: topK.def,
     toolChoice: toolChoice.def,
+    mcpServers: mcpServers.def,
   }) as const;
 
 export { ChatModelBaseConfigDef, ChatModelBaseConfigSchema };

@@ -1,4 +1,7 @@
-import { CHAT_CONFIG, MultiStringConfigItem, RangeConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import { z } from "zod";
+
+import { CHAT_CONFIG, MultiStringConfigItem, ObjectSchemaConfigItem, RangeConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import { McpServer } from "@adaline/types";
 
 const temperature = RangeConfigItem({
   param: "temperature",
@@ -60,4 +63,10 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "any"],
 });
 
-export { maxTokens, stop, temperature, toolChoice, topK, topP };
+const mcpServers = ObjectSchemaConfigItem({
+  param: "mcp_servers",
+  title: CHAT_CONFIG.MCP_SERVERS.title,
+  description: CHAT_CONFIG.MCP_SERVERS.description,
+  objectSchema: z.array(McpServer),
+});
+export { maxTokens, mcpServers, stop, temperature, toolChoice, topK, topP };

@@ -296,12 +296,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     const _toolChoice = config.toolChoice;
     const _reasoningEnabled = config.reasoningEnabled;
     const _maxReasoningTokens = config.maxReasoningTokens;
+    const _mcpServers = config.mcpServers;
 
     const _config = { ...config }; // create a copy to avoid mutating original config
 
     delete _config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
     delete _config.reasoningEnabled;
     delete _config.maxReasoningTokens;
+    delete _config.mcpServers; // MCP servers are handled separately
 
     const _parsedConfig = this.modelSchema.config.schema.safeParse(_config);
     if (!_parsedConfig.success) {
@@ -374,7 +376,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (hasExtendedThinking !== hasThinkingTokens) {
       throw new InvalidConfigError({
         info: `Invalid extended thinking config for model: '${this.modelName}'`,
-        cause: new Error(`Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together.`),
+        cause: new Error("Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together."),
       });
     }
 
@@ -394,6 +396,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           });
         }
       }
+    }
+
+    // Add MCP servers if configured
+    if (_mcpServers) {
+      transformedConfig.mcp_servers = _mcpServers;
     }
 
     return transformedConfig;
@@ -640,16 +647,22 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
+
+    // Add MCP beta header if MCP servers are configured
+    if (config && config.mcpServers) {
+      headers = {
+        ...headers,
+        "anthropic-beta": "mcp-client-2025-04-04",
+      };
+    }
 
     return new Promise((resolve) => {
       resolve(headers);
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCompleteChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
     const transformedConfig = this.transformConfig(config, messages, tools);
     const transformedMessages = this.transformMessages(messages);
@@ -719,9 +732,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
+  async getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
+
+    // Add MCP beta header if MCP servers are configured
+    if (config && config.mcpServers) {
+      headers = {
+        ...headers,
+        "anthropic-beta": "mcp-client-2025-04-04",
+      };
+    }
 
     return new Promise((resolve) => {
       resolve(headers);
