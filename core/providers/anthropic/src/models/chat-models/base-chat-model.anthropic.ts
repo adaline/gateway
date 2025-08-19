@@ -29,10 +29,12 @@ import {
   createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createPartialToolResponseMessage,
   createReasoningContent,
   createRedactedReasoningContent,
   createTextContent,
   createToolCallContent,
+  createToolResponseContent,
   ImageContentType,
   ImageModalityLiteral,
   Message,
@@ -699,6 +701,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           return createReasoningContent(contentItem.thinking, contentItem.signature);
         } else if (contentItem.type === "redacted_thinking") {
           return createRedactedReasoningContent(contentItem.data);
+        } else if (contentItem.type === "mcp_tool_use") {
+          return createToolCallContent(index, contentItem.id, contentItem.name, JSON.stringify(contentItem.input));
+        } else if (contentItem.type === "mcp_tool_result") {
+          return createToolResponseContent(index, contentItem.tool_use_id, "mcp_tool_result", JSON.stringify(contentItem.content), {
+            statusCode: contentItem.is_error ? 500 : 200,
+          });
         }
       }) as ContentType[];
 
@@ -777,7 +785,26 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     buffer: string
   ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
     // merge last buffer message and split into lines
-    const lines = (buffer + chunk).split("\n").filter((line) => line.trim() !== "");
+    const data = buffer + chunk;
+    const lines: string[] = [];
+    let newBuffer = "";
+
+    // Split data into complete lines and new buffer
+    let currentIndex = 0;
+    while (currentIndex < data.length) {
+      const newlineIndex = data.indexOf("\n", currentIndex);
+      if (newlineIndex === -1) {
+        newBuffer = data.substring(currentIndex);
+        break;
+      } else {
+        const line = data.substring(currentIndex, newlineIndex).trim();
+        if (line) {
+          lines.push(line);
+        }
+        currentIndex = newlineIndex + 1;
+      }
+    }
+
     for (const line of lines) {
       if (line.startsWith("data: {") && line.endsWith("}")) {
         // line contains message
@@ -858,9 +885,29 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, parsedResponse.content_block.thinking));
             } else if (parsedResponse.content_block.type === "redacted_thinking") {
               partialMessages.push(createPartialRedactedReasoningMessage(AssistantRoleLiteral, parsedResponse.content_block.data));
+            } else if (parsedResponse.content_block.type === "mcp_tool_use") {
+              partialMessages.push(
+                createPartialToolCallMessage(
+                  AssistantRoleLiteral,
+                  parsedResponse.index,
+                  parsedResponse.content_block.id,
+                  parsedResponse.content_block.name,
+                  JSON.stringify(parsedResponse.content_block.input)
+                )
+              );
+            } else if (parsedResponse.content_block.type === "mcp_tool_result") {
+              partialMessages.push(
+                createPartialToolResponseMessage(
+                  AssistantRoleLiteral,
+                  parsedResponse.index,
+                  parsedResponse.content_block.tool_use_id,
+                  "mcp_tool_result",
+                  JSON.stringify(parsedResponse.content_block.content)
+                )
+              );
             }
 
-            yield { partialResponse: { partialMessages: partialMessages }, buffer: buffer };
+            yield { partialResponse: { partialMessages: partialMessages }, buffer: buffer }; // Buffer is empty after processing this line
           } else {
             throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
           }
@@ -892,6 +939,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         // line starts with unknown event -- ignore
       }
     }
+
+    // Yield the updated buffer after processing all lines
+    yield { partialResponse: { partialMessages: [] }, buffer: newBuffer };
   }
 
   async *transformProxyStreamChatResponseChunk(
