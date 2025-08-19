@@ -298,6 +298,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     const _toolChoice = config.toolChoice;
     const _reasoningEnabled = config.reasoningEnabled;
     const _maxReasoningTokens = config.maxReasoningTokens;
+    const _mcp = config.mcp;
     const _mcpServers = config.mcpServers;
 
     const _config = { ...config }; // create a copy to avoid mutating original config
@@ -305,6 +306,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     delete _config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
     delete _config.reasoningEnabled;
     delete _config.maxReasoningTokens;
+    delete _config.mcp;
     delete _config.mcpServers; // MCP servers are handled separately
 
     const _parsedConfig = this.modelSchema.config.schema.safeParse(_config);
@@ -400,8 +402,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // Add MCP servers if configured
-    if (_mcpServers) {
+    // Add MCP servers if MCP is enabled and servers are configured
+    if (_mcp && _mcpServers) {
       transformedConfig.mcp_servers = _mcpServers;
     }
 
@@ -652,8 +654,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
 
-    // Add MCP beta header if MCP servers are configured
-    if (config && config.mcpServers) {
+    // Add MCP beta header if MCP is enabled and MCP servers are configured
+    if (config && config.mcp && config.mcpServers) {
       headers = {
         ...headers,
         "anthropic-beta": "mcp-client-2025-04-04",
@@ -743,8 +745,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   async getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
 
-    // Add MCP beta header if MCP servers are configured
-    if (config && config.mcpServers) {
+    // Add MCP beta header if MCP is enabled and MCP servers are configured
+    if (config && config.mcp && config.mcpServers) {
       headers = {
         ...headers,
         "anthropic-beta": "mcp-client-2025-04-04",

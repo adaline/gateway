@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-import { CHAT_CONFIG, MultiStringConfigItem, ObjectSchemaConfigItem, RangeConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import {
+  CHAT_CONFIG,
+  MultiStringConfigItem,
+  ObjectSchemaConfigItem,
+  RangeConfigItem,
+  SelectBooleanConfigItem,
+  SelectStringConfigItem,
+} from "@adaline/provider";
 import { McpServer } from "@adaline/types";
 
 const temperature = RangeConfigItem({
@@ -63,10 +70,17 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "any"],
 });
 
+const mcp = SelectBooleanConfigItem({
+  param: "mcp",
+  title: "MCP",
+  description: "Enable or disable Model Context Protocol (MCP) functionality for this model.",
+  default: false,
+});
+
 const mcpServers = ObjectSchemaConfigItem({
   param: "mcp_servers",
   title: CHAT_CONFIG.MCP_SERVERS.title,
   description: CHAT_CONFIG.MCP_SERVERS.description,
   objectSchema: z.array(McpServer),
 });
-export { maxTokens, mcpServers, stop, temperature, toolChoice, topK, topP };
+export { maxTokens, mcp, mcpServers, stop, temperature, toolChoice, topK, topP };
