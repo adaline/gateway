@@ -14,6 +14,8 @@ import {
   PartialTextModalityLiteral,
   PartialToolCallContent,
   PartialToolCallModalityLiteral,
+  PartialToolResponseContent,
+  PartialToolResponseModalityLiteral,
   ReasoningContent,
   ReasoningContentTypeLiteral,
   ReasoningModalityLiteral,
@@ -42,6 +44,25 @@ const createToolCallContent = (index: number, id: string, name: string, args: st
     id: id,
     name: name,
     arguments: args,
+  });
+};
+
+const createToolResponseContent = (
+  index: number,
+  id: string,
+  name: string,
+  args: string,
+  apiResponse?: { statusCode: number },
+  metadata?: any
+): ContentType => {
+  return ToolResponseContent().parse({
+    modality: ToolResponseModalityLiteral,
+    index: index,
+    id: id,
+    name: name,
+    data: args,
+    apiResponse: apiResponse || undefined,
+    metadata: metadata || undefined,
   });
 };
 
@@ -142,6 +163,24 @@ const createPartialToolCallMessage = (role: RoleEnumType, index: number, id?: st
   });
 };
 
+const createPartialToolResponseMessage = (
+  role: RoleEnumType,
+  index: number,
+  id: string,
+  name: string,
+  data: string
+): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialToolResponseContent().parse({
+      modality: PartialToolResponseModalityLiteral,
+      index: index,
+      id: id,
+      name: name,
+      data: data,
+    }),
+  });
+};
 const createReasoningContent = (thinking: string, signature: string): ContentType => {
   return ReasoningContent().parse({
     modality: ReasoningModalityLiteral,
@@ -230,6 +269,7 @@ export {
   createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createPartialToolResponseMessage,
   createReasoningContent,
   createReasoningMessage,
   createRedactedReasoningContent,
@@ -238,6 +278,7 @@ export {
   createTextMessage,
   createToolCallContent,
   createToolCallMessage,
+  createToolResponseContent,
   createToolResponseMessage,
   createUrlImageMessage,
 };

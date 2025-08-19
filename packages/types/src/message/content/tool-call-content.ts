@@ -26,10 +26,10 @@ const PartialToolCallContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadat
 type PartialToolCallContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof PartialToolCallContent<M>>>;
 
 export {
-  ToolCallContent,
   PartialToolCallContent,
-  ToolCallModalityLiteral,
   PartialToolCallModalityLiteral,
-  type ToolCallContentType,
+  ToolCallContent,
+  ToolCallModalityLiteral,
   type PartialToolCallContentType,
+  type ToolCallContentType,
 };
