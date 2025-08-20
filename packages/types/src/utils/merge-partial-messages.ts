@@ -11,12 +11,15 @@ import {
   PartialTextModalityLiteral,
   PartialToolCallContentType,
   PartialToolCallModalityLiteral,
+  PartialToolResponseContentType,
+  PartialToolResponseModalityLiteral,
   ReasoningContentTypeLiteral,
   ReasoningContentValueUnionType,
   ReasoningModalityLiteral,
   RedactedReasoningContentTypeLiteral,
   TextModalityLiteral,
   ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
 } from "./../message";
 
 const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponseType => {
@@ -31,9 +34,11 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   let lastModality: PartialContentType["modality"] | null = null;
   let lastReasoningType: ReasoningContentValueUnionType["type"] | null = null; // Track 'thinking' vs 'redacted'
   let lastToolCallIndex: number | undefined = undefined;
+  let lastToolResponseIndex: number | undefined = undefined;
 
   let currentTextValue: string | null = null;
   let currentToolCall: { index?: number; id: string; name: string; arguments: string } | null = null;
+  let currentToolResponse: { index?: number; id: string; name: string; data: string; apiResponse?: { statusCode: number } } | null = null;
   let currentReasoning: PartialReasoningContentType["value"] | null = null; // Store the partial value directly
 
   // --- Helper Function to Finalize and Add the previous block ---
@@ -59,6 +64,28 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
         throw new GatewayBaseError({
           info: "Incomplete tool call data encountered during finalization. Required fields (id, name, arguments, index) were missing or incomplete.",
           cause: { currentToolCall },
+        });
+      }
+    } else if (lastModality === PartialToolResponseModalityLiteral && currentToolResponse) {
+      // Ensure required fields are present for the final ToolResponse
+      if (
+        currentToolResponse.id &&
+        currentToolResponse.name &&
+        currentToolResponse.data !== undefined &&
+        currentToolResponse.index !== undefined
+      ) {
+        finalizedContent = {
+          modality: ToolResponseModalityLiteral,
+          index: currentToolResponse.index,
+          id: currentToolResponse.id,
+          name: currentToolResponse.name,
+          data: currentToolResponse.data,
+          apiResponse: currentToolResponse.apiResponse,
+        };
+      } else {
+        throw new GatewayBaseError({
+          info: "Incomplete tool response data encountered during finalization. Required fields (id, name, data, index) were missing or incomplete.",
+          cause: { currentToolResponse },
         });
       }
     } else if (lastModality === PartialReasoningModalityLiteral && currentReasoning) {
@@ -104,10 +131,12 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
     // Reset accumulators for the *next* block
     currentTextValue = null;
     currentToolCall = null;
+    currentToolResponse = null;
     currentReasoning = null;
     lastModality = null; // Reset modality marker
     lastReasoningType = null; // Reset reasoning type marker
     lastToolCallIndex = undefined; // Reset tool call index marker
+    lastToolResponseIndex = undefined; // Reset tool response index marker
   };
 
   // --- Main Processing Loop ---
@@ -126,6 +155,7 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
       const currentModality = currentContent.modality;
       let currentReasoningType: ReasoningContentValueUnionType["type"] | null = null;
       let currentToolCallIndex: number | undefined = undefined;
+      let currentToolResponseIndex: number | undefined = undefined;
 
       if (currentModality === PartialReasoningModalityLiteral) {
         currentReasoningType = (currentContent as PartialReasoningContentType).value.type;
@@ -133,12 +163,16 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
       if (currentModality === PartialToolCallModalityLiteral) {
         currentToolCallIndex = (currentContent as PartialToolCallContentType).index;
       }
+      if (currentModality === PartialToolResponseModalityLiteral) {
+        currentToolResponseIndex = (currentContent as PartialToolResponseContentType).index;
+      }
 
       // --- Check for Block Change ---
       // A new block starts if:
       // 1. Modality changes.
       // 2. Modality is Reasoning, and the *type* of reasoning changes.
       // 3. Modality is ToolCall, and the *index* changes.
+      // 4. Modality is ToolResponse, and the *index* changes.
       const modalityChanged = currentModality !== lastModality;
       const reasoningTypeChanged =
         currentModality === PartialReasoningModalityLiteral &&
@@ -148,9 +182,13 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
         currentModality === PartialToolCallModalityLiteral &&
         lastModality === PartialToolCallModalityLiteral &&
         currentToolCallIndex !== lastToolCallIndex;
+      const toolResponseIndexChanged =
+        currentModality === PartialToolResponseModalityLiteral &&
+        lastModality === PartialToolResponseModalityLiteral &&
+        currentToolResponseIndex !== lastToolResponseIndex;
 
       // If a boundary is detected and we were accumulating something, finalize the previous block.
-      if ((modalityChanged || reasoningTypeChanged || toolCallIndexChanged) && lastModality !== null) {
+      if ((modalityChanged || reasoningTypeChanged || toolCallIndexChanged || toolResponseIndexChanged) && lastModality !== null) {
         finalizePreviousBlock();
       }
 
@@ -164,6 +202,9 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
         }
         if (currentModality === PartialToolCallModalityLiteral) {
           lastToolCallIndex = currentToolCallIndex;
+        }
+        if (currentModality === PartialToolResponseModalityLiteral) {
+          lastToolResponseIndex = currentToolResponseIndex;
         }
       }
 
@@ -186,6 +227,27 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
           currentToolCall.id += toolCallPart.id || "";
           currentToolCall.name += toolCallPart.name || "";
           currentToolCall.arguments += toolCallPart.arguments || "";
+        }
+      } else if (currentModality === PartialToolResponseModalityLiteral) {
+        const toolResponsePart = currentContent as PartialToolResponseContentType;
+        if (!currentToolResponse) {
+          // Initialize if starting a new tool response block
+          currentToolResponse = {
+            index: toolResponsePart.index,
+            id: toolResponsePart.id ?? "",
+            name: toolResponsePart.name ?? "",
+            data: toolResponsePart.data ?? "",
+            apiResponse: toolResponsePart.apiResponse,
+          };
+        } else {
+          // Append to existing tool response block (same index)
+          currentToolResponse.id += toolResponsePart.id || "";
+          currentToolResponse.name += toolResponsePart.name || "";
+          currentToolResponse.data += toolResponsePart.data || "";
+          // Keep the first apiResponse encountered
+          if (!currentToolResponse.apiResponse && toolResponsePart.apiResponse) {
+            currentToolResponse.apiResponse = toolResponsePart.apiResponse;
+          }
         }
       } else if (currentModality === PartialReasoningModalityLiteral) {
         const reasoningPart = currentContent as PartialReasoningContentType;
