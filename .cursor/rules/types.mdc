@@ -483,7 +483,5 @@ async function handleCompleteChat(request: CompleteChatRequestType): Promise<Cha
 6. **Performance**: Cache schemas and use lazy validation when appropriate
 7. **Migration**: Use transforms and versioning for backward compatibility
 8. **Integration**: Use shared types consistently across the ecosystem
-   globs: packages/types/\*\*
-   alwaysApply: false
 
 ---

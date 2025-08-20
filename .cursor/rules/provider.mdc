@@ -156,7 +156,5 @@ The provider package defines the core interfaces and base classes that all AI pr
 - **ALWAYS** sanitize user inputs before API calls
 - **ALWAYS** implement rate limiting for user requests
 - **ALWAYS** monitor for suspicious activity patterns
-  globs: packages/provider/\*\*
-  alwaysApply: false
 
 ---

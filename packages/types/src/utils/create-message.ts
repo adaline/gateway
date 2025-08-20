@@ -51,7 +51,7 @@ const createToolResponseContent = (
   index: number,
   id: string,
   name: string,
-  args: string,
+  data: string,
   apiResponse?: { statusCode: number },
   metadata?: any
 ): ContentType => {
@@ -60,9 +60,9 @@ const createToolResponseContent = (
     index: index,
     id: id,
     name: name,
-    data: args,
-    apiResponse: apiResponse || undefined,
-    metadata: metadata || undefined,
+    data: data,
+    apiResponse: apiResponse,
+    metadata: metadata,
   });
 };
 

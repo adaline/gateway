@@ -72,7 +72,8 @@ type PartialMessageType<
   TCM extends z.ZodTypeAny = z.ZodUndefined,
   CCM extends z.ZodTypeAny = z.ZodUndefined,
   MM extends z.ZodTypeAny = z.ZodUndefined,
+  RTCM extends z.ZodTypeAny = z.ZodUndefined,
   TPCM extends z.ZodTypeAny = z.ZodUndefined,
-> = z.infer<ReturnType<typeof PartialMessage<R, TCM, CCM, MM, TPCM>>>;
+> = z.infer<ReturnType<typeof PartialMessage<R, TCM, CCM, MM, RTCM, TPCM>>>;
 
 export { Message, PartialMessage, type MessageType, type PartialMessageType };
