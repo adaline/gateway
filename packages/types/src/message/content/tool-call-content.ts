@@ -9,6 +9,7 @@ const ToolCallContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = 
     id: z.string().min(1),
     name: z.string().min(1),
     arguments: z.string(),
+    serverName: z.string().optional(),
     metadata: Metadata,
   });
 type ToolCallContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof ToolCallContent<M>>>;
@@ -21,6 +22,7 @@ const PartialToolCallContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadat
     id: z.string().optional(),
     name: z.string().optional(),
     arguments: z.string().optional(),
+    serverName: z.string().optional(),
     metadata: Metadata,
   });
 type PartialToolCallContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof PartialToolCallContent<M>>>;

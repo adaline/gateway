@@ -37,13 +37,14 @@ const createTextContent = (content: string): ContentType => {
   });
 };
 
-const createToolCallContent = (index: number, id: string, name: string, args: string): ContentType => {
+const createToolCallContent = (index: number, id: string, name: string, args: string, serverName?: string): ContentType => {
   return ToolCallContent().parse({
     modality: ToolCallModalityLiteral,
     index: index,
     id: id,
     name: name,
     arguments: args,
+    serverName: serverName,
   });
 };
 
@@ -150,7 +151,14 @@ const createPartialTextMessage = (role: RoleEnumType, content: string): PartialM
   });
 };
 
-const createPartialToolCallMessage = (role: RoleEnumType, index: number, id?: string, name?: string, args?: string): PartialMessageType => {
+const createPartialToolCallMessage = (
+  role: RoleEnumType,
+  index: number,
+  id?: string,
+  name?: string,
+  args?: string,
+  serverName?: string
+): PartialMessageType => {
   return PartialMessage().parse({
     role: role,
     partialContent: PartialToolCallContent().parse({
@@ -159,6 +167,7 @@ const createPartialToolCallMessage = (role: RoleEnumType, index: number, id?: st
       id: id,
       name: name,
       arguments: args,
+      serverName: serverName,
     }),
   });
 };

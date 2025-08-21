@@ -65,6 +65,23 @@ const AnthropicRequestToolResponseContent = z.object({
 });
 type AnthropicRequestToolResponseContentType = z.infer<typeof AnthropicRequestToolResponseContent>;
 
+const AnthropicRequestMcpToolUseContent = z.object({
+  type: z.literal("mcp_tool_use"),
+  id: z.string().min(1),
+  name: z.string().min(1),
+  server_name: z.string().min(1),
+  input: z.record(z.any()),
+});
+type AnthropicRequestMcpToolUseContentType = z.infer<typeof AnthropicRequestMcpToolUseContent>;
+
+const AnthropicRequestMcpToolResultContent = z.object({
+  type: z.literal("mcp_tool_result"),
+  tool_use_id: z.string().min(1),
+  is_error: z.boolean().default(false),
+  content: z.array(z.any()),
+});
+type AnthropicRequestMcpToolResultContentType = z.infer<typeof AnthropicRequestMcpToolResultContent>;
+
 const AnthropicRequestMcpServerToolConfiguration = z.object({
   enabled: z.boolean().default(true),
   allowed_tools: z.array(z.string().min(1)).optional(),
@@ -138,6 +155,8 @@ export {
   AnthropicRequestImageContent,
   AnthropicRequestMcpServer,
   AnthropicRequestMcpServerToolConfiguration,
+  AnthropicRequestMcpToolResultContent,
+  AnthropicRequestMcpToolUseContent,
   AnthropicRequestMessage,
   AnthropicRequestRedactedThinkingContent,
   AnthropicRequestTextContent,
@@ -152,6 +171,8 @@ export {
   type AnthropicRequestImageContentType,
   type AnthropicRequestMcpServerToolConfigurationType,
   type AnthropicRequestMcpServerType,
+  type AnthropicRequestMcpToolResultContentType,
+  type AnthropicRequestMcpToolUseContentType,
   type AnthropicRequestMessageType,
   type AnthropicRequestRedactedThinkingContentType,
   type AnthropicRequestTextContentType,

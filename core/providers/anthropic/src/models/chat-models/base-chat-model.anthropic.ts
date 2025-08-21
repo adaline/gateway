@@ -61,6 +61,8 @@ import {
   AnthropicRequest,
   AnthropicRequestAssistantMessageType,
   AnthropicRequestImageContentType,
+  AnthropicRequestMcpToolResultContentType,
+  AnthropicRequestMcpToolUseContentType,
   AnthropicRequestRedactedThinkingContentType,
   AnthropicRequestTextContentType,
   AnthropicRequestThinkingContentType,
@@ -473,6 +475,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         | AnthropicRequestToolResponseContentType
         | AnthropicRequestThinkingContentType
         | AnthropicRequestRedactedThinkingContentType
+        | AnthropicRequestMcpToolUseContentType
+        | AnthropicRequestMcpToolResultContentType
       )[];
     }[] = [];
 
@@ -497,17 +501,29 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             | AnthropicRequestToolCallContentType
             | AnthropicRequestThinkingContentType
             | AnthropicRequestRedactedThinkingContentType
+            | AnthropicRequestMcpToolResultContentType
+            | AnthropicRequestMcpToolUseContentType
           )[] = [];
           message.content.forEach((content) => {
             if (content.modality === TextModalityLiteral) {
               assistantContent.push({ type: "text", text: content.value });
             } else if (content.modality === ToolCallModalityLiteral) {
-              assistantContent.push({
-                type: "tool_use",
-                id: content.id,
-                name: content.name,
-                input: JSON.parse(content.arguments),
-              });
+              if (content.serverName) {
+                assistantContent.push({
+                  type: "mcp_tool_use",
+                  id: content.id,
+                  name: content.name,
+                  server_name: content.serverName,
+                  input: JSON.parse(content.arguments),
+                });
+              } else {
+                assistantContent.push({
+                  type: "tool_use",
+                  id: content.id,
+                  name: content.name,
+                  input: JSON.parse(content.arguments),
+                });
+              }
             } else if (content.modality === ReasoningModalityLiteral && content.value.type === "thinking") {
               assistantContent.push({
                 type: "thinking",
@@ -518,6 +534,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               assistantContent.push({
                 type: "redacted_thinking",
                 data: content.value.data,
+              });
+            } else if (content.modality === ToolResponseModalityLiteral) {
+              assistantContent.push({
+                type: "mcp_tool_result",
+                tool_use_id: content.id,
+                content: JSON.parse(content.data),
+                is_error: (content.apiResponse && content.apiResponse.statusCode !== 200) || false,
               });
             } else {
               throw new InvalidMessagesError({
@@ -704,7 +727,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         } else if (contentItem.type === "redacted_thinking") {
           return createRedactedReasoningContent(contentItem.data);
         } else if (contentItem.type === "mcp_tool_use") {
-          return createToolCallContent(index, contentItem.id, contentItem.name, JSON.stringify(contentItem.input));
+          return createToolCallContent(index, contentItem.id, contentItem.name, JSON.stringify(contentItem.input), contentItem.server_name);
         } else if (contentItem.type === "mcp_tool_result") {
           return createToolResponseContent(index, contentItem.tool_use_id, "mcp_tool_result", JSON.stringify(contentItem.content), {
             statusCode: contentItem.is_error ? 500 : 200,
@@ -894,7 +917,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   parsedResponse.index,
                   parsedResponse.content_block.id,
                   parsedResponse.content_block.name,
-                  JSON.stringify(parsedResponse.content_block.input)
+                  JSON.stringify(parsedResponse.content_block.input),
+                  parsedResponse.content_block.server_name
                 )
               );
             } else if (parsedResponse.content_block.type === "mcp_tool_result") {
