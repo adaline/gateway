@@ -679,10 +679,20 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Add MCP beta header if MCP is enabled and MCP servers are configured
     if (config && config.mcp && config.mcpServers) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "mcp-client-2025-04-04",
-      };
+      const existingBetaHeader = headers["anthropic-beta"];
+      const mcpFeature = "mcp-client-2025-04-04";
+
+      if (existingBetaHeader) {
+        headers = {
+          ...headers,
+          "anthropic-beta": `${existingBetaHeader},${mcpFeature}`,
+        };
+      } else {
+        headers = {
+          ...headers,
+          "anthropic-beta": mcpFeature,
+        };
+      }
     }
 
     return new Promise((resolve) => {
@@ -770,10 +780,20 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Add MCP beta header if MCP is enabled and MCP servers are configured
     if (config && config.mcp && config.mcpServers) {
-      headers = {
-        ...headers,
-        "anthropic-beta": "mcp-client-2025-04-04",
-      };
+      const existingBetaHeader = headers["anthropic-beta"];
+      const mcpFeature = "mcp-client-2025-04-04";
+
+      if (existingBetaHeader) {
+        headers = {
+          ...headers,
+          "anthropic-beta": `${existingBetaHeader},${mcpFeature}`,
+        };
+      } else {
+        headers = {
+          ...headers,
+          "anthropic-beta": mcpFeature,
+        };
+      }
     }
 
     return new Promise((resolve) => {

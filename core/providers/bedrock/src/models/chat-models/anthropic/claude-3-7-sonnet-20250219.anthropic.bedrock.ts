@@ -40,10 +40,23 @@ class BedrockClaude3_7Sonnet20250219 extends BaseChatModelAnthropic {
 
   getDefaultHeaders(): HeadersType {
     let headers = super.getDefaultHeaders();
-    headers = {
-      ...headers,
-      "anthropic-beta": "output-128k-2025-02-19",
-    };
+
+    // Check if there's already an anthropic-beta header
+    const existingBetaHeader = headers["anthropic-beta"];
+    const output128kFeature = "output-128k-2025-02-19";
+
+    if (existingBetaHeader) {
+      headers = {
+        ...headers,
+        "anthropic-beta": `${existingBetaHeader},${output128kFeature}`,
+      };
+    } else {
+      headers = {
+        ...headers,
+        "anthropic-beta": output128kFeature,
+      };
+    }
+
     return headers;
   }
 }
