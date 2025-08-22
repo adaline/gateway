@@ -18,8 +18,7 @@ const MAX_TOKENS = {
 const MAX_REASONING_TOKENS = {
   type: "range",
   title: "Max reasoning tokens",
-  description:
-    "Specify the total tokens for reasoning, where one token approximates four English characters.",
+  description: "Specify the total tokens for reasoning, where one token approximates four English characters.",
 } as const;
 
 const STOP = (max: number) =>
@@ -148,6 +147,12 @@ const RESPONSE_SCHEMA = {
   description: "When response format is set to 'json_schema', the model will return a JSON object of the specified schema.",
 } as const;
 
+const MCP_SERVERS = {
+  type: "object",
+  title: "MCP servers",
+  description: "MCP servers to use for the model.",
+} as const;
+
 const CHAT_CONFIG = {
   TEMPERATURE,
   MAX_TOKENS,
@@ -167,6 +172,7 @@ const CHAT_CONFIG = {
   RESPONSE_FORMAT_WITH_SCHEMA,
   RESPONSE_SCHEMA,
   MAX_REASONING_TOKENS,
+  MCP_SERVERS,
 };
 
 export { CHAT_CONFIG };

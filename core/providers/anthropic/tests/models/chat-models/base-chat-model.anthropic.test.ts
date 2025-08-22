@@ -565,7 +565,7 @@ describe("BaseChatModel", () => {
         model.transformMessages(messages);
       } catch (e: any) {
         expect(e).toBeInstanceOf(InvalidMessagesError);
-        expect(e.info).toContain(`Invalid messages`);
+        expect(e.info).toContain("Invalid messages");
         expect(JSON.parse(e.cause?.message)).toEqual([
           {
             code: "invalid_type",
@@ -763,7 +763,7 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1); // Yields once for message_start
+      expect(results).toHaveLength(2); // Yields once for message_start, once for buffer update
       expect(results[0].buffer).toBe(""); // Line processed, buffer empty
       // message_start primarily provides initial usage and context
       expect(results[0].partialResponse.partialMessages).toEqual([]);
@@ -772,6 +772,9 @@ describe("BaseChatModel", () => {
         completionTokens: 0,
         totalTokens: 15, // Calculated in the transform function
       });
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should process a content_block_start chunk (text)", async () => {
@@ -784,7 +787,7 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2); // Yields once for content, once for buffer update
       expect(results[0].buffer).toBe("");
       // A content_block_start for text might yield an empty initial text message
       // depending on createPartialTextMessage implementation, or potentially []
@@ -792,6 +795,9 @@ describe("BaseChatModel", () => {
       // Assuming it creates a message:
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "")]);
       expect(results[0].partialResponse.usage).toBeUndefined(); // No usage in this event type
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should process a content_block_delta chunk (text delta)", async () => {
@@ -804,10 +810,13 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2); // Yields once for content, once for buffer update
       expect(results[0].buffer).toBe("");
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Hello")]);
       expect(results[0].partialResponse.usage).toBeUndefined();
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should process a content_block_start chunk (tool_use)", async () => {
@@ -819,13 +828,16 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2); // Yields once for content, once for buffer update
       expect(results[0].buffer).toBe("");
       expect(results[0].partialResponse.partialMessages).toEqual([
         // Creates the tool call structure
         createPartialToolCallMessage(AssistantRoleLiteral, 0, "toolu_abc123", "get_current_weather", ""),
       ]);
       expect(results[0].partialResponse.usage).toBeUndefined();
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should process a content_block_delta chunk (tool arguments delta)", async () => {
@@ -837,13 +849,16 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2); // Yields once for content, once for buffer update
       expect(results[0].buffer).toBe("");
       // Yields only the argument delta according to the code
       expect(results[0].partialResponse.partialMessages).toEqual([
         createPartialToolCallMessage(AssistantRoleLiteral, 0, "", "", '{"location":'), // Note empty id/name
       ]);
       expect(results[0].partialResponse.usage).toBeUndefined();
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should process a message_delta chunk (usage update / stop reason)", async () => {
@@ -855,17 +870,17 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2); // Yields once for content, once for buffer update
       expect(results[0].buffer).toBe("");
       expect(results[0].partialResponse.partialMessages).toEqual([]); // No content in message_delta
       expect(results[0].partialResponse.usage).toEqual({
-        promptTokens: undefined, // Not present in message_delta
+        promptTokens: undefined,
         completionTokens: 55,
-        totalTokens: 55, // Calculated in transform
+        totalTokens: 55,
       });
-      // Note: The transform function currently doesn't extract stop_reason/stop_sequence
-      // into the yielded partialResponse. If it did, you'd add an assertion here.
-      // expect(results[0].partialResponse.stopReason).toBe("tool_use");
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should process multiple complete lines (text deltas) in a single chunk", async () => {
@@ -874,7 +889,7 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload1) + anthropicData(payload2);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(2); // Yields per processed line
+      expect(results).toHaveLength(3); // Yields twice for content (one per line) + once for buffer update
 
       // First yield (from payload1)
       expect(results[0].buffer).toBe(""); // Buffer state after processing the *first* complete line
@@ -885,6 +900,10 @@ describe("BaseChatModel", () => {
       expect(results[1].buffer).toBe(""); // Buffer state after processing the *second* complete line
       expect(results[1].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, " Part 2.")]);
       expect(results[1].partialResponse.usage).toBeUndefined();
+
+      // Third yield (buffer update)
+      expect(results[2].partialResponse.partialMessages).toEqual([]);
+      expect(results[2].buffer).toBe("");
     });
 
     it("should terminate processing when 'message_stop' is received", async () => {
@@ -912,10 +931,13 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload);
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2); // Yields once for content, once for buffer update
       expect(results[0].buffer).toBe("");
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "")]); // Yields message with empty text
       expect(results[0].partialResponse.usage).toBeUndefined();
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     // --- Buffering Scenarios ---
@@ -926,7 +948,7 @@ describe("BaseChatModel", () => {
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
 
       // Yields nothing as no lines were completed/processed
-      expect(results).toHaveLength(0);
+      expect(results).toHaveLength(1);
       // Note: The generator doesn't yield the final buffer state explicitly.
       // If testing the *consumer* of this generator, you'd check the final buffer there.
     });
@@ -937,16 +959,19 @@ describe("BaseChatModel", () => {
       const buffer = anthropicData(bufferedPayload); // Buffer contains a *complete* line ending with \n
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
 
-      // Should process the buffered line, then process the newlines (which are ignored), yielding once.
-      expect(results).toHaveLength(1);
+      // Should process the buffered line, then process the newlines (which are ignored), yielding twice.
+      expect(results).toHaveLength(2); // Once for content, once for buffer update
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Buffered.")]);
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should buffer an incomplete chunk (start of line)", async () => {
       const chunk = 'data: {"type": "content_b'; // Incomplete Anthropic line
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(0); // No complete line processed, nothing yielded
+      expect(results).toHaveLength(1); // No complete line processed, nothing yielded
       // The final buffer state would be 'data: {"type": "content_b' if checked externally
     });
 
@@ -955,7 +980,7 @@ describe("BaseChatModel", () => {
       const buffer = 'data: {"type": "content_b';
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
 
-      expect(results).toHaveLength(0); // No complete line processed
+      expect(results).toHaveLength(1); // No complete line processed
       // The final buffer state would be 'data: {"type": "content_block_delta", "index": 0'
     });
 
@@ -964,9 +989,11 @@ describe("BaseChatModel", () => {
       const chunk = '{"type": "text_delta", "text": "Complete!"}}\n'; // Completes the JSON and adds newline
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
 
-      expect(results).toHaveLength(1);
-      expect(results[0].buffer).toBe(`data: {"type": "content_block_delta", "index": 0, "delta": `); // Line was completed and processed
+      expect(results).toHaveLength(2); // Once for content, once for buffer update
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Complete!")]);
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should process complete line and buffer the rest", async () => {
@@ -975,15 +1002,16 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload1) + incompleteLine;
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      // Yields only for the first complete line
-      expect(results).toHaveLength(1);
+      // Yields twice: once for the complete line, once for buffer update
+      expect(results).toHaveLength(2);
 
-      // First (and only) yield corresponds to processing the first line
+      // First yield corresponds to processing the first line
       expect(results[0].buffer).toBe(""); // Buffer reflects state *after* processing the complete line
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "First.")]);
 
-      // The final buffer state (containing `incompleteLine`) would need external tracking/checking
-      // as the generator doesn't yield it after the loop if no more lines were fully processed.
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe(incompleteLine);
     });
 
     it("should handle chunk ending exactly at newline", async () => {
@@ -991,9 +1019,11 @@ describe("BaseChatModel", () => {
       const chunk = anthropicData(payload); // Includes trailing \n
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      expect(results).toHaveLength(1);
-      expect(results[0].buffer).toBe(""); // Newline consumed, buffer empty
+      expect(results).toHaveLength(2); // Once for content, once for buffer update
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Exact.")]);
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     it("should combine buffer and chunk correctly when buffer has partial data", async () => {
@@ -1001,8 +1031,11 @@ describe("BaseChatModel", () => {
       const chunk = 'lock_delta", "index": 0, "delta": {"type": "text_delta", "text": "Joined!"}}\n';
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, buffer));
 
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2); // Once for content, once for buffer update
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Joined!")]);
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     // --- Error Handling ---
@@ -1058,10 +1091,12 @@ describe("BaseChatModel", () => {
         ":heartbeat\n"; // Ignored line (SSE comment)
       const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
 
-      // Only yields for the valid 'data:' line
-      expect(results).toHaveLength(1);
-      expect(results[0].buffer).toBe(""); // Valid line processed, ignored lines don't affect buffer here
+      // Yields twice: once for the valid 'data:' line, once for buffer update
+      expect(results).toHaveLength(2);
       expect(results[0].partialResponse.partialMessages).toEqual([createPartialTextMessage(AssistantRoleLiteral, "Valid")]);
+      // Second yield is for buffer update
+      expect(results[1].partialResponse.partialMessages).toEqual([]);
+      expect(results[1].buffer).toBe("");
     });
 
     // --- message_stop Specifics ---
@@ -1255,7 +1290,7 @@ describe("BaseChatModel", () => {
         modelWithoutTools.transformTools([validTool1]);
       } catch (e: any) {
         expect(e).toBeInstanceOf(InvalidToolsError);
-        expect(e.info).toContain(`Invalid tool 'modality' for model`);
+        expect(e.info).toContain("Invalid tool 'modality' for model");
         expect(e.cause).toBeInstanceOf(Error);
         if (e.cause instanceof Error) {
           expect(e.cause.message).toContain("does not support tool modality : 'tool-call'");

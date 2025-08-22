@@ -14,6 +14,8 @@ import {
   PartialTextModalityLiteral,
   PartialToolCallContent,
   PartialToolCallModalityLiteral,
+  PartialToolResponseContent,
+  PartialToolResponseModalityLiteral,
   ReasoningContent,
   ReasoningContentTypeLiteral,
   ReasoningModalityLiteral,
@@ -35,13 +37,33 @@ const createTextContent = (content: string): ContentType => {
   });
 };
 
-const createToolCallContent = (index: number, id: string, name: string, args: string): ContentType => {
+const createToolCallContent = (index: number, id: string, name: string, args: string, serverName?: string): ContentType => {
   return ToolCallContent().parse({
     modality: ToolCallModalityLiteral,
     index: index,
     id: id,
     name: name,
     arguments: args,
+    serverName: serverName,
+  });
+};
+
+const createToolResponseContent = (
+  index: number,
+  id: string,
+  name: string,
+  data: string,
+  apiResponse?: { statusCode: number },
+  metadata?: any
+): ContentType => {
+  return ToolResponseContent().parse({
+    modality: ToolResponseModalityLiteral,
+    index: index,
+    id: id,
+    name: name,
+    data: data,
+    apiResponse: apiResponse,
+    metadata: metadata,
   });
 };
 
@@ -129,7 +151,14 @@ const createPartialTextMessage = (role: RoleEnumType, content: string): PartialM
   });
 };
 
-const createPartialToolCallMessage = (role: RoleEnumType, index: number, id?: string, name?: string, args?: string): PartialMessageType => {
+const createPartialToolCallMessage = (
+  role: RoleEnumType,
+  index: number,
+  id?: string,
+  name?: string,
+  args?: string,
+  serverName?: string
+): PartialMessageType => {
   return PartialMessage().parse({
     role: role,
     partialContent: PartialToolCallContent().parse({
@@ -138,10 +167,29 @@ const createPartialToolCallMessage = (role: RoleEnumType, index: number, id?: st
       id: id,
       name: name,
       arguments: args,
+      serverName: serverName,
     }),
   });
 };
 
+const createPartialToolResponseMessage = (
+  role: RoleEnumType,
+  index: number,
+  id: string,
+  name: string,
+  data: string
+): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialToolResponseContent().parse({
+      modality: PartialToolResponseModalityLiteral,
+      index: index,
+      id: id,
+      name: name,
+      data: data,
+    }),
+  });
+};
 const createReasoningContent = (thinking: string, signature: string): ContentType => {
   return ReasoningContent().parse({
     modality: ReasoningModalityLiteral,
@@ -230,6 +278,7 @@ export {
   createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createPartialToolResponseMessage,
   createReasoningContent,
   createReasoningMessage,
   createRedactedReasoningContent,
@@ -238,6 +287,7 @@ export {
   createTextMessage,
   createToolCallContent,
   createToolCallMessage,
+  createToolResponseContent,
   createToolResponseMessage,
   createUrlImageMessage,
 };

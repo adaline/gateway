@@ -1,0 +1,557 @@
+---
+alwaysApply: true
+---
+
+# Adaline Gateway Repository - Main Rules
+
+## Repository Overview
+
+This is a TypeScript-based AI gateway service that provides unified interfaces for multiple AI providers (OpenAI, Anthropic, Google, etc.) with features like caching, queuing, analytics, and telemetry.
+
+## Core Architecture Principles
+
+### 1. Type Safety & Schema Validation
+
+#### Rules
+
+- **ALWAYS** use Zod schemas for runtime validation
+- **ALWAYS** export both the schema and inferred types
+- **NEVER** use `any` type - use proper generic constraints
+- **ALWAYS** validate input/output at runtime using schemas
+
+#### Instructions
+
+```typescript
+// ✅ CORRECT: Define schema first, then type
+import { z } from 'zod';
+
+const UserConfig = z.object({
+  apiKey: z.string().min(1),
+  model: z.string().min(1),
+  temperature: z.number().min(0).max(2).default(1.0),
+});
+type UserConfigType = z.infer<typeof UserConfig>;
+
+// Export both schema and type
+export { UserConfig, type UserConfigType };
+
+// ❌ INCORRECT: Using any type
+function processData(data: any): any {
+  return data; // Unsafe and loses type information
+}
+
+// ✅ CORRECT: Proper typing with validation
+function processData(data: unknown): UserConfigType {
+  return UserConfig.parse(data); // Validates at runtime
+}
+```
+
+#### Implementation Steps
+
+1. **Install Zod**: `npm install zod`
+2. **Define Schema**: Create Zod schema with proper constraints
+3. **Infer Type**: Use `z.infer<typeof SchemaName>` for TypeScript types
+4. **Export Both**: Export schema for runtime validation, type for compile-time checking
+5. **Validate Input**: Use `schema.parse()` or `schema.safeParse()` for validation
+
+### 2. Error Handling
+
+#### Rules
+
+- **ALWAYS** use custom error classes extending `GatewayError`
+- **ALWAYS** provide meaningful error messages with context
+- **ALWAYS** handle errors gracefully with proper logging
+- **NEVER** let unhandled errors bubble up
+
+#### Instructions
+
+```typescript
+// ✅ CORRECT: Custom error class with context
+import { GatewayError } from "./errors";
+
+export class ProviderConnectionError extends GatewayError {
+  constructor(
+    message: string,
+    public readonly provider: string,
+    public readonly statusCode: number,
+    public readonly originalError?: Error
+  ) {
+    super(`Failed to connect to ${provider}: ${message} (Status: ${statusCode})`, "PROVIDER_CONNECTION_ERROR");
+  }
+}
+
+// Usage in code
+try {
+  await provider.makeRequest();
+} catch (error) {
+  if (error instanceof HttpError) {
+    throw new ProviderConnectionError("API request failed", "anthropic", error.status, error);
+  }
+  throw error;
+}
+```
+
+#### Implementation Steps
+
+1. **Extend Base Error**: Create custom error class extending `GatewayError`
+2. **Include Context**: Add relevant properties for debugging
+3. **Meaningful Messages**: Provide clear, actionable error messages
+4. **Error Wrapping**: Wrap external errors with custom context
+5. **Proper Logging**: Log errors with full context before re-throwing
+
+### 3. Logging & Telemetry
+
+#### Rules
+
+- **ALWAYS** use the centralized logger from `LoggerManager`
+- **ALWAYS** include relevant context in log messages
+- **ALWAYS** use OpenTelemetry for tracing and metrics
+- **ALWAYS** log at appropriate levels (debug, info, warn, error)
+
+#### Instructions
+
+```typescript
+// ✅ CORRECT: Centralized logging with context
+import { LoggerManager } from "./plugins/logger";
+
+const logger = LoggerManager.getLogger();
+
+// Structured logging with context
+logger?.info("Processing chat request", {
+  requestId: request.id,
+  model: request.model,
+  provider: request.provider,
+  timestamp: new Date().toISOString(),
+});
+
+// Error logging with full context
+logger?.error("Provider request failed", {
+  error: error.message,
+  stack: error.stack,
+  requestId: request.id,
+  provider: request.provider,
+  statusCode: response.status,
+});
+
+// Debug logging for troubleshooting
+logger?.debug("Cache operation", {
+  operation: "get",
+  key: cacheKey,
+  hit: !!cachedResponse,
+  ttl: cachedResponse?.ttl,
+});
+```
+
+#### Implementation Steps
+
+1. **Get Logger**: Use `LoggerManager.getLogger()` to get logger instance
+2. **Choose Level**: Use appropriate log level (debug, info, warn, error)
+3. **Add Context**: Include relevant metadata in log messages
+4. **Structured Format**: Use objects for structured logging
+5. **Performance**: Use optional chaining to avoid null checks
+
+### 4. Testing Standards
+
+#### Rules
+
+- **ALWAYS** write comprehensive tests for new functionality
+- **ALWAYS** use Vitest as the testing framework
+- **ALWAYS** mock external dependencies
+- **ALWAYS** test both success and error scenarios
+- **ALWAYS** use descriptive test names and proper assertions
+
+#### Instructions
+
+```typescript
+// ✅ CORRECT: Comprehensive test structure
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { Gateway } from "./gateway";
+
+describe("Gateway.completeChat", () => {
+  let gateway: Gateway;
+  let mockProvider: any;
+
+  beforeEach(() => {
+    // Setup mocks
+    mockProvider = {
+      completeChat: vi.fn(),
+      getModelPricing: vi.fn(),
+    };
+
+    gateway = new Gateway({
+      providers: { anthropic: mockProvider },
+    });
+  });
+
+  it("should successfully complete chat request", async () => {
+    // Arrange
+    const request = {
+      messages: [{ role: "user", content: "Hello" }],
+      model: "claude-3-sonnet",
+    };
+
+    const expectedResponse = {
+      messages: [{ role: "assistant", content: "Hi there!" }],
+      usage: { promptTokens: 5, completionTokens: 3, totalTokens: 8 },
+    };
+
+    mockProvider.completeChat.mockResolvedValue(expectedResponse);
+
+    // Act
+    const result = await gateway.completeChat(request);
+
+    // Assert
+    expect(result).toEqual(expectedResponse);
+    expect(mockProvider.completeChat).toHaveBeenCalledWith(request);
+  });
+
+  it("should handle provider errors gracefully", async () => {
+    // Arrange
+    const request = { messages: [], model: "invalid-model" };
+    const error = new Error("Model not found");
+    mockProvider.completeChat.mockRejectedValue(error);
+
+    // Act & Assert
+    await expect(gateway.completeChat(request)).rejects.toThrow("Model not found");
+  });
+});
+```
+
+#### Implementation Steps
+
+1. **Setup Test Environment**: Use `beforeEach` for test setup
+2. **Mock Dependencies**: Mock external services and dependencies
+3. **Arrange-Act-Assert**: Follow AAA pattern for test structure
+4. **Test Scenarios**: Cover success, error, and edge cases
+5. **Descriptive Names**: Use clear, descriptive test names
+6. **Proper Assertions**: Use appropriate assertion methods
+
+### 5. Code Organization
+
+#### Rules
+
+- **ALWAYS** follow the established folder structure
+- **ALWAYS** use index files for clean exports
+- **ALWAYS** separate interfaces from implementations
+- **ALWAYS** use consistent naming conventions
+
+#### Instructions
+
+```typescript
+// complete-chat.handler.ts
+import { CompleteChatRequestType } from "./complete-chat.types";
+
+// ✅ CORRECT: Proper file organization
+// core/gateway/src/handlers/complete-chat/
+// ├── complete-chat.handler.ts    // Implementation
+// ├── complete-chat.types.ts      // Types and interfaces
+// └── index.ts                    // Exports
+
+// complete-chat.types.ts
+export interface CompleteChatRequest {
+  messages: Message[];
+  model: string;
+  options?: ChatOptions;
+}
+
+export type CompleteChatRequestType = CompleteChatRequest;
+
+export async function handleCompleteChat(request: CompleteChatRequestType): Promise<ChatResponse> {
+  // Implementation
+}
+
+// index.ts
+export * from "./complete-chat.handler";
+export * from "./complete-chat.types";
+```
+
+#### Implementation Steps
+
+1. **Create Directory Structure**: Follow established folder patterns
+2. **Separate Concerns**: Keep types, implementation, and exports separate
+3. **Use Index Files**: Create index.ts files for clean exports
+4. **Consistent Naming**: Use kebab-case for files, PascalCase for classes
+5. **Group Related Files**: Keep related functionality together
+
+### 6. Performance & Security
+
+#### Rules
+
+- **ALWAYS** implement proper caching strategies
+- **ALWAYS** use queues for rate limiting and concurrency control
+- **ALWAYS** validate and sanitize all inputs
+- **ALWAYS** implement proper retry mechanisms with exponential backoff
+
+#### Instructions
+
+```typescript
+// ✅ CORRECT: Caching with TTL
+class CacheManager {
+  private cache = new Map<string, { data: any; expires: number }>();
+
+  set(key: string, data: any, ttlMs: number): void {
+    const expires = Date.now() + ttlMs;
+    this.cache.set(key, { data, expires });
+  }
+
+  get(key: string): any | null {
+    const item = this.cache.get(key);
+    if (!item || Date.now() > item.expires) {
+      this.cache.delete(key);
+      return null;
+    }
+    return item.data;
+  }
+}
+
+// ✅ CORRECT: Retry with exponential backoff
+async function retryWithBackoff<T>(operation: () => Promise<T>, maxRetries: number = 3, baseDelay: number = 1000): Promise<T> {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error as Error;
+
+      if (attempt === maxRetries) {
+        throw lastError;
+      }
+
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
+}
+```
+
+#### Implementation Steps
+
+1. **Implement Caching**: Use LRU cache with TTL for frequently accessed data
+2. **Add Queuing**: Implement queues for rate limiting and concurrency control
+3. **Input Validation**: Validate all inputs using Zod schemas
+4. **Retry Logic**: Implement exponential backoff for transient failures
+5. **Security**: Sanitize inputs and implement proper access controls
+
+### 7. Documentation
+
+#### Rules
+
+- **ALWAYS** include JSDoc comments for public APIs
+- **ALWAYS** update CHANGELOG.md for breaking changes
+- **ALWAYS** provide clear examples in README files
+- **ALWAYS** document configuration options and their effects
+
+#### Instructions
+
+````typescript
+// ✅ CORRECT: Comprehensive JSDoc documentation
+/**
+ * Processes a chat completion request and returns the response
+ *
+ * @param request - The chat completion request containing messages and options
+ * @param options - Additional processing options
+ * @returns Promise resolving to the chat completion response
+ *
+ * @example
+ * ```typescript
+ * const response = await gateway.completeChat({
+ *   messages: [{ role: 'user', content: 'Hello, how are you?' }],
+ *   model: 'claude-3-sonnet',
+ *   temperature: 0.7,
+ * });
+ *
+ * console.log(response.messages[0].content);
+ * ```
+ *
+ * @throws {ValidationError} When the request format is invalid
+ * @throws {ProviderError} When the AI provider returns an error
+ * @throws {RateLimitError} When rate limits are exceeded
+ */
+async completeChat(
+  request: CompleteChatRequest,
+  options?: ChatOptions
+): Promise<ChatResponse> {
+  // Implementation
+}
+````
+
+#### Implementation Steps
+
+1. **JSDoc Comments**: Add comprehensive documentation for public methods
+2. **Examples**: Include usage examples in documentation
+3. **Error Documentation**: Document all possible errors and their causes
+4. **Parameter Documentation**: Document all parameters and their types
+5. **Return Documentation**: Document return values and their structure
+6. **Update Changelog**: Document breaking changes in CHANGELOG.md
+
+## File Naming Conventions
+
+### Rules
+
+- Use kebab-case for file names: `complete-chat.handler.ts`
+- Use PascalCase for class names: `Gateway`, `AnthropicProvider`
+- Use camelCase for functions and variables: `handleCompleteChat`, `chatModel`
+- Use UPPER_SNAKE_CASE for constants: `MAX_CONCURRENT_TASKS`
+
+### Examples
+
+```typescript
+// ✅ CORRECT: File naming
+// complete-chat.handler.ts
+export async function handleCompleteChat() {}
+
+// gateway.ts
+export class Gateway {}
+
+// constants.ts
+export const MAX_CONCURRENT_TASKS = 10;
+export const DEFAULT_TIMEOUT_MS = 30000;
+
+// ❌ INCORRECT: Inconsistent naming
+// CompleteChatHandler.ts (should be complete-chat.handler.ts)
+export async function HandleCompleteChat() {} // Should be handleCompleteChat
+```
+
+## Import/Export Patterns
+
+### Rules
+
+- **ALWAYS** use named exports for public APIs
+- **ALWAYS** use index files to re-export from subdirectories
+- **ALWAYS** group imports: external libraries, internal modules, relative imports
+- **ALWAYS** use absolute imports for packages: `@adaline/provider`
+
+### Instructions
+
+```typescript
+// ✅ CORRECT: Import organization
+// 1. External libraries
+import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
+
+// 2. Internal packages
+import { ChatModelV1, ProviderV1 } from '@adaline/provider';
+import { MessageType, ChatResponseType } from '@adaline/types';
+
+// 3. Relative imports
+import { GatewayError } from './errors';
+import { handleCompleteChat } from './handlers/complete-chat';
+
+// ✅ CORRECT: Export pattern
+export { Gateway, type GatewayOptionsType };
+export * from './handlers';
+export * from './plugins';
+export * from './utils';
+
+// ❌ INCORRECT: Default exports for classes
+export default class Gateway { } // Should use named export
+```
+
+### Implementation Steps
+
+1. **Group Imports**: Organize imports by external, internal, then relative
+2. **Use Named Exports**: Export specific items rather than default exports
+3. **Create Index Files**: Use index.ts files to re-export from subdirectories
+4. **Absolute Paths**: Use package names for internal package imports
+5. **Clean Exports**: Export only what's needed publicly
+
+## Code Style
+
+### Rules
+
+- Use 2-space indentation
+- Use semicolons at the end of statements
+- Use single quotes for strings
+- Use trailing commas in objects and arrays
+- Use explicit return types for public functions
+- Use `const` by default, `let` only when reassignment is needed
+
+### Instructions
+
+```typescript
+// ✅ CORRECT: Consistent code style
+interface UserConfig {
+  name: string;
+  email: string;
+  preferences: {
+    theme: "light" | "dark";
+    notifications: boolean;
+    language: string;
+  };
+}
+
+class UserManager {
+  private users: Map<string, UserConfig> = new Map();
+
+  public async createUser(config: UserConfig): Promise<string> {
+    const userId = uuidv4();
+
+    this.users.set(userId, {
+      ...config,
+      preferences: {
+        theme: "light",
+        notifications: true,
+        language: "en",
+        ...config.preferences,
+      },
+    });
+
+    return userId;
+  }
+
+  public getUser(id: string): UserConfig | undefined {
+    return this.users.get(id);
+  }
+}
+
+// ❌ INCORRECT: Inconsistent style
+interface UserConfig {
+  name: string;
+  email: string;
+  preferences: {
+    theme: "light" | "dark";
+    notifications: boolean;
+    language: string;
+  };
+}
+```
+
+### Implementation Steps
+
+1. **Configure ESLint**: Use ESLint with TypeScript rules
+2. **Use Prettier**: Configure Prettier for consistent formatting
+3. **Editor Settings**: Set up editor to use 2-space indentation
+4. **Pre-commit Hooks**: Use husky to enforce code style
+5. **Team Agreement**: Establish coding standards with the team
+
+## Quick Reference Checklist
+
+### Before Committing Code
+
+- [ ] All Zod schemas are properly defined and exported
+- [ ] Custom error classes extend `GatewayError`
+- [ ] All public methods have JSDoc documentation
+- [ ] Tests cover success and error scenarios
+- [ ] Code follows naming conventions
+- [ ] Imports are properly organized
+- [ ] No `any` types are used
+- [ ] Error handling is implemented
+- [ ] Logging is added at appropriate levels
+- [ ] Performance considerations are addressed
+
+### When Adding New Features
+
+- [ ] Create proper folder structure
+- [ ] Define types and interfaces first
+- [ ] Implement with proper error handling
+- [ ] Add comprehensive tests
+- [ ] Update documentation
+- [ ] Consider caching and performance
+- [ ] Add telemetry and logging
+- [ ] Follow security best practices
+
+---

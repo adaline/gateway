@@ -23,6 +23,21 @@ const AnthropicCompleteChatRedactedThinkingResponse = z.object({
   data: z.string(),
 });
 
+const AnthropicCompleteChatMcpToolUseResponse = z.object({
+  type: z.literal("mcp_tool_use"),
+  id: z.string(),
+  name: z.string(),
+  server_name: z.string(),
+  input: z.record(z.any()),
+});
+
+const AnthropicCompleteChatMcpToolResultResponse = z.object({
+  type: z.literal("mcp_tool_result"),
+  tool_use_id: z.string(),
+  is_error: z.boolean(),
+  content: z.array(z.any()),
+});
+
 const AnthropicCompleteChatResponse = z.object({
   content: z.array(
     z.discriminatedUnion("type", [
@@ -30,6 +45,8 @@ const AnthropicCompleteChatResponse = z.object({
       AnthropicCompleteChatToolResponse,
       AnthropicCompleteChatThinkingResponse,
       AnthropicCompleteChatRedactedThinkingResponse,
+      AnthropicCompleteChatMcpToolUseResponse,
+      AnthropicCompleteChatMcpToolResultResponse,
     ])
   ),
   id: z.string(),
@@ -97,6 +114,21 @@ const AnthropicStreamChatContentBlockStartRedactedThinkingResponse = z.object({
   data: z.string(),
 });
 
+const AnthropicStreamChatContentBlockStartMcpToolUseResponse = z.object({
+  type: z.literal("mcp_tool_use"),
+  id: z.string(),
+  name: z.string(),
+  server_name: z.string(),
+  input: z.record(z.any()),
+});
+
+const AnthropicStreamChatContentBlockStartMcpToolResultResponse = z.object({
+  type: z.literal("mcp_tool_result"),
+  tool_use_id: z.string(),
+  is_error: z.boolean(),
+  content: z.array(z.any()), // Allow any content type as per MCP specification
+});
+
 const AnthropicStreamChatContentBlockStartResponse = z.object({
   type: z.literal("content_block_start"),
   index: z.number(),
@@ -105,6 +137,8 @@ const AnthropicStreamChatContentBlockStartResponse = z.object({
     AnthropicStreamChatContentBlockStartToolResponse,
     AnthropicStreamChatContentBlockStartThinkingResponse,
     AnthropicStreamChatContentBlockStartRedactedThinkingResponse,
+    AnthropicStreamChatContentBlockStartMcpToolUseResponse,
+    AnthropicStreamChatContentBlockStartMcpToolResultResponse,
   ]),
 });
 
@@ -150,8 +184,12 @@ const AnthropicStreamChatContentBlockDeltaResponse = z.object({
 //   .or(AnthropicStreamChatLastResponse);
 
 export {
+  AnthropicCompleteChatMcpToolResultResponse,
+  AnthropicCompleteChatMcpToolUseResponse,
   AnthropicCompleteChatResponse,
   AnthropicStreamChatContentBlockDeltaResponse,
+  AnthropicStreamChatContentBlockStartMcpToolResultResponse,
+  AnthropicStreamChatContentBlockStartMcpToolUseResponse,
   AnthropicStreamChatContentBlockStartResponse,
   AnthropicStreamChatMessageDeltaResponse,
   AnthropicStreamChatMessageStartResponse,
