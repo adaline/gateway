@@ -96,6 +96,7 @@ describe("BaseChatModelVertex", () => {
   });
 
   const mockOptions = {
+    authType: "accessToken" as const,
     accessToken: "test-api-token",
     projectId: "test-project-id",
     location: "test-location",
@@ -387,7 +388,7 @@ describe("BaseChatModelVertex", () => {
               modality: "pdf" as const,
               value: { type: "base64", base64: "JVBERi0xLjQK..." },
               file: {
-              name: "somie_pdf.pdf",
+                name: "somie_pdf.pdf",
                 id: "some_pdf.pdf",
               },
             },
@@ -540,7 +541,7 @@ describe("BaseChatModelVertex", () => {
         model.transformMessages(messages);
       } catch (e: any) {
         expect(e).toBeInstanceOf(InvalidMessagesError);
-        expect(e.info).toContain(`Invalid messages`);
+        expect(e.info).toContain("Invalid messages");
         expect(JSON.parse(e.cause?.message)).toEqual([
           {
             code: "invalid_type",
@@ -1362,7 +1363,7 @@ describe("BaseChatModelVertex", () => {
         modelWithoutTools.transformTools([validTool1]);
       } catch (e: any) {
         expect(e).toBeInstanceOf(InvalidToolsError);
-        expect(e.info).toContain(`Invalid tool 'modality' for model`);
+        expect(e.info).toContain("Invalid tool 'modality' for model");
         expect(e.cause).toBeInstanceOf(Error);
         if (e.cause instanceof Error) {
           expect(e.cause.message).toContain("does not support tool modality : 'tool-call'");

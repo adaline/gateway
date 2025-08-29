@@ -55,9 +55,10 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@adaline/types": "workspace:*",
-    "@adaline/provider": "workspace:*",
     "@adaline/google": "workspace:*",
+    "@adaline/provider": "workspace:*",
+    "@adaline/types": "workspace:*",
+    "jose": "^5.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
