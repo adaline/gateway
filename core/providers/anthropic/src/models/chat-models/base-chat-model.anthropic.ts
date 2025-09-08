@@ -29,10 +29,12 @@ import {
   createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createPartialToolResponseMessage,
   createReasoningContent,
   createRedactedReasoningContent,
   createTextContent,
   createToolCallContent,
+  createToolResponseContent,
   ImageContentType,
   ImageModalityLiteral,
   Message,
@@ -59,6 +61,8 @@ import {
   AnthropicRequest,
   AnthropicRequestAssistantMessageType,
   AnthropicRequestImageContentType,
+  AnthropicRequestMcpToolResultContentType,
+  AnthropicRequestMcpToolUseContentType,
   AnthropicRequestRedactedThinkingContentType,
   AnthropicRequestTextContentType,
   AnthropicRequestThinkingContentType,
@@ -296,12 +300,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     const _toolChoice = config.toolChoice;
     const _reasoningEnabled = config.reasoningEnabled;
     const _maxReasoningTokens = config.maxReasoningTokens;
+    const _mcp = config.mcp;
+    const _mcpServers = config.mcpServers;
 
     const _config = { ...config }; // create a copy to avoid mutating original config
 
     delete _config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
     delete _config.reasoningEnabled;
     delete _config.maxReasoningTokens;
+    delete _config.mcp;
+    delete _config.mcpServers; // MCP servers are handled separately
 
     const _parsedConfig = this.modelSchema.config.schema.safeParse(_config);
     if (!_parsedConfig.success) {
@@ -374,7 +382,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (hasExtendedThinking !== hasThinkingTokens) {
       throw new InvalidConfigError({
         info: `Invalid extended thinking config for model: '${this.modelName}'`,
-        cause: new Error(`Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together.`),
+        cause: new Error("Both 'reasoningEnabled' and 'maxReasoningTokens' must be defined together."),
       });
     }
 
@@ -394,6 +402,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           });
         }
       }
+    }
+
+    // Add MCP servers if MCP is enabled and servers are configured
+    if (_mcp && _mcpServers) {
+      transformedConfig.mcp_servers = _mcpServers;
     }
 
     return transformedConfig;
@@ -462,6 +475,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         | AnthropicRequestToolResponseContentType
         | AnthropicRequestThinkingContentType
         | AnthropicRequestRedactedThinkingContentType
+        | AnthropicRequestMcpToolUseContentType
+        | AnthropicRequestMcpToolResultContentType
       )[];
     }[] = [];
 
@@ -486,17 +501,29 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             | AnthropicRequestToolCallContentType
             | AnthropicRequestThinkingContentType
             | AnthropicRequestRedactedThinkingContentType
+            | AnthropicRequestMcpToolResultContentType
+            | AnthropicRequestMcpToolUseContentType
           )[] = [];
           message.content.forEach((content) => {
             if (content.modality === TextModalityLiteral) {
               assistantContent.push({ type: "text", text: content.value });
             } else if (content.modality === ToolCallModalityLiteral) {
-              assistantContent.push({
-                type: "tool_use",
-                id: content.id,
-                name: content.name,
-                input: JSON.parse(content.arguments),
-              });
+              if (content.serverName) {
+                assistantContent.push({
+                  type: "mcp_tool_use",
+                  id: content.id,
+                  name: content.name,
+                  server_name: content.serverName,
+                  input: JSON.parse(content.arguments),
+                });
+              } else {
+                assistantContent.push({
+                  type: "tool_use",
+                  id: content.id,
+                  name: content.name,
+                  input: JSON.parse(content.arguments),
+                });
+              }
             } else if (content.modality === ReasoningModalityLiteral && content.value.type === "thinking") {
               assistantContent.push({
                 type: "thinking",
@@ -507,6 +534,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               assistantContent.push({
                 type: "redacted_thinking",
                 data: content.value.data,
+              });
+            } else if (content.modality === ToolResponseModalityLiteral) {
+              assistantContent.push({
+                type: "mcp_tool_result",
+                tool_use_id: content.id,
+                content: JSON.parse(content.data),
+                is_error: (content.apiResponse && content.apiResponse.statusCode !== 200) || false,
               });
             } else {
               throw new InvalidMessagesError({
@@ -640,16 +674,32 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
+
+    // Add MCP beta header if MCP is enabled and MCP servers are configured
+    if (config && config.mcp && config.mcpServers) {
+      const existingBetaHeader = headers["anthropic-beta"];
+      const mcpFeature = "mcp-client-2025-04-04";
+
+      if (existingBetaHeader) {
+        headers = {
+          ...headers,
+          "anthropic-beta": `${existingBetaHeader},${mcpFeature}`,
+        };
+      } else {
+        headers = {
+          ...headers,
+          "anthropic-beta": mcpFeature,
+        };
+      }
+    }
 
     return new Promise((resolve) => {
       resolve(headers);
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getCompleteChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
     const transformedConfig = this.transformConfig(config, messages, tools);
     const transformedMessages = this.transformMessages(messages);
@@ -686,6 +736,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           return createReasoningContent(contentItem.thinking, contentItem.signature);
         } else if (contentItem.type === "redacted_thinking") {
           return createRedactedReasoningContent(contentItem.data);
+        } else if (contentItem.type === "mcp_tool_use") {
+          return createToolCallContent(index, contentItem.id, contentItem.name, JSON.stringify(contentItem.input), contentItem.server_name);
+        } else if (contentItem.type === "mcp_tool_result") {
+          return createToolResponseContent(index, contentItem.tool_use_id, "mcp_tool_result", JSON.stringify(contentItem.content), {
+            statusCode: contentItem.is_error ? 500 : 200,
+          });
         }
       }) as ContentType[];
 
@@ -719,9 +775,26 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
+  async getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
     let headers = this.getDefaultHeaders();
+
+    // Add MCP beta header if MCP is enabled and MCP servers are configured
+    if (config && config.mcp && config.mcpServers) {
+      const existingBetaHeader = headers["anthropic-beta"];
+      const mcpFeature = "mcp-client-2025-04-04";
+
+      if (existingBetaHeader) {
+        headers = {
+          ...headers,
+          "anthropic-beta": `${existingBetaHeader},${mcpFeature}`,
+        };
+      } else {
+        headers = {
+          ...headers,
+          "anthropic-beta": mcpFeature,
+        };
+      }
+    }
 
     return new Promise((resolve) => {
       resolve(headers);
@@ -757,7 +830,26 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     buffer: string
   ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
     // merge last buffer message and split into lines
-    const lines = (buffer + chunk).split("\n").filter((line) => line.trim() !== "");
+    const data = buffer + chunk;
+    const lines: string[] = [];
+    let newBuffer = "";
+
+    // Split data into complete lines and new buffer
+    let currentIndex = 0;
+    while (currentIndex < data.length) {
+      const newlineIndex = data.indexOf("\n", currentIndex);
+      if (newlineIndex === -1) {
+        newBuffer = data.substring(currentIndex);
+        break;
+      } else {
+        const line = data.substring(currentIndex, newlineIndex).trim();
+        if (line) {
+          lines.push(line);
+        }
+        currentIndex = newlineIndex + 1;
+      }
+    }
+
     for (const line of lines) {
       if (line.startsWith("data: {") && line.endsWith("}")) {
         // line contains message
@@ -838,9 +930,30 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, parsedResponse.content_block.thinking));
             } else if (parsedResponse.content_block.type === "redacted_thinking") {
               partialMessages.push(createPartialRedactedReasoningMessage(AssistantRoleLiteral, parsedResponse.content_block.data));
+            } else if (parsedResponse.content_block.type === "mcp_tool_use") {
+              partialMessages.push(
+                createPartialToolCallMessage(
+                  AssistantRoleLiteral,
+                  parsedResponse.index,
+                  parsedResponse.content_block.id,
+                  parsedResponse.content_block.name,
+                  JSON.stringify(parsedResponse.content_block.input),
+                  parsedResponse.content_block.server_name
+                )
+              );
+            } else if (parsedResponse.content_block.type === "mcp_tool_result") {
+              partialMessages.push(
+                createPartialToolResponseMessage(
+                  AssistantRoleLiteral,
+                  parsedResponse.index,
+                  parsedResponse.content_block.tool_use_id,
+                  "mcp_tool_result",
+                  JSON.stringify(parsedResponse.content_block.content)
+                )
+              );
             }
 
-            yield { partialResponse: { partialMessages: partialMessages }, buffer: buffer };
+            yield { partialResponse: { partialMessages: partialMessages }, buffer: buffer }; // Buffer is empty after processing this line
           } else {
             throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
           }
@@ -872,6 +985,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         // line starts with unknown event -- ignore
       }
     }
+
+    // Yield the updated buffer after processing all lines
+    yield { partialResponse: { partialMessages: [] }, buffer: newBuffer };
   }
 
   async *transformProxyStreamChatResponseChunk(

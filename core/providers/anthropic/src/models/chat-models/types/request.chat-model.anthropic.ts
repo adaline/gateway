@@ -65,6 +65,43 @@ const AnthropicRequestToolResponseContent = z.object({
 });
 type AnthropicRequestToolResponseContentType = z.infer<typeof AnthropicRequestToolResponseContent>;
 
+const AnthropicRequestMcpToolUseContent = z.object({
+  type: z.literal("mcp_tool_use"),
+  id: z.string().min(1),
+  name: z.string().min(1),
+  server_name: z.string().min(1),
+  input: z.record(z.any()),
+});
+type AnthropicRequestMcpToolUseContentType = z.infer<typeof AnthropicRequestMcpToolUseContent>;
+
+const AnthropicRequestMcpToolResultContent = z.object({
+  type: z.literal("mcp_tool_result"),
+  tool_use_id: z.string().min(1),
+  is_error: z.boolean().default(false),
+  content: z.array(z.any()),
+});
+type AnthropicRequestMcpToolResultContentType = z.infer<typeof AnthropicRequestMcpToolResultContent>;
+
+const AnthropicRequestMcpServerToolConfiguration = z.object({
+  enabled: z.boolean().default(true),
+  allowed_tools: z.array(z.string().min(1)).optional(),
+});
+type AnthropicRequestMcpServerToolConfigurationType = z.infer<typeof AnthropicRequestMcpServerToolConfiguration>;
+
+const AnthropicRequestMcpServer = z.object({
+  type: z.literal("url"),
+  url: z
+    .string()
+    .url()
+    .refine((url) => url.startsWith("https://"), {
+      message: "MCP server URL must start with https://",
+    }),
+  name: z.string().min(1),
+  tool_configuration: AnthropicRequestMcpServerToolConfiguration.optional(),
+  authorization_token: z.string().min(1).optional(),
+});
+type AnthropicRequestMcpServerType = z.infer<typeof AnthropicRequestMcpServer>;
+
 const AnthropicRequestUserMessage = z.object({
   role: z.literal("user"),
   content: z
@@ -108,6 +145,7 @@ const AnthropicRequest = z.object({
   tools: z.array(AnthropicRequestTool).min(1).optional(),
   top_p: z.number().min(0).max(1).optional(),
   top_k: z.number().min(0).optional(),
+  mcp_servers: z.array(AnthropicRequestMcpServer).min(1).optional(),
 });
 type AnthropicRequestType = z.infer<typeof AnthropicRequest>;
 
@@ -115,6 +153,10 @@ export {
   AnthropicRequest,
   AnthropicRequestAssistantMessage,
   AnthropicRequestImageContent,
+  AnthropicRequestMcpServer,
+  AnthropicRequestMcpServerToolConfiguration,
+  AnthropicRequestMcpToolResultContent,
+  AnthropicRequestMcpToolUseContent,
   AnthropicRequestMessage,
   AnthropicRequestRedactedThinkingContent,
   AnthropicRequestTextContent,
@@ -127,6 +169,10 @@ export {
   AnthropicRequestUserMessage,
   type AnthropicRequestAssistantMessageType,
   type AnthropicRequestImageContentType,
+  type AnthropicRequestMcpServerToolConfigurationType,
+  type AnthropicRequestMcpServerType,
+  type AnthropicRequestMcpToolResultContentType,
+  type AnthropicRequestMcpToolUseContentType,
   type AnthropicRequestMessageType,
   type AnthropicRequestRedactedThinkingContentType,
   type AnthropicRequestTextContentType,

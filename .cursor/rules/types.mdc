@@ -1,0 +1,487 @@
+---
+globs: packages/types/**
+alwaysApply: false
+---
+
+# Types Package Rules & Instructions
+
+## Package Overview
+
+The types package contains shared type definitions, Zod schemas, and interfaces used across the entire Adaline Gateway ecosystem. This package serves as the single source of truth for all data structures.
+
+## Type Definition Rules
+
+### 1. Schema-First Approach
+
+- **ALWAYS** define Zod schemas first, then derive TypeScript types
+- **ALWAYS** export both the schema and the inferred type
+- **ALWAYS** use descriptive schema names ending with descriptive suffixes
+- **NEVER** define types without corresponding schemas
+
+### 2. Naming Conventions
+
+- **ALWAYS** use PascalCase for schema names: `ChatResponse`, `MessageContent`
+- **ALWAYS** use PascalCase + `Type` suffix for type names: `ChatResponseType`, `MessageContentType`
+- **ALWAYS** use descriptive names that clearly indicate purpose
+- **ALWAYS** follow the pattern: `{SchemaName}` and `{SchemaName}Type`
+
+## Schema Definition Instructions
+
+### 1. Basic Schema Structure
+
+```typescript
+// ✅ CORRECT: Define schema first, then type
+const ChatResponse = z.object({
+  messages: z.array(Message()),
+  usage: ChatUsage.optional(),
+  logProbs: ChatLogProbs.optional(),
+});
+type ChatResponseType = z.infer<typeof ChatResponse>;
+
+// ❌ INCORRECT: Define type without schema
+type ChatResponseType = {
+  messages: MessageType[];
+  usage?: ChatUsageType;
+  logProbs?: ChatLogProbsType;
+};
+```
+
+### 2. Schema Composition
+
+```typescript
+// ✅ CORRECT: Compose schemas from smaller parts
+const ChatUsage = z.object({
+  promptTokens: z.number().nonnegative(),
+  completionTokens: z.number().nonnegative(),
+  totalTokens: z.number().nonnegative(),
+});
+
+const ChatResponse = z.object({
+  messages: z.array(Message()),
+  usage: ChatUsage.optional(),
+});
+
+// ❌ INCORRECT: Duplicate schema definitions
+const ChatResponse = z.object({
+  messages: z.array(Message()),
+  usage: z.object({
+    promptTokens: z.number().nonnegative(),
+    completionTokens: z.number().nonnegative(),
+    totalTokens: z.number().nonnegative(),
+  }).optional(),
+});
+```
+
+### 3. Optional vs Required Fields
+
+```typescript
+// ✅ CORRECT: Use .optional() for truly optional fields
+const Message = z.object({
+  role: z.enum(['user', 'assistant', 'system']), // Required
+  content: z.array(MessageContent()), // Required
+  name: z.string().optional(), // Optional
+  toolCalls: z.array(ToolCall()).optional(), // Optional
+});
+
+// ❌ INCORRECT: Making required fields optional
+const Message = z.object({
+  role: z.enum(['user', 'assistant', 'system']).optional(), // Should be required
+  content: z.array(MessageContent()).optional(), // Should be required
+});
+```
+
+## Type Export Instructions
+
+### 1. Export Pattern
+
+```typescript
+// ✅ CORRECT: Export both schema and type
+export {
+  ChatResponse,
+  ChatUsage,
+  type ChatResponseType,
+  type ChatUsageType,
+};
+
+// ❌ INCORRECT: Export only types
+export type {
+  ChatResponseType,
+  ChatUsageType,
+};
+```
+
+### 2. Index File Organization
+
+```typescript
+// ✅ CORRECT: Re-export from subdirectories
+export * from "./chat";
+export * from "./config";
+export * from "./embedding";
+export * from "./errors";
+export * from "./message";
+export * from "./pricing";
+export * from "./tool";
+export * from "./utils";
+
+// ❌ INCORRECT: Export individual items
+export { ChatResponse, ChatUsage } from "./chat";
+export { ConfigType } from "./config";
+```
+
+## Validation Instructions
+
+### 1. Input Validation
+
+```typescript
+// ✅ CORRECT: Validate input using schemas
+function processChatResponse(data: unknown): ChatResponseType {
+  return ChatResponse.parse(data);
+}
+
+// ❌ INCORRECT: Type assertion without validation
+function processChatResponse(data: unknown): ChatResponseType {
+  return data as ChatResponseType; // Unsafe!
+}
+```
+
+### 2. Safe Parsing
+
+```typescript
+// ✅ CORRECT: Use safeParse for error handling
+const result = ChatResponse.safeParse(data);
+if (result.success) {
+  // result.data is ChatResponseType
+  return result.data;
+} else {
+  // result.error contains validation errors
+  throw new ValidationError(result.error.errors);
+}
+
+// ❌ INCORRECT: Ignoring validation errors
+try {
+  return ChatResponse.parse(data);
+} catch (error) {
+  // Error handling is missing
+  throw error;
+}
+```
+
+## Schema Design Instructions
+
+### 1. Union Types
+
+```typescript
+// ✅ CORRECT: Use discriminated unions for different content types
+const MessageContent = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('text'),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.literal('image'),
+    imageUrl: z.string().url(),
+    altText: z.string().optional(),
+  }),
+]);
+
+// ❌ INCORRECT: Simple union without discrimination
+const MessageContent = z.union([
+  z.string(),
+  z.object({ imageUrl: z.string() }),
+]);
+```
+
+### 2. Constrained Types
+
+```typescript
+// ✅ CORRECT: Use appropriate constraints
+const TokenCount = z.number().int().nonnegative();
+const ModelName = z.string().min(1).max(100);
+const ApiKey = z.string().regex(/^sk-[a-zA-Z0-9]{32,}$/);
+
+// ❌ INCORRECT: Overly permissive types
+const TokenCount = z.number(); // Allows negative numbers
+const ModelName = z.string(); // Allows empty strings
+const ApiKey = z.string(); // Allows any string
+```
+
+### 3. Default Values
+
+```typescript
+// ✅ CORRECT: Provide sensible defaults
+const ChatOptions = z.object({
+  temperature: z.number().min(0).max(2).default(1.0),
+  maxTokens: z.number().int().positive().default(1000),
+  stream: z.boolean().default(false),
+});
+
+// ❌ INCORRECT: No defaults for common options
+const ChatOptions = z.object({
+  temperature: z.number().min(0).max(2),
+  maxTokens: z.number().int().positive(),
+  stream: z.boolean(),
+});
+```
+
+## Error Handling Instructions
+
+### 1. Custom Error Types
+
+```typescript
+// ✅ CORRECT: Extend base error classes
+export class ValidationError extends GatewayBaseError {
+  constructor(
+    message: string,
+    public readonly validationErrors: z.ZodError['errors']
+  ) {
+    super(message, 'VALIDATION_ERROR');
+  }
+}
+
+// ❌ INCORRECT: Generic error handling
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+```
+
+### 2. Error Context
+
+```typescript
+// ✅ CORRECT: Provide meaningful error context
+export class InvalidConfigError extends GatewayBaseError {
+  constructor(
+    message: string,
+    public readonly configPath: string,
+    public readonly configValue: unknown
+  ) {
+    super(`Configuration error at ${configPath}: ${message}`, 'INVALID_CONFIG');
+  }
+}
+
+// ❌ INCORRECT: Generic error messages
+export class InvalidConfigError extends GatewayBaseError {
+  constructor(message: string) {
+    super(message, 'INVALID_CONFIG');
+  }
+}
+```
+
+## Testing Instructions
+
+### 1. Schema Testing
+
+```typescript
+// ✅ CORRECT: Test schema validation
+describe("ChatResponse schema", () => {
+  it("should validate valid chat response", () => {
+    const validData = {
+      messages: [{ role: "user", content: [{ type: "text", text: "Hello" }] }],
+      usage: { promptTokens: 10, completionTokens: 5, totalTokens: 15 },
+    };
+
+    const result = ChatResponse.safeParse(validData);
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject invalid chat response", () => {
+    const invalidData = {
+      messages: "not an array", // Invalid type
+    };
+
+    const result = ChatResponse.safeParse(invalidData);
+    expect(result.success).toBe(false);
+    expect(result.error?.errors).toHaveLength(1);
+  });
+});
+```
+
+### 2. Type Inference Testing
+
+```typescript
+// ✅ CORRECT: Test type inference
+it("should infer correct types from schema", () => {
+  // This test ensures TypeScript compilation
+  const response: ChatResponseType = {
+    messages: [],
+    usage: {
+      promptTokens: 0,
+      completionTokens: 0,
+      totalTokens: 0,
+    },
+  };
+
+  expect(response.messages).toBeInstanceOf(Array);
+  expect(response.usage?.totalTokens).toBe(0);
+});
+```
+
+## Performance Instructions
+
+### 1. Schema Caching
+
+```typescript
+// ✅ CORRECT: Cache parsed schemas when possible
+const cachedSchemas = new Map<string, z.ZodSchema>();
+
+function getCachedSchema<T>(schema: z.ZodSchema<T>): z.ZodSchema<T> {
+  const key = schema.toString();
+  if (!cachedSchemas.has(key)) {
+    cachedSchemas.set(key, schema);
+  }
+  return cachedSchemas.get(key)!;
+}
+
+// ❌ INCORRECT: Creating new schemas for each validation
+function validateData(data: unknown) {
+  return z
+    .object({
+      /* ... */
+    })
+    .parse(data); // New schema each time
+}
+```
+
+### 2. Lazy Validation
+
+```typescript
+// ✅ CORRECT: Validate only when needed
+class LazyValidator<T> {
+  private schema: z.ZodSchema<T>;
+  private validated: T | null = null;
+
+  constructor(schema: z.ZodSchema<T>) {
+    this.schema = schema;
+  }
+
+  validate(data: unknown): T {
+    if (this.validated === null) {
+      this.validated = this.schema.parse(data);
+    }
+    return this.validated;
+  }
+}
+```
+
+## Migration Instructions
+
+### 1. Schema Evolution
+
+```typescript
+// ✅ CORRECT: Use .transform() for backward compatibility
+const LegacyMessage = z.object({
+  content: z.string(),
+  role: z.string(),
+});
+
+const NewMessage = z.object({
+  content: z.array(MessageContent()),
+  role: z.enum(["user", "assistant", "system"]),
+});
+
+const Message = z.union([
+  NewMessage,
+  LegacyMessage.transform((legacy) => ({
+    content: [{ type: "text" as const, text: legacy.content }],
+    role: legacy.role as "user" | "assistant" | "system",
+  })),
+]);
+```
+
+### 2. Versioning
+
+```typescript
+// ✅ CORRECT: Version schemas for breaking changes
+const MessageV1 = z.object({
+  content: z.string(),
+  role: z.string(),
+});
+
+const MessageV2 = z.object({
+  content: z.array(MessageContent()),
+  role: z.enum(['user', 'assistant', 'system']),
+});
+
+export const Message = MessageV2; // Current version
+export const MessageV1 = MessageV1; // Legacy version
+```
+
+## Documentation Instructions
+
+### 1. Schema Documentation
+
+````typescript
+// ✅ CORRECT: Document schemas with examples
+/**
+ * Chat response containing messages and usage information
+ *
+ * @example
+ * ```typescript
+ * const response: ChatResponseType = {
+ *   messages: [
+ *     { role: 'user', content: [{ type: 'text', text: 'Hello' }] },
+ *     { role: 'assistant', content: [{ type: 'text', text: 'Hi there!' }] }
+ *   ],
+ *   usage: { promptTokens: 5, completionTokens: 3, totalTokens: 8 }
+ * };
+ * ```
+ */
+const ChatResponse = z.object({
+  messages: z.array(Message()),
+  usage: ChatUsage.optional(),
+});
+````
+
+### 2. Type Documentation
+
+```typescript
+// ✅ CORRECT: Document complex types
+/**
+ * Configuration options for chat models
+ *
+ * @property temperature - Controls randomness (0.0 = deterministic, 2.0 = very random)
+ * @property maxTokens - Maximum number of tokens to generate
+ * @property stream - Whether to stream the response
+ */
+export type ChatOptionsType = z.infer<typeof ChatOptions>;
+```
+
+## Integration Instructions
+
+### 1. Provider Integration
+
+```typescript
+// ✅ CORRECT: Use types in provider implementations
+import { ChatResponseType, MessageType } from "@adaline/types";
+
+class AnthropicProvider {
+  async completeChat(messages: MessageType[]): Promise<ChatResponseType> {
+    // Implementation using shared types
+  }
+}
+```
+
+### 2. Gateway Integration
+
+```typescript
+// ✅ CORRECT: Use types in gateway handlers
+import { ChatResponseType } from "@adaline/types";
+
+async function handleCompleteChat(request: CompleteChatRequestType): Promise<ChatResponseType> {
+  // Handler implementation using shared types
+}
+```
+
+## Best Practices Summary
+
+1. **Schema First**: Always define Zod schemas before TypeScript types
+2. **Composition**: Build complex schemas from simple, reusable parts
+3. **Validation**: Use schemas for runtime validation, not just type checking
+4. **Documentation**: Document schemas with examples and usage patterns
+5. **Testing**: Test both schema validation and type inference
+6. **Performance**: Cache schemas and use lazy validation when appropriate
+7. **Migration**: Use transforms and versioning for backward compatibility
+8. **Integration**: Use shared types consistently across the ecosystem
+
+---
