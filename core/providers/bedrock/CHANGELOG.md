@@ -1,5 +1,11 @@
 # @adaline/bedrock
 
+## 2.0.0
+
+### Major Changes
+
+- 355f368: Add all public regions for AWS
+
 ## 1.9.0
 
 ### Minor Changes
