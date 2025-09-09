@@ -1,5 +1,11 @@
 # @adaline/vertex
 
+## 1.7.0
+
+### Minor Changes
+
+- 1b4e8d4: Add service account auth support for Vertex
+
 ## 1.6.0
 
 ### Minor Changes
