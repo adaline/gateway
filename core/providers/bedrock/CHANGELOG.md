@@ -1,5 +1,26 @@
 # @adaline/bedrock
 
+## 2.1.0
+
+### Minor Changes
+
+- fix
+- 762415a: add mcp
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [762415a]
+  - @adaline/anthropic@1.7.0
+  - @adaline/provider@1.5.0
+  - @adaline/types@1.9.0
+
+## 2.0.0
+
+### Major Changes
+
+- 355f368: Add all public regions for AWS
+
 ## 1.9.0
 
 ### Minor Changes

@@ -1,5 +1,19 @@
 # @adaline/together-ai
 
+## 1.5.0
+
+### Minor Changes
+
+- fix
+- 762415a: add mcp
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [762415a]
+  - @adaline/provider@1.5.0
+  - @adaline/types@1.9.0
+
 ## 1.4.0
 
 ### Minor Changes
