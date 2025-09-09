@@ -1,5 +1,12 @@
 # @adaline/types
 
+## 1.9.0
+
+### Minor Changes
+
+- fix
+- 762415a: add mcp
+
 ## 1.8.0
 
 ### Minor Changes
