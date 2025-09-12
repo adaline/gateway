@@ -434,8 +434,8 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 0.075,
-            "outputPricePerMillion": 0.30
+            "inputPricePerMillion": 0.1,
+            "outputPricePerMillion": 0.4
           }
         }
       }
