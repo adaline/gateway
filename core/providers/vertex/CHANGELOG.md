@@ -1,5 +1,15 @@
 # @adaline/vertex
 
+## 1.7.1
+
+### Patch Changes
+
+- aa2f870: gpt5 config
+- Updated dependencies [aa2f870]
+  - @adaline/google@1.8.1
+  - @adaline/provider@1.5.1
+  - @adaline/types@1.9.1
+
 ## 1.7.0
 
 ### Minor Changes

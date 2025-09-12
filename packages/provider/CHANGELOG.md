@@ -1,5 +1,13 @@
 # @adaline/provider
 
+## 1.5.1
+
+### Patch Changes
+
+- aa2f870: gpt5 config
+- Updated dependencies [aa2f870]
+  - @adaline/types@1.9.1
+
 ## 1.5.0
 
 ### Minor Changes

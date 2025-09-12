@@ -1,5 +1,15 @@
 # @adaline/bedrock
 
+## 2.1.1
+
+### Patch Changes
+
+- aa2f870: gpt5 config
+- Updated dependencies [aa2f870]
+  - @adaline/anthropic@1.7.1
+  - @adaline/provider@1.5.1
+  - @adaline/types@1.9.1
+
 ## 2.1.0
 
 ### Minor Changes

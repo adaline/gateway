@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.9.1
+
+### Patch Changes
+
+- aa2f870: gpt5 config
+
 ## 1.9.0
 
 ### Minor Changes

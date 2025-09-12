@@ -1,5 +1,15 @@
 # @adaline/azure
 
+## 1.6.1
+
+### Patch Changes
+
+- aa2f870: gpt5 config
+- Updated dependencies [aa2f870]
+  - @adaline/openai@1.9.1
+  - @adaline/provider@1.5.1
+  - @adaline/types@1.9.1
+
 ## 1.6.0
 
 ### Minor Changes
