@@ -20,8 +20,8 @@ const GPT_5_MiniSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelMo
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelModalities,
   config: {
-    def: OpenAIChatModelConfigs.responseSchema(131072, 4).def,
-    schema: OpenAIChatModelConfigs.responseSchema(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5(131072, 4).schema,
   },
   price: pricingData[GPT_5_MiniLiteral],
 });
