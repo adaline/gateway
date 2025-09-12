@@ -1,6 +1,8 @@
 import {
   ChatModelBaseConfigDef,
   ChatModelBaseConfigSchema,
+  ChatModelGPT5ConfigDef,
+  ChatModelGPT5ConfigSchema,
   ChatModelOSeriesConfigDef,
   ChatModelOSeriesConfigSchema,
   ChatModelResponseFormatConfigDef,
@@ -31,6 +33,10 @@ const OpenAIChatModelConfigs = {
   oSeries: (maxOutputTokens: number, maxSequences: number) => ({
     def: ChatModelOSeriesConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelOSeriesConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt5: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT5ConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT5ConfigSchema(maxOutputTokens, maxSequences),
   }),
 } as const;
 

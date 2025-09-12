@@ -116,6 +116,8 @@ const OpenAIChatRequest = z.object({
   top_p: z.number().min(0).max(1).nullable().optional(),
   tools: z.array(OpenAIChatRequestTool).optional(),
   tool_choice: OpenAIChatRequestToolChoiceEnum.or(OpenAIChatRequestToolChoiceFunction).optional(),
+  reasoning_effort: z.enum(["minimal", "low", "medium", "high"]).optional(),
+  verbosity: z.enum(["low", "medium", "high"]).optional(),
 });
 type OpenAIChatRequestType = z.infer<typeof OpenAIChatRequest>;
 
@@ -145,5 +147,6 @@ export {
   type OpenAIChatRequestToolMessageType,
   type OpenAIChatRequestToolType,
   type OpenAIChatRequestType,
-  type OpenAIChatRequestUserMessageType,
+  type OpenAIChatRequestUserMessageType
 };
+

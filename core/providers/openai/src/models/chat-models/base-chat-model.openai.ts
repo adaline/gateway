@@ -213,6 +213,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     _config.stop = parsedRequest.stop;
     _config.logProbs = parsedRequest.logprobs;
     _config.topLogProbs = parsedRequest.top_logprobs;
+    _config.reasoningEffort = parsedRequest.reasoning_effort;
+    _config.verbosity = parsedRequest.verbosity;
 
     const config = Config().parse(removeUndefinedEntries(_config));
 

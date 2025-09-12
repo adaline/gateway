@@ -24,8 +24,8 @@ const GPT_5_ChatLatestSchema = ChatModelSchema(OpenAIChatModelRoles, GPT_5_ChatL
   roles: OpenAIChatModelRolesMap,
   modalities: GPT_5_ChatLatestModalities,
   config: {
-    def: OpenAIChatModelConfigs.base(131072, 4).def,
-    schema: OpenAIChatModelConfigs.base(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5(131072, 4).schema,
   },
   price: pricingData[GPT_5_ChatLatestLiteral],
 });
