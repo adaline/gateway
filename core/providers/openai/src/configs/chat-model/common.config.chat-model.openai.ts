@@ -95,4 +95,22 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "required", "none"],
 });
 
-export { frequencyPenalty, logProbs, maxTokens, presencePenalty, seed, stop, temperature, toolChoice, topLogProbs, topP };
+const reasoningEffort = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. 'minimal' prioritizes speed, 'high' engages in deep reasoning.",
+  default: "medium",
+  choices: ["minimal", "low", "medium", "high"],
+});
+
+const verbosity = SelectStringConfigItem({
+  param: "verbosity",
+  title: "Verbosity",
+  description:
+    "Controls the length and detail of the model's responses, independent of reasoning depth. 'low' generates concise answers, 'high' provides comprehensive responses.",
+  default: "medium",
+  choices: ["low", "medium", "high"],
+});
+
+export { frequencyPenalty, logProbs, maxTokens, presencePenalty, reasoningEffort, seed, stop, temperature, toolChoice, topLogProbs, topP, verbosity };

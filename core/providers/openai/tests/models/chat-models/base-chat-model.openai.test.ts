@@ -3,20 +3,20 @@ import { z } from "zod";
 
 import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, InvalidToolsError, ModelResponseError } from "@adaline/provider";
 import {
-  AssistantRoleLiteral,
-  ChatResponseType,
-  Config,
-  createPartialTextMessage,
-  createPartialToolCallMessage,
-  ImageModalityLiteral,
-  MessageType,
-  SystemRoleLiteral,
-  TextModalityLiteral,
-  ToolCallModalityLiteral,
-  ToolResponseModalityLiteral,
-  ToolRoleLiteral,
-  ToolType,
-  UserRoleLiteral,
+    AssistantRoleLiteral,
+    ChatResponseType,
+    Config,
+    createPartialTextMessage,
+    createPartialToolCallMessage,
+    ImageModalityLiteral,
+    MessageType,
+    SystemRoleLiteral,
+    TextModalityLiteral,
+    ToolCallModalityLiteral,
+    ToolResponseModalityLiteral,
+    ToolRoleLiteral,
+    ToolType,
+    UserRoleLiteral,
 } from "@adaline/types";
 
 import { OpenAIChatModelConfigs } from "../../../src/configs";
@@ -422,6 +422,113 @@ describe("BaseChatModel", () => {
         });
         model.transformConfig(config, messages, tools);
       }).toThrowError();
+    });
+  });
+
+  describe("GPT-5 specific parameters", () => {
+    let gpt5Model: BaseChatModel;
+    const gpt5ModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
+      name: "gpt-5",
+      description: "GPT-5 model with reasoning and verbosity parameters",
+      maxInputTokens: 400000,
+      maxOutputTokens: 131072,
+      roles: mockRolesMap,
+      modalities: mockModalities,
+      config: {
+        def: OpenAIChatModelConfigs.gpt5(131072, 4).def,
+        schema: OpenAIChatModelConfigs.gpt5(131072, 4).schema,
+      },
+    });
+
+    beforeEach(() => {
+      gpt5Model = new BaseChatModel(gpt5ModelSchema, mockOptions);
+    });
+
+    it("should transform reasoning effort and verbosity parameters correctly", () => {
+      const config = Config().parse({
+        reasoningEffort: "high",
+        verbosity: "low",
+        temperature: 0.7,
+        maxTokens: 1000,
+      });
+
+      const result = gpt5Model.transformConfig(config, [], []);
+      expect(result).toEqual({
+        reasoning_effort: "high",
+        verbosity: "low",
+        temperature: 0.7,
+        max_completion_tokens: 1000,
+      });
+    });
+
+    it("should handle all valid reasoning effort values", () => {
+      const values = ["minimal", "low", "medium", "high"];
+      
+      values.forEach(value => {
+        const config = Config().parse({
+          reasoningEffort: value as any,
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+
+        const result = gpt5Model.transformConfig(config, [], []);
+        expect(result.reasoning_effort).toBe(value);
+      });
+    });
+
+    it("should handle all valid verbosity values", () => {
+      const values = ["low", "medium", "high"];
+      
+      values.forEach(value => {
+        const config = Config().parse({
+          reasoningEffort: "medium",
+          verbosity: value as any,
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+
+        const result = gpt5Model.transformConfig(config, [], []);
+        expect(result.verbosity).toBe(value);
+      });
+    });
+
+    it("should throw error for invalid reasoning effort value", () => {
+      expect(() => {
+        const config = Config().parse({
+          reasoningEffort: "invalid" as any,
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+        gpt5Model.transformConfig(config, [], []);
+      }).toThrowError();
+    });
+
+    it("should throw error for invalid verbosity value", () => {
+      expect(() => {
+        const config = Config().parse({
+          reasoningEffort: "medium",
+          verbosity: "invalid" as any,
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+        gpt5Model.transformConfig(config, [], []);
+      }).toThrowError();
+    });
+
+    it("should work with request transformation", () => {
+      const request = {
+        model: "gpt-5",
+        messages: [{ role: "user" as const, content: "Hello" }],
+        reasoning_effort: "high" as const,
+        verbosity: "low" as const,
+        temperature: 0.7,
+      };
+
+      const result = gpt5Model.transformModelRequest(request);
+      expect(result.config.reasoningEffort).toBe("high");
+      expect(result.config.verbosity).toBe("low");
     });
   });
 
