@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.10.0
+
+### Minor Changes
+
+- 3a0cbdf: add response
+
 ## 1.9.1
 
 ### Patch Changes
