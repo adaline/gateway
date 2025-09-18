@@ -3,20 +3,20 @@ import { z } from "zod";
 
 import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, InvalidToolsError, ModelResponseError } from "@adaline/provider";
 import {
-    AssistantRoleLiteral,
-    ChatResponseType,
-    Config,
-    createPartialTextMessage,
-    createPartialToolCallMessage,
-    ImageModalityLiteral,
-    MessageType,
-    SystemRoleLiteral,
-    TextModalityLiteral,
-    ToolCallModalityLiteral,
-    ToolResponseModalityLiteral,
-    ToolRoleLiteral,
-    ToolType,
-    UserRoleLiteral,
+  AssistantRoleLiteral,
+  ChatResponseType,
+  Config,
+  createPartialTextMessage,
+  createPartialToolCallMessage,
+  ImageModalityLiteral,
+  MessageType,
+  SystemRoleLiteral,
+  TextModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  ToolRoleLiteral,
+  ToolType,
+  UserRoleLiteral,
 } from "@adaline/types";
 
 import { OpenAIChatModelConfigs } from "../../../src/configs";
@@ -512,6 +512,109 @@ describe("BaseChatModel", () => {
           verbosity: "invalid" as any,
           temperature: 0.7,
           maxTokens: 1000,
+        });
+        gpt5Model.transformConfig(config, [], []);
+      }).toThrowError();
+    });
+
+    it("should handle response format parameter correctly", () => {
+      const config = Config().parse({
+        reasoningEffort: "medium",
+        verbosity: "medium",
+        temperature: 0.7,
+        maxTokens: 1000,
+        responseFormat: "json_object",
+      });
+
+      const result = gpt5Model.transformConfig(config, [], []);
+      expect(result.response_format).toEqual({ type: "json_object" });
+    });
+
+    it("should handle response schema parameter correctly", () => {
+      const responseSchema = {
+        name: "UserInfo",
+        description: "User information schema",
+        schema: {
+          type: "object",
+          required: ["name", "age"],
+          properties: {
+            name: { type: "string" },
+            age: { type: "number" }
+          },
+          additionalProperties: false
+        }
+      };
+
+      const config = Config().parse({
+        reasoningEffort: "medium",
+        verbosity: "medium",
+        temperature: 0.7,
+        maxTokens: 1000,
+        responseFormat: "json_schema",
+        responseSchema: responseSchema,
+      });
+
+      const result = gpt5Model.transformConfig(config, [], []);
+      expect(result.response_format).toEqual({ 
+        type: "json_schema",
+        json_schema: responseSchema
+      });
+    });
+
+    it("should handle all valid response format values", () => {
+      const values = ["text", "json_object"];
+      
+      values.forEach(value => {
+        const config = Config().parse({
+          reasoningEffort: "medium",
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+          responseFormat: value as any,
+        });
+
+        const result = gpt5Model.transformConfig(config, [], []);
+        expect(result.response_format).toEqual({ type: value });
+      });
+
+      // Test json_schema separately as it requires responseSchema
+      const responseSchema = {
+        name: "TestSchema",
+        description: "Test schema",
+        schema: {
+          type: "object",
+          required: ["test"],
+          properties: {
+            test: { type: "string" }
+          },
+          additionalProperties: false
+        }
+      };
+
+      const config = Config().parse({
+        reasoningEffort: "medium",
+        verbosity: "medium",
+        temperature: 0.7,
+        maxTokens: 1000,
+        responseFormat: "json_schema" as any,
+        responseSchema: responseSchema,
+      });
+
+      const result = gpt5Model.transformConfig(config, [], []);
+      expect(result.response_format).toEqual({ 
+        type: "json_schema",
+        json_schema: responseSchema
+      });
+    });
+
+    it("should throw error for invalid response format value", () => {
+      expect(() => {
+        const config = Config().parse({
+          reasoningEffort: "medium",
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+          responseFormat: "invalid" as any,
         });
         gpt5Model.transformConfig(config, [], []);
       }).toThrowError();
