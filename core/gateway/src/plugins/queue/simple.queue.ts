@@ -98,6 +98,8 @@ class SimpleQueue<Request, Response> implements Queue<Request, Response> {
                   delayMs = retryDelay.delayMs;
                 }
               }
+              const randomDelayMs = (60 + Math.random() * 70) * 1000;
+              delayMs += randomDelayMs;
             }
 
             if (error.cause.status >= 500 && error.cause.status < 600) {
