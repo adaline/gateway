@@ -158,5 +158,21 @@
         }
       }
     ]
+  },
+  "claude-sonnet-4-5-20250929": {
+    "modelName": "claude-sonnet-4-5-20250929",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
   }
 }

@@ -1,6 +1,7 @@
 export * from "./base-chat-model.anthropic";
 export * from "./claude-4-opus-20250514.anthropic";
 export * from "./claude-4-sonnet-20250514.anthropic";
+export * from "./claude-sonnet-4-5-20250929.anthropic";
 export * from "./claude-3-5-sonnet-20240620.anthropic";
 export * from "./claude-3-5-sonnet-20241022.anthropic";
 export * from "./claude-3-7-sonnet-20250219.anthropic";
