@@ -1,5 +1,16 @@
 # @adaline/bedrock
 
+## 2.2.0
+
+### Minor Changes
+
+- e4be96c: Add Claude Sonnet 4.5
+
+### Patch Changes
+
+- Updated dependencies [e4be96c]
+  - @adaline/anthropic@1.8.0
+
 ## 2.1.1
 
 ### Patch Changes

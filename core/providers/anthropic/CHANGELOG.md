@@ -1,5 +1,11 @@
 # @adaline/anthropic
 
+## 1.8.0
+
+### Minor Changes
+
+- e4be96c: Add Claude Sonnet 4.5
+
 ## 1.7.1
 
 ### Patch Changes
