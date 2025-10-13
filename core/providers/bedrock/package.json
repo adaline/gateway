@@ -1,6 +1,6 @@
 {
   "name": "@adaline/bedrock",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "license": "MIT",
   "sideEffects": false,
   "private": false,
@@ -55,14 +55,14 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@adaline/types": "workspace:*",
-    "@adaline/provider": "workspace:*",
     "@adaline/anthropic": "workspace:*",
-    "zod": "^3.23.8",
+    "@adaline/provider": "workspace:*",
+    "@adaline/types": "workspace:*",
     "@aws-crypto/sha256-js": "^5.2.0",
     "@aws-sdk/types": "^3.577.0",
     "@smithy/protocol-http": "^4.0.0",
-    "@smithy/signature-v4": "^3.0.0"
+    "@smithy/signature-v4": "^3.0.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@adaline/tsconfig": "workspace:*",

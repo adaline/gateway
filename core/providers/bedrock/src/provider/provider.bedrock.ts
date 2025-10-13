@@ -97,7 +97,15 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
 
   chatModel(options: C): ChatModelV1 {
     const modelName = options.modelName;
-    if (!(modelName in this.chatModelFactories)) {
+
+    const inferenceProfilePattern = /^(global|us|eu|ap|me|sa|af|an)\./;
+    let actualModelName = modelName;
+
+    if (inferenceProfilePattern.test(modelName)) {
+      actualModelName = modelName.replace(inferenceProfilePattern, "");
+    }
+
+    if (!(actualModelName in this.chatModelFactories)) {
       throw new ProviderError({
         info: `Bedrock chat model: ${modelName} not found`,
         cause: new Error(`Bedrock chat model: ${modelName} not found, available chat models: 
@@ -105,9 +113,9 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       });
     }
 
-    const model = this.chatModelFactories[modelName].model;
-    const parsedOptions = this.chatModelFactories[modelName].modelOptions.parse(options);
-    return new model(parsedOptions);
+    const model = this.chatModelFactories[actualModelName].model;
+    const parsedOptions = this.chatModelFactories[actualModelName].modelOptions.parse(options);
+    return new model({ ...parsedOptions, modelName: modelName });
   }
 
   embeddingModelLiterals(): string[] {
