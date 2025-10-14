@@ -99,23 +99,20 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
     const modelName = options.modelName;
 
     const inferenceProfilePattern = /^(global|us|eu|ap|me|sa|af|an)\./;
-    let actualModelName = modelName;
 
-    if (inferenceProfilePattern.test(modelName)) {
-      actualModelName = modelName.replace(inferenceProfilePattern, "");
-    }
+    const actualModelName = inferenceProfilePattern.test(modelName) ? modelName.replace(inferenceProfilePattern, "") : modelName;
 
     if (!(actualModelName in this.chatModelFactories)) {
       throw new ProviderError({
-        info: `Bedrock chat model: ${modelName} not found`,
-        cause: new Error(`Bedrock chat model: ${modelName} not found, available chat models: 
+        info: `Bedrock chat model: ${actualModelName} not found`,
+        cause: new Error(`Bedrock chat model: ${actualModelName} not found, available chat models: 
           ${this.chatModelLiterals().join(", ")}`),
       });
     }
 
     const model = this.chatModelFactories[actualModelName].model;
     const parsedOptions = this.chatModelFactories[actualModelName].modelOptions.parse(options);
-    return new model({ ...parsedOptions, modelName: modelName });
+    return new model({ ...parsedOptions, modelName: actualModelName });
   }
 
   embeddingModelLiterals(): string[] {

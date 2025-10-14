@@ -55,14 +55,14 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@adaline/anthropic": "workspace:*",
-    "@adaline/provider": "workspace:*",
     "@adaline/types": "workspace:*",
+    "@adaline/provider": "workspace:*",
+    "@adaline/anthropic": "workspace:*",
+    "zod": "^3.23.8",
     "@aws-crypto/sha256-js": "^5.2.0",
     "@aws-sdk/types": "^3.577.0",
     "@smithy/protocol-http": "^4.0.0",
-    "@smithy/signature-v4": "^3.0.0",
-    "zod": "^3.23.8"
+    "@smithy/signature-v4": "^3.0.0"
   },
   "devDependencies": {
     "@adaline/tsconfig": "workspace:*",
