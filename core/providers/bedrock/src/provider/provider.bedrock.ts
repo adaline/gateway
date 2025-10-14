@@ -112,7 +112,7 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
 
     const model = this.chatModelFactories[actualModelName].model;
     const parsedOptions = this.chatModelFactories[actualModelName].modelOptions.parse(options);
-    return new model({ ...parsedOptions, modelName: actualModelName });
+    return new model({ ...parsedOptions, modelName: modelName });
   }
 
   embeddingModelLiterals(): string[] {
