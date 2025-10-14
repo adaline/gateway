@@ -173,13 +173,13 @@ class BaseChatModelAnthropic extends BaseChatModel {
       const endParenthesis = line.indexOf("}");
       if (startParenthesis === -1 || endParenthesis === -1 || startParenthesis >= endParenthesis) continue;
       let structuredLine;
+      const jsonStr = line.slice(startParenthesis, endParenthesis + 1);
       try {
-        const jsonStr = line.slice(startParenthesis, endParenthesis + 1);
         structuredLine = JSON.parse(jsonStr);
       } catch (error) {
         // malformed JSON error
         throw new ModelResponseError({
-          info: `Malformed JSON received in stream : ${structuredLine}`,
+          info: `Malformed JSON received in stream : ${jsonStr}`,
           cause: error,
         });
       }
