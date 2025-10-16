@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.9.0
+
+### Minor Changes
+
+- c2a0bf9: Remove unused package files
+
 ## 1.8.1
 
 ### Patch Changes
