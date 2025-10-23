@@ -41,7 +41,7 @@ const AnthropicRequestImageContent = z.object({
   type: z.literal("image"),
   source: z.object({
     type: z.literal("base64"),
-    media_type: z.enum(["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"]),
+    media_type: z.enum(["image/jpeg", "image/png", "image/gif", "image/webp"]),
     data: z.string().base64(),
   }),
 });

@@ -569,7 +569,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   type: "image",
                   source: {
                     type: "base64",
-                    media_type: `image/${content.value.mediaType}` as "image/jpeg" | "image/jpg" | "image/png" | "image/gif" | "image/webp",
+                    media_type: `image/${content.value.mediaType === "jpg" ? "jpeg" : content.value.mediaType}` as AnthropicRequestImageContentType["source"]["media_type"],
                     data: base64Data,
                   },
                 });
