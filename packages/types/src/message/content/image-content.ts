@@ -3,7 +3,7 @@ import { z } from "zod";
 const ImageModalityLiteral = "image" as const;
 
 const Base64ImageContentTypeLiteral = "base64" as const;
-const Base64ImageContentMediaTypeLiterals = ["png", "jpeg", "webp", "gif"] as const;
+const Base64ImageContentMediaTypeLiterals = ["png", "jpeg", "jpg", "webp", "gif"] as const;
 const Base64ImageContentValue = z.object({
   type: z.literal(Base64ImageContentTypeLiteral),
   base64: z.string(),

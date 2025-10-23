@@ -569,12 +569,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   type: "image",
                   source: {
                     type: "base64",
-                    media_type: `image/${content.value.mediaType}` as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+                    media_type: `image/${content.value.mediaType}` as "image/jpeg" | "image/jpg" | "image/png" | "image/gif" | "image/webp",
                     data: base64Data,
                   },
                 });
               } else if (content.value.type === "url") {
-                // TODO: add logic to fetch image from url, remove this error
                 throw new InvalidMessagesError({
                   info: `Invalid message 'modality' for model : ${this.modelName}`,
                   cause: new Error(`model: '${this.modelName}' does not support image content type: '${content.value.type}'`),
