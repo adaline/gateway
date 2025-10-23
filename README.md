@@ -384,7 +384,7 @@ The value field can be one of two types:
 |-------|------|-------------|-------------|
 | type | "base64" | Indicates base64 encoding | Must be "base64" |
 | base64 | string | Base64-encoded image data | Valid base64 string |
-| mediaType | "png" \| "jpeg" \| "webp" \| "gif" | The image format | Must be one of the specified formats |
+| mediaType | "png" \| "jpeg" \| "jpg" \| "webp" \| "gif" | The image format | Must be one of the specified formats |
 
 ```typescript
 // Example of base64 image content value
