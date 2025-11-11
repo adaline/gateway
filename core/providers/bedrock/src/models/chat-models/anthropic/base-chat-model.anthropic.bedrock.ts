@@ -165,28 +165,42 @@ class BaseChatModelAnthropic extends BaseChatModel {
     buffer: string
   ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
     const lines = chunk.toString();
-    // Regex to extract JSON objects starting with `{"bytes":` and ending with `}`
     const bytesRegex = /{\s*"bytes"\s*:\s*"[\w=+/]+".*?}/g;
     const matches = lines.match(bytesRegex) || [];
+    if (matches.length === 0) return;
     for (const line of matches) {
       const startParenthesis = line.indexOf("{");
       const endParenthesis = line.indexOf("}");
-      if (startParenthesis !== -1 && endParenthesis !== -1 && startParenthesis < endParenthesis) {
-        let structuredLine;
-        try {
-          structuredLine = JSON.parse(line.slice(startParenthesis, endParenthesis + 1));
-        } catch (error) {
-          // malformed JSON error
-          throw new ModelResponseError({
-            info: `Malformed JSON received in stream : ${structuredLine}`,
-            cause: error,
-          });
+      if (startParenthesis === -1 || endParenthesis === -1 || startParenthesis >= endParenthesis) continue;
+      let structuredLine;
+      const jsonStr = line.slice(startParenthesis, endParenthesis + 1);
+      try {
+        structuredLine = JSON.parse(jsonStr);
+      } catch (error) {
+        // malformed JSON error
+        throw new ModelResponseError({
+          info: `Malformed JSON received in stream : ${jsonStr}`,
+          cause: error,
+        });
+      }
+      const data_delta = encodedBase64ToString(structuredLine["bytes"]);
+      let eventType = "message_delta";
+      try {
+        const parsedDelta = JSON.parse(data_delta);
+        if (parsedDelta.type) {
+          eventType = parsedDelta.type;
         }
-        const data_delta = encodedBase64ToString(structuredLine["bytes"]);
-        const transformed = (await super.transformStreamChatResponseChunk(`data: ${data_delta}`, buffer).next()).value;
-        if (transformed) {
-          yield transformed;
-        }
+      } catch (e) {
+        throw new ModelResponseError({
+          info: `Malformed JSON received in stream : ${data_delta}`,
+          cause: e,
+        });
+      }
+
+      const sseFormattedData = `event: ${eventType}\ndata: ${data_delta}\n\n`;
+      for await (const result of super.transformStreamChatResponseChunk(sseFormattedData, buffer)) {
+        buffer = result.buffer;
+        yield result;
       }
     }
   }
