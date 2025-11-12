@@ -1,12 +1,5 @@
 # @adaline/vertex
 
-## 1.7.2
-
-### Patch Changes
-
-- Updated dependencies [c2a0bf9]
-  - @adaline/google@1.9.0
-
 ## 1.7.1
 
 ### Patch Changes
