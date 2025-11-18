@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.10.0
+
+### Minor Changes
+
+- f10fa98: Add gpt-5-1 and gemini-3-pro
+
 ## 1.9.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @adaline/custom
 
+## 1.5.0
+
+### Minor Changes
+
+- f10fa98: Add gpt-5-1 and gemini-3-pro
+
+### Patch Changes
+
+- Updated dependencies [f10fa98]
+  - @adaline/openai@1.11.0
+
 ## 1.4.2
 
 ### Patch Changes

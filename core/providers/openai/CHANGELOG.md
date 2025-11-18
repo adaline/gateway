@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.11.0
+
+### Minor Changes
+
+- f10fa98: Add gpt-5-1 and gemini-3-pro
+
 ## 1.10.0
 
 ### Minor Changes

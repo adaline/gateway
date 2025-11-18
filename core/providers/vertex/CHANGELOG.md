@@ -1,5 +1,16 @@
 # @adaline/vertex
 
+## 1.8.0
+
+### Minor Changes
+
+- f10fa98: Add gpt-5-1 and gemini-3-pro
+
+### Patch Changes
+
+- Updated dependencies [f10fa98]
+  - @adaline/google@1.10.0
+
 ## 1.7.2
 
 ### Patch Changes

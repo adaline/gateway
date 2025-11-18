@@ -1,5 +1,11 @@
 # @adaline/together-ai
 
+## 1.6.0
+
+### Minor Changes
+
+- f10fa98: Add gpt-5-1 and gemini-3-pro
+
 ## 1.5.1
 
 ### Patch Changes
