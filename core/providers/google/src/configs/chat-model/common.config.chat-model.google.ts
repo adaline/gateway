@@ -9,6 +9,24 @@ import {
   SelectStringConfigItem,
 } from "@adaline/provider";
 
+export const GOOGLE_SAFETY_CATEGORIES = [
+  "HARM_CATEGORY_UNSPECIFIED",
+  "HARM_CATEGORY_HARASSMENT",
+  "HARM_CATEGORY_HATE_SPEECH",
+  "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+  "HARM_CATEGORY_DANGEROUS_CONTENT",
+  "HARM_CATEGORY_CIVIC_INTEGRITY",
+] as const;
+
+export const GOOGLE_SAFETY_THRESHOLDS = [
+  "HARM_BLOCK_THRESHOLD_UNSPECIFIED",
+  "BLOCK_LOW_AND_ABOVE",
+  "BLOCK_MEDIUM_AND_ABOVE",
+  "BLOCK_ONLY_HIGH",
+  "BLOCK_NONE",
+  "OFF",
+] as const;
+
 const temperature = (max: number, _default: number) =>
   RangeConfigItem({
     param: "temperature",
@@ -106,22 +124,8 @@ const safetySettings = ObjectSchemaConfigItem({
   description: "The safety rating contains the category of harm and the harm probability level in that category for a piece of content.",
   objectSchema: z.array(
     z.object({
-      threshold: z.enum([
-        "HARM_BLOCK_THRESHOLD_UNSPECIFIED",
-        "BLOCK_LOW_AND_ABOVE",
-        "BLOCK_MEDIUM_AND_ABOVE",
-        "BLOCK_ONLY_HIGH",
-        "BLOCK_NONE",
-        "OFF",
-      ]),
-      category: z.enum([
-        "HARM_CATEGORY_UNSPECIFIED",
-        "HARM_CATEGORY_HARASSMENT",
-        "HARM_CATEGORY_HATE_SPEECH",
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "HARM_CATEGORY_CIVIC_INTEGRITY",
-      ]),
+      threshold: z.enum(GOOGLE_SAFETY_THRESHOLDS as unknown as [string, ...string[]]),
+      category: z.enum(GOOGLE_SAFETY_CATEGORIES as unknown as [string, ...string[]]),
     })
   ),
 });
