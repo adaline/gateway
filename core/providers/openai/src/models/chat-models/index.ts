@@ -8,6 +8,7 @@ export * from "./gpt-4-1106-preview.openai";
 export * from "./gpt-4-1.openai";
 export * from "./gpt-4-1-mini.openai";
 export * from "./gpt-4-1-nano.openai";
+export * from "./gpt-5-1.openai";
 export * from "./gpt-5.openai";
 export * from "./gpt-5-mini.openai";
 export * from "./gpt-5-nano.openai";
@@ -30,4 +31,3 @@ export * from "./o3-mini-2025-01-31.openai";
 export * from "./o4-mini-2025-04-16.openai";
 export * from "./o4-mini.openai";
 export * from "./types";
-

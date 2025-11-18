@@ -14,5 +14,6 @@ export * from "./gemini-2.5-flash-preview-04-17.google";
 export * from "./gemini-2.5-flash.google";
 export * from "./gemini-2.5-pro-preview-03-25.google";
 export * from "./gemini-2.5-pro.google";
+export * from "./gemini-3-pro-preview.google";
 export * from "./types";
 

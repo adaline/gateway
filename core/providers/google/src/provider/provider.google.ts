@@ -91,6 +91,11 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini2_5ProOptions,
       modelSchema: Models.Gemini2_5ProSchema,
     },
+    [Models.Gemini3ProPreviewLiteral]: {
+      model: Models.Gemini3ProPreview,
+      modelOptions: Models.Gemini3ProPreviewOptions,
+      modelSchema: Models.Gemini3ProPreviewSchema,
+    },
     [Models.Gemini2_5FlashLiteLiteral]: {
       model: Models.Gemini2_5FlashLite,
       modelOptions: Models.Gemini2_5FlashLiteOptions,
