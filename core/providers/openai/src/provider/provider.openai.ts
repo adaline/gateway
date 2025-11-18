@@ -68,6 +68,11 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_5Options,
       modelSchema: Models.GPT_5Schema,
     },
+    [Models.GPT_5_1Literal]: {
+      model: Models.GPT_5_1,
+      modelOptions: Models.GPT_5_1Options,
+      modelSchema: Models.GPT_5_1Schema,
+    },
     [Models.GPT_5_MiniLiteral]: {
       model: Models.GPT_5_Mini,
       modelOptions: Models.GPT_5_MiniOptions,
