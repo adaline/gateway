@@ -1,5 +1,11 @@
 # @adaline/vertex
 
+## 1.9.0
+
+### Minor Changes
+
+- 0c44a3b: add models
+
 ## 1.8.0
 
 ### Minor Changes
