@@ -5,7 +5,13 @@ export * from "./gemini-1-5-flash.vertex";
 export * from "./gemini-1-5-pro-001.vertex";
 export * from "./gemini-1-5-pro-002.vertex";
 export * from "./gemini-1-5-pro.vertex";
+export * from "./gemini-1.5-flash-latest.vertex";
+export * from "./gemini-1.5-pro-latest.vertex";
 export * from "./gemini-2-0-flash-exp.vertex";
 export * from "./gemini-2-0-flash.vertex";
 export * from "./gemini-2-5-flash-lite.vertex";
-
+export * from "./gemini-2.5-flash-preview-04-17.vertex";
+export * from "./gemini-2.5-flash.vertex";
+export * from "./gemini-2.5-pro-preview-03-25.vertex";
+export * from "./gemini-2.5-pro.vertex";
+export * from "./gemini-3-pro-preview.vertex";
