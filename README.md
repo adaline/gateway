@@ -568,4 +568,123 @@ const searchDatabaseTool: ToolType = {
   }
 };
 ```
+
+## OpenTelemetry Integration with Adaline Trace
+
+The Gateway has built-in OpenTelemetry support that automatically instruments all AI calls with distributed tracing. Export traces to [Adaline Trace](https://www.adaline.ai/docs/api-reference/v2/api/logs/post-log-trace) for complete observability of your LLM applications.
+
+### Installation
+
+```bash
+npm install @adaline/gateway @opentelemetry/sdk-trace-node
+```
+
+### Quick Start
+
+```typescript
+import { Gateway, AdalineTracer } from "@adaline/gateway";
+import { OpenAI } from "@adaline/openai";
+
+// 1. Create the Adaline Tracer
+const adalineTracer = new AdalineTracer({
+  apiKey: process.env.ADALINE_API_KEY!,
+  projectId: process.env.ADALINE_PROJECT_ID!,
+});
+
+// 2. Pass tracer to Gateway
+const gateway = new Gateway({
+  telemetry: { tracer: adalineTracer.tracer }
+});
+
+// 3. Use Gateway normally - all calls are automatically traced!
+const openai = new OpenAI();
+const gpt4o = openai.chatModel({ modelName: "gpt-4o", apiKey: process.env.OPENAI_API_KEY! });
+
+const response = await gateway.completeChat({
+  model: gpt4o,
+  config: { temperature: 0.7 },
+  messages: [{ role: "user", content: [{ modality: "text", value: "Hello!" }] }],
+});
+
+// View traces at https://www.adaline.ai
+```
+
+### What Gets Traced
+
+The Gateway automatically creates spans for:
+- **`complete-chat`** - Chat completions
+- **`stream-chat`** - Streaming chat
+- **`get-embeddings`** - Embeddings
+- **`http.request`** - HTTP calls to LLM providers
+- **`queue.task.execute`** - Task execution
+- **`queue.task.retry-wait`** - Retry delays
+
+Each span includes: model name, cache status, latency, time-to-first-token, HTTP details
+
+### Grouping Multiple Calls
+
+Use `adalineTracer.trace()` to create parent spans:
+
+```typescript
+await adalineTracer.trace('process-user-query', async () => {
+  const analysis = await gateway.completeChat({ /* ... */ });
+  const response = await gateway.completeChat({ /* ... */ });
+  return response;
+});
+
+// Creates hierarchy:
+// process-user-query (parent)
+//   ├─ complete-chat (analysis)
+//   └─ complete-chat (response)
+```
+
+### Configuration Options
+
+```typescript
+const adalineTracer = new AdalineTracer({
+  apiKey: string;              // Required: Adaline Workspace API Key
+  projectId: string;           // Required: Adaline Project ID
+  serviceName?: string;        // Optional: Service name (default: 'adaline-gateway-app')
+  serviceVersion?: string;     // Optional: Service version (default: '1.0.0')
+  sessionId?: string;          // Optional: Group related traces
+  tags?: string[];             // Optional: Categorize traces
+  debug?: boolean;             // Optional: Enable debug logging
+});
+```
+
+**Example with all options:**
+
+```typescript
+const adalineTracer = new AdalineTracer({
+  apiKey: process.env.ADALINE_API_KEY!,
+  projectId: process.env.ADALINE_PROJECT_ID!,
+  serviceName: 'my-llm-service',
+  serviceVersion: '1.0.0',
+  sessionId: `user-${userId}-conversation-${conversationId}`,
+  tags: ['production', 'chat-bot'],
+  debug: true,
+});
+```
+
+Get your API key from: [Adaline Settings > API Keys](https://www.adaline.ai)
+
+### Troubleshooting
+
+**Traces not appearing:**
+- Verify API key and project ID are correct
+- Enable `debug: true` to see logs
+- Check that API key has write permissions
+- Ensure you call `adalineTracer.shutdown()` before process exits
+
+**413 error (content too large):**
+- Adaline Trace has a 1MB limit per span
+- The exporter includes all span data (attributes, events, links, resource info)
+- For very large requests/responses, you may need to modify `AdalineTraceExporter` to truncate or omit large fields
+- See the source code at `core/gateway/src/plugins/telemetry/adaline-trace.exporter.ts` for customization
+
+**Scoped vs Global tracing:**
+- `AdalineTracer` keeps tracing scoped to Gateway only (recommended)
+- If you call `provider.register()` on the internal provider, ALL OpenTelemetry instrumentation in your app will trace to Adaline
+- For most use cases, stick with the default scoped approach
+
 ----
