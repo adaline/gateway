@@ -30,6 +30,11 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini1_5Flash002Options,
       modelSchema: Models.Gemini1_5Flash002Schema,
     },
+    [Models.Gemini1_5FlashLatestLiteral]: {
+      model: Models.Gemini1_5FlashLatest,
+      modelOptions: Models.Gemini1_5FlashLatestOptions,
+      modelSchema: Models.Gemini1_5FlashLatestSchema,
+    },
     [Models.Gemini1_5FlashLiteral]: {
       model: Models.Gemini1_5Flash,
       modelOptions: Models.Gemini1_5FlashOptions,
@@ -44,6 +49,11 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.Gemini1_5Pro002,
       modelOptions: Models.Gemini1_5Pro002Options,
       modelSchema: Models.Gemini1_5Pro002Schema,
+    },
+    [Models.Gemini1_5ProLatestLiteral]: {
+      model: Models.Gemini1_5ProLatest,
+      modelOptions: Models.Gemini1_5ProLatestOptions,
+      modelSchema: Models.Gemini1_5ProLatestSchema,
     },
     [Models.Gemini1_5ProLiteral]: {
       model: Models.Gemini1_5Pro,
@@ -64,6 +74,31 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.Gemini2_5FlashLite,
       modelOptions: Models.Gemini2_5FlashLiteOptions,
       modelSchema: Models.Gemini2_5FlashLiteSchema,
+    },
+    [Models.Gemini2_5FlashPreview0417Literal]: {
+      model: Models.Gemini2_5FlashPreview0417,
+      modelOptions: Models.Gemini2_5FlashPreview0417Options,
+      modelSchema: Models.Gemini2_5FlashPreview0417Schema,
+    },
+    [Models.Gemini2_5ProPreview0325Literal]: {
+      model: Models.Gemini2_5ProPreview0325,
+      modelOptions: Models.Gemini2_5ProPreview0325Options,
+      modelSchema: Models.Gemini2_5ProPreview0325Schema,
+    },
+    [Models.Gemini2_5FlashLiteral]: {
+      model: Models.Gemini2_5Flash,
+      modelOptions: Models.Gemini2_5FlashOptions,
+      modelSchema: Models.Gemini2_5FlashSchema,
+    },
+    [Models.Gemini2_5ProLiteral]: {
+      model: Models.Gemini2_5Pro,
+      modelOptions: Models.Gemini2_5ProOptions,
+      modelSchema: Models.Gemini2_5ProSchema,
+    },
+    [Models.Gemini3ProPreviewLiteral]: {
+      model: Models.Gemini3ProPreview,
+      modelOptions: Models.Gemini3ProPreviewOptions,
+      modelSchema: Models.Gemini3ProPreviewSchema,
     },
   };
 
