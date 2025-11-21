@@ -9,7 +9,7 @@ import {
   SelectStringConfigItem,
 } from "@adaline/provider";
 
-export const GOOGLE_SAFETY_CATEGORIES = [
+const GOOGLE_SAFETY_CATEGORIES = [
   "HARM_CATEGORY_UNSPECIFIED",
   "HARM_CATEGORY_HARASSMENT",
   "HARM_CATEGORY_HATE_SPEECH",
@@ -18,7 +18,7 @@ export const GOOGLE_SAFETY_CATEGORIES = [
   "HARM_CATEGORY_CIVIC_INTEGRITY",
 ] as const;
 
-export const GOOGLE_SAFETY_THRESHOLDS = [
+const GOOGLE_SAFETY_THRESHOLDS = [
   "HARM_BLOCK_THRESHOLD_UNSPECIFIED",
   "BLOCK_LOW_AND_ABOVE",
   "BLOCK_MEDIUM_AND_ABOVE",
@@ -26,6 +26,23 @@ export const GOOGLE_SAFETY_THRESHOLDS = [
   "BLOCK_NONE",
   "OFF",
 ] as const;
+
+const formatSafetyLabel = (value: string, prefix: string) =>
+  value
+    .replace(prefix, "")
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (letter: string) => letter.toUpperCase());
+
+const GOOGLE_SAFETY_CATEGORY_OPTIONS = GOOGLE_SAFETY_CATEGORIES.map((category) => ({
+  value: category,
+  label: formatSafetyLabel(category, "HARM_CATEGORY_"),
+}));
+
+const GOOGLE_SAFETY_THRESHOLD_OPTIONS = GOOGLE_SAFETY_THRESHOLDS.map((threshold) => ({
+  value: threshold,
+  label: formatSafetyLabel(threshold, "HARM_BLOCK_THRESHOLD_"),
+}));
 
 const temperature = (max: number, _default: number) =>
   RangeConfigItem({
@@ -124,10 +141,15 @@ const safetySettings = ObjectSchemaConfigItem({
   description: "The safety rating contains the category of harm and the harm probability level in that category for a piece of content.",
   objectSchema: z.array(
     z.object({
-      threshold: z.enum(GOOGLE_SAFETY_THRESHOLDS as unknown as [string, ...string[]]),
-      category: z.enum(GOOGLE_SAFETY_CATEGORIES as unknown as [string, ...string[]]),
+      threshold: z.enum(GOOGLE_SAFETY_THRESHOLDS),
+      category: z.enum(GOOGLE_SAFETY_CATEGORIES),
     })
   ),
+  variant: "paired-select",
+  fieldChoices: {
+    category: GOOGLE_SAFETY_CATEGORY_OPTIONS,
+    threshold: GOOGLE_SAFETY_THRESHOLD_OPTIONS,
+  },
 });
 
 const reasoningEnabled = SelectBooleanConfigItem({
@@ -138,4 +160,20 @@ const reasoningEnabled = SelectBooleanConfigItem({
   default: false,
 });
 
-export { frequencyPenalty, maxTokens, presencePenalty, reasoningEnabled, safetySettings, seed, stop, temperature, toolChoice, topK, topP };
+export {
+  GOOGLE_SAFETY_CATEGORIES,
+  GOOGLE_SAFETY_CATEGORY_OPTIONS,
+  GOOGLE_SAFETY_THRESHOLDS,
+  GOOGLE_SAFETY_THRESHOLD_OPTIONS,
+  frequencyPenalty,
+  maxTokens,
+  presencePenalty,
+  reasoningEnabled,
+  safetySettings,
+  seed,
+  stop,
+  temperature,
+  toolChoice,
+  topK,
+  topP,
+};
