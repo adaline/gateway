@@ -1,9 +1,7 @@
-import { z } from "zod";
-
 import {
   CHAT_CONFIG,
   MultiStringConfigItem,
-  ObjectSchemaConfigItem,
+  PairedSelectConfigItem,
   RangeConfigItem,
   SelectBooleanConfigItem,
   SelectStringConfigItem,
@@ -135,21 +133,23 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "any", "none"],
 });
 
-const safetySettings = ObjectSchemaConfigItem({
+const safetySettings = PairedSelectConfigItem({
   param: "safetySettings",
   title: "Safety settings",
   description: "The safety rating contains the category of harm and the harm probability level in that category for a piece of content.",
-  objectSchema: z.array(
-    z.object({
-      threshold: z.enum(GOOGLE_SAFETY_THRESHOLDS),
-      category: z.enum(GOOGLE_SAFETY_CATEGORIES),
-    })
-  ),
-  variant: "paired-select",
-  fieldChoices: {
-    category: GOOGLE_SAFETY_CATEGORY_OPTIONS,
-    threshold: GOOGLE_SAFETY_THRESHOLD_OPTIONS,
-  },
+  fields: [
+    {
+      key: "category",
+      label: "Category",
+      choices: GOOGLE_SAFETY_CATEGORY_OPTIONS,
+    },
+    {
+      key: "threshold",
+      label: "Threshold",
+      choices: GOOGLE_SAFETY_THRESHOLD_OPTIONS,
+    },
+  ],
+  uniqueByField: "category",
 });
 
 const reasoningEnabled = SelectBooleanConfigItem({
