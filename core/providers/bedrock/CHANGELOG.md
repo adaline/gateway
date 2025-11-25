@@ -1,5 +1,16 @@
 # @adaline/bedrock
 
+## 2.3.0
+
+### Minor Changes
+
+- 15f7267: add Claude Opus 4.5 model (claude-opus-4-5-20251101)
+
+### Patch Changes
+
+- Updated dependencies [15f7267]
+  - @adaline/anthropic@1.9.0
+
 ## 2.2.0
 
 ### Minor Changes

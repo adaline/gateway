@@ -1,5 +1,11 @@
 # @adaline/anthropic
 
+## 1.9.0
+
+### Minor Changes
+
+- 15f7267: add Claude Opus 4.5 model (claude-opus-4-5-20251101)
+
 ## 1.8.0
 
 ### Minor Changes
