@@ -70,6 +70,11 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelOptions: Models.BedrockClaude4Opus20250514Options,
       modelSchema: Models.BedrockClaude4Opus20250514Schema,
     },
+    [Models.BedrockClaudeOpus4_520251101Literal]: {
+      model: Models.BedrockClaudeOpus4_520251101,
+      modelOptions: Models.BedrockClaudeOpus4_520251101Options,
+      modelSchema: Models.BedrockClaudeOpus4_520251101Schema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<
