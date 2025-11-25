@@ -69,6 +69,11 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       modelOptions: Models.Claude4Opus20250514Options,
       modelSchema: Models.Claude4Opus20250514Schema,
     },
+    [Models.ClaudeOpus4_520251101Literal]: {
+      model: Models.ClaudeOpus4_520251101,
+      modelOptions: Models.ClaudeOpus4_520251101Options,
+      modelSchema: Models.ClaudeOpus4_520251101Schema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<
