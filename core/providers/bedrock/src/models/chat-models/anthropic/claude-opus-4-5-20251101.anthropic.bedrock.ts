@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import {
-  AnthropicChatModelModalities,
-  AnthropicChatModelModalitiesEnum,
   AnthropicChatModelRoles,
   AnthropicChatModelRolesMap,
+  AnthropicThinkingChatModelModalities,
+  AnthropicThinkingChatModelModalitiesEnum,
 } from "@adaline/anthropic";
 import { ChatModelSchema } from "@adaline/provider";
 
@@ -14,15 +14,17 @@ import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
 const BedrockClaudeOpus4_520251101Literal = "anthropic.claude-opus-4-5-20251101-v1:0";
-const BedrockClaudeOpus4_520251101Description = "Premium model combining maximum intelligence with practical performance. Ideal for complex specialized tasks, professional software engineering, and advanced agents. Training cutoff: August 2025.";
+const BedrockClaudeOpus4_520251101Description =
+  "Premium model combining maximum intelligence with practical performance. Ideal for complex specialized tasks, professional software engineering, and advanced agents. Training cutoff: August 2025.";
 
-const BedrockClaudeOpus4_520251101Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicChatModelModalitiesEnum).parse({
+const BedrockClaudeOpus4_520251101Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeOpus4_520251101Literal,
   description: BedrockClaudeOpus4_520251101Description,
   maxInputTokens: 200000,
   maxOutputTokens: 64000,
+  maxReasoningTokens: 64000,
   roles: AnthropicChatModelRolesMap,
-  modalities: AnthropicChatModelModalities,
+  modalities: AnthropicThinkingChatModelModalities,
   config: {
     def: BedrockAnthropicChatModelConfigs.base(64000, 4).def,
     schema: BedrockAnthropicChatModelConfigs.base(64000, 4).schema,
