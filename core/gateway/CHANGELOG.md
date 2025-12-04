@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.11.0
+
+### Minor Changes
+
+- 14d8a3d: bump minor version
+
 ## 1.10.0
 
 ### Minor Changes

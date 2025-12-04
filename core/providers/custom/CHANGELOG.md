@@ -1,5 +1,18 @@
 # @adaline/custom
 
+## 1.6.0
+
+### Minor Changes
+
+- 14d8a3d: bump minor version
+
+### Patch Changes
+
+- Updated dependencies [14d8a3d]
+  - @adaline/openai@1.12.0
+  - @adaline/provider@1.7.0
+  - @adaline/types@1.10.0
+
 ## 1.5.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.10.0
+
+### Minor Changes
+
+- 14d8a3d: bump minor version
+
 ## 1.9.1
 
 ### Patch Changes
