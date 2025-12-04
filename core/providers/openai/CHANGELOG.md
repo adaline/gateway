@@ -1,5 +1,12 @@
 # @adaline/openai
 
+## 1.11.1
+
+### Patch Changes
+
+- Updated dependencies [ac10b6b]
+  - @adaline/provider@1.6.0
+
 ## 1.11.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @adaline/provider
 
+## 1.6.0
+
+### Minor Changes
+
+- ac10b6b: Add PairedSelectConfigItem for Gemini's safety setting configurations.
+
 ## 1.5.1
 
 ### Patch Changes
