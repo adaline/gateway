@@ -494,5 +494,21 @@
         }
       }
     ]
+  },
+  "gpt-5.2": {
+    "modelName": "gpt-5.2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.75,
+            "outputPricePerMillion": 14.0
+          }
+        }
+      }
+    ]
   }
 }
