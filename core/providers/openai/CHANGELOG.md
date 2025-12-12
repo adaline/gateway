@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.14.0
+
+### Minor Changes
+
+- 0998d54: Adding the GPT 5.2 chat latest model for openai
+
 ## 1.13.0
 
 ### Minor Changes
