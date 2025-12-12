@@ -9,7 +9,7 @@ export * from "./gpt-4-1.openai";
 export * from "./gpt-4-1-mini.openai";
 export * from "./gpt-4-1-nano.openai";
 export * from "./gpt-5-1.openai";
-export * from "./gpt-5.2.openai";
+export * from "./gpt-5-2.openai";
 export * from "./gpt-5.openai";
 export * from "./gpt-5-mini.openai";
 export * from "./gpt-5-nano.openai";
