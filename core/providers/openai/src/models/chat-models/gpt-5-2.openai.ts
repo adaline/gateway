@@ -7,7 +7,6 @@ import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
 import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
 
-// Specs reference: https://platform.openai.com/docs/models/gpt-5.2 (retrieved 2025-02-18)
 const GPT_5_2Literal = "gpt-5.2";
 const GPT_5_2Description =
   "Flagship GPT-5.2 model with enhanced reasoning controls and extended knowledge coverage. \
