@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.13.0
+
+### Minor Changes
+
+- d92112f: Introducing Openai GPT 5.2 model
+
 ## 1.12.0
 
 ### Minor Changes
