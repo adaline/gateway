@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.12.1
+
+### Patch Changes
+
+- 4c45f48: Handle unsupported 'additionalProperties' key for Google models
+
 ## 1.12.0
 
 ### Minor Changes
