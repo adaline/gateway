@@ -698,7 +698,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                     },
                   });
                 } else if (content.value.type === "url") {
-                  // TODO: add logic to fetch image from url, remove this error
                   throw new InvalidMessagesError({
                     info: `Invalid message 'modality' for model : ${this.modelName}`,
                     cause: new Error(`model: '${this.modelName}' does not support image content type: '${content.value.type}'`),
@@ -813,6 +812,30 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     };
   }
 
+  /**
+   * Recursively removes 'additionalProperties' from a JSON schema object.
+   * Google's Gemini API does not support this field in function parameters.
+   */
+  private stripAdditionalProperties(obj: unknown): unknown {
+    if (obj === null || typeof obj !== "object") {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map((item) => this.stripAdditionalProperties(item));
+    }
+
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      if (key === "additionalProperties") {
+        // Skip this field - Google doesn't support it
+        continue;
+      }
+      result[key] = this.stripAdditionalProperties(value);
+    }
+    return result;
+  }
+
   transformTools(tools: ToolType[]): ParamsType {
     if (!this.modelSchema.modalities.includes(ToolCallModalityLiteral)) {
       throw new InvalidToolsError({
@@ -836,7 +859,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     const transformedTools = parsedTools.map((tool) => ({
       name: tool.definition.schema.name,
       description: tool.definition.schema.description,
-      parameters: tool.definition.schema.parameters,
+      // Strip additionalProperties as Google's API doesn't support this field
+      parameters: this.stripAdditionalProperties(tool.definition.schema.parameters),
     }));
 
     return {
@@ -1094,7 +1118,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // --- proxyStreamTransform logic starts here ---
     const newData = buffer + chunk;
-    let lines: string[] = [];
+    const lines: string[] = [];
     let newBuffer = "";
 
     // Split newData into complete lines and new buffer
