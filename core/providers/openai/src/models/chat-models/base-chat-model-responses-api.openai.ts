@@ -100,8 +100,8 @@ class BaseChatModelResponsesApi extends BaseChatModel {
    * Override transformConfig to handle Responses API specific config format
    */
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
-    // Get base transformed config
-    const transformedConfig = super.transformConfig(config, messages, tools);
+    const baseConfig = super.transformConfig(config, messages, tools);
+    const transformedConfig = { ...baseConfig };
 
     // Transform reasoning_effort to nested object
     if ("reasoning_effort" in transformedConfig && transformedConfig.reasoning_effort !== undefined) {
@@ -126,7 +126,7 @@ class BaseChatModelResponsesApi extends BaseChatModel {
    * Override transformMessages to use Responses API content types
    */
   transformMessages(messages: MessageType[]): ParamsType {
-    if (!messages || (messages && messages.length === 0)) {
+    if (!messages || messages.length === 0) {
       return { messages: [] };
     }
 
@@ -218,13 +218,15 @@ class BaseChatModelResponsesApi extends BaseChatModel {
             if (content.modality === TextModalityLiteral) {
               userContent.push({ type: "input_text", text: content.value });
             } else if (content.modality === ImageModalityLiteral) {
+              // Extract URL based on content value type with proper type narrowing
+              const imageValue = content.value;
+              const imageUrl = imageValue.type === "url" 
+                ? imageValue.url 
+                : (imageValue as Base64ImageContentValueType).base64;
               userContent.push({
                 type: "image_url",
                 image_url: {
-                  url:
-                    content.value.type === "url"
-                      ? content.value.url
-                      : (content.value as Base64ImageContentValueType).base64,
+                  url: imageUrl,
                   detail: content.detail,
                 },
               });
