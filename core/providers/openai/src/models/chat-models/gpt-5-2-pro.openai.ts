@@ -37,9 +37,7 @@ type GPT_5_2_ProOptionsType = z.infer<typeof GPT_5_2_ProOptions>;
 /**
  * GPT-5.2 Pro Model
  *
- * This model uses the OpenAI Responses API (/v1/responses) for advanced
- * reasoning and agentic workflows. It extends BaseChatModelResponsesApi
- * which handles the different API format.
+ * This model uses the OpenAI Responses API (/v1/responses)
  */
 class GPT_5_2_Pro extends BaseChatModelResponsesApi {
   constructor(options: GPT_5_2_ProOptionsType) {
