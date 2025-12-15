@@ -49,11 +49,6 @@ const BaseChatModelResponsesApiOptions = z.object({
 });
 type BaseChatModelResponsesApiOptionsType = z.infer<typeof BaseChatModelResponsesApiOptions>;
 
-/**
- * Standalone base class for OpenAI Responses API models.
- * Implements ChatModelV1 directly without extending BaseChatModel.
- * All logic is specific to the Responses API format used by GPT-5.2 Pro and similar models.
- */
 class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
   readonly version = "v1" as const;
   modelSchema: ChatModelSchemaType;
@@ -133,8 +128,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
     }, 0);
   }
 
-  // Transform raw API request format to internal format
-  // Note: Responses API models typically receive pre-transformed requests
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transformModelRequest(request: any): {
     modelName: string | undefined;
@@ -148,12 +141,10 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
     });
   }
 
-  // Responses API specific config transformation
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
     const parsedConfig = Config().parse(config);
     const transformedConfig: ParamsType = {};
 
-    // Map config keys to API params using model schema definition
     for (const key of Object.keys(this.modelSchema.config.def)) {
       const configItem = this.modelSchema.config.def[key as keyof typeof this.modelSchema.config.def];
       const paramKey = configItem?.param as string | undefined;
@@ -162,7 +153,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // Handle tool choice
     const toolChoice = parsedConfig.toolChoice;
     if (toolChoice !== undefined) {
       if (tools && tools.length > 0) {
@@ -187,7 +177,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // Handle response format
     const responseFormat = parsedConfig.responseFormat as string | undefined;
     if (responseFormat !== undefined) {
       if (responseFormat === "json_schema") {
@@ -207,7 +196,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // Responses API specific: Transform reasoning_effort to nested object
     if ("reasoning_effort" in transformedConfig && transformedConfig.reasoning_effort !== undefined) {
       transformedConfig.reasoning = {
         effort: transformedConfig.reasoning_effort,
@@ -215,7 +203,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
       delete transformedConfig.reasoning_effort;
     }
 
-    // Responses API specific: Transform verbosity to nested object
     if ("verbosity" in transformedConfig && transformedConfig.verbosity !== undefined) {
       transformedConfig.text = {
         verbosity: transformedConfig.verbosity,
@@ -226,7 +213,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
     return transformedConfig;
   }
 
-  // Responses API specific message transformation using input_text/output_text
   transformMessages(messages: MessageType[]): ParamsType {
     if (!messages || messages.length === 0) {
       return { messages: [] };
@@ -240,7 +226,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
       return parsedMessage.data;
     });
 
-    // Validate modalities
     parsedMessages.forEach((message) => {
       message.content.forEach((content) => {
         if (!this.modelSchema.modalities.includes(content.modality)) {
@@ -252,7 +237,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
       });
     });
 
-    // Validate roles
     parsedMessages.forEach((message) => {
       if (!Object.keys(this.modelSchema.roles).includes(message.role)) {
         throw new InvalidMessagesError({
@@ -425,7 +409,6 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
 
     const transformedTools = tools ? this.transformTools(tools) : {};
 
-    // Responses API uses "input" instead of "messages"
     return Promise.resolve({
       ...this.getDefaultParams(),
       ...transformedConfig,
