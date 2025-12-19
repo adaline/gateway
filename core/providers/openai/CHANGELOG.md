@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.15.0
+
+### Minor Changes
+
+- 3c8f677: Add gemini-3-flash-preview, gpt-5.2-pro
+
 ## 1.14.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @adaline/vertex
 
+## 1.10.2
+
+### Patch Changes
+
+- 3c8f677: Add gemini-3-flash-preview, gpt-5.2-pro
+- Updated dependencies [3c8f677]
+  - @adaline/google@1.12.2
+
 ## 1.10.1
 
 ### Patch Changes

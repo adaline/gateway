@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.12.2
+
+### Patch Changes
+
+- 3c8f677: Add gemini-3-flash-preview, gpt-5.2-pro
+
 ## 1.12.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "1.9.3",
+  "version": "1.9.5",
   "license": "MIT",
   "sideEffects": false,
   "private": false,
