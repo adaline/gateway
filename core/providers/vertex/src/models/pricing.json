@@ -412,5 +412,21 @@
         }
       }
     ]
+  },
+  "gemini-3-flash-preview": {
+    "modelName": "gemini-3-flash-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 3.0
+          }
+        }
+      }
+    ]
   }
 }
