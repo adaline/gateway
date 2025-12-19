@@ -1,4 +1,5 @@
 export * from "./base-chat-model.openai";
+export * from "./base-chat-model-responses-api.openai";
 export * from "./gpt-3-5-turbo-0125.openai";
 export * from "./gpt-3-5-turbo-1106.openai";
 export * from "./gpt-3-5-turbo.openai";
@@ -11,6 +12,7 @@ export * from "./gpt-4-1-nano.openai";
 export * from "./gpt-5-1.openai";
 export * from "./gpt-5-2.openai";
 export * from "./gpt-5-2-chat-latest.openai";
+export * from "./gpt-5-2-pro.openai";
 export * from "./gpt-5.openai";
 export * from "./gpt-5-mini.openai";
 export * from "./gpt-5-nano.openai";
