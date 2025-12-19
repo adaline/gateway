@@ -14,4 +14,5 @@ export * from "./gemini-2.5-flash-preview-04-17.vertex";
 export * from "./gemini-2.5-flash.vertex";
 export * from "./gemini-2.5-pro-preview-03-25.vertex";
 export * from "./gemini-2.5-pro.vertex";
+export * from "./gemini-3-flash-preview.vertex";
 export * from "./gemini-3-pro-preview.vertex";
