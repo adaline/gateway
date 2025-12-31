@@ -32,7 +32,7 @@ The only fully local production-grade Super SDK that provides a simple, unified,
 ### Install packages
 
 ```bash
-npm install @adaline/gateway @adaline/types @adaline/openai @adaline/anthropic
+npm install @adaline/gateway @adaline/types @adaline/openai @adaline/anthropic 
 ```
 
 ### Create a Gateway object
