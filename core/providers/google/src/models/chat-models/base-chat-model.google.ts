@@ -850,11 +850,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       });
     }
 
-    if ((!tools || (tools && tools.length === 0)) && !config?.googleSearchTool) {
+    if ((!tools || tools.length === 0) && !config?.googleSearchTool) {
       return { tools: [] as ToolType[] };
     }
 
-    const parsedTools = tools.map((tool) => {
+    const parsedTools = (tools ?? []).map((tool) => {
       const parsedTool = Tool().safeParse(tool);
       if (!parsedTool.success) {
         throw new InvalidToolsError({ info: "Invalid tools", cause: parsedTool.error });
