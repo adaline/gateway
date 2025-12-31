@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.11.0
+
+### Minor Changes
+
+- 8ffe29e: Add support for Google Search Tool across Gemini models
+
 ## 1.10.0
 
 ### Minor Changes

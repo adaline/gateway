@@ -1,5 +1,14 @@
 # @adaline/azure
 
+## 1.8.4
+
+### Patch Changes
+
+- Updated dependencies [8ffe29e]
+  - @adaline/provider@1.8.0
+  - @adaline/types@1.11.0
+  - @adaline/openai@1.15.1
+
 ## 1.8.3
 
 ### Patch Changes

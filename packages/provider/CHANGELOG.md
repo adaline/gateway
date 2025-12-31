@@ -1,5 +1,16 @@
 # @adaline/provider
 
+## 1.8.0
+
+### Minor Changes
+
+- 8ffe29e: Add support for Google Search Tool across Gemini models
+
+### Patch Changes
+
+- Updated dependencies [8ffe29e]
+  - @adaline/types@1.11.0
+
 ## 1.7.0
 
 ### Minor Changes

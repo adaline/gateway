@@ -1,5 +1,14 @@
 # @adaline/bedrock
 
+## 2.4.1
+
+### Patch Changes
+
+- Updated dependencies [8ffe29e]
+  - @adaline/provider@1.8.0
+  - @adaline/types@1.11.0
+  - @adaline/anthropic@1.10.1
+
 ## 2.4.0
 
 ### Minor Changes
