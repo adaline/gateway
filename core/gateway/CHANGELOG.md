@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.11.1
+
+### Patch Changes
+
+- c44ce3a: Release latest modalities ('search-result' and 'error') into Gateway
+
 ## 1.11.0
 
 ### Minor Changes
