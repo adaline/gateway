@@ -3,10 +3,15 @@ import { ChatResponseType, ChatUsageType, PartialChatResponseType } from "./../c
 import {
   AssistantRoleLiteral,
   ContentType,
+  ErrorModalityLiteral,
   MessageType,
   PartialContentType,
+  PartialErrorContentType,
+  PartialErrorModalityLiteral,
   PartialReasoningContentType,
   PartialReasoningModalityLiteral,
+  PartialSearchResultContentType,
+  PartialSearchResultModalityLiteral,
   PartialTextContentType,
   PartialTextModalityLiteral,
   PartialToolCallContentType,
@@ -17,6 +22,7 @@ import {
   ReasoningContentValueUnionType,
   ReasoningModalityLiteral,
   RedactedReasoningContentTypeLiteral,
+  SearchResultModalityLiteral,
   TextModalityLiteral,
   ToolCallModalityLiteral,
   ToolResponseModalityLiteral,
@@ -40,6 +46,8 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   let currentToolCall: { index?: number; id: string; name: string; arguments: string } | null = null;
   let currentToolResponse: { index?: number; id: string; name: string; data: string; apiResponse?: { statusCode: number } } | null = null;
   let currentReasoning: PartialReasoningContentType["value"] | null = null; // Store the partial value directly
+  let currentSearchResult: PartialSearchResultContentType["value"] | null = null;
+  let currentError: PartialErrorContentType["value"] | null = null;
 
   // --- Helper Function to Finalize and Add the previous block ---
   const finalizePreviousBlock = () => {
@@ -121,6 +129,49 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
           });
         }
       }
+    } else if (lastModality === PartialSearchResultModalityLiteral && currentSearchResult) {
+      // Only finalize search result if it has meaningful content
+      const hasQuery = currentSearchResult.query && currentSearchResult.query.length > 0;
+      const hasResponses = currentSearchResult.responses && currentSearchResult.responses.length > 0;
+      const hasReferences = currentSearchResult.references && currentSearchResult.references.length > 0;
+      
+      if (hasQuery || hasResponses || hasReferences) {
+        finalizedContent = {
+          modality: SearchResultModalityLiteral,
+          value: {
+            type: currentSearchResult.type,
+            query: currentSearchResult.query ?? "",
+            responses: (currentSearchResult.responses ?? []).map((r) => ({
+              source: r.source ?? "",
+              url: r.url ?? "",
+              title: r.title ?? "",
+              snippet: r.snippet,
+            })),
+            references: (currentSearchResult.references ?? []).map((ref) => ({
+              text: ref.text ?? "",
+              responseIndices: ref.responseIndices ?? [],
+              startIndex: ref.startIndex,
+              endIndex: ref.endIndex,
+              confidenceScores: ref.confidenceScores,
+            })),
+          },
+        };
+      }
+      // If empty, don't create content - just reset accumulators
+    } else if (lastModality === PartialErrorModalityLiteral && currentError) {
+      // Errors come as complete objects, convert directly
+      finalizedContent = {
+        modality: ErrorModalityLiteral,
+        value: {
+          type: currentError.type,
+          value: {
+            category: currentError.category ?? "",
+            probability: currentError.probability ?? "",
+            blocked: currentError.blocked ?? false,
+            message: currentError.message ?? "",
+          },
+        },
+      };
     }
 
     // If content was successfully finalized, add it as a separate message
@@ -133,6 +184,8 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
     currentToolCall = null;
     currentToolResponse = null;
     currentReasoning = null;
+    currentSearchResult = null;
+    currentError = null;
     lastModality = null; // Reset modality marker
     lastReasoningType = null; // Reset reasoning type marker
     lastToolCallIndex = undefined; // Reset tool call index marker
@@ -296,6 +349,39 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
             });
           }
         }
+      } else if (currentModality === PartialSearchResultModalityLiteral) {
+        const searchResultPart = currentContent as PartialSearchResultContentType;
+        const valuePart = searchResultPart.value;
+        // Search results accumulate - merge incoming data with existing
+        if (!currentSearchResult) {
+          // Initialize new search result
+          currentSearchResult = {
+            type: valuePart.type,
+            query: valuePart.query ?? "",
+            responses: [...(valuePart.responses ?? [])],
+            references: [...(valuePart.references ?? [])],
+          };
+        } else {
+          // Merge with existing search result - keep latest non-empty query, merge arrays
+          if (valuePart.query && valuePart.query.length > 0) {
+            currentSearchResult.query = valuePart.query;
+          }
+          if (valuePart.responses && valuePart.responses.length > 0) {
+            currentSearchResult.responses = [...(currentSearchResult.responses ?? []), ...valuePart.responses];
+          }
+          if (valuePart.references && valuePart.references.length > 0) {
+            currentSearchResult.references = [...(currentSearchResult.references ?? []), ...valuePart.references];
+          }
+        }
+      } else if (currentModality === PartialErrorModalityLiteral) {
+        const errorPart = currentContent as PartialErrorContentType;
+        // Errors come as complete objects - each one is a separate block
+        if (currentError) {
+          // If we already have an error, finalize it and start a new one
+          finalizePreviousBlock();
+          lastModality = currentModality;
+        }
+        currentError = errorPart.value;
       }
     });
   });

@@ -1496,7 +1496,7 @@ describe("BaseChatModel", () => {
       }
     });
 
-    it("should throw ModelResponseError if content is missing and a safetyRating is blocked", () => {
+    it("should return error content if content is missing and a safetyRating is blocked", () => {
       const apiResponse = createGoogleResponse({
         candidates: [
           {
@@ -1513,17 +1513,18 @@ describe("BaseChatModel", () => {
       // Remove content explicitly if helper adds it by default
       delete apiResponse.candidates[0].content;
 
-      expect(() => googleChatModel.transformCompleteChatResponse(apiResponse)).toThrow(ModelResponseError);
-      try {
-        googleChatModel.transformCompleteChatResponse(apiResponse);
-      } catch (e) {
-        expect(e).toBeInstanceOf(ModelResponseError);
-        expect((e as ModelResponseError).info).toBe("Blocked content for category: HARM_CATEGORY_HATE_SPEECH with probability: HIGH");
-        expect((e as ModelResponseError).cause).toBeInstanceOf(Error);
-        expect((e as ModelResponseError as any).cause?.message).toBe(
-          "Blocked content for category: HARM_CATEGORY_HATE_SPEECH with probability: HIGH"
-        );
-      }
+      const result = googleChatModel.transformCompleteChatResponse(apiResponse);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].role).toBe("assistant");
+      expect(result.messages[0].content).toHaveLength(1);
+      expect(result.messages[0].content[0].modality).toBe("error");
+      expect((result.messages[0].content[0] as any).value.type).toBe("safety");
+      expect((result.messages[0].content[0] as any).value.value.category).toBe("HARM_CATEGORY_HATE_SPEECH");
+      expect((result.messages[0].content[0] as any).value.value.probability).toBe("HIGH");
+      expect((result.messages[0].content[0] as any).value.value.blocked).toBe(true);
+      expect((result.messages[0].content[0] as any).value.value.message).toBe(
+        "Blocked content for category: HARM_CATEGORY_HATE_SPEECH with probability: HIGH"
+      );
     });
 
     it("should throw ModelResponseError if functionCall structure is invalid (e.g., missing name/args)", () => {

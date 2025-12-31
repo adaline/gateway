@@ -159,12 +159,20 @@ const reasoningEnabled = SelectBooleanConfigItem({
   default: false,
 });
 
+const googleSearchTool = SelectBooleanConfigItem({
+  param: "googleSearch",
+  title: "Google Search Tool",
+  description: "Controls whether the model is allowed to use the Google Search tool. Powered by Google.",
+  default: false,
+});
+
 export {
   GOOGLE_SAFETY_CATEGORIES,
   GOOGLE_SAFETY_CATEGORY_OPTIONS,
   GOOGLE_SAFETY_THRESHOLDS,
   GOOGLE_SAFETY_THRESHOLD_OPTIONS,
   frequencyPenalty,
+  googleSearchTool,
   maxTokens,
   presencePenalty,
   reasoningEnabled,
