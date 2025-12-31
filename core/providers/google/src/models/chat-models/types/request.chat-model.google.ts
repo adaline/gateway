@@ -63,6 +63,16 @@ const GoogleChatTool = z.object({
 });
 type GoogleChatToolType = z.infer<typeof GoogleChatTool>;
 
+const GoogleChatGoogleSearchTool = z.object({
+  timeRangeFilter: z
+    .object({
+      startTime: z.string().datetime().optional(),
+      endTime: z.string().datetime().optional(),
+    })
+    .optional(),
+});
+type GoogleChatGoogleSearchToolType = z.infer<typeof GoogleChatGoogleSearchTool>;
+
 const GoogleChatToolConfig = z.object({
   function_calling_config: z.object({
     mode: z.enum(["ANY", "AUTO", "NONE"]),
@@ -114,6 +124,7 @@ const GoogleChatRequest = z.object({
   tools: z
     .object({
       function_declarations: z.array(GoogleChatTool),
+      google_search: GoogleChatGoogleSearchTool.optional(),
     })
     .optional(),
   toolConfig: GoogleChatToolConfig.optional(),
@@ -129,6 +140,7 @@ export {
   GoogleChatContentPartFileData,
   GoogleChatContentPartText,
   GoogleChatGenerationConfig,
+  GoogleChatGoogleSearchTool,
   GoogleChatRequest,
   GoogleChatSystemInstruction,
   GoogleChatTool,
@@ -139,6 +151,7 @@ export {
   type GoogleChatContentPartFunctionResponseType,
   type GoogleChatContentPartInlineDataType,
   type GoogleChatContentPartFileDataType,
+  type GoogleChatGoogleSearchToolType,
   type GoogleChatToolType,
   type GoogleChatToolConfigType,
   type GoogleChatGenerationConfigType,

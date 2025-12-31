@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { maxTokens, safetySettings, stop, temperature, toolChoice, topP } from "./common.config.chat-model.google";
+import { googleSearchTool, maxTokens, safetySettings, stop, temperature, toolChoice, topP } from "./common.config.chat-model.google";
 
 const ChatModelBaseConfigSchema = (
   maxTemperature: number,
@@ -16,6 +16,7 @@ const ChatModelBaseConfigSchema = (
     topP: topP(defaultTopP).schema,
     toolChoice: toolChoice.schema,
     safetySettings: safetySettings.schema,
+    googleSearchTool: googleSearchTool.schema,
   });
 
 const ChatModelBaseConfigDef = (
@@ -32,6 +33,7 @@ const ChatModelBaseConfigDef = (
     topP: topP(defaultTopP).def,
     toolChoice: toolChoice.def,
     safetySettings: safetySettings.def,
+    googleSearchTool: googleSearchTool.def,
   }) as const;
 
 export { ChatModelBaseConfigDef, ChatModelBaseConfigSchema };

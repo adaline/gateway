@@ -21,10 +21,9 @@ interface ChatModelV1<MS extends ChatModelSchemaType = ChatModelSchemaType> {
     tools: ToolType[] | undefined;
   };
 
-  // TODO: these should be async, needed for downloading images, other media
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType;
-  transformMessages(messages: MessageType[]): ParamsType;
-  transformTools(tools: ToolType[]): ParamsType;
+  transformMessages(messages: MessageType[], config?: ConfigType, tools?: ToolType[]): ParamsType;
+  transformTools(tools: ToolType[], config?: ConfigType, messages?: MessageType[]): ParamsType;
 
   getCompleteChatUrl(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<UrlType>;
   getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType>;

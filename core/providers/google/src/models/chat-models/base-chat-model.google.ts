@@ -23,12 +23,15 @@ import {
   Base64ImageContentValueType,
   ChatModelPriceType,
   ChatResponseType,
-  ChatUsageType,
   Config,
   ConfigType,
   ContentType,
+  createPartialSafetyErrorMessage,
+  createPartialSearchResultGoogleMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createSafetyErrorContent,
+  createSearchResultGoogleContent,
   createTextContent,
   createToolCallContent,
   ImageContentType,
@@ -65,6 +68,8 @@ import {
   GoogleCompleteChatResponseType,
   GoogleStreamChatResponse,
   GoogleStreamChatResponseType,
+  GoogleChatGoogleSearchTool,
+  GoogleChatGoogleSearchToolType,
 } from "./types";
 
 const BaseChatModelOptions = z.object({
@@ -508,6 +513,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     const safetySettings = transformedConfig.safetySettings;
     delete transformedConfig.safetySettings;
+    delete transformedConfig.googleSearch;
 
     let toolConfig;
     if (_toolChoice !== undefined) {
@@ -836,7 +842,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     return result;
   }
 
-  transformTools(tools: ToolType[]): ParamsType {
+  transformTools(tools: ToolType[], config?: ConfigType): ParamsType {
     if (!this.modelSchema.modalities.includes(ToolCallModalityLiteral)) {
       throw new InvalidToolsError({
         info: `Invalid tool 'modality' for model : ${this.modelName}`,
@@ -844,7 +850,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       });
     }
 
-    if (!tools || (tools && tools.length === 0)) {
+    if ((!tools || (tools && tools.length === 0)) && !config?.googleSearchTool) {
       return { tools: [] as ToolType[] };
     }
 
@@ -866,7 +872,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     return {
       tools: [
         {
-          function_declarations: transformedTools,
+          ...(transformedTools.length > 0 ? { function_declarations: transformedTools } : {}),
+          ...(config?.googleSearchTool ? { google_search: {} } : {}),
         },
       ],
     };
@@ -900,7 +907,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       });
     }
 
-    const transformedTools = tools ? this.transformTools(tools) : {};
+    const transformedTools = this.transformTools(tools || [], config);
 
     return {
       ...this.getDefaultParams(),
@@ -920,12 +927,26 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         });
       }
 
+      const completeChatResponse: ChatResponseType = {
+        messages: [],
+        usage: undefined,
+        logProbs: undefined,
+      };
+
       const parsedResponse: GoogleCompleteChatResponseType = safe.data;
-      const messages: MessageType[] = [];
-      let usage: ChatUsageType | undefined;
-      const _content = parsedResponse.candidates[0].content;
-      if (_content) {
-        const content = _content.parts.map((contentItem: any, index: any) => {
+      
+      if (parsedResponse.usageMetadata) {
+        completeChatResponse.usage = {
+          promptTokens: parsedResponse.usageMetadata.promptTokenCount,
+          totalTokens: parsedResponse.usageMetadata.totalTokenCount,
+          completionTokens: parsedResponse.usageMetadata.candidatesTokenCount || 0,
+        }
+      }
+
+      const candidate = parsedResponse.candidates[0]; // default to first candidate, top choice
+
+      if (candidate.content) {
+        const content = candidate.content.parts.map((contentItem: any, index: any) => {
           if ("text" in contentItem && contentItem.text !== undefined) {
             return createTextContent(contentItem.text);
           } else if ("functionCall" in contentItem && contentItem.functionCall !== undefined) {
@@ -938,44 +959,85 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           }
         }) as ContentType[];
 
-        messages.push({
+        completeChatResponse.messages.push({
           role: AssistantRoleLiteral,
           content: content,
         });
-
-        if (parsedResponse.usageMetadata) {
-          usage = {
-            promptTokens: parsedResponse.usageMetadata.promptTokenCount,
-            totalTokens: parsedResponse.usageMetadata.totalTokenCount,
-            completionTokens: parsedResponse.usageMetadata.candidatesTokenCount || 0,
-          };
-        }
-
-        return {
-          messages: messages,
-          usage: usage,
-          logProbs: undefined,
-        };
       }
 
-      const safetyRatings = parsedResponse.candidates[0].safetyRatings;
+      if (candidate.groundingMetadata) {
+        if (completeChatResponse.messages.length === 0) {
+          completeChatResponse.messages.push({
+            role: AssistantRoleLiteral,
+            content: [createSearchResultGoogleContent(
+              candidate.groundingMetadata.webSearchQueries?.[0] || "",
+              candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
+                source: chunk.web ? "web" : "",
+                url: chunk.web?.uri || "",
+                title: chunk.web?.title || "",
+              })) || [],
+              candidate.groundingMetadata.groundingSupports?.map((support) => ({
+                text: support.segment?.text || "",
+                responseIndices: support.groundingChunkIndices || [],
+                startIndex: support.segment?.startIndex || undefined,
+                endIndex: support.segment?.endIndex || undefined,
+                confidenceScores: support.confidenceScores || undefined,
+              })) || [],
+            )],
+          });
+        } else {
+          completeChatResponse.messages[0].content.push(
+            createSearchResultGoogleContent(
+              candidate.groundingMetadata.webSearchQueries?.[0] || "",
+              candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
+                source: chunk.web ? "web" : "",
+                url: chunk.web?.uri || "",
+                title: chunk.web?.title || "",
+              })) || [],
+              candidate.groundingMetadata.groundingSupports?.map((support) => ({
+                text: support.segment?.text || "",
+                responseIndices: support.groundingChunkIndices || [],
+                startIndex: support.segment?.startIndex || undefined,
+                endIndex: support.segment?.endIndex || undefined,
+                confidenceScores: support.confidenceScores || undefined,
+              })) || [],
+            )
+          );
+        }
+      }
+
+      const safetyRatings = candidate.safetyRatings;
       if (safetyRatings && safetyRatings.length > 0) {
         safetyRatings.forEach((rating) => {
           if (rating.blocked) {
-            throw new ModelResponseError({
-              info: `Blocked content for category: ${rating.category} with probability: ${rating.probability}`,
-              cause: new Error(`Blocked content for category: ${rating.category} with probability: ${rating.probability}`),
-            });
+            if (completeChatResponse.messages.length === 0) {
+              completeChatResponse.messages.push({
+                role: AssistantRoleLiteral,
+                content: [createSafetyErrorContent(
+                  rating.category, 
+                  rating.probability, 
+                  rating.blocked, 
+                  `Blocked content for category: ${rating.category} with probability: ${rating.probability}`,
+                )],
+              });
+            } else {
+              completeChatResponse.messages[0].content.push(
+                createSafetyErrorContent(
+                  rating.category, 
+                  rating.probability, 
+                  rating.blocked, 
+                  `Blocked content for category: ${rating.category} with probability: ${rating.probability}`
+                )
+              );
+            }
           }
         });
       }
 
-      const finishReason = parsedResponse.candidates[0].finishReason;
-      if (finishReason === "SAFETY") {
-        throw new ModelResponseError({
-          info: "Blocked content, model response finished with safety reason",
-          cause: new Error("Blocked content, model response finished with safety reason"),
-        });
+      if (completeChatResponse.messages.length > 0) {
+        return completeChatResponse;
+      } else if (completeChatResponse.messages.length === 0 && candidate.finishReason === "SAFETY") {
+        throw new ModelResponseError({ info: "Blocked content, model response finished with safety reason", cause: new Error("Blocked content, model response finished with safety reason") });
       }
     }
 
@@ -1010,7 +1072,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       });
     }
 
-    const transformedTools = tools ? this.transformTools(tools) : {};
+    const transformedTools = this.transformTools(tools || [], config);
 
     return {
       ...this.getDefaultParams(),
@@ -1093,6 +1155,47 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             completionTokens: parsedResponse.usageMetadata.candidatesTokenCount,
             totalTokens: parsedResponse.usageMetadata.totalTokenCount,
           };
+        }
+
+        if (parsedResponse.candidates.length > 0) {
+          const candidate = parsedResponse.candidates[0];
+          if (candidate.groundingMetadata) {
+            partialResponse.partialMessages.push(
+              createPartialSearchResultGoogleMessage(
+                AssistantRoleLiteral,
+                candidate.groundingMetadata.webSearchQueries?.[0] || "",
+                candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
+                  source: chunk.web ? "web" : "",
+                  url: chunk.web?.uri || "",
+                  title: chunk.web?.title || "",
+                })) || [],
+                candidate.groundingMetadata.groundingSupports?.map((support) => ({
+                  text: support.segment?.text || "",
+                  responseIndices: support.groundingChunkIndices || [],
+                  startIndex: support.segment?.startIndex || undefined,
+                  endIndex: support.segment?.endIndex || undefined,
+                  confidenceScores: support.confidenceScores || undefined,
+                })) || []
+              )
+            );
+          }
+
+          const safetyRatings = candidate.safetyRatings;
+          if (safetyRatings && safetyRatings.length > 0) {
+            safetyRatings.forEach((rating) => {
+              if (rating.blocked) {
+                partialResponse.partialMessages.push(
+                  createPartialSafetyErrorMessage(
+                    AssistantRoleLiteral,
+                    rating.category,
+                    rating.probability,
+                    rating.blocked,
+                    `Blocked content for category: ${rating.category} with probability: ${rating.probability}`
+                  )
+                );
+              }
+            });
+          }
         }
 
         yield { partialResponse: partialResponse, buffer: buffer };
@@ -1186,6 +1289,47 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                 completionTokens: parsedResponse.usageMetadata.candidatesTokenCount,
                 totalTokens: parsedResponse.usageMetadata.totalTokenCount,
               };
+            }
+
+            if (parsedResponse.candidates.length > 0) {
+              const candidate = parsedResponse.candidates[0];
+              if (candidate.groundingMetadata) {
+                partialResponse.partialMessages.push(
+                  createPartialSearchResultGoogleMessage(
+                    AssistantRoleLiteral,
+                    candidate.groundingMetadata.webSearchQueries?.[0] || "",
+                    candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
+                      source: chunk.web ? "web" : "",
+                      url: chunk.web?.uri || "",
+                      title: chunk.web?.title || "",
+                    })) || [],
+                    candidate.groundingMetadata.groundingSupports?.map((support) => ({
+                      text: support.segment?.text || "",
+                      responseIndices: support.groundingChunkIndices || [],
+                      startIndex: support.segment?.startIndex || undefined,
+                      endIndex: support.segment?.endIndex || undefined,
+                      confidenceScores: support.confidenceScores || undefined,
+                    })) || []
+                  )
+                );
+              }
+
+              const safetyRatings = candidate.safetyRatings;
+              if (safetyRatings && safetyRatings.length > 0) {
+                safetyRatings.forEach((rating) => {
+                  if (rating.blocked) {
+                    partialResponse.partialMessages.push(
+                      createPartialSafetyErrorMessage(
+                        AssistantRoleLiteral,
+                        rating.category,
+                        rating.probability,
+                        rating.blocked,
+                        `Blocked content for category: ${rating.category} with probability: ${rating.probability}`
+                      )
+                    );
+                  }
+                });
+              }
             }
 
             yield { partialResponse: partialResponse, buffer: buffer };

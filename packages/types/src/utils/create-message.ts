@@ -1,15 +1,22 @@
 import {
   Base64ImageContentTypeLiteral,
   ContentType,
+  ErrorContent,
+  ErrorModalityLiteral,
   ImageContent,
   ImageContentDetailsLiteralType,
   ImageModalityLiteral,
   Message,
   MessageType,
+  PartialContentType,
+  PartialErrorContent,
+  PartialErrorModalityLiteral,
   PartialMessage,
   PartialMessageType,
   PartialReasoningContent,
   PartialReasoningModalityLiteral,
+  PartialSearchResultContent,
+  PartialSearchResultModalityLiteral,
   PartialTextContent,
   PartialTextModalityLiteral,
   PartialToolCallContent,
@@ -21,6 +28,11 @@ import {
   ReasoningModalityLiteral,
   RedactedReasoningContentTypeLiteral,
   RoleEnumType,
+  SafetyErrorTypeLiteral,
+  SearchResultContent,
+  SearchResultGoogleContentValueType,
+  SearchResultGoogleTypeLiteral,
+  SearchResultModalityLiteral,
   TextContent,
   TextModalityLiteral,
   ToolCallContent,
@@ -272,10 +284,108 @@ const createPartialRedactedReasoningMessage = (role: RoleEnumType, data: string)
   });
 };
 
+const createSafetyErrorContent = (category: string, probability: string, blocked: boolean, message: string): ContentType => {
+  return ErrorContent().parse({
+    modality: ErrorModalityLiteral,
+    value: {
+      type: SafetyErrorTypeLiteral,
+      value: {
+        category,
+        probability,
+        blocked,
+        message,
+      },
+    },
+  });
+};
+
+const createPartialSafetyErrorContent = (category?: string, probability?: string, blocked?: boolean, message?: string): PartialContentType => {
+  return PartialErrorContent().parse({
+    modality: PartialErrorModalityLiteral,
+    value: {
+      type: SafetyErrorTypeLiteral,
+      category: category,
+      probability: probability,
+      blocked: blocked,
+      message: message,
+    },
+  });
+};
+
+const createPartialSafetyErrorMessage = (
+  role: RoleEnumType,
+  category?: string,
+  probability?: string,
+  blocked?: boolean,
+  message?: string
+): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialErrorContent().parse({
+      modality: PartialErrorModalityLiteral,
+      value: {
+        type: SafetyErrorTypeLiteral,
+        category: category,
+        probability: probability,
+        blocked: blocked,
+        message: message,
+      },
+    }),
+  });
+};
+
+const createSearchResultGoogleContent = (query: string, responses: SearchResultGoogleContentValueType["responses"], references: SearchResultGoogleContentValueType["references"]): ContentType => {
+  return SearchResultContent().parse({
+    modality: SearchResultModalityLiteral,
+    value: {
+      type: SearchResultGoogleTypeLiteral,
+      query,
+      responses,
+      references,
+    },
+  });
+};
+
+const createPartialSearchResultGoogleContent = (query?: string, responses?: SearchResultGoogleContentValueType["responses"], references?: SearchResultGoogleContentValueType["references"]): PartialContentType => {
+  return PartialSearchResultContent().parse({
+    modality: PartialSearchResultModalityLiteral,
+    value: {
+      type: SearchResultGoogleTypeLiteral,
+      query: query,
+      responses: responses,
+      references: references,
+    },
+  });
+};
+
+const createPartialSearchResultGoogleMessage = (
+  role: RoleEnumType,
+  query?: string,
+  responses?: SearchResultGoogleContentValueType["responses"],
+  references?: SearchResultGoogleContentValueType["references"]
+): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialSearchResultContent().parse({
+      modality: PartialSearchResultModalityLiteral,
+      value: {
+        type: SearchResultGoogleTypeLiteral,
+        query: query,
+        responses: responses,
+        references: references,
+      },
+    }),
+  });
+};
+
 export {
   createBase64ImageMessage,
   createPartialReasoningMessage,
   createPartialRedactedReasoningMessage,
+  createPartialSafetyErrorContent,
+  createPartialSafetyErrorMessage,
+  createPartialSearchResultGoogleContent,
+  createPartialSearchResultGoogleMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
   createPartialToolResponseMessage,
@@ -283,6 +393,8 @@ export {
   createReasoningMessage,
   createRedactedReasoningContent,
   createRedactedReasoningMessage,
+  createSafetyErrorContent,
+  createSearchResultGoogleContent,
   createTextContent,
   createTextMessage,
   createToolCallContent,
