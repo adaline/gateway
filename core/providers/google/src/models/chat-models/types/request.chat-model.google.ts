@@ -38,7 +38,8 @@ const GoogleChatContentPartFunctionResponse = z.object({
 type GoogleChatContentPartFunctionResponseType = z.infer<typeof GoogleChatContentPartFunctionResponse>;
 
 const GoogleChatContentPartThinking = z.object({
-  thought: z.boolean(),
+  text: z.string(),
+  thought: z.literal(true),
   thought_signature: z.string().min(1),
 });
 type GoogleChatContentPartThinkingType = z.infer<typeof GoogleChatContentPartThinking>;

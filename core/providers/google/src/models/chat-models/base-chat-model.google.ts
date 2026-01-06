@@ -683,12 +683,15 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   },
                 });
               } else if (content.modality === ReasoningModalityLiteral) {
-                assistantContent.push({
-                  thought: true,
-                  thought_signature: content.value.type === "thinking" ? content.value.signature : content.value.data,
-                });
-              }
-              else {
+                // Only send thinking content back, skip redacted reasoning
+                if (content.value.type === "thinking" && content.value.thinking) {
+                  assistantContent.push({
+                    text: content.value.thinking,
+                    thought: true as const,
+                    thought_signature: content.value.signature,
+                  });
+                }
+              } else {
                 throw new InvalidMessagesError({
                   info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
                   cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),
