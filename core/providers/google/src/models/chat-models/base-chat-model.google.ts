@@ -26,10 +26,12 @@ import {
   Config,
   ConfigType,
   ContentType,
+  createPartialReasoningMessage,
   createPartialSafetyErrorMessage,
   createPartialSearchResultGoogleMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createReasoningContent,
   createSafetyErrorContent,
   createSearchResultGoogleContent,
   createTextContent,
@@ -639,6 +641,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     });
 
+    // Filter out error, search-result modalities from all messages (these are output-only modalities)
+    parsedMessages.forEach((message) => {
+      message.content = message.content.filter(
+        (content) => content.modality !== "error" && content.modality !== "search-result"
+      );
+    });
+
     const systemInstruction: GoogleChatSystemInstructionType = { parts: [] };
     const nonSystemMessages: GoogleChatContentType[] = [];
 
@@ -946,8 +955,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       const candidate = parsedResponse.candidates[0]; // default to first candidate, top choice
 
       if (candidate.content) {
-        const content = candidate.content.parts.map((contentItem: any, index: any) => {
+        const content = candidate.content.parts.map((contentItem, index) => {
           if ("text" in contentItem && contentItem.text !== undefined) {
+            // Check if this is a thinking/reasoning part
+            if (contentItem.thought === true) {
+              return createReasoningContent(contentItem.text, "");
+            }
             return createTextContent(contentItem.text);
           } else if ("functionCall" in contentItem && contentItem.functionCall !== undefined) {
             return createToolCallContent(
@@ -1130,7 +1143,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           if (message && "parts" in message && message.parts.length > 0) {
             message.parts.forEach((messagePart, index) => {
               if ("text" in messagePart && messagePart.text !== undefined) {
-                partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, messagePart.text));
+                // Check if this is a thinking/reasoning part
+                if (messagePart.thought === true) {
+                  partialResponse.partialMessages.push(
+                    createPartialReasoningMessage(AssistantRoleLiteral, messagePart.text, "")
+                  );
+                } else {
+                  partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, messagePart.text));
+                }
               }
 
               if ("functionCall" in messagePart && messagePart.functionCall !== undefined) {
@@ -1259,7 +1279,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               if (message && "parts" in message && message.parts.length > 0) {
                 message.parts.forEach((messagePart, index) => {
                   if ("text" in messagePart && messagePart.text !== undefined) {
-                    partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, messagePart.text));
+                    // Check if this is a thinking/reasoning part
+                    if (messagePart.thought === true) {
+                      partialResponse.partialMessages.push(
+                        createPartialReasoningMessage(AssistantRoleLiteral, messagePart.text, "")
+                      );
+                    } else {
+                      partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, messagePart.text));
+                    }
                   }
 
                   if ("functionCall" in messagePart && messagePart.functionCall !== undefined) {

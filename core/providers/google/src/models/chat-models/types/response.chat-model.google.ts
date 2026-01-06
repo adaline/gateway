@@ -40,6 +40,7 @@ type GoogleGroundingMetadataType = z.infer<typeof GoogleGroundingMetadata>;
 
 const GoogleCompleteChatTextResponse = z.object({
   text: z.string(),
+  thought: z.boolean().optional(),
 });
 
 const GoogleCompleteChatToolResponse = z.object({
@@ -97,6 +98,7 @@ type GoogleCompleteChatResponseType = z.infer<typeof GoogleCompleteChatResponse>
 
 const GoogleStreamChatTextResponse = z.object({
   text: z.string(),
+  thought: z.boolean().optional(),
 });
 
 const GoogleStreamChatToolResponse = z.object({

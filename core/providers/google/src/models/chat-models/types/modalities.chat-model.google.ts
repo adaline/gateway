@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ChatModelSchemaType } from "@adaline/provider";
-import { ImageModalityLiteral, PdfModalityLiteral, TextModalityLiteral, ToolCallModalityLiteral, ToolResponseModalityLiteral } from "@adaline/types";
+import { ErrorModalityLiteral, ImageModalityLiteral, PdfModalityLiteral, ReasoningModalityLiteral, SearchResultModalityLiteral, TextModalityLiteral, ToolCallModalityLiteral, ToolResponseModalityLiteral } from "@adaline/types";
 
 const GoogleChatModelModalities: ChatModelSchemaType["modalities"] = [
   TextModalityLiteral,
@@ -9,6 +9,9 @@ const GoogleChatModelModalities: ChatModelSchemaType["modalities"] = [
   PdfModalityLiteral,
   ToolCallModalityLiteral,
   ToolResponseModalityLiteral,
+  ReasoningModalityLiteral,
+  SearchResultModalityLiteral,
+  ErrorModalityLiteral,
 ];
 
 const GoogleChatModelModalitiesEnum = z.enum([
@@ -17,6 +20,9 @@ const GoogleChatModelModalitiesEnum = z.enum([
   PdfModalityLiteral,
   ToolCallModalityLiteral,
   ToolResponseModalityLiteral,
+  ReasoningModalityLiteral,
+  SearchResultModalityLiteral,
+  ErrorModalityLiteral,
 ]);
 
 const GoogleChatModelTextModalities: ChatModelSchemaType["modalities"] = [TextModalityLiteral];
