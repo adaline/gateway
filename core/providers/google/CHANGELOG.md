@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.14.2
+
+### Patch Changes
+
+- 693c463: Ignore redacted reasoning blocks for Gemini models
+
 ## 1.14.1
 
 ### Patch Changes
