@@ -54,6 +54,7 @@ const GoogleChatContent = z.object({
       GoogleChatContentPartFunctionCall,
       GoogleChatContentPartFunctionResponse,
       GoogleChatContentPartThinking,
+      GoogleChatContentPartThinking,
     ])
   ),
 });

@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.14.1
+
+### Patch Changes
+
+- 55403a3: Handle reasoning content for multi turn chats
+
 ## 1.14.0
 
 ### Minor Changes
