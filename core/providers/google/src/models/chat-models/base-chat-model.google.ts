@@ -43,6 +43,7 @@ import {
   PartialChatResponseType,
   PdfContentType,
   PdfModalityLiteral,
+  ReasoningModalityLiteral,
   ResponseSchemaType,
   SystemRoleLiteral,
   TextModalityLiteral,
@@ -681,7 +682,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                     args: JSON.parse(content.arguments),
                   },
                 });
-              } else {
+              } else if (content.modality === ReasoningModalityLiteral) {
+                assistantContent.push({
+                  thought: true,
+                  thought_signature: content.value.type === "thinking" ? content.value.signature : content.value.data,
+                });
+              }
+              else {
                 throw new InvalidMessagesError({
                   info: `Invalid message 'role' and 'modality' combination for model : ${this.modelName}`,
                   cause: new Error(`role : '${message.role}' cannot have content with modality : '${content.modality}'`),

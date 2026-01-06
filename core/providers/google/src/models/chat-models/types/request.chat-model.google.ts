@@ -37,6 +37,12 @@ const GoogleChatContentPartFunctionResponse = z.object({
 });
 type GoogleChatContentPartFunctionResponseType = z.infer<typeof GoogleChatContentPartFunctionResponse>;
 
+const GoogleChatContentPartThinking = z.object({
+  thought: z.boolean(),
+  thought_signature: z.string().min(1),
+});
+type GoogleChatContentPartThinkingType = z.infer<typeof GoogleChatContentPartThinking>;
+
 const GoogleChatContent = z.object({
   role: z.enum(["user", "model", "function"]),
   parts: z.array(
@@ -46,6 +52,7 @@ const GoogleChatContent = z.object({
       GoogleChatContentPartFileData,
       GoogleChatContentPartFunctionCall,
       GoogleChatContentPartFunctionResponse,
+      GoogleChatContentPartThinking,
     ])
   ),
 });
@@ -136,6 +143,7 @@ export {
   GoogleChatContent,
   GoogleChatContentPartFunctionCall,
   GoogleChatContentPartFunctionResponse,
+  GoogleChatContentPartThinking,
   GoogleChatContentPartInlineData,
   GoogleChatContentPartFileData,
   GoogleChatContentPartText,
@@ -149,6 +157,7 @@ export {
   type GoogleChatContentPartTextType,
   type GoogleChatContentPartFunctionCallType,
   type GoogleChatContentPartFunctionResponseType,
+  type GoogleChatContentPartThinkingType,
   type GoogleChatContentPartInlineDataType,
   type GoogleChatContentPartFileDataType,
   type GoogleChatGoogleSearchToolType,
