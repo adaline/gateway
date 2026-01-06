@@ -246,6 +246,13 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
       }
     });
 
+    // Filter out error and search-result modalities from all messages (these are output-only modalities)
+    parsedMessages.forEach((message) => {
+      message.content = message.content.filter(
+        (content) => content.modality !== "error" && content.modality !== "search-result"
+      );
+    });
+
     const transformedMessages = parsedMessages.map((message) => {
       switch (message.role) {
         case SystemRoleLiteral: {
