@@ -1,5 +1,11 @@
 # @adaline/together-ai
 
+## 1.8.0
+
+### Minor Changes
+
+- 283793f: Handle output only modalities in multi turn chats
+
 ## 1.7.1
 
 ### Patch Changes

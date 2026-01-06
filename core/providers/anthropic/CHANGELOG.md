@@ -1,5 +1,11 @@
 # @adaline/anthropic
 
+## 1.11.0
+
+### Minor Changes
+
+- 283793f: Handle output only modalities in multi turn chats
+
 ## 1.10.1
 
 ### Patch Changes
