@@ -23,9 +23,11 @@ const GoogleChatModelConfigs = {
     maxOutputTokens: number,
     maxSequences: number,
     defaultTopP: number,
+    minReasoningToken: number,
+    maxReasoningToken: number,
   ) => ({
-    def: ChatModelReasoningConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
-    schema: ChatModelReasoningConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
+    def: ChatModelReasoningConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, minReasoningToken, maxReasoningToken),
+    schema: ChatModelReasoningConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP, minReasoningToken, maxReasoningToken),
   }),
 } as const;
 
