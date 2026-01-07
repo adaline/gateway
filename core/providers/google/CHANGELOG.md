@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.14.3
+
+### Patch Changes
+
+- c5904e1: Support thinking config for reasoning Gemini models
+
 ## 1.14.2
 
 ### Patch Changes
