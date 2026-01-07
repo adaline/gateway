@@ -497,14 +497,20 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
       if (key === "reasoningEnabled") {
         // Handle reasoningEnabled specially
-        acc.thinkingConfig = {
-          includeThoughts: paramValue,
-        };
+        acc.thinkingConfig =
+          acc.thinkingConfig && typeof acc.thinkingConfig === "object"
+            ? { ...acc.thinkingConfig, includeThoughts: paramValue }
+            : { includeThoughts: paramValue };
       } else if (key === "maxReasoningTokens") {
         acc.thinkingConfig =
           acc.thinkingConfig && typeof acc.thinkingConfig === "object"
             ? { ...acc.thinkingConfig, thinkingBudget: paramValue }
             : { thinkingBudget: paramValue };
+      } else if (key === "reasoningEffort") {
+        acc.thinkingConfig =
+          acc.thinkingConfig && typeof acc.thinkingConfig === "object"
+            ? { ...acc.thinkingConfig, thinkingLevel: paramValue }
+            : { thinkingLevel: paramValue };
       } else if (paramKey === "maxOutputTokens" && def.type === "range" && paramValue === 0) {
         acc[paramKey] = def.max;
       } else {
@@ -513,6 +519,22 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
       return acc;
     }, {} as ParamsType);
+
+    // Validate that only one of thinkingBudget or thinkingLevel is set
+    if (
+      transformedConfig.thinkingConfig &&
+      typeof transformedConfig.thinkingConfig === "object" &&
+      "thinkingBudget" in transformedConfig.thinkingConfig &&
+      "thinkingLevel" in transformedConfig.thinkingConfig &&
+      transformedConfig.thinkingConfig.thinkingBudget !== undefined &&
+      transformedConfig.thinkingConfig.thinkingBudget !== 0 &&
+      transformedConfig.thinkingConfig.thinkingLevel !== undefined
+    ) {
+      throw new InvalidConfigError({
+        info: `Invalid config for model : '${this.modelName}'`,
+        cause: new Error("Only one of 'thinkingBudget' or 'thinkingLevel' can be set, not both."),
+      });
+    }
 
     const safetySettings = transformedConfig.safetySettings;
     delete transformedConfig.safetySettings;

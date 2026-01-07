@@ -159,6 +159,26 @@ const reasoningEnabled = SelectBooleanConfigItem({
   default: false,
 });
 
+const maxReasoningTokens = (minReasoningToken: number, maxReasoningToken: number) =>
+  RangeConfigItem({
+    param: "thinkingBudget",
+    title: "Thinking budget",
+    description: "Specify the total tokens for thinking (or reasoning), where one token approximates four English characters.",
+    min: minReasoningToken,
+    max: maxReasoningToken,
+    step: 1,
+    default: 0,
+  });
+
+const reasoningEffort = SelectStringConfigItem({
+  param: "thinkingLevel",
+  title: "Thinking Level",
+  description:
+    "Controls the depth of the model's reasoning process. Higher levels may result in more thorough reasoning but use more tokens.",
+  default: "LOW",
+  choices: ["LOW", "HIGH"],
+});
+
 const googleSearchTool = SelectBooleanConfigItem({
   param: "googleSearch",
   title: "Google Search Tool",
@@ -173,6 +193,7 @@ export {
   GOOGLE_SAFETY_THRESHOLD_OPTIONS,
   frequencyPenalty,
   googleSearchTool,
+  maxReasoningTokens,
   maxTokens,
   presencePenalty,
   reasoningEnabled,
@@ -180,6 +201,7 @@ export {
   seed,
   stop,
   temperature,
+  reasoningEffort,
   toolChoice,
   topK,
   topP,

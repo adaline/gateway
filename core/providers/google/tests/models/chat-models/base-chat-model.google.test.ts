@@ -86,8 +86,8 @@ describe("BaseChatModel", () => {
     roles: mockRolesMap,
     modalities: mockModalities,
     config: {
-      def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95).def,
-      schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95).schema,
+      def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 1, 8192).def,
+      schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 8192, 4, 0.95, 1, 8192).schema,
     },
   });
 

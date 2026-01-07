@@ -90,6 +90,13 @@ const GoogleChatToolConfig = z.object({
 });
 type GoogleChatToolConfigType = z.infer<typeof GoogleChatToolConfig>;
 
+const GoogleChatThinkingConfig = z.object({
+  thinkingBudget: z.number().optional(),
+  includeThoughts: z.boolean().optional(),
+  thinkingLevel: z.enum(["LOW", "HIGH"]).optional(),
+});
+type GoogleChatThinkingConfigType = z.infer<typeof GoogleChatThinkingConfig>;
+
 const GoogleChatGenerationConfig = z.object({
   stopSequences: z.array(z.string()).optional(),
   maxOutputTokens: z.number().optional(),
@@ -99,6 +106,7 @@ const GoogleChatGenerationConfig = z.object({
   presencePenalty: z.number().optional(),
   frequencyPenalty: z.number().optional(),
   seed: z.number().optional(),
+  thinkingConfig: GoogleChatThinkingConfig.optional(),
 });
 type GoogleChatGenerationConfigType = z.infer<typeof GoogleChatGenerationConfig>;
 
@@ -153,6 +161,7 @@ export {
   GoogleChatGoogleSearchTool,
   GoogleChatRequest,
   GoogleChatSystemInstruction,
+  GoogleChatThinkingConfig,
   GoogleChatTool,
   GoogleChatToolConfig,
   GoogleChatSafetySettings,
@@ -163,6 +172,7 @@ export {
   type GoogleChatContentPartInlineDataType,
   type GoogleChatContentPartFileDataType,
   type GoogleChatGoogleSearchToolType,
+  type GoogleChatThinkingConfigType,
   type GoogleChatToolType,
   type GoogleChatToolConfigType,
   type GoogleChatGenerationConfigType,
