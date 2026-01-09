@@ -1,0 +1,274 @@
+{
+  "grok-2": {
+    "modelName": "grok-2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.0,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-2-latest": {
+    "modelName": "grok-2-latest",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.0,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-2-1212": {
+    "modelName": "grok-2-1212",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.0,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-2-vision": {
+    "modelName": "grok-2-vision",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.0,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-2-vision-latest": {
+    "modelName": "grok-2-vision-latest",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.0,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-2-vision-1212": {
+    "modelName": "grok-2-vision-1212",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.0,
+            "outputPricePerMillion": 10.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-3-beta": {
+    "modelName": "grok-3-beta",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3.0,
+            "outputPricePerMillion": 15.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-3-fast-beta": {
+    "modelName": "grok-3-fast-beta",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5.0,
+            "outputPricePerMillion": 25.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-3-mini-beta": {
+    "modelName": "grok-3-mini-beta",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.3,
+            "outputPricePerMillion": 0.5
+          }
+        }
+      }
+    ]
+  },
+  "grok-3-mini-fast-beta": {
+    "modelName": "grok-3-mini-fast-beta",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 4.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-4": {
+    "modelName": "grok-4",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 6.0,
+            "outputPricePerMillion": 18.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-4-0709": {
+    "modelName": "grok-4-0709",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 6.0,
+            "outputPricePerMillion": 18.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-4-fast-reasoning": {
+    "modelName": "grok-4-fast-reasoning",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3.0,
+            "outputPricePerMillion": 12.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-4-fast-non-reasoning": {
+    "modelName": "grok-4-fast-non-reasoning",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3.0,
+            "outputPricePerMillion": 12.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-4.1-fast-reasoning": {
+    "modelName": "grok-4.1-fast-reasoning",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3.0,
+            "outputPricePerMillion": 12.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-4.1-fast-non-reasoning": {
+    "modelName": "grok-4.1-fast-non-reasoning",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3.0,
+            "outputPricePerMillion": 12.0
+          }
+        }
+      }
+    ]
+  },
+  "grok-code-fast-1": {
+    "modelName": "grok-code-fast-1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.3,
+            "outputPricePerMillion": 0.5
+          }
+        }
+      }
+    ]
+  }
+}
