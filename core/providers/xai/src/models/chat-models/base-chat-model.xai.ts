@@ -1,0 +1,882 @@
+import { z } from "zod";
+
+import {
+  ChatModelSchemaType,
+  ChatModelV1,
+  getMimeTypeFromBase64,
+  HeadersType,
+  InvalidConfigError,
+  InvalidMessagesError,
+  InvalidModelRequestError,
+  InvalidToolsError,
+  ModelResponseError,
+  ParamsType,
+  removeUndefinedEntries,
+  SelectStringConfigItemDefType,
+  UrlType,
+  urlWithoutTrailingSlash,
+} from "@adaline/provider";
+import {
+  AssistantRoleLiteral,
+  Base64ImageContentTypeLiteral,
+  Base64ImageContentValueType,
+  ChatLogProbsType,
+  ChatModelPriceType,
+  ChatResponseType,
+  ChatUsageType,
+  Config,
+  ConfigType,
+  ContentType,
+  createPartialTextMessage,
+  createPartialToolCallMessage,
+  createTextContent,
+  createToolCallContent,
+  ImageModalityLiteral,
+  Message,
+  MessageType,
+  PartialChatResponseType,
+  SystemRoleLiteral,
+  TextModalityLiteral,
+  Tool,
+  ToolCallContentType,
+  ToolCallModalityLiteral,
+  ToolResponseContentType,
+  ToolResponseModalityLiteral,
+  ToolRoleLiteral,
+  ToolType,
+  UrlImageContentTypeLiteral,
+  UserRoleLiteral,
+} from "@adaline/types";
+
+import pricingData from "../pricing.json";
+import { XAI } from "./../../provider/provider.xai";
+import {
+  XAIChatRequest,
+  XAIChatRequestImageContentType,
+  XAIChatRequestTextContentType,
+  XAIChatRequestToolType,
+  XAIChatRequestType,
+  XAICompleteChatResponse,
+  XAIStreamChatResponse,
+} from "./types";
+
+const BaseChatModelOptions = z.object({
+  modelName: z.string(),
+  apiKey: z.string(),
+  baseUrl: z.string().url().optional(),
+  completeChatUrl: z.string().url().optional(),
+  streamChatUrl: z.string().url().optional(),
+});
+type BaseChatModelOptionsType = z.infer<typeof BaseChatModelOptions>;
+
+class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
+  readonly version = "v1" as const;
+  modelSchema: ChatModelSchemaType;
+  modelName: string;
+
+  private readonly apiKey: string;
+  private readonly baseUrl: string;
+  private readonly streamChatUrl: string;
+  private readonly completeChatUrl: string;
+
+  constructor(modelSchema: ChatModelSchemaType, options: BaseChatModelOptionsType) {
+    const parsedOptions = BaseChatModelOptions.parse(options);
+    this.modelSchema = modelSchema;
+    this.modelName = parsedOptions.modelName;
+    this.apiKey = parsedOptions.apiKey;
+    this.baseUrl = urlWithoutTrailingSlash(parsedOptions.baseUrl || XAI.baseUrl);
+    this.streamChatUrl = urlWithoutTrailingSlash(parsedOptions.streamChatUrl || `${this.baseUrl}/chat/completions`);
+    this.completeChatUrl = urlWithoutTrailingSlash(parsedOptions.completeChatUrl || `${this.baseUrl}/chat/completions`);
+  }
+
+  getDefaultBaseUrl(): UrlType {
+    return this.baseUrl;
+  }
+
+  getDefaultHeaders(): HeadersType {
+    return {
+      Authorization: `Bearer ${this.apiKey}`,
+      "Content-Type": "application/json",
+    };
+  }
+
+  getDefaultParams(): ParamsType {
+    return {
+      model: this.modelName,
+    };
+  }
+
+  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
+    const parseDuration = (duration: string): number => {
+      const regex = /(\d+)(h|m|s|ms)/g;
+      const timeUnits: { [unit: string]: number } = {
+        h: 3600000,
+        m: 60000,
+        s: 1000,
+        ms: 1,
+      };
+
+      let match;
+      let totalMs = 0;
+      while ((match = regex.exec(duration)) !== null) {
+        const value = parseInt(match[1]);
+        const unit = match[2];
+        totalMs += value * timeUnits[unit];
+      }
+
+      return totalMs;
+    };
+
+    let resetRequestsDelayMs = 0;
+    let resetTokensDelayMs = 0;
+    const shouldRetry = true;
+    if (responseHeaders["x-ratelimit-reset-requests"]) {
+      resetRequestsDelayMs = parseDuration(responseHeaders["x-ratelimit-reset-requests"]);
+    }
+    if (responseHeaders["x-ratelimit-reset-tokens"]) {
+      resetTokensDelayMs = parseDuration(responseHeaders["x-ratelimit-reset-tokens"]);
+    }
+
+    const delayMs = Math.max(resetRequestsDelayMs, resetTokensDelayMs);
+    return { shouldRetry, delayMs };
+  }
+
+  getTokenCount(messages: MessageType[]): number {
+    return messages.reduce((acc, message) => {
+      return acc + message.content.map((content) => (content.modality === "text" ? content.value : "")).join(" ").length;
+    }, 0);
+  }
+
+  transformModelRequest(request: XAIChatRequestType): {
+    modelName: string | undefined;
+    config: ConfigType;
+    messages: MessageType[];
+    tools: ToolType[] | undefined;
+  } {
+    const safeRequest = XAIChatRequest.safeParse(request);
+    if (!safeRequest.success) {
+      throw new InvalidModelRequestError({ info: "Invalid model request", cause: safeRequest.error });
+    }
+
+    const parsedRequest = safeRequest.data;
+
+    const modelName = parsedRequest.model;
+
+    if (parsedRequest.tool_choice && (!parsedRequest.tools || parsedRequest.tools.length === 0)) {
+      throw new InvalidModelRequestError({
+        info: `Invalid model request for model : '${this.modelName}'`,
+        cause: new Error("'tools' are required when 'tool_choice' is specified"),
+      });
+    }
+
+    const _config: ConfigType = {};
+    if (parsedRequest.response_format) {
+      _config.responseFormat = parsedRequest.response_format.type;
+      if (parsedRequest.response_format.type === "json_schema") {
+        _config.responseSchema = {
+          name: parsedRequest.response_format.json_schema.name,
+          description: parsedRequest.response_format.json_schema.description || "",
+          strict: parsedRequest.response_format.json_schema.strict,
+          schema: parsedRequest.response_format.json_schema.schema,
+        };
+      }
+    }
+
+    if (parsedRequest.tool_choice) {
+      if (typeof parsedRequest.tool_choice === "string") {
+        _config.toolChoice = parsedRequest.tool_choice;
+      } else {
+        _config.toolChoice = parsedRequest.tool_choice.function.name;
+      }
+    }
+
+    _config.seed = parsedRequest.seed;
+    _config.maxTokens = parsedRequest.max_tokens;
+    _config.temperature = parsedRequest.temperature;
+    _config.topP = parsedRequest.top_p;
+    _config.presencePenalty = parsedRequest.presence_penalty;
+    _config.frequencyPenalty = parsedRequest.frequency_penalty;
+    _config.stop = parsedRequest.stop;
+    _config.logProbs = parsedRequest.logprobs;
+    _config.topLogProbs = parsedRequest.top_logprobs;
+    _config.reasoningEffort = parsedRequest.reasoning_effort;
+
+    const config = Config().parse(removeUndefinedEntries(_config));
+
+    const messages: MessageType[] = [];
+    const toolCallMap: { [id: string]: ToolCallContentType } = {};
+    parsedRequest.messages.forEach((message) => {
+      const role = message.role;
+      switch (role) {
+        case "system":
+          {
+            const content = message.content as string | XAIChatRequestTextContentType[];
+            if (typeof content === "string") {
+              messages.push({
+                role: role,
+                content: [{ modality: TextModalityLiteral, value: content }],
+              });
+            } else {
+              const _content = content.map((c) => {
+                return { modality: TextModalityLiteral, value: c.text };
+              });
+              messages.push({ role: role, content: _content });
+            }
+          }
+          break;
+
+        case "user":
+          {
+            const content = message.content as string | (XAIChatRequestTextContentType | XAIChatRequestImageContentType)[];
+            if (typeof content === "string") {
+              messages.push({
+                role: role,
+                content: [{ modality: TextModalityLiteral, value: content }],
+              });
+            } else {
+              const _content = content.map((c) => {
+                if (c.type === "text") {
+                  return { modality: TextModalityLiteral, value: c.text };
+                } else {
+                  if (c.image_url.url.startsWith("data:")) {
+                    return {
+                      modality: ImageModalityLiteral,
+                      detail: c.image_url.detail || "auto",
+                      value: {
+                        type: Base64ImageContentTypeLiteral,
+                        base64: c.image_url.url,
+                        mediaType: getMimeTypeFromBase64(c.image_url.url) as Base64ImageContentValueType["mediaType"],
+                      },
+                    };
+                  } else {
+                    return {
+                      modality: ImageModalityLiteral,
+                      detail: c.image_url.detail || "auto",
+                      value: { type: UrlImageContentTypeLiteral, url: c.image_url.url },
+                    };
+                  }
+                }
+              });
+              messages.push({ role: role, content: _content });
+            }
+          }
+          break;
+
+        case "assistant":
+          {
+            const assistantContent: ContentType[] = [];
+
+            if (!message.content && !message.tool_calls) {
+              throw new InvalidModelRequestError({
+                info: `Invalid model request for model : '${this.modelName}'`,
+                cause: new Error("one of'content' or 'tool_calls' must be provided"),
+              });
+            }
+
+            if (message.content) {
+              const content = message.content as string | XAIChatRequestTextContentType[];
+              if (typeof content === "string") {
+                assistantContent.push({ modality: TextModalityLiteral, value: content });
+              } else {
+                content.forEach((c) => {
+                  assistantContent.push({ modality: TextModalityLiteral, value: c.text });
+                });
+              }
+            }
+
+            if (message.tool_calls) {
+              const toolCalls = message.tool_calls;
+              toolCalls.forEach((toolCall, index) => {
+                const toolCallContent: ToolCallContentType = {
+                  modality: ToolCallModalityLiteral,
+                  id: toolCall.id,
+                  index: index,
+                  name: toolCall.function.name,
+                  arguments: toolCall.function.arguments,
+                };
+                assistantContent.push(toolCallContent);
+                toolCallMap[toolCallContent.id] = toolCallContent;
+              });
+            }
+            messages.push({ role: role, content: assistantContent });
+          }
+          break;
+
+        case "tool":
+          {
+            const toolResponse = message;
+            messages.push({
+              role: role,
+              content: [
+                {
+                  modality: ToolResponseModalityLiteral,
+                  id: toolResponse.tool_call_id,
+                  index: toolCallMap[toolResponse.tool_call_id].index,
+                  name: toolCallMap[toolResponse.tool_call_id].name,
+                  data: toolResponse.content,
+                },
+              ],
+            });
+          }
+          break;
+      }
+    });
+
+    const tools: ToolType[] = [];
+    if (parsedRequest.tools) {
+      parsedRequest.tools.forEach((tool: XAIChatRequestToolType) => {
+        tools.push({
+          type: "function",
+          definition: {
+            schema: {
+              name: tool.function.name,
+              description: tool.function.description || "",
+              strict: tool.function.strict,
+              parameters: tool.function.parameters,
+            },
+          },
+        });
+      });
+    }
+
+    return {
+      modelName,
+      config,
+      messages,
+      tools: tools.length > 0 ? tools : undefined,
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
+    const _toolChoice = config.toolChoice;
+    delete config.toolChoice;
+
+    const _parsedConfig = this.modelSchema.config.schema.safeParse(config);
+    if (!_parsedConfig.success) {
+      throw new InvalidConfigError({
+        info: `Invalid config for model : '${this.modelName}'`,
+        cause: _parsedConfig.error,
+      });
+    }
+
+    const parsedConfig = _parsedConfig.data as ConfigType;
+    if (_toolChoice !== undefined) {
+      parsedConfig.toolChoice = _toolChoice;
+    }
+
+    Object.keys(parsedConfig).forEach((key) => {
+      if (!(key in this.modelSchema.config.def)) {
+        throw new InvalidConfigError({
+          info: `Invalid config for model : '${this.modelName}'`,
+          cause: new Error(`Invalid config key : '${key}', 
+            available keys : [${Object.keys(this.modelSchema.config.def).join(", ")}]`),
+        });
+      }
+    });
+
+    const transformedConfig = Object.keys(parsedConfig).reduce((acc, key) => {
+      const def = this.modelSchema.config.def[key];
+      const paramKey = def.param;
+      const paramValue = (parsedConfig as ConfigType)[key];
+
+      if (paramKey === "max_tokens" && def.type === "range" && paramValue === 0) {
+        acc[paramKey] = def.max;
+      } else {
+        acc[paramKey] = paramValue;
+      }
+
+      return acc;
+    }, {} as ParamsType);
+
+    if (transformedConfig.top_logprobs && !transformedConfig.logprobs) {
+      throw new InvalidConfigError({
+        info: `Invalid config for model : '${this.modelName}'`,
+        cause: new Error("'logprobs' must be 'true' when 'top_logprobs' is specified"),
+      });
+    }
+
+    if ("tool_choice" in transformedConfig && transformedConfig.tool_choice !== undefined) {
+      const toolChoice = transformedConfig.tool_choice as string;
+      if (!tools || (tools && tools.length === 0)) {
+        throw new InvalidConfigError({
+          info: `Invalid config for model : '${this.modelName}'`,
+          cause: new Error("'tools' are required when 'toolChoice' is specified"),
+        });
+      } else if (tools && tools.length > 0) {
+        const configToolChoice = this.modelSchema.config.def.toolChoice as SelectStringConfigItemDefType;
+        if (!configToolChoice.choices.includes(toolChoice)) {
+          if (tools.map((tool) => tool.definition.schema.name).includes(toolChoice)) {
+            transformedConfig.tool_choice = { type: "function", function: { name: toolChoice } };
+          } else {
+            throw new InvalidConfigError({
+              info: `Invalid config for model : '${this.modelName}'`,
+              cause: new Error(`toolChoice : '${toolChoice}' is not part of provided 'tools' names or 
+                one of [${configToolChoice.choices.join(", ")}]`),
+            });
+          }
+        }
+      }
+    }
+
+    if ("response_format" in transformedConfig && transformedConfig.response_format !== undefined) {
+      const responseFormat = transformedConfig.response_format as string;
+      if (responseFormat === "json_schema") {
+        if (!("response_schema" in transformedConfig)) {
+          throw new InvalidConfigError({
+            info: `Invalid config for model : '${this.modelName}'`,
+            cause: new Error("'responseSchema' is required in config when 'responseFormat' is 'json_schema'"),
+          });
+        } else {
+          transformedConfig.response_format = {
+            type: "json_schema",
+            json_schema: transformedConfig.response_schema,
+          };
+          delete transformedConfig.response_schema;
+        }
+      } else {
+        transformedConfig.response_format = { type: responseFormat };
+      }
+    }
+
+    return transformedConfig;
+  }
+
+  transformMessages(messages: MessageType[]): ParamsType {
+    if (!messages || (messages && messages.length === 0)) {
+      return { messages: [] };
+    }
+
+    const parsedMessages = messages.map((message) => {
+      const parsedMessage = Message().safeParse(message);
+      if (!parsedMessage.success) {
+        throw new InvalidMessagesError({ info: "Invalid messages", cause: parsedMessage.error });
+      }
+      return parsedMessage.data;
+    });
+
+    parsedMessages.forEach((message) => {
+      message.content.forEach((content) => {
+        if (!this.modelSchema.modalities.includes(content.modality)) {
+          throw new InvalidMessagesError({
+            info: `Invalid message content for model : '${this.modelName}'`,
+            cause: new Error(`model : '${this.modelName}' does not support modality : '${content.modality}', 
+              available modalities : [${this.modelSchema.modalities.join(", ")}]`),
+          });
+        }
+      });
+    });
+
+    parsedMessages.forEach((message) => {
+      if (!Object.keys(this.modelSchema.roles).includes(message.role)) {
+        throw new InvalidMessagesError({
+          info: `Invalid message content for model : '${this.modelName}'`,
+          cause: new Error(`model : '${this.modelName}' does not support role : '${message.role}', 
+            available roles : [${Object.keys(this.modelSchema.roles).join(", ")}]`),
+        });
+      }
+    });
+
+    // Filter out error and search-result modalities from all messages (these are output-only modalities)
+    parsedMessages.forEach((message) => {
+      message.content = message.content.filter(
+        (content) => (content.modality as string) !== "error" && (content.modality as string) !== "search-result"
+      );
+    });
+
+    const transformedMessages = parsedMessages.map((message) => {
+      switch (message.role) {
+        case SystemRoleLiteral: {
+          const textContent: { type: "text"; text: string }[] = [];
+          message.content.forEach((content) => {
+            if (content.modality === TextModalityLiteral) {
+              textContent.push({ type: "text", text: content.value });
+            } else {
+              throw new InvalidMessagesError({
+                info: `Invalid message content for model : '${this.modelName}'`,
+                cause: new Error(`model : '${this.modelName}' does not support modality : '${content.modality}' for role : 'system'`),
+              });
+            }
+          });
+          return { role: "system", content: textContent };
+        }
+
+        case UserRoleLiteral: {
+          const userContent: ({ type: "text"; text: string } | { type: "image_url"; image_url: { url: string; detail: string } })[] = [];
+          message.content.forEach((content) => {
+            if (content.modality === TextModalityLiteral) {
+              userContent.push({ type: "text", text: content.value });
+            } else if (content.modality === ImageModalityLiteral) {
+              if (content.value.type === Base64ImageContentTypeLiteral) {
+                userContent.push({
+                  type: "image_url",
+                  image_url: { url: content.value.base64, detail: content.detail },
+                });
+              } else if (content.value.type === UrlImageContentTypeLiteral) {
+                userContent.push({
+                  type: "image_url",
+                  image_url: { url: content.value.url, detail: content.detail },
+                });
+              }
+            } else {
+              throw new InvalidMessagesError({
+                info: `Invalid message content for model : '${this.modelName}'`,
+                cause: new Error(`model : '${this.modelName}' does not support modality : '${content.modality}' for role : 'user'`),
+              });
+            }
+          });
+          return { role: "user", content: userContent };
+        }
+
+        case AssistantRoleLiteral: {
+          const textContent: { type: "text"; text: string }[] = [];
+          const toolCalls: { id: string; type: "function"; function: { name: string; arguments: string } }[] = [];
+          message.content.forEach((content) => {
+            if (content.modality === TextModalityLiteral) {
+              textContent.push({ type: "text", text: content.value });
+            } else if (content.modality === ToolCallModalityLiteral) {
+              toolCalls.push({
+                id: content.id,
+                type: "function",
+                function: { name: content.name, arguments: content.arguments },
+              });
+            } else {
+              throw new InvalidMessagesError({
+                info: `Invalid message content for model : '${this.modelName}'`,
+                cause: new Error(`model : '${this.modelName}' does not support modality : '${content.modality}' for role : 'assistant'`),
+              });
+            }
+          });
+          if (textContent.length > 0 && toolCalls.length > 0) {
+            return { role: "assistant", content: textContent, tool_calls: toolCalls };
+          } else if (textContent.length > 0) {
+            return { role: "assistant", content: textContent };
+          } else if (toolCalls.length > 0) {
+            return { role: "assistant", tool_calls: toolCalls };
+          } else {
+            throw new InvalidMessagesError({
+              info: `Invalid message content for model : '${this.modelName}'`,
+              cause: new Error("assistant message must have at least one text or tool_call content"),
+            });
+          }
+        }
+
+        case ToolRoleLiteral: {
+          const toolResponseContent = message.content.find(
+            (content) => content.modality === ToolResponseModalityLiteral
+          ) as ToolResponseContentType;
+          if (!toolResponseContent) {
+            throw new InvalidMessagesError({
+              info: `Invalid message content for model : '${this.modelName}'`,
+              cause: new Error("tool message must have tool_response content"),
+            });
+          }
+          return {
+            role: "tool",
+            tool_call_id: toolResponseContent.id,
+            content: typeof toolResponseContent.data === "string" ? toolResponseContent.data : JSON.stringify(toolResponseContent.data),
+          };
+        }
+
+        default:
+          throw new InvalidMessagesError({
+            info: `Invalid message content for model : '${this.modelName}'`,
+            cause: new Error(`model : '${this.modelName}' does not support role : '${message.role}'`),
+          });
+      }
+    });
+
+    return { messages: transformedMessages };
+  }
+
+  transformTools(tools: ToolType[]): ParamsType {
+    if (!tools || (tools && tools.length === 0)) {
+      return {};
+    }
+
+    if (!this.modelSchema.modalities.includes(ToolCallModalityLiteral)) {
+      throw new InvalidToolsError({
+        info: `Invalid tools for model : '${this.modelName}'`,
+        cause: new Error(`model : '${this.modelName}' does not support tools`),
+      });
+    }
+
+    const parsedTools = tools.map((tool) => {
+      const parsedTool = Tool().safeParse(tool);
+      if (!parsedTool.success) {
+        throw new InvalidToolsError({ info: "Invalid tools", cause: parsedTool.error });
+      }
+      return parsedTool.data;
+    });
+
+    const transformedTools = parsedTools.map((tool) => ({
+      type: "function" as const,
+      function: tool.definition.schema,
+    }));
+
+    return { tools: transformedTools };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getCompleteChatUrl(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<UrlType> {
+    return new Promise((resolve) => {
+      resolve(this.completeChatUrl);
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getCompleteChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
+    return new Promise((resolve) => {
+      resolve(this.getDefaultHeaders());
+    });
+  }
+
+  async getCompleteChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
+    const transformedConfig = this.transformConfig(config, messages, tools);
+    const transformedMessages = this.transformMessages(messages);
+    if (transformedMessages.messages && (transformedMessages.messages as MessageType[]).length === 0) {
+      throw new InvalidMessagesError({
+        info: "Messages are required",
+        cause: new Error("Messages are required"),
+      });
+    }
+
+    const transformedTools = tools ? this.transformTools(tools) : {};
+
+    return new Promise((resolve) => {
+      resolve({
+        ...this.getDefaultParams(),
+        ...transformedConfig,
+        ...transformedMessages,
+        ...transformedTools,
+      });
+    });
+  }
+
+  transformCompleteChatResponse(response: unknown): ChatResponseType {
+    const parsedResponse = XAICompleteChatResponse.safeParse(response);
+    if (!parsedResponse.success) {
+      throw new ModelResponseError({ info: "Invalid response from model", cause: parsedResponse.error });
+    }
+
+    const data = parsedResponse.data;
+    const choice = data.choices[0];
+
+    const messages: MessageType[] = [];
+    const assistantContent: ContentType[] = [];
+
+    if (choice.message.content) {
+      assistantContent.push(createTextContent(choice.message.content));
+    }
+
+    if (choice.message.tool_calls) {
+      choice.message.tool_calls.forEach((toolCall, index) => {
+        assistantContent.push(createToolCallContent(index, toolCall.id, toolCall.function.name, toolCall.function.arguments));
+      });
+    }
+
+    if (assistantContent.length > 0) {
+      messages.push({ role: AssistantRoleLiteral, content: assistantContent });
+    }
+
+    const usage: ChatUsageType = {
+      promptTokens: data.usage.prompt_tokens,
+      completionTokens: data.usage.completion_tokens,
+      totalTokens: data.usage.total_tokens,
+    };
+
+    let logProbs: ChatLogProbsType | undefined;
+    if (choice.logprobs && choice.logprobs.content) {
+      logProbs = choice.logprobs.content.map((logProb) => ({
+        token: logProb.token,
+        logProb: logProb.logprob,
+        bytes: logProb.bytes,
+        topLogProbs: logProb.top_logprobs.map((topLogProb) => ({
+          token: topLogProb.token,
+          logProb: topLogProb.logprob,
+          bytes: topLogProb.bytes,
+        })),
+      }));
+    }
+
+    return {
+      messages,
+      usage,
+      logProbs,
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getStreamChatUrl(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<UrlType> {
+    return new Promise((resolve) => {
+      resolve(this.streamChatUrl);
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getStreamChatHeaders(config?: ConfigType, messages?: MessageType[], tools?: ToolType[]): Promise<HeadersType> {
+    return new Promise((resolve) => {
+      resolve(this.getDefaultHeaders());
+    });
+  }
+
+  async getStreamChatData(config: ConfigType, messages: MessageType[], tools?: ToolType[]): Promise<ParamsType> {
+    const transformedConfig = this.transformConfig(config, messages, tools);
+    const transformedMessages = this.transformMessages(messages);
+    if (transformedMessages.messages && (transformedMessages.messages as MessageType[]).length === 0) {
+      throw new InvalidMessagesError({
+        info: "Messages are required",
+        cause: new Error("Messages are required"),
+      });
+    }
+
+    const transformedTools = tools ? this.transformTools(tools) : {};
+
+    return new Promise((resolve) => {
+      resolve({
+        stream: true,
+        stream_options: { include_usage: true },
+        ...this.getDefaultParams(),
+        ...transformedConfig,
+        ...transformedMessages,
+        ...transformedTools,
+      });
+    });
+  }
+
+  async *transformStreamChatResponseChunk(
+    chunk: string,
+    buffer: string
+  ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    const data = buffer + chunk;
+    const lines: string[] = [];
+    let newBuffer = "";
+
+    let currentIndex = 0;
+    while (currentIndex < data.length) {
+      const newlineIndex = data.indexOf("\n", currentIndex);
+      if (newlineIndex === -1) {
+        newBuffer = data.substring(currentIndex);
+        break;
+      } else {
+        const line = data.substring(currentIndex, newlineIndex).trim();
+        if (line) {
+          lines.push(line);
+        }
+        currentIndex = newlineIndex + 1;
+      }
+    }
+
+    for (const line of lines) {
+      if (line === "data: [DONE]") {
+        return;
+      }
+
+      if (line.startsWith("data: ")) {
+        const jsonStr = line.substring("data: ".length);
+        try {
+          const structuredLine = JSON.parse(jsonStr);
+          const safe = XAIStreamChatResponse.safeParse(structuredLine);
+          if (safe.success) {
+            const partialResponse: PartialChatResponseType = { partialMessages: [] };
+            const parsedResponse = safe.data;
+
+            if (parsedResponse.choices.length > 0) {
+              const message = parsedResponse.choices[0].delta;
+              if (message !== undefined && Object.keys(message).length !== 0) {
+                if ("content" in message && message.content !== null) {
+                  partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.content as string));
+                } else if ("tool_calls" in message && message.tool_calls !== undefined) {
+                  const toolCall = message.tool_calls.at(0)!;
+                  partialResponse.partialMessages.push(
+                    createPartialToolCallMessage(
+                      AssistantRoleLiteral,
+                      toolCall.index,
+                      toolCall.id,
+                      toolCall.function?.name,
+                      toolCall.function?.arguments
+                    )
+                  );
+                }
+              }
+            }
+
+            if (parsedResponse.usage) {
+              partialResponse.usage = {
+                promptTokens: parsedResponse.usage.prompt_tokens,
+                completionTokens: parsedResponse.usage.completion_tokens,
+                totalTokens: parsedResponse.usage.total_tokens,
+              };
+            }
+            yield { partialResponse: partialResponse, buffer: newBuffer };
+          } else {
+            throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
+          }
+        } catch (error) {
+          throw new ModelResponseError({
+            info: `Malformed JSON received in stream: ${jsonStr}`,
+            cause: error,
+          });
+        }
+      }
+    }
+
+    yield { partialResponse: { partialMessages: [] }, buffer: newBuffer };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async *transformProxyStreamChatResponseChunk(
+    chunk: string,
+    buffer: string,
+    data?: any,
+    headers?: Record<string, string>,
+    query?: Record<string, string>
+  ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    yield* this.transformStreamChatResponseChunk(chunk, buffer);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getProxyStreamChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
+    return new Promise((resolve) => {
+      resolve(this.streamChatUrl);
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getProxyCompleteChatUrl(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<UrlType> {
+    return new Promise((resolve) => {
+      resolve(this.completeChatUrl);
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getProxyCompleteChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
+    if (!headers) {
+      return {};
+    }
+    const sanitizedHeaders: Record<string, string> = { ...headers };
+
+    delete sanitizedHeaders.host;
+    delete sanitizedHeaders["content-length"];
+    return sanitizedHeaders;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getProxyStreamChatHeaders(data?: any, headers?: Record<string, string>, query?: Record<string, string>): Promise<HeadersType> {
+    return await this.getProxyCompleteChatHeaders(data, headers, query);
+  }
+
+  getModelPricing(): ChatModelPriceType {
+    if (!(this.modelName in pricingData)) {
+      throw new ModelResponseError({
+        info: `Invalid model pricing for model : '${this.modelName}'`,
+        cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
+      });
+    }
+
+    const entry = pricingData[this.modelName as keyof typeof pricingData];
+    return entry as ChatModelPriceType;
+  }
+}
+
+export { BaseChatModel, BaseChatModelOptions, type BaseChatModelOptionsType };
