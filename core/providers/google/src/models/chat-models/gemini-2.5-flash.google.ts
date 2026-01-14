@@ -19,8 +19,8 @@ const Gemini2_5FlashSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatMod
   roles: GoogleChatModelRolesMap,
   modalities: GoogleChatModelModalities,
   config: {
-    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95).def,
-    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95).schema,
+    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 24576).def,
+    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 24576).schema,
   },
   price: pricingData[Gemini2_5FlashLiteral],
 });
