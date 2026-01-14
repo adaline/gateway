@@ -19,8 +19,8 @@ const Gemini2_5FlashSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatMod
   roles: GoogleChatModelRolesMap,
   modalities: GoogleChatModelModalities,
   config: {
-    def: GoogleChatModelConfigs.responseSchema(2.0, 1.0, 65536, 4, 0.95).def,
-    schema: GoogleChatModelConfigs.responseSchema(2.0, 1.0, 65536, 4, 0.95).schema,
+    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95).def,
+    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95).schema,
   },
   price: pricingData[Gemini2_5FlashLiteral],
 });
@@ -34,10 +34,4 @@ class Gemini2_5Flash extends BaseChatModel {
   }
 }
 
-export {
-  Gemini2_5Flash,
-  Gemini2_5FlashLiteral,
-  Gemini2_5FlashOptions,
-  Gemini2_5FlashSchema,
-  type Gemini2_5FlashOptionsType,
-};
+export { Gemini2_5Flash, Gemini2_5FlashLiteral, Gemini2_5FlashOptions, Gemini2_5FlashSchema, type Gemini2_5FlashOptionsType };
