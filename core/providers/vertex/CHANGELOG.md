@@ -1,5 +1,16 @@
 # @adaline/vertex
 
+## 1.11.0
+
+### Minor Changes
+
+- adfdfbe: add reasoning to flash
+
+### Patch Changes
+
+- Updated dependencies [adfdfbe]
+  - @adaline/google@1.15.0
+
 ## 1.10.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.15.0
+
+### Minor Changes
+
+- adfdfbe: add reasoning to flash
+
 ## 1.14.3
 
 ### Patch Changes
