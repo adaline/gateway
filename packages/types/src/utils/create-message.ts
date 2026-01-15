@@ -49,7 +49,7 @@ const createTextContent = (content: string): ContentType => {
   });
 };
 
-const createToolCallContent = (index: number, id: string, name: string, args: string, serverName?: string): ContentType => {
+const createToolCallContent = (index: number, id: string, name: string, args: string, serverName?: string, thoughtSignature?: string): ContentType => {
   return ToolCallContent().parse({
     modality: ToolCallModalityLiteral,
     index: index,
@@ -57,6 +57,7 @@ const createToolCallContent = (index: number, id: string, name: string, args: st
     name: name,
     arguments: args,
     serverName: serverName,
+    thoughtSignature: thoughtSignature,
   });
 };
 
@@ -123,7 +124,7 @@ const createBase64ImageMessage = (role: RoleEnumType, base64: string, detail: Im
   });
 };
 
-const createToolCallMessage = (role: RoleEnumType, index: number, id: string, name: string, args: string): MessageType => {
+const createToolCallMessage = (role: RoleEnumType, index: number, id: string, name: string, args: string, thoughtSignature?: string): MessageType => {
   return Message().parse({
     role: role,
     content: [
@@ -133,6 +134,7 @@ const createToolCallMessage = (role: RoleEnumType, index: number, id: string, na
         id: id,
         name: name,
         arguments: args,
+        thoughtSignature: thoughtSignature,
       }),
     ],
   });
@@ -169,7 +171,8 @@ const createPartialToolCallMessage = (
   id?: string,
   name?: string,
   args?: string,
-  serverName?: string
+  serverName?: string,
+  thoughtSignature?: string
 ): PartialMessageType => {
   return PartialMessage().parse({
     role: role,
@@ -180,6 +183,7 @@ const createPartialToolCallMessage = (
       name: name,
       arguments: args,
       serverName: serverName,
+      thoughtSignature: thoughtSignature,
     }),
   });
 };

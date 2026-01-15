@@ -48,6 +48,7 @@ const GoogleCompleteChatToolResponse = z.object({
     name: z.string(),
     args: z.record(z.any()),
   }),
+  thoughtSignature: z.string().optional(),
 });
 
 const GoogleCompleteChatResponse = z.object({
@@ -106,6 +107,7 @@ const GoogleStreamChatToolResponse = z.object({
     name: z.string(),
     args: z.record(z.any()),
   }),
+  thoughtSignature: z.string().optional(),
 });
 
 const GoogleStreamChatResponse = z.object({

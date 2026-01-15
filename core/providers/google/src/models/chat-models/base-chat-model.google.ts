@@ -71,8 +71,6 @@ import {
   GoogleCompleteChatResponseType,
   GoogleStreamChatResponse,
   GoogleStreamChatResponseType,
-  GoogleChatGoogleSearchTool,
-  GoogleChatGoogleSearchToolType,
 } from "./types";
 
 const BaseChatModelOptions = z.object({
@@ -666,9 +664,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Filter out error, search-result modalities from all messages (these are output-only modalities)
     parsedMessages.forEach((message) => {
-      message.content = message.content.filter(
-        (content) => content.modality !== "error" && content.modality !== "search-result"
-      );
+      message.content = message.content.filter((content) => content.modality !== "error" && content.modality !== "search-result");
     });
 
     const systemInstruction: GoogleChatSystemInstructionType = { parts: [] };
@@ -698,11 +694,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               if (content.modality === TextModalityLiteral) {
                 assistantContent.push({ text: content.value });
               } else if (content.modality === ToolCallModalityLiteral) {
+                // Include thought_signature if present (for thinking models)
                 assistantContent.push({
                   function_call: {
                     name: content.name,
                     args: JSON.parse(content.arguments),
                   },
+                  ...(content.thoughtSignature ? { thought_signature: content.thoughtSignature } : {}),
                 });
               } else if (content.modality === ReasoningModalityLiteral) {
                 // Only send thinking content back, skip redacted reasoning
@@ -975,13 +973,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       };
 
       const parsedResponse: GoogleCompleteChatResponseType = safe.data;
-      
+
       if (parsedResponse.usageMetadata) {
         completeChatResponse.usage = {
           promptTokens: parsedResponse.usageMetadata.promptTokenCount,
           totalTokens: parsedResponse.usageMetadata.totalTokenCount,
           completionTokens: parsedResponse.usageMetadata.candidatesTokenCount || 0,
-        }
+        };
       }
 
       const candidate = parsedResponse.candidates[0]; // default to first candidate, top choice
@@ -999,7 +997,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               index,
               `${contentItem.functionCall.name}_${index}`,
               contentItem.functionCall.name,
-              JSON.stringify(contentItem.functionCall.args)
+              JSON.stringify(contentItem.functionCall.args),
+              undefined, // serverName
+              contentItem.thoughtSignature // thoughtSignature for thinking models
             );
           }
         }) as ContentType[];
@@ -1014,21 +1014,23 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         if (completeChatResponse.messages.length === 0) {
           completeChatResponse.messages.push({
             role: AssistantRoleLiteral,
-            content: [createSearchResultGoogleContent(
-              candidate.groundingMetadata.webSearchQueries?.[0] || "",
-              candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
-                source: chunk.web ? "web" : "",
-                url: chunk.web?.uri || "",
-                title: chunk.web?.title || "",
-              })) || [],
-              candidate.groundingMetadata.groundingSupports?.map((support) => ({
-                text: support.segment?.text || "",
-                responseIndices: support.groundingChunkIndices || [],
-                startIndex: support.segment?.startIndex || undefined,
-                endIndex: support.segment?.endIndex || undefined,
-                confidenceScores: support.confidenceScores || undefined,
-              })) || [],
-            )],
+            content: [
+              createSearchResultGoogleContent(
+                candidate.groundingMetadata.webSearchQueries?.[0] || "",
+                candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
+                  source: chunk.web ? "web" : "",
+                  url: chunk.web?.uri || "",
+                  title: chunk.web?.title || "",
+                })) || [],
+                candidate.groundingMetadata.groundingSupports?.map((support) => ({
+                  text: support.segment?.text || "",
+                  responseIndices: support.groundingChunkIndices || [],
+                  startIndex: support.segment?.startIndex || undefined,
+                  endIndex: support.segment?.endIndex || undefined,
+                  confidenceScores: support.confidenceScores || undefined,
+                })) || []
+              ),
+            ],
           });
         } else {
           completeChatResponse.messages[0].content.push(
@@ -1045,7 +1047,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                 startIndex: support.segment?.startIndex || undefined,
                 endIndex: support.segment?.endIndex || undefined,
                 confidenceScores: support.confidenceScores || undefined,
-              })) || [],
+              })) || []
             )
           );
         }
@@ -1058,19 +1060,21 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             if (completeChatResponse.messages.length === 0) {
               completeChatResponse.messages.push({
                 role: AssistantRoleLiteral,
-                content: [createSafetyErrorContent(
-                  rating.category, 
-                  rating.probability, 
-                  rating.blocked, 
-                  `Blocked content for category: ${rating.category} with probability: ${rating.probability}`,
-                )],
+                content: [
+                  createSafetyErrorContent(
+                    rating.category,
+                    rating.probability,
+                    rating.blocked,
+                    `Blocked content for category: ${rating.category} with probability: ${rating.probability}`
+                  ),
+                ],
               });
             } else {
               completeChatResponse.messages[0].content.push(
                 createSafetyErrorContent(
-                  rating.category, 
-                  rating.probability, 
-                  rating.blocked, 
+                  rating.category,
+                  rating.probability,
+                  rating.blocked,
                   `Blocked content for category: ${rating.category} with probability: ${rating.probability}`
                 )
               );
@@ -1082,7 +1086,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       if (completeChatResponse.messages.length > 0) {
         return completeChatResponse;
       } else if (completeChatResponse.messages.length === 0 && candidate.finishReason === "SAFETY") {
-        throw new ModelResponseError({ info: "Blocked content, model response finished with safety reason", cause: new Error("Blocked content, model response finished with safety reason") });
+        throw new ModelResponseError({
+          info: "Blocked content, model response finished with safety reason",
+          cause: new Error("Blocked content, model response finished with safety reason"),
+        });
       }
     }
 
@@ -1177,9 +1184,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               if ("text" in messagePart && messagePart.text !== undefined) {
                 // Check if this is a thinking/reasoning part
                 if (messagePart.thought === true) {
-                  partialResponse.partialMessages.push(
-                    createPartialReasoningMessage(AssistantRoleLiteral, messagePart.text, "")
-                  );
+                  partialResponse.partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, messagePart.text, ""));
                 } else {
                   partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, messagePart.text));
                 }
@@ -1193,7 +1198,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                     index,
                     `${toolCall.name}_${index}`,
                     toolCall.name,
-                    JSON.stringify(toolCall.args)
+                    JSON.stringify(toolCall.args),
+                    undefined, // serverName
+                    messagePart.thoughtSignature // thoughtSignature for thinking models
                   )
                 );
               }
@@ -1313,9 +1320,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   if ("text" in messagePart && messagePart.text !== undefined) {
                     // Check if this is a thinking/reasoning part
                     if (messagePart.thought === true) {
-                      partialResponse.partialMessages.push(
-                        createPartialReasoningMessage(AssistantRoleLiteral, messagePart.text, "")
-                      );
+                      partialResponse.partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, messagePart.text, ""));
                     } else {
                       partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, messagePart.text));
                     }
@@ -1329,7 +1334,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                         index,
                         `${toolCall.name}_${index}`,
                         toolCall.name,
-                        JSON.stringify(toolCall.args)
+                        JSON.stringify(toolCall.args),
+                        undefined, // serverName
+                        messagePart.thoughtSignature // thoughtSignature for thinking models
                       )
                     );
                   }
