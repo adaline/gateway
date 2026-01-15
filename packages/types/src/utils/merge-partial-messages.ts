@@ -43,7 +43,7 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   let lastToolResponseIndex: number | undefined = undefined;
 
   let currentTextValue: string | null = null;
-  let currentToolCall: { index?: number; id: string; name: string; arguments: string } | null = null;
+  let currentToolCall: { index?: number; id: string; name: string; arguments: string; thoughtSignature?: string } | null = null;
   let currentToolResponse: { index?: number; id: string; name: string; data: string; apiResponse?: { statusCode: number } } | null = null;
   let currentReasoning: PartialReasoningContentType["value"] | null = null; // Store the partial value directly
   let currentSearchResult: PartialSearchResultContentType["value"] | null = null;
@@ -67,6 +67,7 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
           id: currentToolCall.id,
           name: currentToolCall.name,
           arguments: currentToolCall.arguments,
+          ...(currentToolCall.thoughtSignature ? { thoughtSignature: currentToolCall.thoughtSignature } : {}),
         };
       } else {
         throw new GatewayBaseError({
@@ -134,7 +135,7 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
       const hasQuery = currentSearchResult.query && currentSearchResult.query.length > 0;
       const hasResponses = currentSearchResult.responses && currentSearchResult.responses.length > 0;
       const hasReferences = currentSearchResult.references && currentSearchResult.references.length > 0;
-      
+
       if (hasQuery || hasResponses || hasReferences) {
         finalizedContent = {
           modality: SearchResultModalityLiteral,
@@ -274,12 +275,17 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
             id: toolCallPart.id ?? "",
             name: toolCallPart.name ?? "",
             arguments: toolCallPart.arguments ?? "",
+            thoughtSignature: toolCallPart.thoughtSignature,
           };
         } else {
           // Append to existing tool call block (same index)
           currentToolCall.id += toolCallPart.id || "";
           currentToolCall.name += toolCallPart.name || "";
           currentToolCall.arguments += toolCallPart.arguments || "";
+          // Keep the first thoughtSignature encountered (or update if newly provided)
+          if (!currentToolCall.thoughtSignature && toolCallPart.thoughtSignature) {
+            currentToolCall.thoughtSignature = toolCallPart.thoughtSignature;
+          }
         }
       } else if (currentModality === PartialToolResponseModalityLiteral) {
         const toolResponsePart = currentContent as PartialToolResponseContentType;
