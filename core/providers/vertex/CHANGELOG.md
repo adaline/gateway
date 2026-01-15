@@ -1,5 +1,18 @@
 # @adaline/vertex
 
+## 1.12.0
+
+### Minor Changes
+
+- f50ecbb: add thoughtsignature
+
+### Patch Changes
+
+- Updated dependencies [f50ecbb]
+  - @adaline/google@1.16.0
+  - @adaline/provider@1.9.0
+  - @adaline/types@1.12.0
+
 ## 1.11.0
 
 ### Minor Changes

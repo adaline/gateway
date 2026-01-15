@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.12.0
+
+### Minor Changes
+
+- f50ecbb: add thoughtsignature
+
 ## 1.11.0
 
 ### Minor Changes

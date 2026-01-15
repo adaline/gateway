@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.12.0
+
+### Minor Changes
+
+- f50ecbb: add thoughtsignature
+
 ## 1.11.1
 
 ### Patch Changes

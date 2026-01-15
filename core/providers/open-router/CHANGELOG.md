@@ -1,5 +1,17 @@
 # @adaline/open-router
 
+## 1.9.0
+
+### Minor Changes
+
+- f50ecbb: add thoughtsignature
+
+### Patch Changes
+
+- Updated dependencies [f50ecbb]
+  - @adaline/provider@1.9.0
+  - @adaline/types@1.12.0
+
 ## 1.8.0
 
 ### Minor Changes
