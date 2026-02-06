@@ -457,6 +457,9 @@ importers:
       '@adaline/vertex':
         specifier: workspace:*
         version: link:../../core/providers/vertex
+      '@adaline/xai':
+        specifier: workspace:*
+        version: link:../../core/providers/xai
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
