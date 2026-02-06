@@ -174,5 +174,21 @@
         }
       }
     ]
+  },
+  "anthropic.claude-opus-4-6-v1": {
+    "modelName": "anthropic.claude-opus-4-6-v1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 25
+          }
+        }
+      }
+    ]
   }
 }
