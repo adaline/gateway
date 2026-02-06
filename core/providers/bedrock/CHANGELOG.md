@@ -1,5 +1,13 @@
 # @adaline/bedrock
 
+## 2.5.1
+
+### Patch Changes
+
+- c574f01: Add Claude Opus 4.6 model support to Anthropic and Bedrock providers
+- Updated dependencies [c574f01]
+  - @adaline/anthropic@1.12.1
+
 ## 2.5.0
 
 ### Minor Changes
