@@ -60,7 +60,7 @@ class MockHttpRequestError extends Error {
 // Default mock model behavior - gets overridden in specific tests if needed
 const mockModelDefault = {
   // Default: retry immediately unless overridden
-  getRetryDelay: (headers: any) => ({ shouldRetry: true, delayMs: 1 }),
+  getRetryDelay: (_headers: any, _responseData: any) => ({ shouldRetry: true, delayMs: 1 }),
 };
 
 // Mock for Gateway Request Parsing (used in 429 test)

@@ -113,9 +113,19 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     };
   }
 
+  // Open Router 429: use Retry-After header (seconds). https://openrouter.ai/docs/errors
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
-    return { shouldRetry: true, delayMs: 0 };
+  getRetryDelay(responseHeaders: HeadersType, _responseData: unknown): { shouldRetry: boolean; delayMs: number } {
+    const shouldRetry = true;
+    let delayMs = 0;
+    const retryAfter = responseHeaders["retry-after"];
+    if (retryAfter) {
+      const seconds = parseInt(retryAfter, 10);
+      if (!Number.isNaN(seconds) && seconds >= 0) {
+        delayMs = seconds * 1000;
+      }
+    }
+    return { shouldRetry, delayMs };
   }
 
   getTokenCount(messages: MessageType[]): number {

@@ -96,7 +96,7 @@ class Gateway {
       maxConcurrentTasks: this.options.queueOptions?.maxConcurrentTasks || 4,
       retryCount: this.options.queueOptions?.retryCount || 3,
       retry: this.options.queueOptions?.retry || {
-        initialDelay: 1000,
+        initialDelay: 3500,
         exponentialFactor: 2,
       },
       timeout: this.options.queueOptions?.timeout || 120000,

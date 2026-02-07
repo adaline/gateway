@@ -125,7 +125,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   }
 
   // TODO: needs testing, implement the same for all providers
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
+  getRetryDelay(responseHeaders: HeadersType, _responseData: unknown): { shouldRetry: boolean; delayMs: number } {
     let retryAfterMs = 0;
     let shouldRetry = true;
     if (responseHeaders["x-should-retry"]) {

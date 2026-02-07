@@ -77,7 +77,7 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
+  getRetryDelay(responseHeaders: HeadersType, _responseData: unknown): { shouldRetry: boolean; delayMs: number } {
     const delayMs = 0;
     const shouldRetry = true;
     return { shouldRetry, delayMs };

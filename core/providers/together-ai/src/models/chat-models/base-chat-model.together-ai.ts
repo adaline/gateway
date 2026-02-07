@@ -105,9 +105,21 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     };
   }
 
+  // Together AI returns rate limit info in headers: x-ratelimit-reset (seconds until reset).
+  // https://docs.together.ai/docs/rate-limits
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
-    return { shouldRetry: true, delayMs: 0 };
+  getRetryDelay(responseHeaders: HeadersType, _responseData: unknown): { shouldRetry: boolean; delayMs: number } {
+    const shouldRetry = true;
+    let delayMs = 0;
+    const reset = responseHeaders["x-ratelimit-reset"];
+    if (reset) {
+      const seconds = parseInt(reset, 10);
+      if (!Number.isNaN(seconds) && seconds >= 0) {
+        // Value is seconds until reset (or Unix timestamp if very large)
+        delayMs = seconds > 31536000 ? Math.max(0, seconds * 1000 - Date.now()) : seconds * 1000;
+      }
+    }
+    return { shouldRetry, delayMs };
   }
 
   getTokenCount(messages: MessageType[]): number {

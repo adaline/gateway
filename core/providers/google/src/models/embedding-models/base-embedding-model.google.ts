@@ -71,9 +71,36 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     };
   }
 
+  // Google returns retry delay information in the response body rather than headers.
+  // The response body contains error.details with a RetryInfo object:
+  // {"@type":"type.googleapis.com/google.rpc.RetryInfo","retryDelay":"45s"}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
-    return { shouldRetry: false, delayMs: 0 };
+  getRetryDelay(_responseHeaders: HeadersType, responseData: unknown): { shouldRetry: boolean; delayMs: number } {
+    const shouldRetry = true;
+    let delayMs = 0;
+
+    // parse duration from retryDelay value of format "45s" or "1.5s" or "45.499282066s"
+    const parseDuration = (duration: string): number => {
+      const match = duration.match(/^(\d+(?:\.\d+)?)s$/);
+      if (match) {
+        return Math.ceil(parseFloat(match[1]) * 1000);
+      }
+      return 0;
+    };
+
+    if (responseData && typeof responseData === "object") {
+      const data = responseData as { error?: { details?: Array<{ "@type"?: string; retryDelay?: string }> } };
+      if (data.error?.details && Array.isArray(data.error.details)) {
+        const retryInfo = data.error.details.find(
+          (detail) => detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo"
+        );
+        if (retryInfo?.retryDelay) {
+          delayMs = parseDuration(retryInfo.retryDelay);
+        }
+      }
+    }
+
+    return { shouldRetry, delayMs };
   }
 
   // TODO: unused method, not tested

@@ -91,14 +91,14 @@ class SimpleQueue<Request, Response> implements Queue<Request, Response> {
               logger?.warn(`SimpleQueue.executeWithRetry rate limiting error, id: ${task.id}`);
               const taskRequest = GatewayCompleteChatRequest.safeParse(task.request);
               if (taskRequest.success) {
-                const retryDelay = taskRequest.data.model.getRetryDelay(error.cause.headers);
+                const retryDelay = taskRequest.data.model.getRetryDelay(error.cause.headers, error.cause.data);
                 shouldRetry = retryDelay.shouldRetry;
                 // valid delayMs is returned from model
                 if (retryDelay.delayMs > 0) {
                   delayMs = retryDelay.delayMs;
                 }
               }
-              const randomDelayMs = (60 + Math.random() * 70) * 1000;
+              const randomDelayMs = (30 + Math.random() * 90) * 1000;
               delayMs += randomDelayMs;
             }
 

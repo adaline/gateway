@@ -11,7 +11,7 @@ interface ChatModelV1<MS extends ChatModelSchemaType = ChatModelSchemaType> {
   getDefaultHeaders(): HeadersType;
   getDefaultParams(): ParamsType;
 
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number };
+  getRetryDelay(responseHeaders: HeadersType, responseData: unknown): { shouldRetry: boolean; delayMs: number };
   getTokenCount(messages: MessageType[]): number;
 
   transformModelRequest(request: any): {
