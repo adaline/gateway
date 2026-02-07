@@ -1,5 +1,16 @@
 # @adaline/openai
 
+## 1.18.0
+
+### Minor Changes
+
+- ba6ea54: Implement retry with delay (response based) + jitter in case of 429 errors
+
+### Patch Changes
+
+- Updated dependencies [ba6ea54]
+  - @adaline/provider@1.10.0
+
 ## 1.17.0
 
 ### Minor Changes

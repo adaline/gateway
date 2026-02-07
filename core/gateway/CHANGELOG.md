@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.13.0
+
+### Minor Changes
+
+- ba6ea54: Implement retry with delay (response based) + jitter in case of 429 errors
+
 ## 1.12.0
 
 ### Minor Changes
