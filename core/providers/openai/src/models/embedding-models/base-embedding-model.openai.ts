@@ -81,7 +81,7 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
   // x-ratelimit-remaining-tokens	The remaining number of tokens that are permitted before exhausting the rate limit.
   // x-ratelimit-reset-requests	The time until the rate limit (based on requests) resets to its initial state.
   // x-ratelimit-reset-tokens	The time until the rate limit (based on tokens) resets to its initial state.
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
+  getRetryDelay(responseHeaders: HeadersType, _responseData: unknown): { shouldRetry: boolean; delayMs: number } {
     // parse duration from header value of format "6m0s" or "21s" or "41ms" or "2s81ms" or "5h50m30ms" and such
     const parseDuration = (duration: string): number => {
       const regex = /(\d+)(h|m|s|ms)/g;

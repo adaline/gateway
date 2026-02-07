@@ -11,7 +11,7 @@ interface EmbeddingModelV1<MS extends EmbeddingModelSchemaType = EmbeddingModelS
   getDefaultHeaders(): HeadersType;
   getDefaultParams(): ParamsType;
 
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number };
+  getRetryDelay(responseHeaders: HeadersType, responseData: unknown): { shouldRetry: boolean; delayMs: number };
   getTokenCount(requests: EmbeddingRequestsType): number;
 
   transformModelRequest(request: any): {

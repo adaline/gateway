@@ -88,9 +88,27 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     return {};
   }
 
+  // Vertex AI 429 uses same error shape as Google: response body error.details with RetryInfo.retryDelay (e.g. "45s").
+  // https://cloud.google.com/vertex-ai/generative-ai/docs/error-code-429
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
-    return { shouldRetry: false, delayMs: 0 };
+  getRetryDelay(_responseHeaders: HeadersType, responseData: unknown): { shouldRetry: boolean; delayMs: number } {
+    const shouldRetry = true;
+    let delayMs = 0;
+    const parseDuration = (duration: string): number => {
+      const match = duration.match(/^(\d+(?:\.\d+)?)s$/);
+      if (match) return Math.ceil(parseFloat(match[1]) * 1000);
+      return 0;
+    };
+    if (responseData && typeof responseData === "object") {
+      const data = responseData as { error?: { details?: Array<{ "@type"?: string; retryDelay?: string }> } };
+      if (data.error?.details && Array.isArray(data.error.details)) {
+        const retryInfo = data.error.details.find(
+          (d) => d["@type"] === "type.googleapis.com/google.rpc.RetryInfo"
+        );
+        if (retryInfo?.retryDelay) delayMs = parseDuration(retryInfo.retryDelay);
+      }
+    }
+    return { shouldRetry, delayMs };
   }
 
   getTokenCount(requests: EmbeddingRequestsType): number {

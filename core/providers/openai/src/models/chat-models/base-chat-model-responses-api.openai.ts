@@ -87,7 +87,7 @@ class BaseChatModelResponsesApi implements ChatModelV1<ChatModelSchemaType> {
     };
   }
 
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
+  getRetryDelay(responseHeaders: HeadersType, _responseData: unknown): { shouldRetry: boolean; delayMs: number } {
     const parseDuration = (duration: string): number => {
       const regex = /(\d+)(h|m|s|ms)/g;
       const timeUnits: { [unit: string]: number } = {

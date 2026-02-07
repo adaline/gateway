@@ -68,9 +68,20 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     };
   }
 
+  // Together AI returns rate limit info in headers: x-ratelimit-reset (seconds until reset).
+  // https://docs.together.ai/docs/rate-limits
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRetryDelay(responseHeaders: HeadersType): { shouldRetry: boolean; delayMs: number } {
-    return { shouldRetry: true, delayMs: 0 };
+  getRetryDelay(responseHeaders: HeadersType, _responseData: unknown): { shouldRetry: boolean; delayMs: number } {
+    const shouldRetry = true;
+    let delayMs = 0;
+    const reset = responseHeaders["x-ratelimit-reset"];
+    if (reset) {
+      const seconds = parseInt(reset, 10);
+      if (!Number.isNaN(seconds) && seconds >= 0) {
+        delayMs = seconds > 31536000 ? Math.max(0, seconds * 1000 - Date.now()) : seconds * 1000;
+      }
+    }
+    return { shouldRetry, delayMs };
   }
 
   getTokenCount(requests: EmbeddingRequestsType): number {
