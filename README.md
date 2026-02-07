@@ -34,6 +34,7 @@ The only fully local, production-grade Super SDK that provides a simple, unified
 | Anthropic             | ✅              | ❌                |
 | Google AI Studio      | ✅              | ❌                |
 | Google Vertex         | ✅              | ✅                |
+| xAi                   | ✅              | ✅                |
 | AWS Bedrock           | ✅              | ❌                |
 | Azure OpenAI          | ✅              | ✅                |
 | Groq                  | ✅              | ❌                |
