@@ -4,7 +4,7 @@ import { PartialChatResponseType } from "@adaline/types";
 
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, normalizeProviderResponseSchemaByUrl } from "../../utils";
+import { castToError } from "../../utils";
 import type { ProxyStreamChatHandlerRequestType, ProxyStreamChatHandlerResponseType } from "./proxy-stream-chat.types";
 import { ProxyStreamChatHandlerRequest } from "./proxy-stream-chat.types";
 
@@ -28,7 +28,6 @@ async function* handleProxyStreamChat(
         headers: await data.model.getProxyStreamChatHeaders(data.data, data.headers, data.query),
         data: data.data,
       };
-      providerRequest.data = normalizeProviderResponseSchemaByUrl(providerRequest.data, providerRequest.url);
 
       logger?.debug("handleProxyStreamChat providerRequest: ", { providerRequest });
 

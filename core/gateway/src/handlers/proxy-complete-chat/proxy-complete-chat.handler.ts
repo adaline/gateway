@@ -2,7 +2,7 @@ import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, normalizeProviderResponseSchemaByUrl } from "../../utils";
+import { castToError } from "../../utils";
 import type { ProxyCompleteChatHandlerRequestType, ProxyCompleteChatHandlerResponseType } from "./proxy-complete-chat.types";
 import { ProxyCompleteChatHandlerRequest } from "./proxy-complete-chat.types";
 
@@ -26,7 +26,6 @@ async function handleProxyCompleteChat(
         headers: await data.model.getProxyCompleteChatHeaders(data.data, data.headers, data.query),
         data: data.data,
       };
-      providerRequest.data = normalizeProviderResponseSchemaByUrl(providerRequest.data, providerRequest.url);
       logger?.debug("handleProxyCompleteChat providerRequest: ", { providerRequest });
 
       const providerResponse = await client.post(
