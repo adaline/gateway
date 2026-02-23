@@ -452,7 +452,6 @@ describe("BaseChatModel", () => {
                       email: { type: "string" }
                     },
                     required: ["id", "name"],
-                    additionalProperties: false
                   }
                 },
                 total: { type: "number" }
@@ -479,7 +478,6 @@ describe("BaseChatModel", () => {
                       email: { type: "string" }
                     },
                     required: ["id", "name"],
-                    additionalProperties: false
                   }
                 },
                 total: { type: "number" }
