@@ -191,17 +191,17 @@ const enforceOpenAIStrictJsonSchema = (payload: Record<string, unknown>): Record
   return result;
 };
 
-const normalizeProviderResponseSchemaPayload = (payload: unknown, target: ProviderSchemaTarget): unknown => {
+const normalizeProviderResponseSchemaPayload = <T>(payload: T, target: ProviderSchemaTarget): T => {
   if (!isRecord(payload)) {
     return payload;
   }
 
   if (target === "gemini" || target === "vertex") {
-    return sanitizeGeminiVertexPayload(payload);
+    return sanitizeGeminiVertexPayload(payload) as T;
   }
 
   if (target === "openai" || target === "azure") {
-    return enforceOpenAIStrictJsonSchema(payload);
+    return enforceOpenAIStrictJsonSchema(payload) as T;
   }
 
   return payload;
@@ -235,7 +235,7 @@ const inferProviderSchemaTargetFromUrl = (url: string): ProviderSchemaTarget => 
   return "other";
 };
 
-const normalizeProviderResponseSchemaByUrl = (payload: unknown, url: string): unknown => {
+const normalizeProviderResponseSchemaByUrl = <T>(payload: T, url: string): T => {
   const target = inferProviderSchemaTargetFromUrl(url);
   return normalizeProviderResponseSchemaPayload(payload, target);
 };
