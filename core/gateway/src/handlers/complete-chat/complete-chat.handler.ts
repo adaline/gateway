@@ -2,7 +2,7 @@ import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 
 import { GatewayError } from "../../errors/errors";
 import { HttpClient, HttpRequestError, LoggerManager, TelemetryManager } from "../../plugins";
-import { castToError, getCacheKeyHash, isRunningInBrowser, safelyInvokeCallbacks } from "../../utils";
+import { castToError, getCacheKeyHash, isRunningInBrowser, normalizeProviderResponseSchemaByUrl, safelyInvokeCallbacks } from "../../utils";
 import {
   CompleteChatCallbackType,
   CompleteChatHandlerRequest,
@@ -41,6 +41,7 @@ async function handleCompleteChat(
         headers: await data.model.getCompleteChatHeaders(data.config, data.messages, data.tools),
         data: await data.model.getCompleteChatData(data.config, data.messages, data.tools),
       };
+      providerRequest.data = normalizeProviderResponseSchemaByUrl(providerRequest.data, providerRequest.url);
 
       if (!isRunningInBrowser()) {
         providerRequest.headers = {
