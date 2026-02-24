@@ -1,5 +1,17 @@
 # @adaline/bedrock
 
+## 2.6.0
+
+### Minor Changes
+
+- ba6ea54: Implement retry with delay (response based) + jitter in case of 429 errors
+
+### Patch Changes
+
+- Updated dependencies [ba6ea54]
+  - @adaline/anthropic@1.13.0
+  - @adaline/provider@1.10.0
+
 ## 2.5.1
 
 ### Patch Changes

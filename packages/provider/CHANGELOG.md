@@ -1,5 +1,11 @@
 # @adaline/provider
 
+## 1.10.0
+
+### Minor Changes
+
+- ba6ea54: Implement retry with delay (response based) + jitter in case of 429 errors
+
 ## 1.9.0
 
 ### Minor Changes

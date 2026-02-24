@@ -1,5 +1,17 @@
 # @adaline/google
 
+## 1.17.0
+
+### Minor Changes
+
+- ba6ea54: Implement retry with delay (response based) + jitter in case of 429 errors
+
+### Patch Changes
+
+- b1b32c9: Fix Gemini response schema transformation by stripping nested `additionalProperties` recursively before calling Google APIs.
+- Updated dependencies [ba6ea54]
+  - @adaline/provider@1.10.0
+
 ## 1.16.0
 
 ### Minor Changes
