@@ -622,12 +622,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             cause: new Error("'responseSchema' is required in config when 'responseFormat' is 'json_schema'"),
           });
         } else {
-          transformedConfig.responseSchema = responseSchemaConfig.schema;
+          // Keep response-schema normalization aligned with tool schema handling for Google.
+          transformedConfig.responseSchema = this.stripAdditionalProperties(responseSchemaConfig.schema);
           transformedConfig.responseMimeType = "application/json";
-          if ("additionalProperties" in responseSchemaConfig.schema) {
-            // Google does not support additionalProperties in responseSchema but our schema always has it
-            delete (transformedConfig.responseSchema as any).additionalProperties;
-          }
           delete transformedConfig.response_format;
           delete transformedConfig.response_schema;
         }
