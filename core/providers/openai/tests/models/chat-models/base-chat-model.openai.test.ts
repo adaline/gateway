@@ -561,10 +561,11 @@ describe("BaseChatModel", () => {
       });
     });
 
-    it("should preserve nested JSON Schema keywords in response schema", () => {
+    it("should preserve responseSchema for strict json_schema mode", () => {
       const responseSchema = {
         name: "Envelope",
         description: "Schema with nested JSON Schema keywords",
+        strict: true,
         schema: {
           type: "object",
           required: ["payload"],
@@ -613,11 +614,10 @@ describe("BaseChatModel", () => {
       });
 
       const result = gpt5Model.transformConfig(config, [], []);
-      const transformedSchema = (result.response_format as any).json_schema.schema;
-
-      expect(transformedSchema.properties.payload.additionalProperties).toBe(false);
-      expect(transformedSchema.properties.payload.$defs).toEqual(responseSchema.schema.properties.payload.$defs);
-      expect(transformedSchema.properties.payload.properties.entity.$ref).toBe("#/$defs/userEntity");
+      expect(result.response_format).toEqual({
+        type: "json_schema",
+        json_schema: responseSchema,
+      });
     });
 
     it("should handle all valid response format values", () => {
