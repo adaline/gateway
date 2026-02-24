@@ -561,6 +561,65 @@ describe("BaseChatModel", () => {
       });
     });
 
+    it("should preserve nested JSON Schema keywords in response schema", () => {
+      const responseSchema = {
+        name: "Envelope",
+        description: "Schema with nested JSON Schema keywords",
+        schema: {
+          type: "object",
+          required: ["payload"],
+          properties: {
+            payload: {
+              type: "object",
+              required: ["kind", "entity"],
+              properties: {
+                kind: { type: "string", enum: ["user"] },
+                entity: { $ref: "#/$defs/userEntity" },
+              },
+              additionalProperties: false,
+              $defs: {
+                localType: {
+                  type: "object",
+                  required: ["value"],
+                  properties: {
+                    value: { type: "string" },
+                  },
+                  additionalProperties: false,
+                },
+              },
+            },
+          },
+          $defs: {
+            userEntity: {
+              type: "object",
+              required: ["id"],
+              properties: {
+                id: { type: "string" },
+              },
+              additionalProperties: false,
+            },
+          },
+          additionalProperties: false,
+        },
+      };
+
+      const config = Config().parse({
+        reasoningEffort: "medium",
+        verbosity: "medium",
+        temperature: 0.7,
+        maxTokens: 1000,
+        responseFormat: "json_schema",
+        responseSchema: responseSchema,
+      });
+
+      const result = gpt5Model.transformConfig(config, [], []);
+      const transformedSchema = (result.response_format as any).json_schema.schema;
+
+      expect(transformedSchema.properties.payload.additionalProperties).toBe(false);
+      expect(transformedSchema.properties.payload.$defs).toEqual(responseSchema.schema.properties.payload.$defs);
+      expect(transformedSchema.properties.payload.properties.entity.$ref).toBe("#/$defs/userEntity");
+    });
+
     it("should handle all valid response format values", () => {
       const values = ["text", "json_object"];
       
