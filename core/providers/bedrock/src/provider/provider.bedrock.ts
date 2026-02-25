@@ -65,6 +65,16 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelOptions: Models.BedrockClaudeSonnet4_520250929Options,
       modelSchema: Models.BedrockClaudeSonnet4_520250929Schema,
     },
+    [Models.BedrockClaudeSonnet4_6Literal]: {
+      model: Models.BedrockClaudeSonnet4_6,
+      modelOptions: Models.BedrockClaudeSonnet4_6Options,
+      modelSchema: Models.BedrockClaudeSonnet4_6Schema,
+    },
+    [Models.BedrockClaudeHaiku4_520251001Literal]: {
+      model: Models.BedrockClaudeHaiku4_520251001,
+      modelOptions: Models.BedrockClaudeHaiku4_520251001Options,
+      modelSchema: Models.BedrockClaudeHaiku4_520251001Schema,
+    },
     [Models.BedrockClaude4Opus20250514Literal]: {
       model: Models.BedrockClaude4Opus20250514,
       modelOptions: Models.BedrockClaude4Opus20250514Options,

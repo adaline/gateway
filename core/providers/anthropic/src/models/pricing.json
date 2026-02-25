@@ -175,6 +175,38 @@
       }
     ]
   },
+  "claude-sonnet-4-6": {
+    "modelName": "claude-sonnet-4-6",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  },
+  "claude-haiku-4-5-20251001": {
+    "modelName": "claude-haiku-4-5-20251001",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1,
+            "outputPricePerMillion": 5
+          }
+        }
+      }
+    ]
+  },
   "claude-opus-4-5-20251101": {
     "modelName": "claude-opus-4-5-20251101",
     "currency": "USD",

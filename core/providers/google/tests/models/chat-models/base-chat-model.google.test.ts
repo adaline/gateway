@@ -1164,6 +1164,49 @@ describe("BaseChatModel", () => {
       expect(model.transformMessages(messages)).toEqual(expected);
     });
 
+    it("should merge consecutive Tool messages into one message with multiple function responses", () => {
+      const messages: MessageType[] = [
+        { role: UserRoleLiteral, content: [{ modality: TextModalityLiteral, value: "Call tools" }] },
+        {
+          role: AssistantRoleLiteral,
+          content: [
+            { modality: ToolCallModalityLiteral, id: "call_1", name: "get_holdings", arguments: "{}", index: 0 },
+            { modality: ToolCallModalityLiteral, id: "call_2", name: "get_sectors", arguments: "{}", index: 1 },
+          ],
+        },
+        {
+          role: ToolRoleLiteral,
+          content: [{ modality: ToolResponseModalityLiteral, id: "call_1", data: '{"items":[1]}', index: 0, name: "get_holdings" }],
+        },
+        {
+          role: ToolRoleLiteral,
+          content: [{ modality: ToolResponseModalityLiteral, id: "call_2", data: '{"sectors":["tech"]}', index: 1, name: "get_sectors" }],
+        },
+      ];
+
+      const expected: any = {
+        contents: [
+          { role: "user", parts: [{ text: "Call tools" }] },
+          {
+            role: "assistant",
+            parts: [
+              { function_call: { name: "get_holdings", args: {} } },
+              { function_call: { name: "get_sectors", args: {} } },
+            ],
+          },
+          {
+            role: "tool",
+            parts: [
+              { function_response: { name: "get_holdings", response: { items: [1] } } },
+              { function_response: { name: "get_sectors", response: { sectors: ["tech"] } } },
+            ],
+          },
+        ],
+      };
+
+      expect(model.transformMessages(messages)).toEqual(expected);
+    });
+
     it("should throw error as user after tool not supported)", () => {
       const base64ImageData = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="; // 1x1 black pixel png
       const messages: MessageType[] = [

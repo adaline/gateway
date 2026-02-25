@@ -143,6 +143,38 @@
       }
     ]
   },
+  "anthropic.claude-sonnet-4-6-v1": {
+    "modelName": "anthropic.claude-sonnet-4-6-v1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "modelName": "anthropic.claude-haiku-4-5-20251001-v1:0",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1,
+            "outputPricePerMillion": 5
+          }
+        }
+      }
+    ]
+  },
   "anthropic.claude-3-7-sonnet-20250219-v1:0": {
     "modelName": "anthropic.claude-3-7-sonnet-20250219-v1:0",
     "currency": "USD",

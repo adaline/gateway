@@ -2,8 +2,18 @@ import { CHAT_CONFIG, RangeConfigItem, SelectStringConfigItem } from "@adaline/p
 
 import { ChatModelResponseSchemaConfigDef, ChatModelResponseSchemaConfigSchema } from "./response-schema.config.chat-model.openai";
 
+const oSeriesTemperature = RangeConfigItem({
+  param: "temperature",
+  title: CHAT_CONFIG.TEMPERATURE.title,
+  description: CHAT_CONFIG.TEMPERATURE.description,
+  min: 0,
+  max: 2,
+  step: 0.01,
+  default: 1,
+});
+
 // o1 models only support temperature = 1.0
-const temperature = RangeConfigItem({
+const o1SeriesTemperature = RangeConfigItem({
   param: "temperature",
   title: CHAT_CONFIG.TEMPERATURE.title,
   description: CHAT_CONFIG.TEMPERATURE.description,
@@ -23,14 +33,26 @@ const reasoningEffort = SelectStringConfigItem({
 });
 const ChatModelOSeriesConfigDef = (maxOutputTokens: number, maxSequences: number) => ({
   ...ChatModelResponseSchemaConfigDef(maxOutputTokens, maxSequences),
-  temperature: temperature.def,
+  temperature: oSeriesTemperature.def,
   reasoningEffort: reasoningEffort.def,
 });
 
 const ChatModelOSeriesConfigSchema = (maxOutputTokens: number, maxSequences: number) =>
   ChatModelResponseSchemaConfigSchema(maxOutputTokens, maxSequences).extend({
-    temperature: temperature.schema,
+    temperature: oSeriesTemperature.schema,
     reasoningEffort: reasoningEffort.schema,
   });
 
-export { ChatModelOSeriesConfigDef, ChatModelOSeriesConfigSchema };
+const ChatModelO1SeriesConfigDef = (maxOutputTokens: number, maxSequences: number) => ({
+  ...ChatModelResponseSchemaConfigDef(maxOutputTokens, maxSequences),
+  temperature: o1SeriesTemperature.def,
+  reasoningEffort: reasoningEffort.def,
+});
+
+const ChatModelO1SeriesConfigSchema = (maxOutputTokens: number, maxSequences: number) =>
+  ChatModelResponseSchemaConfigSchema(maxOutputTokens, maxSequences).extend({
+    temperature: o1SeriesTemperature.schema,
+    reasoningEffort: reasoningEffort.schema,
+  });
+
+export { ChatModelO1SeriesConfigDef, ChatModelO1SeriesConfigSchema, ChatModelOSeriesConfigDef, ChatModelOSeriesConfigSchema };

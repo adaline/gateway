@@ -239,6 +239,22 @@
       }
     ]
   },
+  "chatgpt-4o-latest": {
+    "modelName": "chatgpt-4o-latest",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  },
   "o1-2024-12-17": {
     "modelName": "o1-2024-12-17",
     "currency": "USD",
