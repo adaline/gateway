@@ -33,4 +33,18 @@ describe("OpenAI model config definitions", () => {
     expect(responseFormatDef.type).toBe("select-string");
     expect(responseFormatDef.choices).toEqual(expect.arrayContaining(["text", "json_object", "json_schema"]));
   });
+
+  it("does not expose function-calling or structured output controls for gpt-5-chat-latest", () => {
+    const chatLatestSchema = schemas["gpt-5-chat-latest"];
+    const parsed = chatLatestSchema.config.schema.parse({
+      toolChoice: "auto",
+      responseFormat: "json_schema",
+    });
+
+    expect(chatLatestSchema.config.def.toolChoice).toBeUndefined();
+    expect(chatLatestSchema.config.def.responseFormat).toBeUndefined();
+    expect(chatLatestSchema.config.def.responseSchema).toBeUndefined();
+    expect((parsed as any).toolChoice).toBeUndefined();
+    expect((parsed as any).responseFormat).toBeUndefined();
+  });
 });
