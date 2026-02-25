@@ -19,8 +19,8 @@ const O1Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalities
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelModalities,
   config: {
-    def: OpenAIChatModelConfigs.oSeries(100000, 4).def,
-    schema: OpenAIChatModelConfigs.oSeries(100000, 4).schema,
+    def: OpenAIChatModelConfigs.o1Series(100000, 4).def,
+    schema: OpenAIChatModelConfigs.o1Series(100000, 4).schema,
   },
   price: pricingData[O1Literal],
 });
