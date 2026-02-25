@@ -102,7 +102,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       parsedOptions.completeChatUrl || `${this.baseUrl}/models/${this.modelName}:generateContent?key=${this.apiKey}`
     );
     this.streamChatUrl = urlWithoutTrailingSlash(
-      parsedOptions.streamChatUrl || `${this.baseUrl}/models/${this.modelName}:streamGenerateContent?key=${this.apiKey}`
+      parsedOptions.streamChatUrl || `${this.baseUrl}/models/${this.modelName}:streamGenerateContent?key=${this.apiKey}&alt=sse`
     );
   }
 
@@ -1179,6 +1179,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     chunk: string,
     buffer: string
   ): AsyncGenerator<{ partialResponse: PartialChatResponseType; buffer: string }> {
+    const mergedData = buffer + chunk;
+    // Gemini 3.1 streams over SSE for direct provider calls; auto-detect to avoid parser stalls.
+    if (mergedData.trimStart().startsWith("data:")) {
+      yield* this.transformProxyStreamChatResponseChunk(chunk, buffer, undefined, undefined, { alt: "sse" });
+      return;
+    }
+
     // merge last buffer message and split into lines
     const lines = (buffer + chunk).split(",\r").filter((line) => line.trim() !== "");
     for (const line of lines) {

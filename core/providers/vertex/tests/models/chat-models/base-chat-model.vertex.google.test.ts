@@ -1728,8 +1728,12 @@ describe("BaseChatModelVertex", () => {
         const chunk = `data: ${JSON.stringify(response)}\n\n`;
         const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, {}); // Empty query
         const results = await collectAsyncGenerator(generator);
-        expect(results).toHaveLength(1); // Should behave like SSE
-        expect(results[0].partialResponse.partialMessages).toHaveLength(0);
+        expect(results).toHaveLength(2);
+        expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+        expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+        expect(results[0].buffer).toBe("");
+        expect(results[1].partialResponse.partialMessages).toEqual([]);
+        expect(results[1].buffer).toBe("");
       });
 
       it("should default to SSE handling if query is undefined", async () => {
@@ -1737,8 +1741,12 @@ describe("BaseChatModelVertex", () => {
         const chunk = `data: ${JSON.stringify(response)}\n\n`;
         const generator = model.transformProxyStreamChatResponseChunk(chunk, "", undefined, undefined, undefined); // No query
         const results = await collectAsyncGenerator(generator);
-        expect(results).toHaveLength(1); // Should behave like SSE
-        expect(results[0].partialResponse.partialMessages).toHaveLength(0);
+        expect(results).toHaveLength(2);
+        expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+        expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, mockTextPart.text));
+        expect(results[0].buffer).toBe("");
+        expect(results[1].partialResponse.partialMessages).toEqual([]);
+        expect(results[1].buffer).toBe("");
       });
     });
 
