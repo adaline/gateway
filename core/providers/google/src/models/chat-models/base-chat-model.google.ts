@@ -691,10 +691,27 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       message.content = message.content.filter((content) => content.modality !== "error" && content.modality !== "search-result");
     });
 
+    const normalizedMessages: MessageType[] = [];
+    for (const message of parsedMessages) {
+      const lastMessage = normalizedMessages[normalizedMessages.length - 1];
+
+      // Gemini expects parallel tool responses from one turn to be grouped
+      // into a single function message with multiple function_response parts.
+      if (message.role === ToolRoleLiteral && lastMessage?.role === ToolRoleLiteral) {
+        normalizedMessages[normalizedMessages.length - 1] = {
+          ...lastMessage,
+          content: [...lastMessage.content, ...message.content],
+        };
+        continue;
+      }
+
+      normalizedMessages.push(message);
+    }
+
     const systemInstruction: GoogleChatSystemInstructionType = { parts: [] };
     const nonSystemMessages: GoogleChatContentType[] = [];
 
-    parsedMessages.forEach((message) => {
+    normalizedMessages.forEach((message) => {
       switch (message.role) {
         case SystemRoleLiteral:
           {
