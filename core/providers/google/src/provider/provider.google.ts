@@ -70,6 +70,11 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini2_0FlashOptions,
       modelSchema: Models.Gemini2_0FlashSchema,
     },
+    [Models.Gemini2_0FlashLiteLiteral]: {
+      model: Models.Gemini2_0FlashLite,
+      modelOptions: Models.Gemini2_0FlashLiteOptions,
+      modelSchema: Models.Gemini2_0FlashLiteSchema,
+    },
 
     [Models.Gemini2_5FlashPreview0417Literal]: {
       model: Models.Gemini2_5FlashPreview0417,
@@ -105,6 +110,11 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.Gemini2_5FlashLite,
       modelOptions: Models.Gemini2_5FlashLiteOptions,
       modelSchema: Models.Gemini2_5FlashLiteSchema,
+    },
+    [Models.Gemini2_5FlashLitePreview092025Literal]: {
+      model: Models.Gemini2_5FlashLitePreview092025,
+      modelOptions: Models.Gemini2_5FlashLitePreview092025Options,
+      modelSchema: Models.Gemini2_5FlashLitePreview092025Schema,
     },
   };
 

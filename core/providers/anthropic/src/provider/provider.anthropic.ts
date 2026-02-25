@@ -64,6 +64,16 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       modelOptions: Models.ClaudeSonnet4_520250929Options,
       modelSchema: Models.ClaudeSonnet4_520250929Schema,
     },
+    [Models.ClaudeSonnet4_6Literal]: {
+      model: Models.ClaudeSonnet4_6,
+      modelOptions: Models.ClaudeSonnet4_6Options,
+      modelSchema: Models.ClaudeSonnet4_6Schema,
+    },
+    [Models.ClaudeHaiku4_520251001Literal]: {
+      model: Models.ClaudeHaiku4_520251001,
+      modelOptions: Models.ClaudeHaiku4_520251001Options,
+      modelSchema: Models.ClaudeHaiku4_520251001Schema,
+    },
     [Models.Claude4Opus20250514Literal]: {
       model: Models.Claude4Opus20250514,
       modelOptions: Models.Claude4Opus20250514Options,

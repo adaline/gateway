@@ -4,6 +4,8 @@ export * from "./claude-4-sonnet-20250514.anthropic";
 export * from "./claude-opus-4-5-20251101.anthropic";
 export * from "./claude-opus-4-6.anthropic";
 export * from "./claude-sonnet-4-5-20250929.anthropic";
+export * from "./claude-sonnet-4-6.anthropic";
+export * from "./claude-haiku-4-5-20251001.anthropic";
 export * from "./claude-3-5-sonnet-20240620.anthropic";
 export * from "./claude-3-5-sonnet-20241022.anthropic";
 export * from "./claude-3-7-sonnet-20250219.anthropic";

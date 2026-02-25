@@ -53,6 +53,11 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Kimi_K2_Instruct_Options,
       modelSchema: Models.Kimi_K2_InstructSchema,
     },
+    [Models.Kimi_K2_Instruct_0905Literal]: {
+      model: Models.Kimi_K2_Instruct_0905,
+      modelOptions: Models.Kimi_K2_Instruct_0905_Options,
+      modelSchema: Models.Kimi_K2_Instruct_0905Schema,
+    },
     [Models.Llama_4_Maverick_17b_128e_InstructLiteral]: {
       model: Models.Llama_4_Maverick_17b_128e_Instruct,
       modelOptions: Models.Llama_4_Maverick_17b_128e_Instruct_Options,
@@ -72,6 +77,11 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       model: Models.Gpt_Oss_120b,
       modelOptions: Models.Gpt_Oss_120b_Options,
       modelSchema: Models.Gpt_Oss_120bSchema,
+    },
+    [Models.Gpt_Oss_Safeguard_20bLiteral]: {
+      model: Models.Gpt_Oss_Safeguard_20b,
+      modelOptions: Models.Gpt_Oss_Safeguard_20b_Options,
+      modelSchema: Models.Gpt_Oss_Safeguard_20bSchema,
     },
   };
 
