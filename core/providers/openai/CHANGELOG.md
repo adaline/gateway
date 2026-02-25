@@ -1,5 +1,13 @@
 # @adaline/openai
 
+## 1.18.1
+
+### Patch Changes
+
+- 5b588c2: Sync provider model registries with current docs by adding missing OpenAI, Google/Vertex, Anthropic/Bedrock, and Groq model IDs plus pricing updates.
+- f49f783: Enable ChatGPT-5.2 response-format config wiring and allow decimal temperatures for `o4-mini` while keeping `o1` models fixed-temperature.
+- 27ecde1: Add doc-backed model coverage for `gpt-5.2-codex`, `gpt-5.3-codex`, and `gemini-3.1-pro-preview` with pricing metadata.
+
 ## 1.18.0
 
 ### Minor Changes

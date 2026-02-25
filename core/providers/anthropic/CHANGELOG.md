@@ -1,5 +1,11 @@
 # @adaline/anthropic
 
+## 1.13.1
+
+### Patch Changes
+
+- 5b588c2: Sync provider model registries with current docs by adding missing OpenAI, Google/Vertex, Anthropic/Bedrock, and Groq model IDs plus pricing updates.
+
 ## 1.13.0
 
 ### Minor Changes

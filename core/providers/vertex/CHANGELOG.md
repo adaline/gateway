@@ -1,5 +1,16 @@
 # @adaline/vertex
 
+## 1.13.1
+
+### Patch Changes
+
+- 5b588c2: Sync provider model registries with current docs by adding missing OpenAI, Google/Vertex, Anthropic/Bedrock, and Groq model IDs plus pricing updates.
+- 27ecde1: Add doc-backed model coverage for `gpt-5.2-codex`, `gpt-5.3-codex`, and `gemini-3.1-pro-preview` with pricing metadata.
+- Updated dependencies [5b588c2]
+- Updated dependencies [b4a6dd4]
+- Updated dependencies [f49f783]
+  - @adaline/google@1.17.1
+
 ## 1.13.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # @adaline/google
 
+## 1.17.1
+
+### Patch Changes
+
+- 5b588c2: Sync provider model registries with current docs by adding missing OpenAI, Google/Vertex, Anthropic/Bedrock, and Groq model IDs plus pricing updates.
+- b4a6dd4: Fix Gemini tool-response message batching so consecutive parallel tool results are emitted in a provider-compatible grouped format.
+- f49f783: Fix Gemini response schema transformation by stripping nested `additionalProperties` recursively before calling Google APIs.
+
 ## 1.17.0
 
 ### Minor Changes

@@ -1,5 +1,15 @@
 # @adaline/groq
 
+## 1.11.2
+
+### Patch Changes
+
+- 5b588c2: Sync provider model registries with current docs by adding missing OpenAI, Google/Vertex, Anthropic/Bedrock, and Groq model IDs plus pricing updates.
+- Updated dependencies [5b588c2]
+- Updated dependencies [f49f783]
+- Updated dependencies [27ecde1]
+  - @adaline/openai@1.18.1
+
 ## 1.11.1
 
 ### Patch Changes
