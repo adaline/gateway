@@ -527,6 +527,22 @@
       }
     ]
   },
+  "gpt-5.2-codex": {
+    "modelName": "gpt-5.2-codex",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.75,
+            "outputPricePerMillion": 14.0
+          }
+        }
+      }
+    ]
+  },
   "gpt-5.2-chat-latest": {
     "modelName": "gpt-5.2-chat-latest",
     "currency": "USD",
@@ -554,6 +570,22 @@
           "base": {
             "inputPricePerMillion": 21.0,
             "outputPricePerMillion": 168.0
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5.3-codex": {
+    "modelName": "gpt-5.3-codex",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.1,
+            "outputPricePerMillion": 16.8
           }
         }
       }

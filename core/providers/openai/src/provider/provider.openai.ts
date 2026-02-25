@@ -78,6 +78,10 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_5_2Options,
       modelSchema: Models.GPT_5_2Schema,
     },
+    [Models.GPT_5_2_CodexLiteral]: {
+      model: Models.GPT_5_2_Codex,
+      modelOptions: Models.GPT_5_2_CodexOptions,
+      modelSchema: Models.GPT_5_2_CodexSchema,
     [Models.ChatGPT_5_2Literal]: {
       model: Models.ChatGPT_5_2,
       modelOptions: Models.ChatGPT_5_2Options,
@@ -92,6 +96,11 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.GPT_5_2_ChatLatest,
       modelOptions: Models.GPT_5_2_ChatLatestOptions,
       modelSchema: Models.GPT_5_2_ChatLatestSchema,
+    },
+    [Models.GPT_5_3_CodexLiteral]: {
+      model: Models.GPT_5_3_Codex,
+      modelOptions: Models.GPT_5_3_CodexOptions,
+      modelSchema: Models.GPT_5_3_CodexSchema,
     },
     [Models.GPT_5_MiniLiteral]: {
       model: Models.GPT_5_Mini,
