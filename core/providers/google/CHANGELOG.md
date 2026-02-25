@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.17.2
+
+### Patch Changes
+
+- 0285f23: Add Gemini 3.1 Pro Preview models to the Google provider: `gemini-3.1-pro-preview` and `gemini-3.1-pro-preview-customtools`, including provider registration and pricing metadata.
+
 ## 1.17.1
 
 ### Patch Changes
