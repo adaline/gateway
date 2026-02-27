@@ -338,6 +338,32 @@ describe("BaseChatModel", () => {
       });
     });
 
+    it("should transform reasoningEffort: MINIMAL correctly", () => {
+      const config = Config().parse({
+        reasoningEffort: "MINIMAL",
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          thinkingConfig: {
+            thinkingLevel: "MINIMAL",
+          },
+        },
+      });
+    });
+
+    it("should transform reasoningEffort: MEDIUM correctly", () => {
+      const config = Config().parse({
+        reasoningEffort: "MEDIUM",
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          thinkingConfig: {
+            thinkingLevel: "MEDIUM",
+          },
+        },
+      });
+    });
+
     it("should throw error if tool is defined", () => {
       expect(() => {
         const config = Config().parse({
