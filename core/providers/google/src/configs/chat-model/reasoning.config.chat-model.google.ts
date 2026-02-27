@@ -1,4 +1,4 @@
-import { maxReasoningTokens, reasoningEnabled, reasoningEffort } from "./common.config.chat-model.google";
+import { includeThoughts, maxReasoningTokens, reasoningEffort } from "./common.config.chat-model.google";
 
 import {
   GoogleChatModelResponseSchemaConfigDef,
@@ -15,7 +15,7 @@ const ChatModelReasoningConfigSchema = (
   maxReasoningToken: number,
 ) =>
   GoogleChatModelResponseSchemaConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP).extend({
-    reasoningEnabled: reasoningEnabled.schema,
+    includeThoughts: includeThoughts.schema,
     maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).schema,
     reasoningEffort: reasoningEffort.schema,
   });
@@ -31,7 +31,7 @@ const ChatModelReasoningConfigDef = (
 ) =>
   ({
     ...GoogleChatModelResponseSchemaConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
-    reasoningEnabled: reasoningEnabled.def,
+    includeThoughts: includeThoughts.def,
     maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).def,
     reasoningEffort: reasoningEffort.def,
   });
