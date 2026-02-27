@@ -386,6 +386,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     _config.presencePenalty = generationConfig?.presencePenalty;
     _config.frequencyPenalty = generationConfig?.frequencyPenalty;
     _config.stop = generationConfig?.stopSequences;
+    _config.includeThoughts = generationConfig?.thinkingConfig?.includeThoughts;
+    _config.maxReasoningTokens = generationConfig?.thinkingConfig?.thinkingBudget;
+    _config.reasoningEffort = generationConfig?.thinkingConfig?.thinkingLevel;
     _config.safetySettings = safetySettings;
     const config = Config().parse(removeUndefinedEntries(_config));
 
@@ -492,10 +495,17 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
-    const _toolChoice = config.toolChoice;
-    delete config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
+    const normalizedConfig = { ...config } as ConfigType & { reasoningEnabled?: boolean | null; includeThoughts?: boolean | null };
+    const _toolChoice = normalizedConfig.toolChoice;
+    delete normalizedConfig.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
 
-    const _parsedConfig = this.modelSchema.config.schema.safeParse(config);
+    // Backward compatibility: map legacy `reasoningEnabled` to Google `includeThoughts`.
+    if (normalizedConfig.includeThoughts === undefined && normalizedConfig.reasoningEnabled !== undefined) {
+      normalizedConfig.includeThoughts = normalizedConfig.reasoningEnabled;
+    }
+    delete normalizedConfig.reasoningEnabled;
+
+    const _parsedConfig = this.modelSchema.config.schema.safeParse(normalizedConfig);
     if (!_parsedConfig.success) {
       throw new InvalidConfigError({
         info: `Invalid config for model : '${this.modelName}'`,
@@ -520,8 +530,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       const paramKey = def.param;
       const paramValue = (parsedConfig as ConfigType)[key];
 
-      if (key === "reasoningEnabled") {
-        // Handle reasoningEnabled specially
+      if (key === "includeThoughts") {
         acc.thinkingConfig =
           acc.thinkingConfig && typeof acc.thinkingConfig === "object"
             ? { ...acc.thinkingConfig, includeThoughts: paramValue }

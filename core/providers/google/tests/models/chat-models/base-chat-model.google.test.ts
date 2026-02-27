@@ -281,10 +281,10 @@ describe("BaseChatModel", () => {
       });
     });
 
-    // ReasoningEnabled tests
-    it("should transform reasoningEnabled: true correctly", () => {
+    // includeThoughts tests
+    it("should transform includeThoughts: true correctly", () => {
       const config2 = Config().parse({
-        reasoningEnabled: true,
+        includeThoughts: true,
       });
 
       expect(model.transformConfig(config2, messages, tools)).toEqual({
@@ -296,9 +296,9 @@ describe("BaseChatModel", () => {
       });
     });
 
-    it("should transform reasoningEnabled: false correctly", () => {
+    it("should transform includeThoughts: false correctly", () => {
       const config = Config().parse({
-        reasoningEnabled: false,
+        includeThoughts: false,
       });
       expect(model.transformConfig(config, messages, tools)).toEqual({
         generation_config: {
@@ -309,7 +309,20 @@ describe("BaseChatModel", () => {
       });
     });
 
-    it("should not include thinkingConfig when reasoningEnabled is not provided", () => {
+    it("should map legacy reasoningEnabled to includeThoughts for backwards compatibility", () => {
+      const config = Config().parse({
+        reasoningEnabled: true,
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          thinkingConfig: {
+            includeThoughts: true,
+          },
+        },
+      });
+    });
+
+    it("should not include thinkingConfig when includeThoughts is not provided", () => {
       const config = Config().parse({
         temperature: 0.5, // Add another config to ensure generation_config is not empty
       });
@@ -321,11 +334,11 @@ describe("BaseChatModel", () => {
       });
     });
 
-    it("should transform reasoningEnabled along with other configs", () => {
+    it("should transform includeThoughts along with other configs", () => {
       const config = Config().parse({
         temperature: 0.5,
         maxTokens: 100,
-        reasoningEnabled: true,
+        includeThoughts: true,
       });
       expect(model.transformConfig(config, messages, tools)).toEqual({
         generation_config: {
@@ -333,6 +346,32 @@ describe("BaseChatModel", () => {
           maxOutputTokens: 100,
           thinkingConfig: {
             includeThoughts: true,
+          },
+        },
+      });
+    });
+
+    it("should transform reasoningEffort: MINIMAL correctly", () => {
+      const config = Config().parse({
+        reasoningEffort: "MINIMAL",
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          thinkingConfig: {
+            thinkingLevel: "MINIMAL",
+          },
+        },
+      });
+    });
+
+    it("should transform reasoningEffort: MEDIUM correctly", () => {
+      const config = Config().parse({
+        reasoningEffort: "MEDIUM",
+      });
+      expect(model.transformConfig(config, messages, tools)).toEqual({
+        generation_config: {
+          thinkingConfig: {
+            thinkingLevel: "MEDIUM",
           },
         },
       });

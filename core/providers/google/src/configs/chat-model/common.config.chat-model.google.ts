@@ -151,11 +151,11 @@ const safetySettings = PairedSelectConfigItem({
   uniqueByField: "category",
 });
 
-const reasoningEnabled = SelectBooleanConfigItem({
-  param: "reasoningEnabled",
-  title: "Reasoning Enabled",
+const includeThoughts = SelectBooleanConfigItem({
+  param: "includeThoughts",
+  title: "Include Thoughts",
   description:
-    "Controls whether the model is allowed to think for a longer period of time before generating a response. This can be useful for complex tasks that require more time to think.",
+    "Controls whether the model returns thought content in the response payload.",
   default: false,
 });
 
@@ -176,7 +176,7 @@ const reasoningEffort = SelectStringConfigItem({
   description:
     "Controls the depth of the model's reasoning process. Higher levels may result in more thorough reasoning but use more tokens.",
   default: "LOW",
-  choices: ["LOW", "HIGH"],
+  choices: ["MINIMAL", "LOW", "MEDIUM", "HIGH"],
 });
 
 const googleSearchTool = SelectBooleanConfigItem({
@@ -193,10 +193,10 @@ export {
   GOOGLE_SAFETY_THRESHOLD_OPTIONS,
   frequencyPenalty,
   googleSearchTool,
+  includeThoughts,
   maxReasoningTokens,
   maxTokens,
   presencePenalty,
-  reasoningEnabled,
   safetySettings,
   seed,
   stop,
