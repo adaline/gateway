@@ -1,5 +1,13 @@
 # @adaline/groq
 
+## 1.11.3
+
+### Patch Changes
+
+- e98e85e: bump rollup to >=4.59.0 to resolve CVE (Arbitrary File Write via Path Traversal)
+- Updated dependencies [e98e85e]
+  - @adaline/openai@1.18.2
+
 ## 1.11.2
 
 ### Patch Changes

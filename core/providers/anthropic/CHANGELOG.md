@@ -1,5 +1,11 @@
 # @adaline/anthropic
 
+## 1.13.2
+
+### Patch Changes
+
+- e98e85e: bump rollup to >=4.59.0 to resolve CVE (Arbitrary File Write via Path Traversal)
+
 ## 1.13.1
 
 ### Patch Changes

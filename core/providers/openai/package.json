@@ -1,6 +1,6 @@
 {
   "name": "@adaline/openai",
-  "version": "1.18.1",
+  "version": "1.18.2",
   "license": "MIT",
   "sideEffects": false,
   "private": false,
