@@ -94,7 +94,7 @@ type GoogleChatToolConfigType = z.infer<typeof GoogleChatToolConfig>;
 const GoogleChatThinkingConfig = z.object({
   thinkingBudget: z.number().optional(),
   includeThoughts: z.boolean().optional(),
-  thinkingLevel: z.enum(["LOW", "HIGH"]).optional(),
+  thinkingLevel: z.enum(["MINIMAL", "LOW", "MEDIUM", "HIGH"]).optional(),
 });
 type GoogleChatThinkingConfigType = z.infer<typeof GoogleChatThinkingConfig>;
 

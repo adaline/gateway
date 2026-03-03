@@ -176,7 +176,7 @@ const reasoningEffort = SelectStringConfigItem({
   description:
     "Controls the depth of the model's reasoning process. Higher levels may result in more thorough reasoning but use more tokens.",
   default: "LOW",
-  choices: ["LOW", "HIGH"],
+  choices: ["MINIMAL", "LOW", "MEDIUM", "HIGH"],
 });
 
 const googleSearchTool = SelectBooleanConfigItem({
