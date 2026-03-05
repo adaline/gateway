@@ -27,8 +27,12 @@ import {
   Config,
   ConfigType,
   ContentType,
+  createPartialReasoningMessage,
+  createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createReasoningContent,
+  createRedactedReasoningContent,
   createTextContent,
   createToolCallContent,
   ImageModalityLiteral,
@@ -670,6 +674,19 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         },
       ];
       const message = parsedResponse.choices[0].message;
+
+      if (message.reasoning_details) {
+        for (const detail of message.reasoning_details) {
+          if (detail.type === "reasoning.summary") {
+            messages[0].content.push(createReasoningContent(detail.summary, ""));
+          } else if (detail.type === "reasoning.encrypted") {
+            messages[0].content.push(createRedactedReasoningContent(detail.data));
+          } else if (detail.type === "reasoning.text") {
+            messages[0].content.push(createReasoningContent(detail.text ?? "", detail.signature ?? ""));
+          }
+        }
+      }
+
       if (message.content) {
         messages[0].content.push(createTextContent(message.content));
       }
@@ -816,7 +833,20 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             if (parsedResponse.choices.length > 0) {
               const message = parsedResponse.choices[0].delta;
               if (message !== undefined && Object.keys(message).length !== 0) {
-                if ("content" in message && message.content !== null) {
+                if ("reasoning_details" in message && message.reasoning_details !== undefined) {
+                  for (const detail of message.reasoning_details) {
+                    if (detail.type === "reasoning.summary") {
+                      partialResponse.partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, detail.summary));
+                    } else if (detail.type === "reasoning.encrypted") {
+                      partialResponse.partialMessages.push(createPartialRedactedReasoningMessage(AssistantRoleLiteral, detail.data));
+                    } else if (detail.type === "reasoning.text") {
+                      partialResponse.partialMessages.push(
+                        createPartialReasoningMessage(AssistantRoleLiteral, detail.text ?? undefined, detail.signature ?? undefined)
+                      );
+                    }
+                  }
+                }
+                if ("content" in message && message.content !== null && message.content !== undefined && message.content !== "") {
                   partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.content as string));
                 } else if ("refusal" in message && message.refusal !== null) {
                   partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.refusal as string));

@@ -5,6 +5,8 @@ import {
   logProbs,
   maxTokens,
   presencePenalty,
+  responseFormatWithSchema,
+  responseSchema,
   seed,
   stop,
   temperature,
@@ -25,6 +27,8 @@ const ChatModelBaseConfigSchema = (maxOutputTokens: number, maxSequences: number
     logProbs: logProbs.schema,
     topLogProbs: topLogProbs.schema,
     toolChoice: toolChoice.schema,
+    responseFormat: responseFormatWithSchema.schema,
+    responseSchema: responseSchema.schema,
   });
 
 const ChatModelBaseConfigDef = (maxOutputTokens: number, maxSequences: number) =>
@@ -39,6 +43,8 @@ const ChatModelBaseConfigDef = (maxOutputTokens: number, maxSequences: number) =
     logProbs: logProbs.def,
     topLogProbs: topLogProbs.def,
     toolChoice: toolChoice.def,
+    responseFormat: responseFormatWithSchema.def,
+    responseSchema: responseSchema.def,
   }) as const;
 
 export { ChatModelBaseConfigDef, ChatModelBaseConfigSchema };
