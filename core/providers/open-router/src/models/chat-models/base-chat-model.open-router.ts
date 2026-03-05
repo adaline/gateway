@@ -675,7 +675,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       ];
       const message = parsedResponse.choices[0].message;
 
-      if (message.reasoning_details) {
+      if (message.reasoning_details && message.reasoning_details.length > 0) {
         for (const detail of message.reasoning_details) {
           if (detail.type === "reasoning.summary") {
             messages[0].content.push(createReasoningContent(detail.summary, ""));
@@ -685,6 +685,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             messages[0].content.push(createReasoningContent(detail.text ?? "", detail.signature ?? ""));
           }
         }
+      } else if (message.reasoning) {
+        messages[0].content.push(createReasoningContent(message.reasoning, ""));
       }
 
       if (message.content) {
@@ -833,7 +835,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             if (parsedResponse.choices.length > 0) {
               const message = parsedResponse.choices[0].delta;
               if (message !== undefined && Object.keys(message).length !== 0) {
-                if ("reasoning_details" in message && message.reasoning_details !== undefined) {
+                if ("reasoning_details" in message && message.reasoning_details !== undefined && message.reasoning_details.length > 0) {
                   for (const detail of message.reasoning_details) {
                     if (detail.type === "reasoning.summary") {
                       partialResponse.partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, detail.summary));
@@ -845,6 +847,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                       );
                     }
                   }
+                } else if ("reasoning" in message && message.reasoning) {
+                  partialResponse.partialMessages.push(createPartialReasoningMessage(AssistantRoleLiteral, message.reasoning));
                 }
                 if ("content" in message && message.content !== null && message.content !== undefined && message.content !== "") {
                   partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, message.content as string));
