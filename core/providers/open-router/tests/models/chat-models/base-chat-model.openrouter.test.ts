@@ -1,11 +1,20 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { ChatModelSchema, ChatModelSchemaType, InvalidMessagesError, InvalidToolsError, ModelResponseError } from "@adaline/provider";
+import {
+  ChatModelSchema,
+  ChatModelSchemaType,
+  InvalidConfigError,
+  InvalidMessagesError,
+  InvalidToolsError,
+  ModelResponseError,
+} from "@adaline/provider";
 import {
   AssistantRoleLiteral,
   ChatResponseType,
   Config,
+  createPartialReasoningMessage,
+  createPartialRedactedReasoningMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
   ImageModalityLiteral,
@@ -2014,6 +2023,403 @@ describe("BaseChatModel", () => {
           }
         }
       });
+    });
+  });
+
+  describe("transformConfig - response format and schema", () => {
+    let model: BaseChatModel;
+    let messages: MessageType[];
+
+    beforeEach(() => {
+      model = new BaseChatModel(mockModelSchema, mockOptions);
+      messages = [];
+    });
+
+    it("should transform responseFormat 'text' to { type: 'text' }", () => {
+      const config = Config().parse({
+        responseFormat: "text",
+      });
+      const result = model.transformConfig(config, messages);
+      expect(result.response_format).toEqual({ type: "text" });
+    });
+
+    it("should transform responseFormat 'json_object' to { type: 'json_object' }", () => {
+      const config = Config().parse({
+        responseFormat: "json_object",
+      });
+      const result = model.transformConfig(config, messages);
+      expect(result.response_format).toEqual({ type: "json_object" });
+    });
+
+    it("should transform responseFormat 'json_schema' with a valid responseSchema", () => {
+      const schema = {
+        name: "test_schema",
+        description: "A test schema",
+        strict: true,
+        schema: {
+          type: "object" as const,
+          required: ["name"],
+          properties: {
+            name: { type: "string" as const },
+            age: { type: "number" as const },
+          },
+          additionalProperties: false as const,
+        },
+      };
+      const config = Config().parse({
+        responseFormat: "json_schema",
+        responseSchema: schema,
+      });
+      const result = model.transformConfig(config, messages);
+      expect(result.response_format).toEqual({
+        type: "json_schema",
+        json_schema: schema,
+      });
+      expect(result.response_schema).toBeUndefined();
+    });
+
+    it("should throw InvalidConfigError when responseFormat is 'json_schema' but responseSchema is missing", () => {
+      const config = Config().parse({
+        responseFormat: "json_schema",
+      });
+      expect(() => model.transformConfig(config, messages)).toThrow(InvalidConfigError);
+      try {
+        model.transformConfig(config, messages);
+      } catch (e: any) {
+        expect(e).toBeInstanceOf(InvalidConfigError);
+        expect(e.cause.message).toContain("'responseSchema' is required in config when 'responseFormat' is 'json_schema'");
+      }
+    });
+
+    it("should throw an error when responseFormat is an invalid value", () => {
+      const config = Config().parse({
+        responseFormat: "invalid_format",
+      });
+      expect(() => model.transformConfig(config, messages)).toThrow();
+    });
+
+    it("should include responseFormat alongside other config params", () => {
+      const config = Config().parse({
+        temperature: 0.5,
+        maxTokens: 1000,
+        responseFormat: "json_object",
+      });
+      const result = model.transformConfig(config, messages);
+      expect(result.temperature).toBe(0.5);
+      expect(result.max_tokens).toBe(1000);
+      expect(result.response_format).toEqual({ type: "json_object" });
+    });
+  });
+
+  describe("transformStreamChatResponseChunk - reasoning_details", () => {
+    let model: BaseChatModel;
+
+    beforeEach(() => {
+      model = new BaseChatModel(mockModelSchema, mockOptions);
+    });
+
+    it("should process a chunk with reasoning.summary details", async () => {
+      const chunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"x-ai/grok-4.1-fast","choices":[{"index":0,"delta":{"content":"","role":"assistant","reasoning":null,"reasoning_details":[{"type":"reasoning.summary","summary":"The user wants","format":"xai-responses-v1","index":0}]},"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialReasoningMessage(AssistantRoleLiteral, "The user wants"),
+      ]);
+    });
+
+    it("should process a chunk with reasoning.encrypted details", async () => {
+      const chunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"x-ai/grok-4.1-fast","choices":[{"index":0,"delta":{"content":"","role":"assistant","reasoning":null,"reasoning_details":[{"type":"reasoning.encrypted","data":"encrypted_data_blob","format":"xai-responses-v1","id":"rs_abc","index":0}]},"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialRedactedReasoningMessage(AssistantRoleLiteral, "encrypted_data_blob"),
+      ]);
+    });
+
+    it("should process a chunk with reasoning.text details", async () => {
+      const chunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"test-model","choices":[{"index":0,"delta":{"content":"","reasoning_details":[{"type":"reasoning.text","text":"Let me think about this","signature":"sig_123"}]},"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialReasoningMessage(AssistantRoleLiteral, "Let me think about this", "sig_123"),
+      ]);
+    });
+
+    it("should not emit empty text message when content is empty string during reasoning", async () => {
+      const chunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"test-model","choices":[{"index":0,"delta":{"content":"","reasoning_details":[{"type":"reasoning.summary","summary":"thinking","format":"xai-responses-v1","index":0}]},"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages[0]).toEqual(
+        createPartialReasoningMessage(AssistantRoleLiteral, "thinking")
+      );
+    });
+
+    it("should process regular content chunks after reasoning chunks", async () => {
+      const reasoningChunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"test-model","choices":[{"index":0,"delta":{"content":"","reasoning_details":[{"type":"reasoning.summary","summary":"Planning","format":"xai-responses-v1","index":0}]},"finish_reason":null}]}\n';
+      const contentChunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"test-model","choices":[{"index":0,"delta":{"content":"Hello world"},"finish_reason":null}]}\n';
+      const combined = reasoningChunk + contentChunk;
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(combined, ""));
+
+      expect(results).toHaveLength(3);
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialReasoningMessage(AssistantRoleLiteral, "Planning"),
+      ]);
+      expect(results[1].partialResponse.partialMessages).toEqual([
+        createPartialTextMessage(AssistantRoleLiteral, "Hello world"),
+      ]);
+    });
+
+    it("should handle streaming chunks without logprobs field", async () => {
+      const chunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"x-ai/grok-4.1-fast","choices":[{"index":0,"delta":{"content":"Hello"},"finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialTextMessage(AssistantRoleLiteral, "Hello"),
+      ]);
+    });
+
+    it("should handle OpenRouter processing comments mixed with reasoning chunks", async () => {
+      const chunk =
+        ': OPENROUTER PROCESSING\n' +
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"test-model","choices":[{"index":0,"delta":{"content":"","reasoning_details":[{"type":"reasoning.summary","summary":"Thinking hard","format":"xai-responses-v1","index":0}]},"finish_reason":null}]}\n' +
+        ': OPENROUTER PROCESSING\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialReasoningMessage(AssistantRoleLiteral, "Thinking hard"),
+      ]);
+    });
+
+    it("should handle chunk with provider field (extra fields stripped by Zod)", async () => {
+      const chunk =
+        'data: {"id":"gen-123","object":"chat.completion.chunk","created":1772643268,"model":"x-ai/grok-4.1-fast","provider":"xAI","choices":[{"index":0,"delta":{"content":"test","role":"assistant"},"finish_reason":null,"native_finish_reason":null}]}\n';
+      const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+
+      expect(results).toHaveLength(2);
+      expect(results[0].partialResponse.partialMessages).toEqual([
+        createPartialTextMessage(AssistantRoleLiteral, "test"),
+      ]);
+    });
+  });
+
+  describe("transformCompleteChatResponse - reasoning_details", () => {
+    let model: BaseChatModel;
+
+    beforeEach(() => {
+      model = new BaseChatModel(mockModelSchema, mockOptions);
+    });
+
+    it("should transform a response with reasoning.summary details", () => {
+      const response = {
+        id: "gen-123",
+        object: "chat.completion",
+        created: 1772643268,
+        model: "x-ai/grok-4.1-fast",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "The answer is 42.",
+              reasoning_details: [
+                { type: "reasoning.summary" as const, summary: "The user asked about the meaning of life", format: "xai-responses-v1", index: 0 },
+              ],
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(2);
+      expect(result.messages[0].content[0].modality).toBe("reasoning");
+      expect(result.messages[0].content[1].modality).toBe("text");
+      expect((result.messages[0].content[1] as any).value).toBe("The answer is 42.");
+    });
+
+    it("should transform a response with reasoning.encrypted details", () => {
+      const response = {
+        id: "gen-123",
+        object: "chat.completion",
+        created: 1772643268,
+        model: "x-ai/grok-4.1-fast",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "Here is my answer.",
+              reasoning_details: [
+                { type: "reasoning.encrypted" as const, data: "encrypted_blob_data", format: "xai-responses-v1", id: "rs_123", index: 0 },
+              ],
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(2);
+      expect(result.messages[0].content[0].modality).toBe("reasoning");
+      expect(result.messages[0].content[1].modality).toBe("text");
+    });
+
+    it("should transform a response with reasoning.text details", () => {
+      const response = {
+        id: "gen-123",
+        object: "chat.completion",
+        created: 1772643268,
+        model: "test-model",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "Final answer.",
+              reasoning_details: [
+                { type: "reasoning.text" as const, text: "Step 1: analyze. Step 2: conclude.", signature: "sig_abc" },
+              ],
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(2);
+      expect(result.messages[0].content[0].modality).toBe("reasoning");
+      expect(result.messages[0].content[1].modality).toBe("text");
+    });
+
+    it("should transform a response with multiple reasoning_details", () => {
+      const response = {
+        id: "gen-123",
+        object: "chat.completion",
+        created: 1772643268,
+        model: "test-model",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "Result.",
+              reasoning_details: [
+                { type: "reasoning.summary" as const, summary: "Summary of thinking" },
+                { type: "reasoning.encrypted" as const, data: "encrypted_data" },
+              ],
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(3);
+      expect(result.messages[0].content[0].modality).toBe("reasoning");
+      expect(result.messages[0].content[1].modality).toBe("reasoning");
+      expect(result.messages[0].content[2].modality).toBe("text");
+    });
+
+    it("should handle a response without reasoning_details (backward compat)", () => {
+      const response = {
+        id: "gen-123",
+        object: "chat.completion",
+        created: 1772643268,
+        model: "test-model",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "Plain response.",
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(1);
+      expect(result.messages[0].content[0].modality).toBe("text");
+      expect((result.messages[0].content[0] as any).value).toBe("Plain response.");
+    });
+
+    it("should handle a response with reasoning_details but no text content", () => {
+      const response = {
+        id: "gen-123",
+        object: "chat.completion",
+        created: 1772643268,
+        model: "test-model",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: null,
+              reasoning_details: [
+                { type: "reasoning.summary" as const, summary: "Thinking only, no final answer yet" },
+              ],
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(1);
+      expect(result.messages[0].content[0].modality).toBe("reasoning");
+    });
+
+    it("should handle a response without logprobs field in choices", () => {
+      const response = {
+        id: "gen-123",
+        object: "chat.completion",
+        created: 1772643268,
+        model: "x-ai/grok-4.1-fast",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "No logprobs here.",
+            },
+            finish_reason: "stop",
+          },
+        ],
+        usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(1);
+      expect((result.messages[0].content[0] as any).value).toBe("No logprobs here.");
+      expect(result.logProbs).toEqual([]);
     });
   });
 

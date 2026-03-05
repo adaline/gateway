@@ -1,4 +1,5 @@
-import { CHAT_CONFIG, MultiStringConfigItem, RangeConfigItem, SelectBooleanConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import { CHAT_CONFIG, MultiStringConfigItem, ObjectSchemaConfigItem, RangeConfigItem, SelectBooleanConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import { ResponseSchema } from "@adaline/types";
 
 const temperature = RangeConfigItem({
   param: "temperature",
@@ -145,6 +146,21 @@ const responseFormat = SelectStringConfigItem({
   choices: ["text", "json_object"],
 });
 
+const responseFormatWithSchema = SelectStringConfigItem({
+  param: "response_format",
+  title: CHAT_CONFIG.RESPONSE_FORMAT_WITH_SCHEMA.title,
+  description: CHAT_CONFIG.RESPONSE_FORMAT_WITH_SCHEMA.description,
+  default: "text",
+  choices: ["text", "json_object", "json_schema"],
+});
+
+const responseSchema = ObjectSchemaConfigItem({
+  param: "response_schema",
+  title: CHAT_CONFIG.RESPONSE_SCHEMA.title,
+  description: CHAT_CONFIG.RESPONSE_SCHEMA.description,
+  objectSchema: ResponseSchema,
+});
+
 export {
   frequencyPenalty,
   logProbs,
@@ -161,4 +177,6 @@ export {
   topK,
   minP,
   responseFormat,
+  responseFormatWithSchema,
+  responseSchema,
 };

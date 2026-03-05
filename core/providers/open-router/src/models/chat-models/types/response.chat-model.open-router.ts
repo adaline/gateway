@@ -25,6 +25,31 @@ const OpenRouterLogProb = z
   })
   .nullable();
 
+const OpenRouterReasoningDetail = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("reasoning.summary"),
+    summary: z.string(),
+    id: z.string().nullable().optional(),
+    format: z.string().nullable().optional(),
+    index: z.number().optional(),
+  }),
+  z.object({
+    type: z.literal("reasoning.encrypted"),
+    data: z.string(),
+    id: z.string().nullable().optional(),
+    format: z.string().nullable().optional(),
+    index: z.number().optional(),
+  }),
+  z.object({
+    type: z.literal("reasoning.text"),
+    text: z.string().nullable().optional(),
+    signature: z.string().nullable().optional(),
+    id: z.string().nullable().optional(),
+    format: z.string().nullable().optional(),
+    index: z.number().optional(),
+  }),
+]);
+
 const OpenRouterToolCallsCompleteChatResponse = z.array(
   z.object({
     id: z.string().min(1),
@@ -50,6 +75,8 @@ const OpenRouterCompleteChatResponse = z.object({
         content: z.string().nullable().optional(),
         tool_calls: OpenRouterToolCallsCompleteChatResponse.optional(),
         refusal: z.string().nullable().optional(),
+        reasoning: z.string().nullable().optional(),
+        reasoning_details: z.array(OpenRouterReasoningDetail).optional(),
       }),
       logprobs: OpenRouterLogProb.optional(),
       finish_reason: z.string().nullable().optional(),
@@ -91,12 +118,15 @@ const OpenRouterStreamChatResponse = z.object({
       index: z.number(),
       delta: z
         .object({
+          role: z.string().optional(),
           content: z.string().nullable().optional(),
           tool_calls: OpenRouterToolCallsStreamChatResponse.optional(),
           refusal: z.string().nullable().optional(),
+          reasoning: z.string().nullable().optional(),
+          reasoning_details: z.array(OpenRouterReasoningDetail).optional(),
         })
         .or(z.object({})),
-      logprobs: OpenRouterLogProb,
+      logprobs: OpenRouterLogProb.optional(),
       finish_reason: z.string().nullable().optional(),
     })
   ),
