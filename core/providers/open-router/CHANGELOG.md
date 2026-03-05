@@ -1,5 +1,11 @@
 # @adaline/open-router
 
+## 1.11.0
+
+### Minor Changes
+
+- 5e36c27: Add reasoning modality support, response format with json_schema support
+
 ## 1.10.1
 
 ### Patch Changes
