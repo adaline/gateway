@@ -51,3 +51,6 @@ pegasus-*.json
 isolate
 .next
 tools/gateway-experiments
+
+# Claude Code
+.claude/worktrees/
