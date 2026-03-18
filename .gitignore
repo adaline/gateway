@@ -54,3 +54,6 @@ tools/gateway-experiments
 
 # Claude Code
 .claude/worktrees/
+.claude/projects/
+.claude/settings.local.json
+.claude/agent-memory-local/
