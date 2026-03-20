@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm run test)",
+      "Bash(pnpm run lint)",
+      "Bash(pnpm run format)",
+      "Bash(pnpm run clean)",
+      "Bash(pnpm run dev)",
+      "Bash(pnpm run test:watch)",
+      "Bash(pnpm run changeset)",
+      "Bash(npx turbo run *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git fetch *)",
+      "Bash(git stash *)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf *)",
+      "Bash(pnpm run release*)",
+      "Bash(changeset publish*)"
+    ]
+  }
+}
