@@ -33,6 +33,8 @@ import {
   SearchResultGoogleContentValueType,
   SearchResultGoogleTypeLiteral,
   SearchResultModalityLiteral,
+  SearchResultOpenAIContentValueType,
+  SearchResultOpenAITypeLiteral,
   TextContent,
   TextModalityLiteral,
   ToolCallContent,
@@ -382,6 +384,50 @@ const createPartialSearchResultGoogleMessage = (
   });
 };
 
+const createSearchResultOpenAIContent = (query: string, responses: SearchResultOpenAIContentValueType["responses"], references: SearchResultOpenAIContentValueType["references"]): ContentType => {
+  return SearchResultContent().parse({
+    modality: SearchResultModalityLiteral,
+    value: {
+      type: SearchResultOpenAITypeLiteral,
+      query,
+      responses,
+      references,
+    },
+  });
+};
+
+const createPartialSearchResultOpenAIContent = (query?: string, responses?: SearchResultOpenAIContentValueType["responses"], references?: SearchResultOpenAIContentValueType["references"]): PartialContentType => {
+  return PartialSearchResultContent().parse({
+    modality: PartialSearchResultModalityLiteral,
+    value: {
+      type: SearchResultOpenAITypeLiteral,
+      query: query,
+      responses: responses,
+      references: references,
+    },
+  });
+};
+
+const createPartialSearchResultOpenAIMessage = (
+  role: RoleEnumType,
+  query?: string,
+  responses?: SearchResultOpenAIContentValueType["responses"],
+  references?: SearchResultOpenAIContentValueType["references"]
+): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialSearchResultContent().parse({
+      modality: PartialSearchResultModalityLiteral,
+      value: {
+        type: SearchResultOpenAITypeLiteral,
+        query: query,
+        responses: responses,
+        references: references,
+      },
+    }),
+  });
+};
+
 export {
   createBase64ImageMessage,
   createPartialReasoningMessage,
@@ -390,6 +436,8 @@ export {
   createPartialSafetyErrorMessage,
   createPartialSearchResultGoogleContent,
   createPartialSearchResultGoogleMessage,
+  createPartialSearchResultOpenAIContent,
+  createPartialSearchResultOpenAIMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
   createPartialToolResponseMessage,
@@ -399,6 +447,7 @@ export {
   createRedactedReasoningMessage,
   createSafetyErrorContent,
   createSearchResultGoogleContent,
+  createSearchResultOpenAIContent,
   createTextContent,
   createTextMessage,
   createToolCallContent,
