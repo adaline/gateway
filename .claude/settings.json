@@ -11,6 +11,10 @@
       "Bash(pnpm run test:watch)",
       "Bash(pnpm run changeset)",
       "Bash(npx turbo run *)",
+      "Bash(npx prettier --write *)",
+      "Bash(npx eslint --fix *)",
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
       "Bash(git status)",
       "Bash(git diff *)",
       "Bash(git log *)",
@@ -27,6 +31,41 @@
       "Bash(rm -rf *)",
       "Bash(pnpm run release*)",
       "Bash(changeset publish*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | grep -E '\\.(ts|tsx|js|jsx|json|css|md|mdx)$' | head -1 | xargs -I{} npx prettier --write '{}' 2>/dev/null; exit 0"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | grep -qE '(\\.env|package-lock\\.json|pnpm-lock\\.yaml|\\.production)' && (echo 'BLOCKED: Protected file' >&2; exit 2) || exit 0"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude needs your input\" with title \"Gateway\"' 2>/dev/null || true"
+          }
+        ]
+      }
     ]
   }
 }
