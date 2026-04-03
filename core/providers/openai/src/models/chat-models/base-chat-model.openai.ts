@@ -29,6 +29,7 @@ import {
   ContentType,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createSearchResultOpenAIContent,
   createTextContent,
   createToolCallContent,
   ImageModalityLiteral,
@@ -454,6 +455,23 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
+    // Handle web_search_options construction
+    if ("webSearch" in transformedConfig) {
+      if (transformedConfig.webSearch === true) {
+        const webSearchOptions: Record<string, unknown> = {};
+        if ("webSearchContextSize" in transformedConfig && transformedConfig.webSearchContextSize) {
+          webSearchOptions.search_context_size = transformedConfig.webSearchContextSize;
+        }
+        if ("webSearchUserLocation" in transformedConfig && transformedConfig.webSearchUserLocation) {
+          webSearchOptions.user_location = transformedConfig.webSearchUserLocation;
+        }
+        transformedConfig.web_search_options = webSearchOptions;
+      }
+      delete transformedConfig.webSearch;
+      delete transformedConfig.webSearchContextSize;
+      delete transformedConfig.webSearchUserLocation;
+    }
+
     return transformedConfig;
   }
 
@@ -707,6 +725,32 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         message.tool_calls.forEach((toolCall, index) => {
           messages[0].content.push(createToolCallContent(index, toolCall.id, toolCall.function.name, toolCall.function.arguments));
         });
+      }
+
+      if (message.annotations && message.annotations.length > 0) {
+        const urlMap = new Map<string, number>();
+        const responses: { source: string; url: string; title: string }[] = [];
+        const references: { text: string; responseIndices: number[]; startIndex?: number; endIndex?: number }[] = [];
+
+        for (const annotation of message.annotations) {
+          const citation = annotation.url_citation;
+          if (!urlMap.has(citation.url)) {
+            urlMap.set(citation.url, responses.length);
+            responses.push({
+              source: "web",
+              url: citation.url,
+              title: citation.title,
+            });
+          }
+          references.push({
+            text: "",
+            responseIndices: [urlMap.get(citation.url)!],
+            startIndex: citation.start_index,
+            endIndex: citation.end_index,
+          });
+        }
+
+        messages[0].content.push(createSearchResultOpenAIContent("", responses, references));
       }
 
       const usage: ChatUsageType = {
