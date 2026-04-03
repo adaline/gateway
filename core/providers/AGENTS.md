@@ -10,7 +10,7 @@ These packages implement provider-specific model catalogs and request/response b
 
 ## Standard Layout
 
-- `src/configs/`: model config objects
+- `src/configs/`: model config objects (present in providers that define shared config schemas; omitted by some providers such as `azure` and `custom`)
 - `src/models/`: model schemas and model catalog exports
 - `src/provider/`: provider class implementation
 
