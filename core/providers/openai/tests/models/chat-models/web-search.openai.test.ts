@@ -45,7 +45,7 @@ describe("OpenAI Web Search", () => {
 
   // --- Config Tests ---
   describe("web search config", () => {
-    it("should have webSearchTool, webSearchContextSize, and webSearchUserLocation config keys", () => {
+    it("should have webSearchTool and webSearchContextSize config keys", () => {
       const configDef = OpenAIChatModelConfigs.webSearch(16384, 4).def;
       expect(configDef.webSearchTool).toBeDefined();
       expect(configDef.webSearchTool.type).toBe("select-boolean");
@@ -55,10 +55,6 @@ describe("OpenAI Web Search", () => {
       expect(configDef.webSearchContextSize.type).toBe("select-string");
       expect(configDef.webSearchContextSize.param).toBe("webSearchContextSize");
       expect(configDef.webSearchContextSize.choices).toEqual(["low", "medium", "high"]);
-
-      expect(configDef.webSearchUserLocation).toBeDefined();
-      expect(configDef.webSearchUserLocation.type).toBe("object-schema");
-      expect(configDef.webSearchUserLocation.param).toBe("webSearchUserLocation");
     });
 
     it("should validate valid web search config", () => {
@@ -79,22 +75,6 @@ describe("OpenAI Web Search", () => {
       expect(result.success).toBe(false);
     });
 
-    it("should validate user_location object", () => {
-      const schema = OpenAIChatModelConfigs.webSearch(16384, 4).schema;
-      const result = schema.safeParse({
-        webSearchTool: true,
-        webSearchUserLocation: {
-          type: "approximate",
-          approximate: {
-            city: "San Francisco",
-            country: "US",
-            region: "California",
-            timezone: "America/Los_Angeles",
-          },
-        },
-      });
-      expect(result.success).toBe(true);
-    });
   });
 
   // --- transformConfig Tests ---
@@ -119,31 +99,6 @@ describe("OpenAI Web Search", () => {
       expect(result.webSearchContextSize).toBeUndefined();
     });
 
-    it("should include user_location in web_search_options", () => {
-      const result = model.transformConfig({
-        webSearchTool: true,
-        webSearchContextSize: "medium",
-        webSearchUserLocation: {
-          type: "approximate",
-          approximate: {
-            city: "London",
-            country: "GB",
-          },
-        },
-      });
-
-      expect(result.web_search_options).toEqual({
-        search_context_size: "medium",
-        user_location: {
-          type: "approximate",
-          approximate: {
-            city: "London",
-            country: "GB",
-          },
-        },
-      });
-    });
-
     it("should not include web_search_options when webSearchTool is false", () => {
       const result = model.transformConfig({
         webSearchTool: false,
@@ -152,7 +107,6 @@ describe("OpenAI Web Search", () => {
       expect(result.web_search_options).toBeUndefined();
       expect(result.webSearch).toBeUndefined();
       expect(result.webSearchContextSize).toBeUndefined();
-      expect(result.webSearchUserLocation).toBeUndefined();
     });
   });
 

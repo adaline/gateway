@@ -1,6 +1,4 @@
-import { z } from "zod";
-
-import { CHAT_CONFIG, MultiStringConfigItem, ObjectSchemaConfigItem, RangeConfigItem, SelectBooleanConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import { CHAT_CONFIG, MultiStringConfigItem, RangeConfigItem, SelectBooleanConfigItem, SelectStringConfigItem } from "@adaline/provider";
 
 const temperature = RangeConfigItem({
   param: "temperature",
@@ -130,19 +128,4 @@ const webSearchContextSize = SelectStringConfigItem({
   choices: ["low", "medium", "high"],
 });
 
-const webSearchUserLocation = ObjectSchemaConfigItem({
-  param: "webSearchUserLocation",
-  title: "Web Search User Location",
-  description: "Approximate location parameters for the web search. Helps tailor results to a geographic area.",
-  objectSchema: z.object({
-    type: z.literal("approximate"),
-    approximate: z.object({
-      city: z.string().optional(),
-      country: z.string().optional(),
-      region: z.string().optional(),
-      timezone: z.string().optional(),
-    }),
-  }),
-});
-
-export { frequencyPenalty, logProbs, maxTokens, presencePenalty, reasoningEffort, seed, stop, temperature, toolChoice, topLogProbs, topP, verbosity, webSearchContextSize, webSearchTool, webSearchUserLocation };
+export { frequencyPenalty, logProbs, maxTokens, presencePenalty, reasoningEffort, seed, stop, temperature, toolChoice, topLogProbs, topP, verbosity, webSearchContextSize, webSearchTool };

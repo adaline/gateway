@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"git add core/providers/openai/src/models/chat-models/base-chat-model.openai.ts core/providers/openai/tests/models/chat-models/web-search.openai.test.ts && git commit -m \\\"$(cat <<'EOF'\\nfi...",
+  "error": "Exit code 128\nwarning: could not open directory 'core/providers/openai/core/providers/openai/': No such file or directory\nfatal: pathspec 'core/providers/openai/src/models/chat-models/base-chat-model.openai.ts' did not match any files",
+  "timestamp": "2026-04-06T04:03:58.289Z",
+  "retry_count": 1
+}

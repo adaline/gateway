@@ -455,21 +455,17 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // Handle web_search_options construction
+    // Handle web_search_options construction — only include when explicitly enabled
     if ("webSearch" in transformedConfig) {
       if (transformedConfig.webSearch === true) {
         const webSearchOptions: Record<string, unknown> = {};
         if ("webSearchContextSize" in transformedConfig && transformedConfig.webSearchContextSize) {
           webSearchOptions.search_context_size = transformedConfig.webSearchContextSize;
         }
-        if ("webSearchUserLocation" in transformedConfig && transformedConfig.webSearchUserLocation) {
-          webSearchOptions.user_location = transformedConfig.webSearchUserLocation;
-        }
         transformedConfig.web_search_options = webSearchOptions;
       }
       delete transformedConfig.webSearch;
       delete transformedConfig.webSearchContextSize;
-      delete transformedConfig.webSearchUserLocation;
     }
 
     return transformedConfig;
