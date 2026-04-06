@@ -1,5 +1,13 @@
 # @adaline/together-ai
 
+## 1.10.2
+
+### Patch Changes
+
+- Updated dependencies [3cab885]
+  - @adaline/types@1.13.0
+  - @adaline/provider@1.10.1
+
 ## 1.10.1
 
 ### Patch Changes

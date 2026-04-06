@@ -1,5 +1,14 @@
 # @adaline/bedrock
 
+## 2.6.3
+
+### Patch Changes
+
+- Updated dependencies [3cab885]
+  - @adaline/types@1.13.0
+  - @adaline/anthropic@1.13.3
+  - @adaline/provider@1.10.1
+
 ## 2.6.2
 
 ### Patch Changes

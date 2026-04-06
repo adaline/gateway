@@ -1,5 +1,17 @@
 # @adaline/openai
 
+## 1.19.0
+
+### Minor Changes
+
+- 3cab885: Add web_search_options to OpenAI Provider
+
+### Patch Changes
+
+- Updated dependencies [3cab885]
+  - @adaline/types@1.13.0
+  - @adaline/provider@1.10.1
+
 ## 1.18.2
 
 ### Patch Changes
