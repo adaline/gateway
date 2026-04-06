@@ -411,14 +411,21 @@ describe("OpenAI Web Search", () => {
       expect(result.success).toBe(true);
     });
 
-    it("should reject invalid type", () => {
-      const result = SearchResultOpenAIContentValue.safeParse({
+    it("should accept any type string or no type", () => {
+      const withType = SearchResultOpenAIContentValue.safeParse({
         type: "google",
         query: "",
         responses: [],
         references: [],
       });
-      expect(result.success).toBe(false);
+      expect(withType.success).toBe(true);
+
+      const withoutType = SearchResultOpenAIContentValue.safeParse({
+        query: "",
+        responses: [],
+        references: [],
+      });
+      expect(withoutType.success).toBe(true);
     });
 
     it("should require responses and references arrays", () => {
