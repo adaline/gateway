@@ -1,5 +1,15 @@
 # @adaline/vertex
 
+## 1.14.2
+
+### Patch Changes
+
+- 5b21690: Remove the redundant 'type' union on 'search-result' modality, not a discriminanted union anynmore
+- Updated dependencies [5b21690]
+  - @adaline/types@1.14.0
+  - @adaline/google@1.17.5
+  - @adaline/provider@1.10.2
+
 ## 1.14.1
 
 ### Patch Changes

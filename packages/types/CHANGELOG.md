@@ -1,5 +1,11 @@
 # @adaline/types
 
+## 1.14.0
+
+### Minor Changes
+
+- 5b21690: Remove the redundant 'type' union on 'search-result' modality, not a discriminanted union anynmore
+
 ## 1.13.0
 
 ### Minor Changes
