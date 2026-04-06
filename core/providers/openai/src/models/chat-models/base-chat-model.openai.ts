@@ -29,7 +29,7 @@ import {
   ContentType,
   createPartialTextMessage,
   createPartialToolCallMessage,
-  createSearchResultOpenAIContent,
+  createSearchResultContent,
   createTextContent,
   createToolCallContent,
   ImageModalityLiteral,
@@ -749,7 +749,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           });
         }
 
-        messages[0].content.push(createSearchResultOpenAIContent("", responses, references));
+        messages[0].content.push(createSearchResultContent("openai", "", responses, references));
       }
 
       const usage: ChatUsageType = {
