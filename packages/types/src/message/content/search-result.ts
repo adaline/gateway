@@ -70,37 +70,15 @@ const PartialSearchResultContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Met
   });
 type PartialSearchResultContentType<M extends z.ZodTypeAny = z.ZodUndefined> = z.infer<ReturnType<typeof PartialSearchResultContent<M>>>;
 
-// Backward-compat aliases
-const SearchResultGoogleTypeLiteral = "google" as const;
-const SearchResultOpenAITypeLiteral = "openai" as const;
-const SearchResultGoogleContentValue = SearchResultContentValue;
-type SearchResultGoogleContentValueType = SearchResultContentValueType;
-const SearchResultOpenAIContentValue = SearchResultContentValue;
-type SearchResultOpenAIContentValueType = SearchResultContentValueType;
-const PartialSearchResultGoogleContentValue = PartialSearchResultContentValue;
-type PartialSearchResultGoogleContentValueType = PartialSearchResultContentValueType;
-const PartialSearchResultOpenAIContentValue = PartialSearchResultContentValue;
-type PartialSearchResultOpenAIContentValueType = PartialSearchResultContentValueType;
-
 export {
   PartialSearchResultModalityLiteral,
   PartialSearchResultContent,
   PartialSearchResultContentValue,
-  PartialSearchResultGoogleContentValue,
-  PartialSearchResultOpenAIContentValue,
   SearchResultModalityLiteral,
   SearchResultContent,
   SearchResultContentValue,
-  SearchResultGoogleTypeLiteral,
-  SearchResultGoogleContentValue,
-  SearchResultOpenAITypeLiteral,
-  SearchResultOpenAIContentValue,
   type SearchResultContentType,
   type SearchResultContentValueType,
-  type SearchResultGoogleContentValueType,
-  type SearchResultOpenAIContentValueType,
   type PartialSearchResultContentType,
   type PartialSearchResultContentValueType,
-  type PartialSearchResultGoogleContentValueType,
-  type PartialSearchResultOpenAIContentValueType,
 };

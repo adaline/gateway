@@ -30,11 +30,8 @@ import {
   RoleEnumType,
   SafetyErrorTypeLiteral,
   SearchResultContent,
-  SearchResultGoogleContentValueType,
-  SearchResultGoogleTypeLiteral,
+  SearchResultContentValueType,
   SearchResultModalityLiteral,
-  SearchResultOpenAIContentValueType,
-  SearchResultOpenAITypeLiteral,
   TextContent,
   TextModalityLiteral,
   ToolCallContent,
@@ -51,7 +48,14 @@ const createTextContent = (content: string): ContentType => {
   });
 };
 
-const createToolCallContent = (index: number, id: string, name: string, args: string, serverName?: string, thoughtSignature?: string): ContentType => {
+const createToolCallContent = (
+  index: number,
+  id: string,
+  name: string,
+  args: string,
+  serverName?: string,
+  thoughtSignature?: string
+): ContentType => {
   return ToolCallContent().parse({
     modality: ToolCallModalityLiteral,
     index: index,
@@ -126,7 +130,14 @@ const createBase64ImageMessage = (role: RoleEnumType, base64: string, detail: Im
   });
 };
 
-const createToolCallMessage = (role: RoleEnumType, index: number, id: string, name: string, args: string, thoughtSignature?: string): MessageType => {
+const createToolCallMessage = (
+  role: RoleEnumType,
+  index: number,
+  id: string,
+  name: string,
+  args: string,
+  thoughtSignature?: string
+): MessageType => {
   return Message().parse({
     role: role,
     content: [
@@ -305,7 +316,12 @@ const createSafetyErrorContent = (category: string, probability: string, blocked
   });
 };
 
-const createPartialSafetyErrorContent = (category?: string, probability?: string, blocked?: boolean, message?: string): PartialContentType => {
+const createPartialSafetyErrorContent = (
+  category?: string,
+  probability?: string,
+  blocked?: boolean,
+  message?: string
+): PartialContentType => {
   return PartialErrorContent().parse({
     modality: PartialErrorModalityLiteral,
     value: {
@@ -340,90 +356,42 @@ const createPartialSafetyErrorMessage = (
   });
 };
 
-const createSearchResultGoogleContent = (query: string, responses: SearchResultGoogleContentValueType["responses"], references: SearchResultGoogleContentValueType["references"]): ContentType => {
+const createSearchResultContent = (
+  type: string,
+  query: string,
+  responses: SearchResultContentValueType["responses"],
+  references: SearchResultContentValueType["references"]
+): ContentType => {
   return SearchResultContent().parse({
     modality: SearchResultModalityLiteral,
-    value: {
-      type: SearchResultGoogleTypeLiteral,
-      query,
-      responses,
-      references,
-    },
+    value: { type, query, responses, references },
   });
 };
 
-const createPartialSearchResultGoogleContent = (query?: string, responses?: SearchResultGoogleContentValueType["responses"], references?: SearchResultGoogleContentValueType["references"]): PartialContentType => {
+const createPartialSearchResultContent = (
+  type: string,
+  query?: string,
+  responses?: SearchResultContentValueType["responses"],
+  references?: SearchResultContentValueType["references"]
+): PartialContentType => {
   return PartialSearchResultContent().parse({
     modality: PartialSearchResultModalityLiteral,
-    value: {
-      type: SearchResultGoogleTypeLiteral,
-      query: query,
-      responses: responses,
-      references: references,
-    },
+    value: { type, query, responses, references },
   });
 };
 
-const createPartialSearchResultGoogleMessage = (
+const createPartialSearchResultMessage = (
+  type: string,
   role: RoleEnumType,
   query?: string,
-  responses?: SearchResultGoogleContentValueType["responses"],
-  references?: SearchResultGoogleContentValueType["references"]
+  responses?: SearchResultContentValueType["responses"],
+  references?: SearchResultContentValueType["references"]
 ): PartialMessageType => {
   return PartialMessage().parse({
     role: role,
     partialContent: PartialSearchResultContent().parse({
       modality: PartialSearchResultModalityLiteral,
-      value: {
-        type: SearchResultGoogleTypeLiteral,
-        query: query,
-        responses: responses,
-        references: references,
-      },
-    }),
-  });
-};
-
-const createSearchResultOpenAIContent = (query: string, responses: SearchResultOpenAIContentValueType["responses"], references: SearchResultOpenAIContentValueType["references"]): ContentType => {
-  return SearchResultContent().parse({
-    modality: SearchResultModalityLiteral,
-    value: {
-      type: SearchResultOpenAITypeLiteral,
-      query,
-      responses,
-      references,
-    },
-  });
-};
-
-const createPartialSearchResultOpenAIContent = (query?: string, responses?: SearchResultOpenAIContentValueType["responses"], references?: SearchResultOpenAIContentValueType["references"]): PartialContentType => {
-  return PartialSearchResultContent().parse({
-    modality: PartialSearchResultModalityLiteral,
-    value: {
-      type: SearchResultOpenAITypeLiteral,
-      query: query,
-      responses: responses,
-      references: references,
-    },
-  });
-};
-
-const createPartialSearchResultOpenAIMessage = (
-  role: RoleEnumType,
-  query?: string,
-  responses?: SearchResultOpenAIContentValueType["responses"],
-  references?: SearchResultOpenAIContentValueType["references"]
-): PartialMessageType => {
-  return PartialMessage().parse({
-    role: role,
-    partialContent: PartialSearchResultContent().parse({
-      modality: PartialSearchResultModalityLiteral,
-      value: {
-        type: SearchResultOpenAITypeLiteral,
-        query: query,
-        responses: responses,
-        references: references,
-      },
+      value: { type, query, responses, references },
     }),
   });
 };
@@ -434,10 +402,8 @@ export {
   createPartialRedactedReasoningMessage,
   createPartialSafetyErrorContent,
   createPartialSafetyErrorMessage,
-  createPartialSearchResultGoogleContent,
-  createPartialSearchResultGoogleMessage,
-  createPartialSearchResultOpenAIContent,
-  createPartialSearchResultOpenAIMessage,
+  createPartialSearchResultContent,
+  createPartialSearchResultMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
   createPartialToolResponseMessage,
@@ -446,8 +412,7 @@ export {
   createRedactedReasoningContent,
   createRedactedReasoningMessage,
   createSafetyErrorContent,
-  createSearchResultGoogleContent,
-  createSearchResultOpenAIContent,
+  createSearchResultContent,
   createTextContent,
   createTextMessage,
   createToolCallContent,

@@ -28,12 +28,12 @@ import {
   ContentType,
   createPartialReasoningMessage,
   createPartialSafetyErrorMessage,
-  createPartialSearchResultGoogleMessage,
+  createPartialSearchResultMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
   createReasoningContent,
   createSafetyErrorContent,
-  createSearchResultGoogleContent,
+  createSearchResultContent,
   createTextContent,
   createToolCallContent,
   ImageContentType,
@@ -140,9 +140,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     if (responseData && typeof responseData === "object") {
       const data = responseData as { error?: { details?: Array<{ "@type"?: string; retryDelay?: string }> } };
       if (data.error?.details && Array.isArray(data.error.details)) {
-        const retryInfo = data.error.details.find(
-          (detail) => detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo"
-        );
+        const retryInfo = data.error.details.find((detail) => detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo");
         if (retryInfo?.retryDelay) {
           delayMs = parseDuration(retryInfo.retryDelay);
         }
@@ -1056,7 +1054,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           completeChatResponse.messages.push({
             role: AssistantRoleLiteral,
             content: [
-              createSearchResultGoogleContent(
+              createSearchResultContent(
+                "google",
                 candidate.groundingMetadata.webSearchQueries?.[0] || "",
                 candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
                   source: chunk.web ? "web" : "",
@@ -1075,7 +1074,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           });
         } else {
           completeChatResponse.messages[0].content.push(
-            createSearchResultGoogleContent(
+            createSearchResultContent(
+              "google",
               candidate.groundingMetadata.webSearchQueries?.[0] || "",
               candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
                 source: chunk.web ? "web" : "",
@@ -1261,7 +1261,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           const candidate = parsedResponse.candidates[0];
           if (candidate.groundingMetadata) {
             partialResponse.partialMessages.push(
-              createPartialSearchResultGoogleMessage(
+              createPartialSearchResultMessage(
+                "google",
                 AssistantRoleLiteral,
                 candidate.groundingMetadata.webSearchQueries?.[0] || "",
                 candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
@@ -1402,7 +1403,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               const candidate = parsedResponse.candidates[0];
               if (candidate.groundingMetadata) {
                 partialResponse.partialMessages.push(
-                  createPartialSearchResultGoogleMessage(
+                  createPartialSearchResultMessage(
+                    "google",
                     AssistantRoleLiteral,
                     candidate.groundingMetadata.webSearchQueries?.[0] || "",
                     candidate.groundingMetadata.groundingChunks?.map((chunk) => ({

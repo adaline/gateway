@@ -2,12 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { z } from "zod";
 
 import { ChatModelSchema, ChatModelSchemaType } from "@adaline/provider";
-import {
-  AssistantRoleLiteral,
-  SearchResultModalityLiteral,
-  SearchResultOpenAIContentValue,
-  SearchResultOpenAITypeLiteral,
-} from "@adaline/types";
+import { AssistantRoleLiteral, SearchResultContentValue, SearchResultModalityLiteral } from "@adaline/types";
 
 import { OpenAI } from "../../../src";
 import { OpenAIChatModelConfigs } from "../../../src/configs";
@@ -200,7 +195,7 @@ describe("OpenAI Web Search", () => {
       // Second content is search-result
       const searchResult = result.messages[0].content[1];
       expect(searchResult.modality).toBe(SearchResultModalityLiteral);
-      expect(searchResult.value.type).toBe(SearchResultOpenAITypeLiteral);
+      expect(searchResult.value.type).toBe("openai");
       expect(searchResult.value.query).toBe("");
       expect(searchResult.value.responses).toHaveLength(2);
       expect(searchResult.value.responses[0]).toEqual({
@@ -400,9 +395,9 @@ describe("OpenAI Web Search", () => {
   });
 
   // --- Zod Schema Tests ---
-  describe("SearchResultOpenAIContentValue schema", () => {
+  describe("SearchResultContentValue schema", () => {
     it("should validate a valid OpenAI search result", () => {
-      const result = SearchResultOpenAIContentValue.safeParse({
+      const result = SearchResultContentValue.safeParse({
         type: "openai",
         query: "",
         responses: [{ source: "web", url: "https://example.com", title: "Example" }],
@@ -412,7 +407,7 @@ describe("OpenAI Web Search", () => {
     });
 
     it("should accept any type string or no type", () => {
-      const withType = SearchResultOpenAIContentValue.safeParse({
+      const withType = SearchResultContentValue.safeParse({
         type: "google",
         query: "",
         responses: [],
@@ -420,7 +415,7 @@ describe("OpenAI Web Search", () => {
       });
       expect(withType.success).toBe(true);
 
-      const withoutType = SearchResultOpenAIContentValue.safeParse({
+      const withoutType = SearchResultContentValue.safeParse({
         query: "",
         responses: [],
         references: [],
@@ -429,7 +424,7 @@ describe("OpenAI Web Search", () => {
     });
 
     it("should require responses and references arrays", () => {
-      const result = SearchResultOpenAIContentValue.safeParse({
+      const result = SearchResultContentValue.safeParse({
         type: "openai",
         query: "",
       });
