@@ -1262,8 +1262,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           if (candidate.groundingMetadata) {
             partialResponse.partialMessages.push(
               createPartialSearchResultMessage(
-                "google",
                 AssistantRoleLiteral,
+                "google",
                 candidate.groundingMetadata.webSearchQueries?.[0] || "",
                 candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
                   source: chunk.web ? "web" : "",
@@ -1404,8 +1404,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               if (candidate.groundingMetadata) {
                 partialResponse.partialMessages.push(
                   createPartialSearchResultMessage(
-                    "google",
                     AssistantRoleLiteral,
+                    "google",
                     candidate.groundingMetadata.webSearchQueries?.[0] || "",
                     candidate.groundingMetadata.groundingChunks?.map((chunk) => ({
                       source: chunk.web ? "web" : "",

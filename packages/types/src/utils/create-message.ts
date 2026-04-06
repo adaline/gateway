@@ -381,8 +381,8 @@ const createPartialSearchResultContent = (
 };
 
 const createPartialSearchResultMessage = (
-  type: string,
   role: RoleEnumType,
+  type: string,
   query?: string,
   responses?: SearchResultContentValueType["responses"],
   references?: SearchResultContentValueType["references"]
