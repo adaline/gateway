@@ -723,7 +723,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         });
       }
 
-      if (message.annotations && message.annotations.length > 0) {
+      if (message.content && message.annotations && message.annotations.length > 0) {
         const urlMap = new Map<string, number>();
         const responses: { source: string; url: string; title: string }[] = [];
         const references: { text: string; responseIndices: number[]; startIndex?: number; endIndex?: number }[] = [];

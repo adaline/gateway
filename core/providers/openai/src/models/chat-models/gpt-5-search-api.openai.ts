@@ -9,8 +9,7 @@ import { OpenAIChatModelRoles, OpenAIChatModelRolesMap, OpenAIChatModelWebSearch
 
 const GPT_5_Search_ApiLiteral = "gpt-5-search-api";
 const GPT_5_Search_ApiDescription =
-  "GPT-5 model optimized for web search. Retrieves information from the web before responding to queries. \
-  Does not support reasoning_effort, verbosity, or sampling parameters.";
+  "GPT-5 model optimized for web search. Retrieves information from the web before responding to queries.";
 
 const GPT_5_Search_ApiSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWebSearchModalitiesEnum).parse({
   name: GPT_5_Search_ApiLiteral,

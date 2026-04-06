@@ -108,6 +108,18 @@ describe("OpenAI Web Search", () => {
       expect(result.webSearch).toBeUndefined();
       expect(result.webSearchContextSize).toBeUndefined();
     });
+
+    it("should not leak webSearchContextSize when webSearchTool is false", () => {
+      const result = model.transformConfig({
+        webSearchTool: false,
+        webSearchContextSize: "high",
+      });
+
+      expect(result.web_search_options).toBeUndefined();
+      expect(result.webSearch).toBeUndefined();
+      expect(result.webSearchContextSize).toBeUndefined();
+      expect(result.search_context_size).toBeUndefined();
+    });
   });
 
   // --- transformCompleteChatResponse Tests ---
@@ -255,6 +267,49 @@ describe("OpenAI Web Search", () => {
       // Only text content, no search-result
       expect(result.messages[0].content).toHaveLength(1);
       expect(result.messages[0].content[0].modality).toBe("text");
+    });
+
+    it("should skip annotations when content is null", () => {
+      const response = {
+        id: "chatcmpl-null",
+        object: "chat.completion" as const,
+        created: 1677652288,
+        model: "gpt-4o-search-preview",
+        system_fingerprint: "fp_search",
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: null,
+              annotations: [
+                {
+                  type: "url_citation" as const,
+                  url_citation: {
+                    start_index: 0,
+                    end_index: 5,
+                    title: "Example",
+                    url: "https://example.com",
+                  },
+                },
+              ],
+            },
+            logprobs: null,
+            finish_reason: "stop",
+          },
+        ],
+        usage: {
+          prompt_tokens: 9,
+          completion_tokens: 0,
+          total_tokens: 9,
+        },
+      };
+
+      const result = model.transformCompleteChatResponse(response);
+
+      expect(result.messages).toHaveLength(1);
+      // No text content (null), no search-result (skipped due to null content)
+      expect(result.messages[0].content).toHaveLength(0);
     });
 
     it("should handle response with no annotations field", () => {
