@@ -56,4 +56,4 @@ tools/gateway-experiments
 .claude/worktrees/
 .claude/projects/
 .claude/settings.local.json
-.claude/agent-memory-local/
+.claude/agent-memory-local/.omc/

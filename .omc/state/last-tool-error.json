@@ -1,7 +1,0 @@
-{
-  "tool_name": "WebFetch",
-  "tool_input_preview": "{\"url\":\"https://platform.openai.com/docs/models/gpt-4o-search-preview\",\"prompt\":\"List ALL models that support web search in the Chat Completions API. Include model IDs, context windows, max output tok...",
-  "error": "Request failed with status code 403",
-  "timestamp": "2026-04-06T04:55:50.319Z",
-  "retry_count": 1
-}
