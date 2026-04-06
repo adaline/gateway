@@ -203,8 +203,8 @@ describe("OpenAI Web Search", () => {
         {
           type: "url_citation",
           url_citation: {
-            start_index: 68,
-            end_index: 71,
+            start_index: 71,
+            end_index: 74,
             title: "Paris Population",
             url: "https://worldpopulationreview.com/cities/paris",
           },
@@ -238,18 +238,21 @@ describe("OpenAI Web Search", () => {
         title: "Paris Population",
       });
       expect(searchResult.value.references).toHaveLength(2);
-      expect(searchResult.value.references[0]).toEqual({
-        text: "",
+      expect(searchResult.value.references[0]).toMatchObject({
         responseIndices: [0],
         startIndex: 31,
         endIndex: 34,
       });
-      expect(searchResult.value.references[1]).toEqual({
-        text: "",
+      // prefixStart = max(0, 31-40) = 0, so no "..." prefix
+      expect(searchResult.value.references[0].text).toBe("Paris is the capital of France [1]");
+
+      expect(searchResult.value.references[1]).toMatchObject({
         responseIndices: [1],
-        startIndex: 68,
-        endIndex: 71,
+        startIndex: 71,
+        endIndex: 74,
       });
+      // prefixStart = max(0, 71-40) = 31, so has "..." prefix
+      expect(searchResult.value.references[1].text).toMatch(/^\.\.\..*\[2\]$/);
     });
 
     it("should deduplicate URLs in responses", () => {

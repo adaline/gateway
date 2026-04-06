@@ -742,8 +742,15 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               title: citation.title,
             });
           }
+          const prefixChars = 40;
+          const prefixStart = Math.max(0, citation.start_index - prefixChars);
+          const citationText = message.content
+            ? (prefixStart > 0 ? "..." : "") +
+              message.content.slice(prefixStart, citation.end_index)
+            : "";
+
           references.push({
-            text: "",
+            text: citationText,
             responseIndices: [urlMap.get(citation.url)!],
             startIndex: citation.start_index,
             endIndex: citation.end_index,
