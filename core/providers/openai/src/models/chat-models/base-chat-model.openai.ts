@@ -456,17 +456,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     }
 
     // Handle web_search_options construction — only include when explicitly enabled
-    if ("webSearch" in transformedConfig) {
-      if (transformedConfig.webSearch === true) {
-        const webSearchOptions: Record<string, unknown> = {};
-        if ("webSearchContextSize" in transformedConfig && transformedConfig.webSearchContextSize) {
-          webSearchOptions.search_context_size = transformedConfig.webSearchContextSize;
-        }
-        transformedConfig.web_search_options = webSearchOptions;
+    if ("webSearch" in transformedConfig && transformedConfig.webSearch === true) {
+      const webSearchOptions: Record<string, unknown> = {};
+      if ("webSearchContextSize" in transformedConfig && transformedConfig.webSearchContextSize) {
+        webSearchOptions.search_context_size = transformedConfig.webSearchContextSize;
       }
-      delete transformedConfig.webSearch;
-      delete transformedConfig.webSearchContextSize;
+      transformedConfig.web_search_options = webSearchOptions;
     }
+    // Always clean up internal web search keys to prevent leaking to API
+    delete transformedConfig.webSearch;
+    delete transformedConfig.webSearchContextSize;
 
     return transformedConfig;
   }
@@ -508,9 +507,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Filter out error and search-result modalities from all messages (these are output-only modalities)
     parsedMessages.forEach((message) => {
-      message.content = message.content.filter(
-        (content) => content.modality !== "error" && content.modality !== "search-result"
-      );
+      message.content = message.content.filter((content) => content.modality !== "error" && content.modality !== "search-result");
     });
 
     const transformedMessages = parsedMessages.map((message) => {
@@ -741,8 +738,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           const prefixChars = 40;
           const prefixStart = Math.max(0, citation.start_index - prefixChars);
           const citationText = message.content
-            ? (prefixStart > 0 ? "..." : "") +
-              message.content.slice(prefixStart, citation.end_index)
+            ? (prefixStart > 0 ? "..." : "") + message.content.slice(prefixStart, citation.end_index)
             : "";
 
           references.push({

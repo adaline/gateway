@@ -9,9 +9,9 @@ import {
   SearchResultOpenAITypeLiteral,
 } from "@adaline/types";
 
+import { OpenAI } from "../../../src";
 import { OpenAIChatModelConfigs } from "../../../src/configs";
 import { BaseChatModel } from "../../../src/models";
-import { OpenAI } from "../../../src";
 
 describe("OpenAI Web Search", () => {
   const mockRoles = ["system", "user", "assistant", "tool"] as const;
@@ -74,7 +74,6 @@ describe("OpenAI Web Search", () => {
       });
       expect(result.success).toBe(false);
     });
-
   });
 
   // --- transformConfig Tests ---
@@ -107,6 +106,17 @@ describe("OpenAI Web Search", () => {
       expect(result.web_search_options).toBeUndefined();
       expect(result.webSearch).toBeUndefined();
       expect(result.webSearchContextSize).toBeUndefined();
+    });
+
+    it("should not leak webSearchContextSize when webSearchTool is omitted", () => {
+      const result = model.transformConfig({
+        webSearchContextSize: "high",
+      });
+
+      expect(result.web_search_options).toBeUndefined();
+      expect(result.webSearch).toBeUndefined();
+      expect(result.webSearchContextSize).toBeUndefined();
+      expect(result.search_context_size).toBeUndefined();
     });
 
     it("should not leak webSearchContextSize when webSearchTool is false", () => {
@@ -395,12 +405,8 @@ describe("OpenAI Web Search", () => {
       const result = SearchResultOpenAIContentValue.safeParse({
         type: "openai",
         query: "",
-        responses: [
-          { source: "web", url: "https://example.com", title: "Example" },
-        ],
-        references: [
-          { text: "", responseIndices: [0], startIndex: 0, endIndex: 10 },
-        ],
+        responses: [{ source: "web", url: "https://example.com", title: "Example" }],
+        references: [{ text: "", responseIndices: [0], startIndex: 0, endIndex: 10 }],
       });
       expect(result.success).toBe(true);
     });
