@@ -590,5 +590,85 @@
         }
       }
     ]
+  },
+  "gpt-4o-search-preview": {
+    "modelName": "gpt-4o-search-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
+  "gpt-4o-search-preview-2025-03-11": {
+    "modelName": "gpt-4o-search-preview-2025-03-11",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
+  "gpt-4o-mini-search-preview": {
+    "modelName": "gpt-4o-mini-search-preview",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 2.4
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5-search-api": {
+    "modelName": "gpt-5-search-api",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
+  "gpt-4o-mini-search-preview-2025-03-11": {
+    "modelName": "gpt-4o-mini-search-preview-2025-03-11",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 2.4
+          }
+        }
+      }
+    ]
   }
 }

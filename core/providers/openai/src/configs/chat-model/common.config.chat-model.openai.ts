@@ -113,4 +113,19 @@ const verbosity = SelectStringConfigItem({
   choices: ["low", "medium", "high"],
 });
 
-export { frequencyPenalty, logProbs, maxTokens, presencePenalty, reasoningEffort, seed, stop, temperature, toolChoice, topLogProbs, topP, verbosity };
+const webSearchTool = SelectBooleanConfigItem({
+  param: "webSearch",
+  title: "Web Search Tool",
+  description: "Controls whether the model searches the web for relevant results before responding.",
+  default: false,
+});
+
+const webSearchContextSize = SelectStringConfigItem({
+  param: "webSearchContextSize",
+  title: "Web Search Context Size",
+  description: "High level guidance for the amount of context window space to use for the search.",
+  default: "medium",
+  choices: ["low", "medium", "high"],
+});
+
+export { frequencyPenalty, logProbs, maxTokens, presencePenalty, reasoningEffort, seed, stop, temperature, toolChoice, topLogProbs, topP, verbosity, webSearchContextSize, webSearchTool };

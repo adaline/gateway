@@ -29,6 +29,7 @@ import {
   ContentType,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createSearchResultOpenAIContent,
   createTextContent,
   createToolCallContent,
   ImageModalityLiteral,
@@ -454,6 +455,18 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
+    // Handle web_search_options construction — only include when explicitly enabled
+    if ("webSearch" in transformedConfig && transformedConfig.webSearch === true) {
+      const webSearchOptions: Record<string, unknown> = {};
+      if ("webSearchContextSize" in transformedConfig && transformedConfig.webSearchContextSize) {
+        webSearchOptions.search_context_size = transformedConfig.webSearchContextSize;
+      }
+      transformedConfig.web_search_options = webSearchOptions;
+    }
+    // Always clean up internal web search keys to prevent leaking to API
+    delete transformedConfig.webSearch;
+    delete transformedConfig.webSearchContextSize;
+
     return transformedConfig;
   }
 
@@ -494,9 +507,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Filter out error and search-result modalities from all messages (these are output-only modalities)
     parsedMessages.forEach((message) => {
-      message.content = message.content.filter(
-        (content) => content.modality !== "error" && content.modality !== "search-result"
-      );
+      message.content = message.content.filter((content) => content.modality !== "error" && content.modality !== "search-result");
     });
 
     const transformedMessages = parsedMessages.map((message) => {
@@ -707,6 +718,38 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         message.tool_calls.forEach((toolCall, index) => {
           messages[0].content.push(createToolCallContent(index, toolCall.id, toolCall.function.name, toolCall.function.arguments));
         });
+      }
+
+      if (message.content && message.annotations && message.annotations.length > 0) {
+        const urlMap = new Map<string, number>();
+        const responses: { source: string; url: string; title: string }[] = [];
+        const references: { text: string; responseIndices: number[]; startIndex?: number; endIndex?: number }[] = [];
+
+        for (const annotation of message.annotations) {
+          const citation = annotation.url_citation;
+          if (!urlMap.has(citation.url)) {
+            urlMap.set(citation.url, responses.length);
+            responses.push({
+              source: "web",
+              url: citation.url,
+              title: citation.title,
+            });
+          }
+          const prefixChars = 40;
+          const prefixStart = Math.max(0, citation.start_index - prefixChars);
+          const citationText = message.content
+            ? (prefixStart > 0 ? "..." : "") + message.content.slice(prefixStart, citation.end_index)
+            : "";
+
+          references.push({
+            text: citationText,
+            responseIndices: [urlMap.get(citation.url)!],
+            startIndex: citation.start_index,
+            endIndex: citation.end_index,
+          });
+        }
+
+        messages[0].content.push(createSearchResultOpenAIContent("", responses, references));
       }
 
       const usage: ChatUsageType = {

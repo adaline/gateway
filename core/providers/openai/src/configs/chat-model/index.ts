@@ -4,4 +4,4 @@ export * from "./gpt5.config.chat-model.openai";
 export * from "./o-series.config.chat-model.openai";
 export * from "./response-format.config.chat-model.openai";
 export * from "./response-schema.config.chat-model.openai";
-
+export * from "./web-search.config.chat-model.openai";

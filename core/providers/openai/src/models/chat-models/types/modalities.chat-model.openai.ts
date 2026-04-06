@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ChatModelSchemaType } from "@adaline/provider";
-import { ImageModalityLiteral, TextModalityLiteral, ToolCallModalityLiteral, ToolResponseModalityLiteral } from "@adaline/types";
+import { ImageModalityLiteral, SearchResultModalityLiteral, TextModalityLiteral, ToolCallModalityLiteral, ToolResponseModalityLiteral } from "@adaline/types";
 
 const OpenAIChatModelModalities: ChatModelSchemaType["modalities"] = [
   TextModalityLiteral,
@@ -29,6 +29,22 @@ const OpenAIChatModelTextToolModalities: ChatModelSchemaType["modalities"] = [
 
 const OpenAIChatModelTextToolModalitiesEnum = z.enum([TextModalityLiteral, ToolCallModalityLiteral, ToolResponseModalityLiteral]);
 
+const OpenAIChatModelWebSearchModalities: ChatModelSchemaType["modalities"] = [
+  TextModalityLiteral,
+  ImageModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  SearchResultModalityLiteral,
+];
+
+const OpenAIChatModelWebSearchModalitiesEnum = z.enum([
+  TextModalityLiteral,
+  ImageModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  SearchResultModalityLiteral,
+]);
+
 export {
   OpenAIChatModelModalitiesEnum,
   OpenAIChatModelModalities,
@@ -36,4 +52,6 @@ export {
   OpenAIChatModelTextModalities,
   OpenAIChatModelTextToolModalitiesEnum,
   OpenAIChatModelTextToolModalities,
+  OpenAIChatModelWebSearchModalitiesEnum,
+  OpenAIChatModelWebSearchModalities,
 };

@@ -158,6 +158,31 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.ChatGPT_4o_LatestOptions,
       modelSchema: Models.ChatGPT_4o_LatestSchema,
     },
+    [Models.GPT_4o_Search_PreviewLiteral]: {
+      model: Models.GPT_4o_Search_Preview,
+      modelOptions: Models.GPT_4o_Search_PreviewOptions,
+      modelSchema: Models.GPT_4o_Search_PreviewSchema,
+    },
+    [Models.GPT_4o_Search_Preview_2025_03_11Literal]: {
+      model: Models.GPT_4o_Search_Preview_2025_03_11,
+      modelOptions: Models.GPT_4o_Search_Preview_2025_03_11Options,
+      modelSchema: Models.GPT_4o_Search_Preview_2025_03_11Schema,
+    },
+    [Models.GPT_4o_Mini_Search_PreviewLiteral]: {
+      model: Models.GPT_4o_Mini_Search_Preview,
+      modelOptions: Models.GPT_4o_Mini_Search_PreviewOptions,
+      modelSchema: Models.GPT_4o_Mini_Search_PreviewSchema,
+    },
+    [Models.GPT_4o_Mini_Search_Preview_2025_03_11Literal]: {
+      model: Models.GPT_4o_Mini_Search_Preview_2025_03_11,
+      modelOptions: Models.GPT_4o_Mini_Search_Preview_2025_03_11Options,
+      modelSchema: Models.GPT_4o_Mini_Search_Preview_2025_03_11Schema,
+    },
+    [Models.GPT_5_Search_ApiLiteral]: {
+      model: Models.GPT_5_Search_Api,
+      modelOptions: Models.GPT_5_Search_ApiOptions,
+      modelSchema: Models.GPT_5_Search_ApiSchema,
+    },
     [Models.GPT_4o_Mini_2024_07_18Literal]: {
       model: Models.GPT_4o_Mini_2024_07_18,
       modelOptions: Models.GPT_4o_Mini_2024_07_18Options,

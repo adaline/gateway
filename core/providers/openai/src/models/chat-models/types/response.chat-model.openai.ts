@@ -52,6 +52,19 @@ const OpenAICompleteChatResponse = z.object({
         content: z.string().nullable().optional(),
         tool_calls: OpenAIToolCallsCompleteChatResponse.optional(),
         refusal: z.string().nullable().optional(),
+        annotations: z
+          .array(
+            z.object({
+              type: z.literal("url_citation"),
+              url_citation: z.object({
+                start_index: z.number(),
+                end_index: z.number(),
+                title: z.string(),
+                url: z.string(),
+              }),
+            })
+          )
+          .optional(),
       }),
       logprobs: OpenAILogProb.optional(),
       finish_reason: z.string(),
