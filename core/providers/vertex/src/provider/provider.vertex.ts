@@ -115,6 +115,11 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini3_1ProPreviewOptions,
       modelSchema: Models.Gemini3_1ProPreviewSchema,
     },
+    [Models.Gemini3_1ProPreviewCustomtoolsLiteral]: {
+      model: Models.Gemini3_1ProPreviewCustomtools,
+      modelOptions: Models.Gemini3_1ProPreviewCustomtoolsOptions,
+      modelSchema: Models.Gemini3_1ProPreviewCustomtoolsSchema,
+    },
     [Models.Gemini3ProPreviewLiteral]: {
       model: Models.Gemini3ProPreview,
       modelOptions: Models.Gemini3ProPreviewOptions,

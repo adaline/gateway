@@ -1,5 +1,11 @@
 # @adaline/vertex
 
+## 1.14.0
+
+### Minor Changes
+
+- 6db4812: Add gemini-3.1-pro-preview-customtools model to Vertex provider with pricing, achieving parity with the Google provider's customtools variant.
+
 ## 1.13.3
 
 ### Patch Changes

@@ -85,7 +85,7 @@ jobs:
         run: |
           git config user.name "Akshay Gulati"
           git config user.email "akshay@adaline.ai"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.GATEWAY_RELEASE }}@github.com/${{ github.repository }}
           git add .
           git commit -m "chore(release): v${{ github.event.inputs.releaseVersion }}"
           git tag v${{ github.event.inputs.releaseVersion }}
@@ -105,17 +105,24 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Push changes
-        run: git push --follow-tags
+      - name: Push tag
+        run: git push origin "v${{ github.event.inputs.releaseVersion }}"
 
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Push version bump via PR
+        run: |
+          RELEASE_BRANCH="release/v${{ github.event.inputs.releaseVersion }}"
+          git checkout -b "$RELEASE_BRANCH"
+          git push origin "$RELEASE_BRANCH"
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "$RELEASE_BRANCH" \
+            --title "chore(release): v${{ github.event.inputs.releaseVersion }}" \
+            --body "Automated version bump to v${{ github.event.inputs.releaseVersion }}")
+          gh pr merge "$PR_URL" --merge --admin --delete-branch
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ github.event.inputs.releaseVersion }}
-          release_name: v${{ github.event.inputs.releaseVersion }}
-          body_path: cxrx.md
-          draft: false
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GATEWAY_RELEASE }}
+
+      - name: Create GitHub release
+        run: gh release create "v${{ github.event.inputs.releaseVersion }}" --notes-file cxrx.md --title "v${{ github.event.inputs.releaseVersion }}"
+        env:
+          GH_TOKEN: ${{ secrets.GATEWAY_RELEASE }}
