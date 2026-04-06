@@ -33,6 +33,7 @@ export * from "./gpt-4o-search-preview.openai";
 export * from "./gpt-4o-search-preview-2025-03-11.openai";
 export * from "./gpt-4o-mini-search-preview.openai";
 export * from "./gpt-4o-mini-search-preview-2025-03-11.openai";
+export * from "./gpt-5-search-api.openai";
 export * from "./chatgpt-4o-latest.openai";
 export * from "./o1-2024-12-17.openai";
 export * from "./o1.openai";

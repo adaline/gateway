@@ -639,6 +639,22 @@
       }
     ]
   },
+  "gpt-5-search-api": {
+    "modelName": "gpt-5-search-api",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
   "gpt-4o-mini-search-preview-2025-03-11": {
     "modelName": "gpt-4o-mini-search-preview-2025-03-11",
     "currency": "USD",

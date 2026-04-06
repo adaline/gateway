@@ -356,6 +356,13 @@ describe("OpenAI Web Search", () => {
       expect(schemas["gpt-4o-mini-search-preview-2025-03-11"]).toBeDefined();
     });
 
+    it("should register gpt-5-search-api model", () => {
+      expect(schemas["gpt-5-search-api"]).toBeDefined();
+      expect(schemas["gpt-5-search-api"].name).toBe("gpt-5-search-api");
+      expect(schemas["gpt-5-search-api"].modalities).toContain(SearchResultModalityLiteral);
+      expect(schemas["gpt-5-search-api"].config.def.webSearchTool).toBeDefined();
+    });
+
     it("should include search-result modality in search-preview models", () => {
       const modalities = schemas["gpt-4o-search-preview"].modalities;
       expect(modalities).toContain(SearchResultModalityLiteral);
