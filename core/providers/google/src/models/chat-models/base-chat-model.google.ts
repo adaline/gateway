@@ -1065,8 +1065,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                 candidate.groundingMetadata.groundingSupports?.map((support) => ({
                   text: support.segment?.text || "",
                   responseIndices: support.groundingChunkIndices || [],
-                  startIndex: support.segment?.startIndex || undefined,
-                  endIndex: support.segment?.endIndex || undefined,
+                  startIndex: support.segment?.startIndex ?? undefined,
+                  endIndex: support.segment?.endIndex ?? undefined,
                   confidenceScores: support.confidenceScores || undefined,
                 })) || []
               ),
@@ -1085,8 +1085,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               candidate.groundingMetadata.groundingSupports?.map((support) => ({
                 text: support.segment?.text || "",
                 responseIndices: support.groundingChunkIndices || [],
-                startIndex: support.segment?.startIndex || undefined,
-                endIndex: support.segment?.endIndex || undefined,
+                startIndex: support.segment?.startIndex ?? undefined,
+                endIndex: support.segment?.endIndex ?? undefined,
                 confidenceScores: support.confidenceScores || undefined,
               })) || []
             )
@@ -1273,8 +1273,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                 candidate.groundingMetadata.groundingSupports?.map((support) => ({
                   text: support.segment?.text || "",
                   responseIndices: support.groundingChunkIndices || [],
-                  startIndex: support.segment?.startIndex || undefined,
-                  endIndex: support.segment?.endIndex || undefined,
+                  startIndex: support.segment?.startIndex ?? undefined,
+                  endIndex: support.segment?.endIndex ?? undefined,
                   confidenceScores: support.confidenceScores || undefined,
                 })) || []
               )
@@ -1415,8 +1415,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                     candidate.groundingMetadata.groundingSupports?.map((support) => ({
                       text: support.segment?.text || "",
                       responseIndices: support.groundingChunkIndices || [],
-                      startIndex: support.segment?.startIndex || undefined,
-                      endIndex: support.segment?.endIndex || undefined,
+                      startIndex: support.segment?.startIndex ?? undefined,
+                      endIndex: support.segment?.endIndex ?? undefined,
                       confidenceScores: support.confidenceScores || undefined,
                     })) || []
                   )
