@@ -1,5 +1,14 @@
 # @adaline/vertex
 
+## 1.14.1
+
+### Patch Changes
+
+- Updated dependencies [3cab885]
+  - @adaline/types@1.13.0
+  - @adaline/google@1.17.4
+  - @adaline/provider@1.10.1
+
 ## 1.14.0
 
 ### Minor Changes
