@@ -1,5 +1,14 @@
 # @adaline/google
 
+## 1.17.6
+
+### Patch Changes
+
+- 48702e8: Fix top dependabot vulnerabilities
+- Updated dependencies [48702e8]
+  - @adaline/provider@1.10.3
+  - @adaline/types@1.14.1
+
 ## 1.17.5
 
 ### Patch Changes

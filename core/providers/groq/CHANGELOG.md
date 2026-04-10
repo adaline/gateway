@@ -1,5 +1,15 @@
 # @adaline/groq
 
+## 1.11.6
+
+### Patch Changes
+
+- 48702e8: Fix top dependabot vulnerabilities
+- Updated dependencies [48702e8]
+  - @adaline/openai@1.20.1
+  - @adaline/provider@1.10.3
+  - @adaline/types@1.14.1
+
 ## 1.11.5
 
 ### Patch Changes

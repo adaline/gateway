@@ -1,5 +1,14 @@
 # @adaline/xai
 
+## 1.3.4
+
+### Patch Changes
+
+- 48702e8: Fix top dependabot vulnerabilities
+- Updated dependencies [48702e8]
+  - @adaline/provider@1.10.3
+  - @adaline/types@1.14.1
+
 ## 1.3.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.14.1
+
+### Patch Changes
+
+- 48702e8: Fix top dependabot vulnerabilities
+
 ## 1.14.0
 
 ### Minor Changes
