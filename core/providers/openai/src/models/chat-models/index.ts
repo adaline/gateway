@@ -16,6 +16,8 @@ export * from "./gpt-5-2-chat-latest.openai";
 export * from "./gpt-5-2-codex.openai";
 export * from "./gpt-5-2-pro.openai";
 export * from "./gpt-5-3-codex.openai";
+export * from "./gpt-5-4.openai";
+export * from "./gpt-5-4-mini.openai";
 export * from "./gpt-5.openai";
 export * from "./gpt-5-mini.openai";
 export * from "./gpt-5-nano.openai";
