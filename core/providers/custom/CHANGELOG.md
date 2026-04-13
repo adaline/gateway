@@ -1,5 +1,12 @@
 # @adaline/custom
 
+## 1.7.7
+
+### Patch Changes
+
+- Updated dependencies [a336aef]
+  - @adaline/openai@1.20.2
+
 ## 1.7.6
 
 ### Patch Changes

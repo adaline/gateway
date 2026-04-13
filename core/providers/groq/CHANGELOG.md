@@ -1,5 +1,12 @@
 # @adaline/groq
 
+## 1.11.7
+
+### Patch Changes
+
+- Updated dependencies [a336aef]
+  - @adaline/openai@1.20.2
+
 ## 1.11.6
 
 ### Patch Changes
