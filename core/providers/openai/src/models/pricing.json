@@ -591,6 +591,38 @@
       }
     ]
   },
+  "gpt-5.4": {
+    "modelName": "gpt-5.4",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.5,
+            "outputPricePerMillion": 15.0
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5.4-mini": {
+    "modelName": "gpt-5.4-mini",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.75,
+            "outputPricePerMillion": 4.5
+          }
+        }
+      }
+    ]
+  },
   "gpt-4o-search-preview": {
     "modelName": "gpt-4o-search-preview",
     "currency": "USD",
