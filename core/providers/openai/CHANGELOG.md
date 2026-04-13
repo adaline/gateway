@@ -1,5 +1,11 @@
 # @adaline/openai
 
+## 1.20.2
+
+### Patch Changes
+
+- a336aef: Add doc-backed model coverage for `gpt-5.4` and `gpt-5.4-mini` with pricing metadata.
+
 ## 1.20.1
 
 ### Patch Changes
