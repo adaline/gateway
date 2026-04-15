@@ -5,12 +5,7 @@ import { ChatModelSchema } from "@adaline/provider";
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModelResponsesApi, BaseChatModelResponsesApiOptions } from "./base-chat-model-responses-api.openai";
-import {
-  OpenAIChatModelModalities,
-  OpenAIChatModelModalitiesEnum,
-  OpenAIChatModelRoles,
-  OpenAIChatModelRolesMap,
-} from "./types";
+import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
 
 const GPT_5_2_ProLiteral = "gpt-5.2-pro";
 const GPT_5_2_ProDescription =
@@ -25,8 +20,8 @@ const GPT_5_2_ProSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelM
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5Pro(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5Pro(131072, 4).schema,
   },
   price: pricingData[GPT_5_2_ProLiteral],
 });
