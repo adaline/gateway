@@ -20,8 +20,8 @@ const GPT_5_2Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModal
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5_2Plus(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5_2Plus(131072, 4).schema,
   },
   price: pricingData[GPT_5_2Literal],
 });

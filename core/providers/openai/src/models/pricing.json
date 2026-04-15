@@ -623,6 +623,22 @@
       }
     ]
   },
+  "gpt-5.4-pro": {
+    "modelName": "gpt-5.4-pro",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 30.0,
+            "outputPricePerMillion": 180.0
+          }
+        }
+      }
+    ]
+  },
   "gpt-4o-search-preview": {
     "modelName": "gpt-4o-search-preview",
     "currency": "USD",

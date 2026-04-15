@@ -463,8 +463,8 @@ describe("BaseChatModel", () => {
 
     it("should handle all valid reasoning effort values", () => {
       const values = ["minimal", "low", "medium", "high"];
-      
-      values.forEach(value => {
+
+      values.forEach((value) => {
         const config = Config().parse({
           reasoningEffort: value as any,
           verbosity: "medium",
@@ -479,8 +479,8 @@ describe("BaseChatModel", () => {
 
     it("should handle all valid verbosity values", () => {
       const values = ["low", "medium", "high"];
-      
-      values.forEach(value => {
+
+      values.forEach((value) => {
         const config = Config().parse({
           reasoningEffort: "medium",
           verbosity: value as any,
@@ -539,10 +539,10 @@ describe("BaseChatModel", () => {
           required: ["name", "age"],
           properties: {
             name: { type: "string" },
-            age: { type: "number" }
+            age: { type: "number" },
           },
-          additionalProperties: false
-        }
+          additionalProperties: false,
+        },
       };
 
       const config = Config().parse({
@@ -555,16 +555,16 @@ describe("BaseChatModel", () => {
       });
 
       const result = gpt5Model.transformConfig(config, [], []);
-      expect(result.response_format).toEqual({ 
+      expect(result.response_format).toEqual({
         type: "json_schema",
-        json_schema: responseSchema
+        json_schema: responseSchema,
       });
     });
 
     it("should handle all valid response format values", () => {
       const values = ["text", "json_object"];
-      
-      values.forEach(value => {
+
+      values.forEach((value) => {
         const config = Config().parse({
           reasoningEffort: "medium",
           verbosity: "medium",
@@ -585,10 +585,10 @@ describe("BaseChatModel", () => {
           type: "object",
           required: ["test"],
           properties: {
-            test: { type: "string" }
+            test: { type: "string" },
           },
-          additionalProperties: false
-        }
+          additionalProperties: false,
+        },
       };
 
       const config = Config().parse({
@@ -601,9 +601,9 @@ describe("BaseChatModel", () => {
       });
 
       const result = gpt5Model.transformConfig(config, [], []);
-      expect(result.response_format).toEqual({ 
+      expect(result.response_format).toEqual({
         type: "json_schema",
-        json_schema: responseSchema
+        json_schema: responseSchema,
       });
     });
 
@@ -632,6 +632,213 @@ describe("BaseChatModel", () => {
       const result = gpt5Model.transformModelRequest(request);
       expect(result.config.reasoningEffort).toBe("high");
       expect(result.config.verbosity).toBe("low");
+    });
+  });
+
+  describe("GPT-5.2+ (5.2, 5.4) reasoning effort parameter", () => {
+    let gpt5_2PlusModel: BaseChatModel;
+    const gpt5_2PlusModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
+      name: "gpt-5.4",
+      description: "gpt-5.2+ shared config with none/low/medium/high/xhigh",
+      maxInputTokens: 1050000,
+      maxOutputTokens: 128000,
+      roles: mockRolesMap,
+      modalities: mockModalities,
+      config: {
+        def: OpenAIChatModelConfigs.gpt5_2Plus(128000, 4).def,
+        schema: OpenAIChatModelConfigs.gpt5_2Plus(128000, 4).schema,
+      },
+    });
+
+    beforeEach(() => {
+      gpt5_2PlusModel = new BaseChatModel(gpt5_2PlusModelSchema, mockOptions);
+    });
+
+    it("should handle all valid 5.2+ reasoning effort values", () => {
+      const values = ["none", "low", "medium", "high", "xhigh"];
+
+      values.forEach((value) => {
+        const config = Config().parse({
+          reasoningEffort: value as any,
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+
+        const result = gpt5_2PlusModel.transformConfig(config, [], []);
+        expect(result.reasoning_effort).toBe(value);
+      });
+    });
+
+    it("should reject 'minimal' reasoning effort for 5.2+ models", () => {
+      expect(() => {
+        const config = Config().parse({
+          reasoningEffort: "minimal" as any,
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+        gpt5_2PlusModel.transformConfig(config, [], []);
+      }).toThrowError();
+    });
+
+    it("should accept 'xhigh' through request transformation", () => {
+      const request = {
+        model: "gpt-5.4",
+        messages: [{ role: "user" as const, content: "Hello" }],
+        reasoning_effort: "xhigh" as const,
+        verbosity: "low" as const,
+        temperature: 0.7,
+      };
+
+      const result = gpt5_2PlusModel.transformModelRequest(request);
+      expect(result.config.reasoningEffort).toBe("xhigh");
+    });
+  });
+
+  describe("GPT-5.1 reasoning effort parameter", () => {
+    let gpt5_1Model: BaseChatModel;
+    const gpt5_1ModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
+      name: "gpt-5.1",
+      description: "gpt-5.1 with none/low/medium/high (no xhigh, no minimal)",
+      maxInputTokens: 400000,
+      maxOutputTokens: 128000,
+      roles: mockRolesMap,
+      modalities: mockModalities,
+      config: {
+        def: OpenAIChatModelConfigs.gpt5_1(128000, 4).def,
+        schema: OpenAIChatModelConfigs.gpt5_1(128000, 4).schema,
+      },
+    });
+
+    beforeEach(() => {
+      gpt5_1Model = new BaseChatModel(gpt5_1ModelSchema, mockOptions);
+    });
+
+    it("should handle all valid 5.1 reasoning effort values", () => {
+      const values = ["none", "low", "medium", "high"];
+      values.forEach((value) => {
+        const config = Config().parse({
+          reasoningEffort: value as any,
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+        const result = gpt5_1Model.transformConfig(config, [], []);
+        expect(result.reasoning_effort).toBe(value);
+      });
+    });
+
+    it("should reject 'xhigh' and 'minimal' for 5.1", () => {
+      ["xhigh", "minimal"].forEach((value) => {
+        expect(() => {
+          const config = Config().parse({
+            reasoningEffort: value as any,
+            verbosity: "medium",
+            temperature: 0.7,
+            maxTokens: 1000,
+          });
+          gpt5_1Model.transformConfig(config, [], []);
+        }).toThrowError();
+      });
+    });
+  });
+
+  describe("GPT-5 codex reasoning effort parameter", () => {
+    let codexModel: BaseChatModel;
+    const codexModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
+      name: "gpt-5.3-codex",
+      description: "codex variants with low/medium/high/xhigh only",
+      maxInputTokens: 400000,
+      maxOutputTokens: 131072,
+      roles: mockRolesMap,
+      modalities: mockModalities,
+      config: {
+        def: OpenAIChatModelConfigs.gpt5Codex(131072, 4).def,
+        schema: OpenAIChatModelConfigs.gpt5Codex(131072, 4).schema,
+      },
+    });
+
+    beforeEach(() => {
+      codexModel = new BaseChatModel(codexModelSchema, mockOptions);
+    });
+
+    it("should handle all valid codex reasoning effort values", () => {
+      const values = ["low", "medium", "high", "xhigh"];
+      values.forEach((value) => {
+        const config = Config().parse({
+          reasoningEffort: value as any,
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+        const result = codexModel.transformConfig(config, [], []);
+        expect(result.reasoning_effort).toBe(value);
+      });
+    });
+
+    it("should reject 'none' and 'minimal' for codex", () => {
+      ["none", "minimal"].forEach((value) => {
+        expect(() => {
+          const config = Config().parse({
+            reasoningEffort: value as any,
+            verbosity: "medium",
+            temperature: 0.7,
+            maxTokens: 1000,
+          });
+          codexModel.transformConfig(config, [], []);
+        }).toThrowError();
+      });
+    });
+  });
+
+  describe("GPT-5 pro reasoning effort parameter", () => {
+    let proModel: BaseChatModel;
+    const proModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
+      name: "gpt-5.4-pro",
+      description: "pro variants with medium/high/xhigh only",
+      maxInputTokens: 1050000,
+      maxOutputTokens: 128000,
+      roles: mockRolesMap,
+      modalities: mockModalities,
+      config: {
+        def: OpenAIChatModelConfigs.gpt5Pro(128000, 4).def,
+        schema: OpenAIChatModelConfigs.gpt5Pro(128000, 4).schema,
+      },
+    });
+
+    // BaseChatModel (not the Responses API variant) is used here only to exercise the
+    // config schema — the actual pro models extend BaseChatModelResponsesApi.
+    beforeEach(() => {
+      proModel = new BaseChatModel(proModelSchema, mockOptions);
+    });
+
+    it("should handle all valid pro reasoning effort values", () => {
+      const values = ["medium", "high", "xhigh"];
+      values.forEach((value) => {
+        const config = Config().parse({
+          reasoningEffort: value as any,
+          verbosity: "medium",
+          temperature: 0.7,
+          maxTokens: 1000,
+        });
+        const result = proModel.transformConfig(config, [], []);
+        expect(result.reasoning_effort).toBe(value);
+      });
+    });
+
+    it("should reject 'none', 'low', and 'minimal' for pro", () => {
+      ["none", "low", "minimal"].forEach((value) => {
+        expect(() => {
+          const config = Config().parse({
+            reasoningEffort: value as any,
+            verbosity: "medium",
+            temperature: 0.7,
+            maxTokens: 1000,
+          });
+          proModel.transformConfig(config, [], []);
+        }).toThrowError();
+      });
     });
   });
 

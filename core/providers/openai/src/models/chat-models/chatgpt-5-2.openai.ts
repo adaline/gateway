@@ -5,12 +5,7 @@ import { ChatModelSchema } from "@adaline/provider";
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
-import {
-  OpenAIChatModelModalities,
-  OpenAIChatModelModalitiesEnum,
-  OpenAIChatModelRoles,
-  OpenAIChatModelRolesMap,
-} from "./types";
+import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
 
 const ChatGPT_5_2Literal = "chatgpt-5.2";
 const ChatGPT_5_2Description =
@@ -25,8 +20,8 @@ const ChatGPT_5_2Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelM
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5_2Plus(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5_2Plus(131072, 4).schema,
   },
   price: pricingData["gpt-5.2"],
 });

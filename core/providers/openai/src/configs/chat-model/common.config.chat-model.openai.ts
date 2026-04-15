@@ -104,6 +104,54 @@ const reasoningEffort = SelectStringConfigItem({
   choices: ["minimal", "low", "medium", "high"],
 });
 
+// GPT-5.1 reasoning effort: replaces the legacy 'minimal' with 'none' but does not
+// yet include 'xhigh'. Default is 'none'.
+// See https://developers.openai.com/api/docs/models/gpt-5.1
+const reasoningEffort5_1 = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'high' engages the deepest reasoning.",
+  default: "none",
+  choices: ["none", "low", "medium", "high"],
+});
+
+// Shared reasoning effort for gpt-5.2 through gpt-5.4 chat models: adds 'xhigh' on top
+// of the 5.1 enum. Default is 'none'. Pro and codex variants use their own enums.
+// See https://developers.openai.com/api/docs/models/gpt-5.4
+const reasoningEffort5_2Plus = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'xhigh' engages the deepest reasoning.",
+  default: "none",
+  choices: ["none", "low", "medium", "high", "xhigh"],
+});
+
+// Reasoning effort for codex variants (gpt-5.2-codex, gpt-5.3-codex). Codex models
+// always run with some reasoning, so 'none' and 'minimal' are not accepted.
+// See https://developers.openai.com/api/docs/models/gpt-5.3-codex
+const reasoningEffortCodex = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. 'low' is the minimum for codex models; 'xhigh' engages the deepest reasoning.",
+  default: "medium",
+  choices: ["low", "medium", "high", "xhigh"],
+});
+
+// Reasoning effort for pro variants (gpt-5.2-pro, gpt-5.4-pro). Pro tiers are
+// reasoning-heavy by design and only expose medium/high/xhigh.
+// See https://developers.openai.com/api/docs/models/gpt-5.4-pro
+const reasoningEffortPro = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. Pro tiers require at least 'medium' and support up to 'xhigh'.",
+  default: "medium",
+  choices: ["medium", "high", "xhigh"],
+});
+
 const verbosity = SelectStringConfigItem({
   param: "verbosity",
   title: "Verbosity",
@@ -128,4 +176,23 @@ const webSearchContextSize = SelectStringConfigItem({
   choices: ["low", "medium", "high"],
 });
 
-export { frequencyPenalty, logProbs, maxTokens, presencePenalty, reasoningEffort, seed, stop, temperature, toolChoice, topLogProbs, topP, verbosity, webSearchContextSize, webSearchTool };
+export {
+  frequencyPenalty,
+  logProbs,
+  maxTokens,
+  presencePenalty,
+  reasoningEffort,
+  reasoningEffort5_1,
+  reasoningEffort5_2Plus,
+  reasoningEffortCodex,
+  reasoningEffortPro,
+  seed,
+  stop,
+  temperature,
+  toolChoice,
+  topLogProbs,
+  topP,
+  verbosity,
+  webSearchContextSize,
+  webSearchTool,
+};
