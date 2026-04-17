@@ -1,5 +1,13 @@
 # @adaline/bedrock
 
+## 2.6.6
+
+### Patch Changes
+
+- 5523824: Add support for Anthropic Claude Opus 4.7 (`claude-opus-4-7`) in the Anthropic provider and Claude Opus 4.7 on Amazon Bedrock (`anthropic.claude-opus-4-7-v1`) with pricing metadata ($5/M input, $25/M output). Supports 200K context, 128K max output tokens, and extended thinking.
+- Updated dependencies [5523824]
+  - @adaline/anthropic@1.13.6
+
 ## 2.6.5
 
 ### Patch Changes
