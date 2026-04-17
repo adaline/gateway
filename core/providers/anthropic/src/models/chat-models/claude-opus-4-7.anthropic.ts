@@ -14,7 +14,7 @@ import {
 
 const ClaudeOpus4_7Literal = "claude-opus-4-7";
 const ClaudeOpus4_7Description =
-  "Most intelligent model for building agents and coding. Features 128K max output tokens and 1M context window. Training cutoff: January 2026.";
+  "Most intelligent model for building agents and coding. Features 128K max output tokens and 200K context window. Training cutoff: January 2026.";
 
 const ClaudeOpus4_7Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: ClaudeOpus4_7Literal,
