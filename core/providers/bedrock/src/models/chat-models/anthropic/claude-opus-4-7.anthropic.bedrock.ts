@@ -15,7 +15,7 @@ import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
 const BedrockClaudeOpus4_7Literal = "anthropic.claude-opus-4-7-v1";
 const BedrockClaudeOpus4_7Description =
-  "Most intelligent model for building agents and coding. Features 128K max output tokens and 1M context window. Training cutoff: January 2026.";
+  "Most intelligent model for building agents and coding. Features 128K max output tokens and 200K context window. Training cutoff: January 2026.";
 
 const BedrockClaudeOpus4_7Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeOpus4_7Literal,
