@@ -10,6 +10,7 @@ export * from "./claude-4-opus-20250514.anthropic.bedrock";
 export * from "./claude-4-sonnet-20250514.anthropic.bedrock";
 export * from "./claude-opus-4-5-20251101.anthropic.bedrock";
 export * from "./claude-opus-4-6.anthropic.bedrock";
+export * from "./claude-opus-4-7.anthropic.bedrock";
 export * from "./claude-sonnet-4-5-20250929.anthropic.bedrock";
 export * from "./claude-sonnet-4-6.anthropic.bedrock";
 export * from "./claude-haiku-4-5-20251001.anthropic.bedrock";
