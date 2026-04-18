@@ -403,12 +403,12 @@ describe("BaseChatModel", () => {
               type: "object",
               properties: {
                 name: { type: "string" },
-                age: { type: "number" }
+                age: { type: "number" },
               },
               required: ["name"],
-              additionalProperties: false
-            }
-          }
+              additionalProperties: false,
+            },
+          },
         });
         expect(responseSchemaModel.transformConfig(config, messages, tools)).toEqual({
           generation_config: {
@@ -417,11 +417,11 @@ describe("BaseChatModel", () => {
               type: "object",
               properties: {
                 name: { type: "string" },
-                age: { type: "number" }
+                age: { type: "number" },
               },
               required: ["name"],
-            }
-          }
+            },
+          },
         });
       });
 
@@ -441,18 +441,18 @@ describe("BaseChatModel", () => {
       it("should handle text response format by removing it", () => {
         const config = Config().parse({
           responseFormat: "text",
-          temperature: 0.5
+          temperature: 0.5,
         });
         expect(responseSchemaModel.transformConfig(config, messages, tools)).toEqual({
           generation_config: {
-            temperature: 0.5
-          }
+            temperature: 0.5,
+          },
         });
       });
 
       it("should throw error when responseSchema is missing for json_schema format", () => {
         const config = Config().parse({
-          responseFormat: "json_schema"
+          responseFormat: "json_schema",
         });
         expect(() => responseSchemaModel.transformConfig(config, messages, tools)).toThrowError(
           "'responseSchema' is required in config when 'responseFormat' is 'json_schema'"
@@ -475,18 +475,18 @@ describe("BaseChatModel", () => {
                     properties: {
                       id: { type: "number" },
                       name: { type: "string" },
-                      email: { type: "string" }
+                      email: { type: "string" },
                     },
                     required: ["id", "name"],
-                  }
+                  },
                 },
-                total: { type: "number" }
+                total: { type: "number" },
               },
               required: ["users", "total"],
-              additionalProperties: false
-            }
+              additionalProperties: false,
+            },
           },
-          temperature: 0.7
+          temperature: 0.7,
         });
         expect(responseSchemaModel.transformConfig(config, messages, tools)).toEqual({
           generation_config: {
@@ -501,18 +501,64 @@ describe("BaseChatModel", () => {
                     properties: {
                       id: { type: "number" },
                       name: { type: "string" },
-                      email: { type: "string" }
+                      email: { type: "string" },
                     },
                     required: ["id", "name"],
-                  }
+                  },
                 },
-                total: { type: "number" }
+                total: { type: "number" },
               },
               required: ["users", "total"],
             },
-            temperature: 0.7
-          }
+            temperature: 0.7,
+          },
         });
+      });
+    });
+
+    describe("googleSearchTool + function tools", () => {
+      const functionTool: ToolType = {
+        type: "function",
+        definition: {
+          schema: {
+            name: "get_weather",
+            description: "Get the current weather of a location",
+            parameters: {
+              type: "object",
+              properties: {
+                location: { type: "string", description: "location to get weather of" },
+              },
+              required: ["location"],
+            },
+          },
+        },
+      };
+
+      it("should set tool_config.include_server_side_tool_invocations when googleSearchTool and function tools are both present", () => {
+        const config = Config().parse({ googleSearchTool: true });
+        const result = model.transformConfig(config, messages, [functionTool]);
+        expect(result.tool_config).toEqual({ include_server_side_tool_invocations: true });
+      });
+
+      it("should merge the flag with function_calling_config when toolChoice is also set", () => {
+        const config = Config().parse({ googleSearchTool: true, toolChoice: "auto" });
+        const result = model.transformConfig(config, messages, [functionTool]);
+        expect(result.tool_config).toEqual({
+          function_calling_config: { mode: "AUTO" },
+          include_server_side_tool_invocations: true,
+        });
+      });
+
+      it("should not emit tool_config when googleSearchTool is enabled without function tools", () => {
+        const config = Config().parse({ googleSearchTool: true });
+        const result = model.transformConfig(config, messages, []);
+        expect(result.tool_config).toBeUndefined();
+      });
+
+      it("should not emit tool_config when function tools are present without googleSearchTool", () => {
+        const config = Config().parse({});
+        const result = model.transformConfig(config, messages, [functionTool]);
+        expect(result.tool_config).toBeUndefined();
       });
     });
   });
@@ -1215,10 +1261,7 @@ describe("BaseChatModel", () => {
           { role: "user", parts: [{ text: "Call tools" }] },
           {
             role: "assistant",
-            parts: [
-              { function_call: { name: "get_holdings", args: {} } },
-              { function_call: { name: "get_sectors", args: {} } },
-            ],
+            parts: [{ function_call: { name: "get_holdings", args: {} } }, { function_call: { name: "get_sectors", args: {} } }],
           },
           {
             role: "tool",

@@ -563,7 +563,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     delete transformedConfig.safetySettings;
     delete transformedConfig.googleSearch;
 
-    let toolConfig;
+    let toolConfig: Record<string, any> | undefined;
     if (_toolChoice !== undefined) {
       const toolChoice = _toolChoice as string;
       if (!tools || (tools && tools.length === 0)) {
@@ -634,6 +634,15 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       } else if (responseFormat === "text") {
         delete transformedConfig.response_format;
       }
+    }
+
+    // Gemini rejects requests that combine the built-in google_search tool with
+    // user-provided function_declarations unless this opt-in flag is set on
+    // tool_config. Without it the API returns a 400 with:
+    // "Please enable tool_config.include_server_side_tool_invocations to use
+    // Built-in tools with Function calling."
+    if (config?.googleSearchTool && tools && tools.length > 0) {
+      toolConfig = { ...(toolConfig ?? {}), include_server_side_tool_invocations: true };
     }
 
     return {
