@@ -84,10 +84,12 @@ const GoogleChatGoogleSearchTool = z.object({
 type GoogleChatGoogleSearchToolType = z.infer<typeof GoogleChatGoogleSearchTool>;
 
 const GoogleChatToolConfig = z.object({
-  function_calling_config: z.object({
-    mode: z.enum(["ANY", "AUTO", "NONE"]),
-    allowed_function_names: z.array(z.string()).optional(),
-  }),
+  function_calling_config: z
+    .object({
+      mode: z.enum(["ANY", "AUTO", "NONE"]),
+      allowed_function_names: z.array(z.string()).optional(),
+    })
+    .optional(),
   include_server_side_tool_invocations: z.boolean().optional(),
 });
 type GoogleChatToolConfigType = z.infer<typeof GoogleChatToolConfig>;

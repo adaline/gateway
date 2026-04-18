@@ -66,6 +66,7 @@ import {
   GoogleChatRequest,
   GoogleChatRequestType,
   GoogleChatSystemInstructionType,
+  GoogleChatToolConfigType,
   GoogleChatToolType,
   GoogleCompleteChatResponse,
   GoogleCompleteChatResponseType,
@@ -353,7 +354,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     const safetySettings = parsedRequest.safety_settings || parsedRequest.safetySettings;
     const toolConfig = parsedRequest.tool_config || parsedRequest.toolConfig;
 
-    if (toolConfig && (!parsedRequest.tools || parsedRequest.tools.function_declarations.length === 0)) {
+    if (toolConfig?.function_calling_config && (!parsedRequest.tools || parsedRequest.tools.function_declarations.length === 0)) {
       throw new InvalidModelRequestError({
         info: `Invalid model request for model : '${this.modelName}'`,
         cause: new Error("'tools' are required when 'tool_choice' is specified"),
@@ -362,18 +363,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     const _config: ConfigType = {};
 
-    if (toolConfig) {
-      if (toolConfig.function_calling_config.mode === "ANY") {
-        if (
-          toolConfig.function_calling_config.allowed_function_names &&
-          toolConfig.function_calling_config.allowed_function_names.length === 1
-        ) {
-          _config.toolChoice = toolConfig.function_calling_config.allowed_function_names[0];
+    if (toolConfig?.function_calling_config) {
+      const functionCallingConfig = toolConfig.function_calling_config;
+      if (functionCallingConfig.mode === "ANY") {
+        if (functionCallingConfig.allowed_function_names && functionCallingConfig.allowed_function_names.length === 1) {
+          _config.toolChoice = functionCallingConfig.allowed_function_names[0];
         } else {
-          _config.toolChoice = toolConfig.function_calling_config.mode.toLowerCase();
+          _config.toolChoice = functionCallingConfig.mode.toLowerCase();
         }
       } else {
-        _config.toolChoice = toolConfig.function_calling_config.mode.toLowerCase();
+        _config.toolChoice = functionCallingConfig.mode.toLowerCase();
       }
     }
 
@@ -563,7 +562,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     delete transformedConfig.safetySettings;
     delete transformedConfig.googleSearch;
 
-    let toolConfig: Record<string, any> | undefined;
+    let toolConfig: GoogleChatToolConfigType | undefined;
     if (_toolChoice !== undefined) {
       const toolChoice = _toolChoice as string;
       if (!tools || (tools && tools.length === 0)) {
@@ -602,7 +601,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           } else {
             toolConfig = {
               function_calling_config: {
-                mode: toolChoice.toUpperCase(), // Google uses uppercase for toolChoice
+                mode: toolChoice.toUpperCase() as "ANY" | "AUTO" | "NONE", // Google uses uppercase for toolChoice
               },
             };
           }
