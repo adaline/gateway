@@ -1653,6 +1653,82 @@ describe("BaseChatModel", () => {
         expect((e as ModelResponseError as any).cause?.errors[0]?.path).toEqual(["candidates", 0, "content", "parts", 0]);
       }
     });
+
+    it("should accept server-side tool invocation parts (toolCall / toolResponse) and skip them in content", () => {
+      // Mirrors the shape Gemini returns when tool_config.include_server_side_tool_invocations
+      // is enabled and google_search is combined with user-defined function tools.
+      const apiResponse: any = {
+        candidates: [
+          {
+            content: {
+              role: "model",
+              parts: [
+                {
+                  thoughtSignature: "sig-1",
+                  toolCall: {
+                    toolType: "GOOGLE_SEARCH_WEB",
+                    args: { queries: ["current CEO of Meta"] },
+                    id: "8p3fh4es",
+                  },
+                },
+                {
+                  thoughtSignature: "sig-2",
+                  toolResponse: {
+                    toolType: "GOOGLE_SEARCH_WEB",
+                    response: { search_suggestions: "<html/>" },
+                    id: "8p3fh4es",
+                  },
+                },
+                {
+                  functionCall: { name: "get_user_details", args: { userId: "u1" } },
+                  thoughtSignature: "sig-3",
+                },
+                { text: "" },
+              ],
+            },
+            finishReason: "STOP",
+          },
+        ],
+        usageMetadata: { promptTokenCount: 5, totalTokenCount: 10 },
+      };
+
+      const result = googleChatModel.transformCompleteChatResponse(apiResponse);
+      expect(result.messages).toHaveLength(1);
+      // server-side toolCall/toolResponse parts are skipped; functionCall + empty text remain
+      expect(result.messages[0].content).toHaveLength(2);
+      expect(result.messages[0].content[0].modality).toBe("tool-call");
+      expect((result.messages[0].content[0] as any).name).toBe("get_user_details");
+      expect(result.messages[0].content[1].modality).toBe("text");
+    });
+
+    it("should accept candidates with no finishReason (intermediate server-side tool turns)", () => {
+      // Gemini emits intermediate candidates without finishReason while executing
+      // its built-in tools; only the final candidate carries finishReason: "STOP".
+      const apiResponse: any = {
+        candidates: [
+          {
+            content: {
+              role: "model",
+              parts: [
+                {
+                  thoughtSignature: "sig",
+                  toolCall: { toolType: "GOOGLE_SEARCH_WEB", args: { queries: ["x"] }, id: "1" },
+                },
+                { text: "" },
+              ],
+            },
+          },
+        ],
+        usageMetadata: { promptTokenCount: 5, totalTokenCount: 10 },
+      };
+
+      // Should not throw (schema accepts missing finishReason + server-side parts)
+      const result = googleChatModel.transformCompleteChatResponse(apiResponse);
+      // Only the empty-text part survives; server-side toolCall is skipped
+      expect(result.messages).toHaveLength(1);
+      expect(result.messages[0].content).toHaveLength(1);
+      expect(result.messages[0].content[0].modality).toBe("text");
+    });
   });
   describe("transformTools", () => {
     let modelWithTools: BaseChatModel;
@@ -1976,6 +2052,48 @@ describe("BaseChatModel", () => {
       expect(results).toHaveLength(1);
       expect(results[0].partialResponse.partialMessages).toEqual([]);
       expect(results[0].buffer).toBe("existing_buffer");
+    });
+
+    it("should accept server-side tool invocation parts without throwing", async () => {
+      // Mirrors the shape Gemini streams when google_search + user tools are combined
+      // (tool_config.include_server_side_tool_invocations is enabled).
+      const serverSideToolCallResponse = {
+        candidates: [
+          {
+            content: {
+              role: "model",
+              parts: [
+                {
+                  thoughtSignature: "sig",
+                  toolCall: { toolType: "GOOGLE_SEARCH_WEB", args: { queries: ["x"] }, id: "1" },
+                },
+                { text: "" },
+              ],
+            },
+          },
+        ],
+      };
+      const functionCallResponse = createMockResponse([mockFunctionCallPart]);
+      const chunk = `${JSON.stringify(serverSideToolCallResponse)},\r${JSON.stringify(functionCallResponse)}`;
+      const generator = model.transformStreamChatResponseChunk(chunk, "[");
+      const results = await collectAsyncGenerator(generator);
+
+      // First object: only the empty text part emits a partial message; toolCall is skipped.
+      // Second object: functionCall is emitted.
+      // Third yield: the trailing empty-buffer yield.
+      expect(results).toHaveLength(3);
+      expect(results[0].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[0].partialResponse.partialMessages![0]).toEqual(createPartialTextMessage(AssistantRoleLiteral, ""));
+      expect(results[1].partialResponse.partialMessages).toHaveLength(1);
+      expect(results[1].partialResponse.partialMessages![0]).toEqual(
+        createPartialToolCallMessage(
+          AssistantRoleLiteral,
+          0,
+          `${mockFunctionCallPart.functionCall.name}_0`,
+          mockFunctionCallPart.functionCall.name,
+          JSON.stringify(mockFunctionCallPart.functionCall.args)
+        )
+      );
     });
   });
 

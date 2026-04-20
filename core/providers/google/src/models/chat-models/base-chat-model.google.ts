@@ -1032,24 +1032,31 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       const candidate = parsedResponse.candidates[0]; // default to first candidate, top choice
 
       if (candidate.content) {
-        const content = candidate.content.parts.map((contentItem, index) => {
+        const content = candidate.content.parts.flatMap((contentItem, index): ContentType[] => {
           if ("text" in contentItem && contentItem.text !== undefined) {
             // Check if this is a thinking/reasoning part
             if (contentItem.thought === true) {
-              return createReasoningContent(contentItem.text, "");
+              return [createReasoningContent(contentItem.text, "")];
             }
-            return createTextContent(contentItem.text);
+            return [createTextContent(contentItem.text)];
           } else if ("functionCall" in contentItem && contentItem.functionCall !== undefined) {
-            return createToolCallContent(
-              index,
-              `${contentItem.functionCall.name}_${index}`,
-              contentItem.functionCall.name,
-              JSON.stringify(contentItem.functionCall.args),
-              undefined, // serverName
-              contentItem.thoughtSignature // thoughtSignature for thinking models
-            );
+            return [
+              createToolCallContent(
+                index,
+                `${contentItem.functionCall.name}_${index}`,
+                contentItem.functionCall.name,
+                JSON.stringify(contentItem.functionCall.args),
+                undefined, // serverName
+                contentItem.thoughtSignature // thoughtSignature for thinking models
+              ),
+            ];
           }
-        }) as ContentType[];
+          // Skip server-side built-in tool invocations (toolCall / toolResponse).
+          // These are emitted when tool_config.include_server_side_tool_invocations
+          // is enabled and are internal to Google's tool processing; surfaced
+          // search grounding data comes through candidate.groundingMetadata.
+          return [];
+        });
 
         completeChatResponse.messages.push({
           role: AssistantRoleLiteral,
