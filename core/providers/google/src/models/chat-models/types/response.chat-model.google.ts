@@ -51,16 +51,49 @@ const GoogleCompleteChatToolResponse = z.object({
   thoughtSignature: z.string().optional(),
 });
 
+// Server-side built-in tool invocation (e.g. GOOGLE_SEARCH_WEB) emitted when
+// tool_config.include_server_side_tool_invocations is enabled.
+// Schema mirrors google.golang.org/genai ToolCall / ToolResponse:
+//   toolType: TOOL_TYPE_UNSPECIFIED | GOOGLE_SEARCH_WEB | GOOGLE_SEARCH_IMAGE
+//           | URL_CONTEXT | GOOGLE_MAPS | FILE_SEARCH
+//   args / response: map[string]any keyed by toolType-specific shape
+//   id: correlates toolCall → toolResponse
+// z.string() on toolType (not z.enum) to stay forward-compat with new tools.
+const GoogleCompleteChatServerSideToolCallResponse = z.object({
+  toolCall: z.object({
+    toolType: z.string(),
+    args: z.record(z.unknown()),
+    id: z.string(),
+  }),
+  thoughtSignature: z.string().optional(),
+});
+
+const GoogleCompleteChatServerSideToolResultResponse = z.object({
+  toolResponse: z.object({
+    toolType: z.string(),
+    response: z.record(z.unknown()),
+    id: z.string(),
+  }),
+  thoughtSignature: z.string().optional(),
+});
+
 const GoogleCompleteChatResponse = z.object({
   candidates: z.array(
     z.object({
       content: z
         .object({
           role: z.string(),
-          parts: z.array(z.union([GoogleCompleteChatTextResponse, GoogleCompleteChatToolResponse])),
+          parts: z.array(
+            z.union([
+              GoogleCompleteChatTextResponse,
+              GoogleCompleteChatToolResponse,
+              GoogleCompleteChatServerSideToolCallResponse,
+              GoogleCompleteChatServerSideToolResultResponse,
+            ])
+          ),
         })
         .optional(),
-      finishReason: z.string(),
+      finishReason: z.string().optional(),
       index: z.number().optional(),
       safetyRatings: z.optional(
         z.array(
@@ -110,13 +143,40 @@ const GoogleStreamChatToolResponse = z.object({
   thoughtSignature: z.string().optional(),
 });
 
+// Stream variant of the server-side built-in tool invocation parts. See
+// GoogleCompleteChatServerSideToolCallResponse above for schema rationale.
+const GoogleStreamChatServerSideToolCallResponse = z.object({
+  toolCall: z.object({
+    toolType: z.string(),
+    args: z.record(z.unknown()),
+    id: z.string(),
+  }),
+  thoughtSignature: z.string().optional(),
+});
+
+const GoogleStreamChatServerSideToolResultResponse = z.object({
+  toolResponse: z.object({
+    toolType: z.string(),
+    response: z.record(z.unknown()),
+    id: z.string(),
+  }),
+  thoughtSignature: z.string().optional(),
+});
+
 const GoogleStreamChatResponse = z.object({
   candidates: z.array(
     z.object({
       content: z
         .object({
           role: z.string(),
-          parts: z.array(z.union([GoogleStreamChatTextResponse, GoogleStreamChatToolResponse])),
+          parts: z.array(
+            z.union([
+              GoogleStreamChatTextResponse,
+              GoogleStreamChatToolResponse,
+              GoogleStreamChatServerSideToolCallResponse,
+              GoogleStreamChatServerSideToolResultResponse,
+            ])
+          ),
         })
         .optional(),
       finishReason: z.string().optional(),
@@ -156,9 +216,10 @@ const GoogleStreamChatResponse = z.object({
 });
 type GoogleStreamChatResponseType = z.infer<typeof GoogleStreamChatResponse>;
 
-
 export {
   GoogleCompleteChatResponse,
+  GoogleCompleteChatServerSideToolCallResponse,
+  GoogleCompleteChatServerSideToolResultResponse,
   GoogleCompleteChatTextResponse,
   GoogleCompleteChatToolResponse,
   GoogleGroundingChunk,
@@ -166,6 +227,8 @@ export {
   GoogleGroundingSupport,
   GoogleSearchEntryPoint,
   GoogleStreamChatResponse,
+  GoogleStreamChatServerSideToolCallResponse,
+  GoogleStreamChatServerSideToolResultResponse,
   GoogleStreamChatTextResponse,
   GoogleStreamChatToolResponse,
   type GoogleCompleteChatResponseType,
