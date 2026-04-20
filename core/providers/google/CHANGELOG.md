@@ -1,5 +1,11 @@
 # @adaline/google
 
+## 1.17.8
+
+### Patch Changes
+
+- 05d0d28: handle 'tool_config.include_server_side_tool_invocations' set to true for Google provider and models
+
 ## 1.17.7
 
 ### Patch Changes
