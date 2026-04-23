@@ -1,5 +1,12 @@
 # @adaline/azure
 
+## 1.10.7
+
+### Patch Changes
+
+- Updated dependencies [26be93c]
+  - @adaline/openai@1.22.1
+
 ## 1.10.6
 
 ### Patch Changes
