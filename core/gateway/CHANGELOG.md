@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.15.0
+
+### Minor Changes
+
+- 4f55295:
+
 ## 1.14.1
 
 ### Patch Changes
