@@ -5,23 +5,28 @@ import { ChatModelSchema } from "@adaline/provider";
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
-import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
+import {
+  OpenAIChatModelRoles,
+  OpenAIChatModelRolesMap,
+  OpenAIChatModelWithWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalitiesEnum,
+} from "./types";
 
 const GPT_4_1_MiniLiteral = "gpt-4.1-mini";
 const GPT_4_1_MiniDescription =
   "Provides a balance between intelligence, speed, and cost that makes it an attractive model for many use cases. \
   Training data up to May 2024.";
 
-const GPT_4_1_MiniSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalitiesEnum).parse({
+const GPT_4_1_MiniSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_4_1_MiniLiteral,
   description: GPT_4_1_MiniDescription,
   maxInputTokens: 1047576,
   maxOutputTokens: 32768,
   roles: OpenAIChatModelRolesMap,
-  modalities: OpenAIChatModelModalities,
+  modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.responseSchema(32768, 4).def,
-    schema: OpenAIChatModelConfigs.responseSchema(32768, 4).schema,
+    def: OpenAIChatModelConfigs.responseSchemaWithWebSearch(32768, 4).def,
+    schema: OpenAIChatModelConfigs.responseSchemaWithWebSearch(32768, 4).schema,
   },
   price: pricingData[GPT_4_1_MiniLiteral],
 });

@@ -161,18 +161,32 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
       // If empty, don't create content - just reset accumulators
     } else if (lastModality === PartialErrorModalityLiteral && currentError) {
       // Errors come as complete objects, convert directly
-      finalizedContent = {
-        modality: ErrorModalityLiteral,
-        value: {
-          type: currentError.type,
+      if (currentError.type === "safety") {
+        finalizedContent = {
+          modality: ErrorModalityLiteral,
           value: {
-            category: currentError.category ?? "",
-            probability: currentError.probability ?? "",
-            blocked: currentError.blocked ?? false,
-            message: currentError.message ?? "",
+            type: "safety",
+            value: {
+              category: currentError.category ?? "",
+              probability: currentError.probability ?? "",
+              blocked: currentError.blocked ?? false,
+              message: currentError.message ?? "",
+            },
           },
-        },
-      };
+        };
+      } else if (currentError.type === "response_error") {
+        finalizedContent = {
+          modality: ErrorModalityLiteral,
+          value: {
+            type: "response_error",
+            value: {
+              code: currentError.code ?? "",
+              message: currentError.message ?? "",
+              ...(currentError.provider !== undefined ? { provider: currentError.provider } : {}),
+            },
+          },
+        };
+      }
     }
 
     // If content was successfully finalized, add it as a separate message
@@ -381,13 +395,27 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
         }
       } else if (currentModality === PartialErrorModalityLiteral) {
         const errorPart = currentContent as PartialErrorContentType;
-        // Errors come as complete objects - each one is a separate block
-        if (currentError) {
-          // If we already have an error, finalize it and start a new one
+        const incoming = errorPart.value;
+        // `safety` errors arrive as complete objects — each one is a separate block.
+        // `response_error` partials are delta-concatenated on `message` to support streaming
+        // refusal text (e.g. OpenAI Responses API `response.refusal.delta` chunks), while
+        // `code` and `provider` take the first non-undefined value seen in the block.
+        if (!currentError) {
+          currentError = incoming;
+        } else if (currentError.type === "response_error" && incoming.type === "response_error") {
+          currentError = {
+            type: "response_error",
+            code: currentError.code ?? incoming.code,
+            message: (currentError.message ?? "") + (incoming.message ?? ""),
+            provider: currentError.provider ?? incoming.provider,
+          };
+        } else {
+          // Type changed (e.g. safety→response_error or response_error→safety) or safety→safety:
+          // finalize the existing block and start a new one.
           finalizePreviousBlock();
           lastModality = currentModality;
+          currentError = incoming;
         }
-        currentError = errorPart.value;
       }
     });
   });

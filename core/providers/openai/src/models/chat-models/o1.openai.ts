@@ -4,23 +4,28 @@ import { ChatModelSchema } from "@adaline/provider";
 
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
-import { BaseChatModelOptions, BaseChatModel } from "./base-chat-model.openai";
-import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
+import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
+import {
+  OpenAIChatModelRoles,
+  OpenAIChatModelRolesMap,
+  OpenAIChatModelWithWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalitiesEnum,
+} from "./types";
 
 const O1Literal = "o1";
 const O1Description =
   "Highly capable general-purpose reasoning model with advanced capabilities in language, coding, and reasoning. Training data up to Oct 2023.";
 
-const O1Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalitiesEnum).parse({
+const O1Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: O1Literal,
   description: O1Description,
   maxInputTokens: 200000,
   maxOutputTokens: 100000,
   roles: OpenAIChatModelRolesMap,
-  modalities: OpenAIChatModelModalities,
+  modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.o1Series(100000, 4).def,
-    schema: OpenAIChatModelConfigs.o1Series(100000, 4).schema,
+    def: OpenAIChatModelConfigs.o1SeriesWithWebSearch(100000, 4).def,
+    schema: OpenAIChatModelConfigs.o1SeriesWithWebSearch(100000, 4).schema,
   },
   price: pricingData[O1Literal],
 });

@@ -5,22 +5,27 @@ import { ChatModelSchema } from "@adaline/provider";
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
-import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
+import {
+  OpenAIChatModelRoles,
+  OpenAIChatModelRolesMap,
+  OpenAIChatModelWithWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalitiesEnum,
+} from "./types";
 
 const O1_2024_12_17Literal = "o1-2024-12-17";
 const O1_2024_12_17Description =
   "A stable release model for production use, offering robust performance and advanced features. Training data up to December 2024.";
 
-const O1_2024_12_17Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalitiesEnum).parse({
+const O1_2024_12_17Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: O1_2024_12_17Literal,
   description: O1_2024_12_17Description,
   maxInputTokens: 200000,
   maxOutputTokens: 100000,
   roles: OpenAIChatModelRolesMap,
-  modalities: OpenAIChatModelModalities,
+  modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.o1Series(100000, 4).def,
-    schema: OpenAIChatModelConfigs.o1Series(100000, 4).schema,
+    def: OpenAIChatModelConfigs.o1SeriesWithWebSearch(100000, 4).def,
+    schema: OpenAIChatModelConfigs.o1SeriesWithWebSearch(100000, 4).schema,
   },
   price: pricingData[O1_2024_12_17Literal],
 });

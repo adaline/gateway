@@ -3,23 +3,27 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { OpenAIChatModelConfigs } from "../../configs";
-import { BaseChatModelOptions, BaseChatModel } from "./base-chat-model.openai";
-import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
+import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
+import {
+  OpenAIChatModelRoles,
+  OpenAIChatModelRolesMap,
+  OpenAIChatModelWithWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalitiesEnum,
+} from "./types";
 
 const O3_2025_04_16Literal = "o3-2025-04-16";
-const O3_2025_04_16Description =
-  "A new standard for math, science, coding, and visual reasoning tasks. Training data up to Jun 2024.";
+const O3_2025_04_16Description = "A new standard for math, science, coding, and visual reasoning tasks. Training data up to Jun 2024.";
 
-const O3_2025_04_16Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalitiesEnum).parse({
+const O3_2025_04_16Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: O3_2025_04_16Literal,
   description: O3_2025_04_16Description,
   maxInputTokens: 200000,
   maxOutputTokens: 100000,
   roles: OpenAIChatModelRolesMap,
-  modalities: OpenAIChatModelModalities,
+  modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.oSeries(100000, 4).def,
-    schema: OpenAIChatModelConfigs.oSeries(100000, 4).schema,
+    def: OpenAIChatModelConfigs.oSeriesWithWebSearch(100000, 4).def,
+    schema: OpenAIChatModelConfigs.oSeriesWithWebSearch(100000, 4).schema,
   },
 });
 

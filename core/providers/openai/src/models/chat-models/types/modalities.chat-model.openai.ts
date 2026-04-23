@@ -1,7 +1,13 @@
 import { z } from "zod";
 
 import { ChatModelSchemaType } from "@adaline/provider";
-import { ImageModalityLiteral, SearchResultModalityLiteral, TextModalityLiteral, ToolCallModalityLiteral, ToolResponseModalityLiteral } from "@adaline/types";
+import {
+  ImageModalityLiteral,
+  SearchResultModalityLiteral,
+  TextModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+} from "@adaline/types";
 
 const OpenAIChatModelModalities: ChatModelSchemaType["modalities"] = [
   TextModalityLiteral,
@@ -45,13 +51,49 @@ const OpenAIChatModelWebSearchModalitiesEnum = z.enum([
   SearchResultModalityLiteral,
 ]);
 
+const OpenAIChatModelWithWebSearchModalities: ChatModelSchemaType["modalities"] = [
+  TextModalityLiteral,
+  ImageModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  SearchResultModalityLiteral,
+];
+
+const OpenAIChatModelWithWebSearchModalitiesEnum = z.enum([
+  TextModalityLiteral,
+  ImageModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  SearchResultModalityLiteral,
+]);
+
+const OpenAIChatModelProWithWebSearchModalities: ChatModelSchemaType["modalities"] = [
+  TextModalityLiteral,
+  ImageModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  SearchResultModalityLiteral,
+];
+
+const OpenAIChatModelProWithWebSearchModalitiesEnum = z.enum([
+  TextModalityLiteral,
+  ImageModalityLiteral,
+  ToolCallModalityLiteral,
+  ToolResponseModalityLiteral,
+  SearchResultModalityLiteral,
+]);
+
 export {
   OpenAIChatModelModalitiesEnum,
   OpenAIChatModelModalities,
+  OpenAIChatModelProWithWebSearchModalities,
+  OpenAIChatModelProWithWebSearchModalitiesEnum,
   OpenAIChatModelTextModalitiesEnum,
   OpenAIChatModelTextModalities,
   OpenAIChatModelTextToolModalitiesEnum,
   OpenAIChatModelTextToolModalities,
   OpenAIChatModelWebSearchModalitiesEnum,
   OpenAIChatModelWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalitiesEnum,
 };

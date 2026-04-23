@@ -40,34 +40,11 @@ describe("OpenAI Web Search", () => {
 
   // --- Config Tests ---
   describe("web search config", () => {
-    it("should have webSearchTool and webSearchContextSize config keys", () => {
+    it("should have webSearchTool config key", () => {
       const configDef = OpenAIChatModelConfigs.webSearch(16384, 4).def;
       expect(configDef.webSearchTool).toBeDefined();
       expect(configDef.webSearchTool.type).toBe("select-boolean");
       expect(configDef.webSearchTool.param).toBe("webSearch");
-
-      expect(configDef.webSearchContextSize).toBeDefined();
-      expect(configDef.webSearchContextSize.type).toBe("select-string");
-      expect(configDef.webSearchContextSize.param).toBe("webSearchContextSize");
-      expect(configDef.webSearchContextSize.choices).toEqual(["low", "medium", "high"]);
-    });
-
-    it("should validate valid web search config", () => {
-      const schema = OpenAIChatModelConfigs.webSearch(16384, 4).schema;
-      const result = schema.safeParse({
-        webSearchTool: true,
-        webSearchContextSize: "high",
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it("should reject invalid search_context_size", () => {
-      const schema = OpenAIChatModelConfigs.webSearch(16384, 4).schema;
-      const result = schema.safeParse({
-        webSearchTool: true,
-        webSearchContextSize: "extreme",
-      });
-      expect(result.success).toBe(false);
     });
   });
 
@@ -79,18 +56,14 @@ describe("OpenAI Web Search", () => {
       model = new BaseChatModel(mockModelSchema, mockOptions);
     });
 
-    it("should transform webSearch config into web_search_options", () => {
+    it("should transform webSearch config into empty web_search_options", () => {
       const result = model.transformConfig({
         webSearchTool: true,
-        webSearchContextSize: "high",
       });
 
       expect(result.web_search_options).toBeDefined();
-      expect(result.web_search_options).toEqual({
-        search_context_size: "high",
-      });
+      expect(result.web_search_options).toEqual({});
       expect(result.webSearch).toBeUndefined();
-      expect(result.webSearchContextSize).toBeUndefined();
     });
 
     it("should not include web_search_options when webSearchTool is false", () => {
@@ -100,30 +73,18 @@ describe("OpenAI Web Search", () => {
 
       expect(result.web_search_options).toBeUndefined();
       expect(result.webSearch).toBeUndefined();
-      expect(result.webSearchContextSize).toBeUndefined();
     });
 
-    it("should not leak webSearchContextSize when webSearchTool is omitted", () => {
+    it("strips Responses-only keys from CC body (regression guard)", () => {
       const result = model.transformConfig({
-        webSearchContextSize: "high",
-      });
-
-      expect(result.web_search_options).toBeUndefined();
-      expect(result.webSearch).toBeUndefined();
-      expect(result.webSearchContextSize).toBeUndefined();
-      expect(result.search_context_size).toBeUndefined();
-    });
-
-    it("should not leak webSearchContextSize when webSearchTool is false", () => {
-      const result = model.transformConfig({
-        webSearchTool: false,
-        webSearchContextSize: "high",
-      });
-
-      expect(result.web_search_options).toBeUndefined();
-      expect(result.webSearch).toBeUndefined();
-      expect(result.webSearchContextSize).toBeUndefined();
-      expect(result.search_context_size).toBeUndefined();
+        webSearchTool: true,
+        webSearchAllowedDomains: ["leak.example"],
+        webSearchUserLocation: { country: "XX" },
+        webSearchExternalAccess: false,
+      } as any);
+      expect(result.webSearchAllowedDomains).toBeUndefined();
+      expect(result.webSearchUserLocation).toBeUndefined();
+      expect(result.webSearchExternalAccess).toBeUndefined();
     });
   });
 
@@ -195,6 +156,7 @@ describe("OpenAI Web Search", () => {
       // Second content is search-result
       const searchResult = result.messages[0].content[1];
       expect(searchResult.modality).toBe(SearchResultModalityLiteral);
+      if (searchResult.modality !== SearchResultModalityLiteral) throw new Error("expected search-result modality");
       expect(searchResult.value.type).toBe("openai");
       expect(searchResult.value.query).toBe("");
       expect(searchResult.value.responses).toHaveLength(2);
@@ -250,6 +212,7 @@ describe("OpenAI Web Search", () => {
 
       const result = model.transformCompleteChatResponse(response);
       const searchResult = result.messages[0].content[1];
+      if (searchResult.modality !== SearchResultModalityLiteral) throw new Error("expected search-result modality");
 
       // Same URL should be deduplicated to one response
       expect(searchResult.value.responses).toHaveLength(1);
@@ -382,9 +345,9 @@ describe("OpenAI Web Search", () => {
       expect(modalities).toContain(SearchResultModalityLiteral);
     });
 
-    it("should not include search-result modality in non-search models", () => {
+    it("should include search-result modality in general models with web-search opt-in", () => {
       const modalities = schemas["gpt-4o"].modalities;
-      expect(modalities).not.toContain(SearchResultModalityLiteral);
+      expect(modalities).toContain(SearchResultModalityLiteral);
     });
 
     it("should have webSearchTool config in search-preview models", () => {
