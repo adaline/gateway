@@ -2010,4 +2010,55 @@ describe("registry", () => {
       expect(def.webSearchExternalAccess).toBeUndefined();
     });
   });
+
+  describe("regression — top-level leakage + caller-config immutability", () => {
+    it("does not leak web-search filter config keys at the top level of the Responses body", async () => {
+      const model = makeGpt5Model();
+      const body = await model.getCompleteChatData(
+        {
+          webSearchTool: true,
+          webSearchAllowedDomains: ["example.com"],
+          webSearchUserLocation: { country: "US", city: "SF" },
+          webSearchExternalAccess: false,
+        } as ConfigType,
+        [makeUserTextMessage("search")]
+      );
+      // None of the raw config keys should appear at the top level — they're consumed by
+      // transformToolsResponsesApi and built into the `tools` entry.
+      expect((body as Record<string, unknown>).webSearchAllowedDomains).toBeUndefined();
+      expect((body as Record<string, unknown>).webSearchUserLocation).toBeUndefined();
+      expect((body as Record<string, unknown>).webSearchExternalAccess).toBeUndefined();
+      // But they SHOULD appear in the web_search tool entry.
+      const tools = body.tools as Array<Record<string, unknown>>;
+      const webSearchTool = tools.find((t) => t.type === "web_search") as Record<string, unknown>;
+      expect(webSearchTool.filters).toEqual({ allowed_domains: ["example.com"] });
+      expect(webSearchTool.user_location).toEqual({ type: "approximate", country: "US", city: "SF" });
+      expect(webSearchTool.external_web_access).toBe(false);
+    });
+
+    it("does not leak webSearchExternalAccess default=true at the top level of the Responses body", async () => {
+      const model = makeGpt5Model();
+      const body = await model.getCompleteChatData({ webSearchTool: true } as ConfigType, [makeUserTextMessage("search")]);
+      // Zod applies the default (true) during parse; verify it never surfaces at top level.
+      expect((body as Record<string, unknown>).webSearchExternalAccess).toBeUndefined();
+    });
+
+    it("does not mutate the caller's config on the Responses path", async () => {
+      const model = makeGpt5Model();
+      const tool = makeFunctionTool("get_weather", "stub", { type: "object", properties: {}, required: [] });
+      const originalConfig = { webSearchTool: true, toolChoice: "auto" };
+      const snapshot = JSON.parse(JSON.stringify(originalConfig));
+      await model.getCompleteChatData(originalConfig as ConfigType, [makeUserTextMessage("hi")], [tool]);
+      expect(originalConfig).toEqual(snapshot);
+    });
+
+    it("does not mutate the caller's config on the CC path", async () => {
+      const model = makeGpt5Model();
+      const tool = makeFunctionTool("get_weather", "stub", { type: "object", properties: {}, required: [] });
+      const originalConfig = { webSearchTool: false, toolChoice: "auto" };
+      const snapshot = JSON.parse(JSON.stringify(originalConfig));
+      await model.getCompleteChatData(originalConfig as ConfigType, [makeUserTextMessage("hi")], [tool]);
+      expect(originalConfig).toEqual(snapshot);
+    });
+  });
 });

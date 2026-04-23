@@ -378,10 +378,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transformConfig(config: ConfigType, messages?: MessageType[], tools?: ToolType[]): ParamsType {
-    const _toolChoice = config.toolChoice;
-    delete config.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
+    // Shallow-copy so the caller's object is not mutated (e.g. on retries).
+    const workingConfig = { ...config };
+    const _toolChoice = workingConfig.toolChoice;
+    delete workingConfig.toolChoice; // can have a specific tool name that is not in the model schema, validated at transformation
 
-    const _parsedConfig = this.modelSchema.config.schema.safeParse(config);
+    const _parsedConfig = this.modelSchema.config.schema.safeParse(workingConfig);
     if (!_parsedConfig.success) {
       throw new InvalidConfigError({
         info: `Invalid config for model : '${this.modelName}'`,
@@ -468,13 +470,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // Handle web_search_options construction — only include when explicitly enabled
+    // Web-search-options construction for CC search-preview SKUs (gpt-4o-search-preview family,
+    // gpt-5-search-api). Via the public getCompleteChatData path, shouldUseResponsesApi intercepts
+    // webSearchTool=true and routes to Responses, so this branch is unreachable today. It remains
+    // for (a) direct transformConfig callers (ChatModelV1 contract), and (b) to keep CC search-preview
+    // semantics intact if routing later adds a forceChatCompletions counterpart.
     if ("webSearch" in transformedConfig && transformedConfig.webSearch === true) {
       transformedConfig.web_search_options = {};
     }
-    // Always clean up internal web search keys to prevent leaking to API
+    // Always strip internal web-search keys (even when webSearchTool=false) so nothing leaks to the CC body.
     delete transformedConfig.webSearch;
-    // These three keys are Responses-API-only; never emit to Chat Completions body.
     delete transformedConfig.webSearchAllowedDomains;
     delete transformedConfig.webSearchUserLocation;
     delete transformedConfig.webSearchExternalAccess;
@@ -1009,10 +1014,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Strip-and-reattach toolChoice so schema.safeParse doesn't reject custom function names
     // that aren't in the schema's choices list (mirrors CC transformConfig without delegating).
-    const _toolChoice = config.toolChoice;
-    delete config.toolChoice;
+    // Shallow-copy so the caller's object is not mutated (e.g. on retries).
+    const workingConfig = { ...config };
+    const _toolChoice = workingConfig.toolChoice;
+    delete workingConfig.toolChoice;
 
-    const _parsedConfig = this.modelSchema.config.schema.safeParse(config);
+    const _parsedConfig = this.modelSchema.config.schema.safeParse(workingConfig);
     if (!_parsedConfig.success) {
       throw new InvalidConfigError({
         info: `Invalid config for model : '${this.modelName}'`,
@@ -1049,8 +1056,17 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       });
     }
 
-    // CC-only params (schema `param` values) that must NOT leak onto the Responses request.
-    const ccOnlyParams = new Set<string>([
+    // Params (by `def.param` value) that MUST NOT be emitted at the top level of the
+    // Responses API request body. Two disjoint reasons for membership:
+    //   1. Chat-Completions-only fields that Responses API rejects as unknown:
+    //      logprobs, frequency_penalty, presence_penalty, stop, seed, n, stream_options, web_search_options.
+    //   2. Internal config keys that are Responses API params but belong INSIDE `tools[]`,
+    //      not at the top level. `transformToolsResponsesApi` reads them from config and
+    //      builds `{type:"web_search", filters, user_location, external_web_access}` inside
+    //      the tools entry. Skipping them here prevents double-emission, which OpenAI would
+    //      reject as unknown top-level fields.
+    const skipFromResponsesTopLevel = new Set<string>([
+      // Category 1 — CC-only
       "logprobs",
       "frequency_penalty",
       "presence_penalty",
@@ -1059,7 +1075,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       "n",
       "stream_options",
       "web_search_options",
+      // Category 2 — Responses API, consumed by transformToolsResponsesApi
       "webSearch",
+      "webSearchAllowedDomains",
+      "webSearchUserLocation",
+      "webSearchExternalAccess",
     ]);
 
     const responsesConfig: ParamsType = {};
@@ -1073,7 +1093,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       const paramKey = def.param;
       const paramValue = (parsedConfig as ConfigType)[key];
 
-      if (ccOnlyParams.has(paramKey)) {
+      if (skipFromResponsesTopLevel.has(paramKey)) {
         continue;
       }
 
