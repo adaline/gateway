@@ -807,8 +807,8 @@ describe("BaseChatModel", () => {
       },
     });
 
-    // BaseChatModel (not the Responses API variant) is used here only to exercise the
-    // config schema — the actual pro models extend BaseChatModelResponsesApi.
+    // Pro models extend BaseChatModel with forceResponsesApi: true; here we exercise
+    // the config schema only, so the default routing suffices.
     beforeEach(() => {
       proModel = new BaseChatModel(proModelSchema, mockOptions);
     });

@@ -1,12 +1,16 @@
 import { z } from "zod";
 
+// JSON Schema body is structurally recursive with arbitrary keys; validated by the server.
+// Use a typed object record so callers get `Record<string, unknown>` instead of `any`.
+const OpenAIChatJsonSchemaObject = z.record(z.string(), z.unknown());
+
 const OpenAIChatRequestTool = z.object({
   type: z.literal("function"),
   function: z.object({
     name: z.string().min(1),
     description: z.string().min(1).optional(),
     strict: z.boolean().optional(),
-    parameters: z.any(),
+    parameters: OpenAIChatJsonSchemaObject,
   }),
 });
 type OpenAIChatRequestToolType = z.infer<typeof OpenAIChatRequestTool>;
@@ -33,7 +37,7 @@ const OpenAIChatRequestResponseFormat = z
         name: z.string().min(1),
         description: z.string().min(1).optional(),
         strict: z.boolean().optional(),
-        schema: z.any(),
+        schema: OpenAIChatJsonSchemaObject,
       }),
     })
   );

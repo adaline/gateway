@@ -5,23 +5,28 @@ import { ChatModelSchema } from "@adaline/provider";
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
-import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
+import {
+  OpenAIChatModelRoles,
+  OpenAIChatModelRolesMap,
+  OpenAIChatModelWithWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalitiesEnum,
+} from "./types";
 
 const GPT_5_NanoLiteral = "gpt-5-nano";
 const GPT_5_NanoDescription =
   "Most cost-effective GPT-5 model optimized for speed and efficiency. \
   Training data up to October 2024.";
 
-const GPT_5_NanoSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalitiesEnum).parse({
+const GPT_5_NanoSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_NanoLiteral,
   description: GPT_5_NanoDescription,
   maxInputTokens: 400000,
   maxOutputTokens: 131072,
   roles: OpenAIChatModelRolesMap,
-  modalities: OpenAIChatModelModalities,
+  modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5WithWebSearch(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5WithWebSearch(131072, 4).schema,
   },
   price: pricingData[GPT_5_NanoLiteral],
 });

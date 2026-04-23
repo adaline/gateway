@@ -195,6 +195,7 @@ describe("OpenAI Web Search", () => {
       // Second content is search-result
       const searchResult = result.messages[0].content[1];
       expect(searchResult.modality).toBe(SearchResultModalityLiteral);
+      if (searchResult.modality !== SearchResultModalityLiteral) throw new Error("expected search-result modality");
       expect(searchResult.value.type).toBe("openai");
       expect(searchResult.value.query).toBe("");
       expect(searchResult.value.responses).toHaveLength(2);
@@ -250,6 +251,7 @@ describe("OpenAI Web Search", () => {
 
       const result = model.transformCompleteChatResponse(response);
       const searchResult = result.messages[0].content[1];
+      if (searchResult.modality !== SearchResultModalityLiteral) throw new Error("expected search-result modality");
 
       // Same URL should be deduplicated to one response
       expect(searchResult.value.responses).toHaveLength(1);
@@ -382,9 +384,9 @@ describe("OpenAI Web Search", () => {
       expect(modalities).toContain(SearchResultModalityLiteral);
     });
 
-    it("should not include search-result modality in non-search models", () => {
+    it("should include search-result modality in general models with web-search opt-in", () => {
       const modalities = schemas["gpt-4o"].modalities;
-      expect(modalities).not.toContain(SearchResultModalityLiteral);
+      expect(modalities).toContain(SearchResultModalityLiteral);
     });
 
     it("should have webSearchTool config in search-preview models", () => {

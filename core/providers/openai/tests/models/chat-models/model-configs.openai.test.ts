@@ -10,6 +10,7 @@ describe("OpenAI model config definitions", () => {
     const o4MiniSchema = schemas["o4-mini"];
     const temperatureDef = o4MiniSchema.config.def.temperature;
 
+    if (temperatureDef.type !== "range") throw new Error("expected range config for temperature");
     expect(temperatureDef.min).toBe(0);
     expect(temperatureDef.max).toBe(2);
     expect(temperatureDef.step).toBe(0.01);
@@ -20,6 +21,7 @@ describe("OpenAI model config definitions", () => {
     const o1Schema = schemas.o1;
     const temperatureDef = o1Schema.config.def.temperature;
 
+    if (temperatureDef.type !== "range") throw new Error("expected range config for temperature");
     expect(temperatureDef.min).toBe(1);
     expect(temperatureDef.max).toBe(1);
     expect(o1Schema.config.schema.safeParse({ temperature: 0.7 }).success).toBe(false);
@@ -31,6 +33,7 @@ describe("OpenAI model config definitions", () => {
 
     expect(chatgpt52Schema.name).toBe("chatgpt-5.2");
     expect(responseFormatDef.type).toBe("select-string");
+    if (responseFormatDef.type !== "select-string") throw new Error("expected select-string config for responseFormat");
     expect(responseFormatDef.choices).toEqual(expect.arrayContaining(["text", "json_object", "json_schema"]));
   });
 });

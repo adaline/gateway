@@ -5,26 +5,28 @@ import { ChatModelSchema } from "@adaline/provider";
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
-import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
+import {
+  OpenAIChatModelRoles,
+  OpenAIChatModelRolesMap,
+  OpenAIChatModelWithWebSearchModalities,
+  OpenAIChatModelWithWebSearchModalitiesEnum,
+} from "./types";
 
 const GPT_5_2_ChatLatestLiteral = "gpt-5.2-chat-latest";
 const GPT_5_2_ChatLatestDescription =
   "Latest GPT-5.2 chat-optimized model for conversational workloads with tool/function calling support. \
   Training data up to January 2025.";
 
-const GPT_5_2_ChatLatestModalities = OpenAIChatModelModalities;
-const GPT_5_2_ChatLatestModalitiesEnum = OpenAIChatModelModalitiesEnum;
-
-const GPT_5_2_ChatLatestSchema = ChatModelSchema(OpenAIChatModelRoles, GPT_5_2_ChatLatestModalitiesEnum).parse({
+const GPT_5_2_ChatLatestSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_2_ChatLatestLiteral,
   description: GPT_5_2_ChatLatestDescription,
   maxInputTokens: 400000,
   maxOutputTokens: 131072,
   roles: OpenAIChatModelRolesMap,
-  modalities: GPT_5_2_ChatLatestModalities,
+  modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5_2Plus(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5_2Plus(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(131072, 4).schema,
   },
   price: pricingData[GPT_5_2_ChatLatestLiteral],
 });
