@@ -28,9 +28,12 @@ import {
   ConfigType,
   ContentType,
   createPartialReasoningMessage,
+  createPartialResponseErrorMessage,
   createPartialSearchResultMessage,
   createPartialTextMessage,
   createPartialToolCallMessage,
+  createReasoningContent,
+  createResponseErrorContent,
   createSearchResultContent,
   createTextContent,
   createToolCallContent,
@@ -467,15 +470,14 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Handle web_search_options construction — only include when explicitly enabled
     if ("webSearch" in transformedConfig && transformedConfig.webSearch === true) {
-      const webSearchOptions: Record<string, unknown> = {};
-      if ("webSearchContextSize" in transformedConfig && transformedConfig.webSearchContextSize) {
-        webSearchOptions.search_context_size = transformedConfig.webSearchContextSize;
-      }
-      transformedConfig.web_search_options = webSearchOptions;
+      transformedConfig.web_search_options = {};
     }
     // Always clean up internal web search keys to prevent leaking to API
     delete transformedConfig.webSearch;
-    delete transformedConfig.webSearchContextSize;
+    // These three keys are Responses-API-only; never emit to Chat Completions body.
+    delete transformedConfig.webSearchAllowedDomains;
+    delete transformedConfig.webSearchUserLocation;
+    delete transformedConfig.webSearchExternalAccess;
 
     return transformedConfig;
   }
@@ -1033,10 +1035,23 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     });
 
+    // Cross-field guard: OpenAI rejects webSearchTool=true with reasoningEffort="minimal" on gpt-5 models.
+    // Pre-validate here so the caller sees a typed InvalidConfigError instead of a raw HTTP 400.
+    if (
+      (parsedConfig as { webSearchTool?: unknown }).webSearchTool === true &&
+      (parsedConfig as { reasoningEffort?: unknown }).reasoningEffort === "minimal"
+    ) {
+      throw new InvalidConfigError({
+        info: `Invalid config combination for model: '${this.modelName}'`,
+        cause: new Error(
+          "webSearchTool=true is incompatible with reasoningEffort='minimal' — OpenAI Responses API rejects this combination"
+        ),
+      });
+    }
+
     // CC-only params (schema `param` values) that must NOT leak onto the Responses request.
     const ccOnlyParams = new Set<string>([
       "logprobs",
-      "top_logprobs",
       "frequency_penalty",
       "presence_penalty",
       "stop",
@@ -1045,7 +1060,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       "stream_options",
       "web_search_options",
       "webSearch",
-      "webSearchContextSize",
     ]);
 
     const responsesConfig: ParamsType = {};
@@ -1115,7 +1129,25 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         continue;
       }
 
+      if (paramKey === "top_logprobs") {
+        // Handled below after the loop, together with logprobs.
+        continue;
+      }
+
       responsesConfig[paramKey] = paramValue;
+    }
+
+    // Logprobs: Responses API uses top_logprobs only (no separate logprobs boolean).
+    // Emit top_logprobs when logProbs=true; guard against top_logprobs>0 without logProbs=true.
+    const _logProbs = (parsedConfig as { logProbs?: unknown }).logProbs;
+    const _topLogProbs = (parsedConfig as { topLogProbs?: unknown }).topLogProbs;
+    if (_logProbs === true) {
+      responsesConfig.top_logprobs = typeof _topLogProbs === "number" ? _topLogProbs : 0;
+    } else if (typeof _topLogProbs === "number" && _topLogProbs > 0) {
+      throw new InvalidConfigError({
+        info: `Invalid config for model : '${this.modelName}'`,
+        cause: new Error("'logprobs' must be 'true' when 'top_logprobs' is specified"),
+      });
     }
 
     if (responseFormatValue !== undefined) {
@@ -1330,7 +1362,34 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     }
 
     if ((config as { webSearchTool?: unknown }).webSearchTool === true) {
-      responsesTools.push({ type: "web_search" });
+      const webSearchTool: Record<string, unknown> = { type: "web_search" };
+
+      const domains = (config as { webSearchAllowedDomains?: string[] }).webSearchAllowedDomains;
+      if (Array.isArray(domains) && domains.length > 0) {
+        webSearchTool.filters = { allowed_domains: domains };
+      }
+
+      const loc = (
+        config as {
+          webSearchUserLocation?: { country?: string; city?: string; region?: string; timezone?: string };
+        }
+      ).webSearchUserLocation;
+      if (loc && (loc.country || loc.city || loc.region || loc.timezone)) {
+        webSearchTool.user_location = {
+          type: "approximate",
+          ...(loc.country ? { country: loc.country } : {}),
+          ...(loc.city ? { city: loc.city } : {}),
+          ...(loc.region ? { region: loc.region } : {}),
+          ...(loc.timezone ? { timezone: loc.timezone } : {}),
+        };
+      }
+
+      const externalAccess = (config as { webSearchExternalAccess?: boolean }).webSearchExternalAccess;
+      if (externalAccess === false) {
+        webSearchTool.external_web_access = false;
+      }
+
+      responsesTools.push(webSearchTool);
     }
 
     if (responsesTools.length === 0) {
@@ -1390,17 +1449,54 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     }
     const parsed = safe.data;
 
-    if (parsed.status === "failed" || parsed.error) {
+    // Compute any surfaceable error from status/error fields. Non-terminal statuses ("failed"
+    // with output, "incomplete", "cancelled") produce an ErrorContent appended after parsing
+    // so callers still receive any partial text. Terminal "failed" with no output throws.
+    let responseError: { code: string; message: string } | null = null;
+    if (parsed.status === "failed") {
+      if (parsed.error) {
+        responseError = {
+          code: parsed.error.code ?? parsed.error.type ?? "failed",
+          message: parsed.error.message,
+        };
+      } else {
+        responseError = {
+          code: "failed",
+          message: `Response failed for model: '${this.modelName}'`,
+        };
+      }
+    } else if (parsed.status === "incomplete") {
+      responseError = {
+        code: "incomplete",
+        message: `Response incomplete — reason: ${parsed.incomplete_details?.reason ?? "unknown"}`,
+      };
+    } else if (parsed.status === "cancelled") {
+      responseError = {
+        code: "cancelled",
+        message: `Response cancelled for model: '${this.modelName}'`,
+      };
+    } else if (parsed.error) {
+      // Edge case: status=completed but error field populated.
+      responseError = {
+        code: parsed.error.code ?? parsed.error.type ?? "error",
+        message: parsed.error.message,
+      };
+    }
+
+    const hasNoOutput = !parsed.output || parsed.output.length === 0;
+    if (responseError !== null && hasNoOutput && (parsed.status === "failed" || parsed.error)) {
       throw new ModelResponseError({
         info: `Responses API returned status '${parsed.status}' for model: '${this.modelName}'`,
-        cause: new Error(parsed.error?.message ?? "no error message"),
+        cause: new Error(responseError.message),
       });
     }
 
     const messages: MessageType[] = [{ role: AssistantRoleLiteral, content: [] }];
     const collectedAnnotations: { url: string; title: string; start_index: number; end_index: number }[] = [];
+    const searchQueries: string[] = [];
     let collectedText = "";
     let functionCallIndex = 0;
+    let hadWebSearchCall = false;
 
     for (const item of parsed.output) {
       if (item.type === "message") {
@@ -1409,25 +1505,48 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             messages[0].content.push(createTextContent(part.text));
             collectedText += part.text;
             for (const annotation of part.annotations ?? []) {
-              collectedAnnotations.push({
-                url: annotation.url,
-                title: annotation.title,
-                start_index: annotation.start_index,
-                end_index: annotation.end_index,
-              });
+              if (annotation.type === "url_citation") {
+                collectedAnnotations.push({
+                  url: annotation.url,
+                  title: annotation.title,
+                  start_index: annotation.start_index,
+                  end_index: annotation.end_index,
+                });
+              }
+              // file_citation, file_path, container_file_citation are ignored — file_search and code_interpreter tools are out of scope (Q6)
             }
           } else if (part.type === "refusal") {
-            messages[0].content.push(createTextContent(part.refusal));
+            messages[0].content.push(createResponseErrorContent("refusal", part.refusal, "openai"));
           }
         }
       } else if (item.type === "function_call") {
         messages[0].content.push(createToolCallContent(functionCallIndex++, item.call_id, item.name, item.arguments));
+      } else if (item.type === "reasoning") {
+        const summaryParts = item.summary ?? [];
+        const thinking = summaryParts
+          .filter((p) => p.type === "summary_text" && typeof p.text === "string")
+          .map((p) => p.text)
+          .join("\n\n");
+        const signature = item.encrypted_content ?? "";
+        if (thinking || signature) {
+          messages[0].content.push(createReasoningContent(thinking, signature));
+        }
+      } else if (item.type === "web_search_call") {
+        hadWebSearchCall = true;
+        if (item.action?.query) {
+          searchQueries.push(item.action.query);
+        }
       }
-      // web_search_call, reasoning, file_search_call items emit no content (Q5/Q6 out-of-scope)
+      // file_search_call items emit no content (Q5 out-of-scope)
     }
 
-    if (collectedAnnotations.length > 0) {
-      messages[0].content.push(this.buildSearchResultContent(collectedText, collectedAnnotations));
+    const joinedQuery = searchQueries.join(" | ");
+    if (collectedAnnotations.length > 0 || (hadWebSearchCall && joinedQuery.length > 0)) {
+      messages[0].content.push(this.buildSearchResultContent(collectedText, collectedAnnotations, joinedQuery));
+    }
+
+    if (responseError !== null) {
+      messages[0].content.push(createResponseErrorContent(responseError.code, responseError.message, "openai"));
     }
 
     const usage: ChatUsageType = {
@@ -1436,7 +1555,29 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       totalTokens: parsed.usage?.total_tokens ?? 0,
     };
 
-    return { messages, usage, logProbs: [] };
+    const logProbs: ChatLogProbsType = [];
+    for (const item of parsed.output) {
+      if (item.type === "message") {
+        for (const part of item.content) {
+          if (part.type === "output_text" && part.logprobs) {
+            for (const lp of part.logprobs) {
+              logProbs.push({
+                token: lp.token,
+                logProb: lp.logprob,
+                bytes: lp.bytes,
+                topLogProbs: lp.top_logprobs.map((top) => ({
+                  token: top.token,
+                  logProb: top.logprob,
+                  bytes: top.bytes,
+                })),
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return { messages, usage, logProbs };
   }
 
   private looksLikeResponsesStream(data: string): boolean {
@@ -1591,7 +1732,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       } else if (type === "response.refusal.delta") {
         const delta = (evt as { delta?: unknown }).delta;
         if (typeof delta === "string" && delta.length > 0) {
-          partialResponse.partialMessages.push(createPartialTextMessage(AssistantRoleLiteral, delta));
+          partialResponse.partialMessages.push(createPartialResponseErrorMessage(AssistantRoleLiteral, "refusal", delta, "openai"));
         }
       } else if (type === "response.refusal.done") {
         continue;
@@ -1610,7 +1751,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       } else if (type === "response.output_item.added") {
         const item = (
           evt as {
-            item?: { id?: string; type?: string; call_id?: string; name?: string };
+            item?: { id?: string; type?: string; call_id?: string; name?: string; action?: { query?: string } };
           }
         ).item;
         if (item && item.type === "function_call" && item.id) {
@@ -1622,6 +1763,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
               createPartialToolCallMessage(AssistantRoleLiteral, state.itemIdToIndex[item.id], item.call_id ?? "", item.name, "")
             );
           }
+        } else if (item && item.type === "web_search_call" && item.action?.query) {
+          partialResponse.partialMessages.push(createPartialSearchResultMessage(AssistantRoleLiteral, "openai", item.action.query, [], []));
         }
       } else if (type === "response.function_call_arguments.delta") {
         const itemId = (evt as { item_id?: string }).item_id;
@@ -1667,13 +1810,23 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       } else if (type === "response.failed" || type === "response.incomplete") {
         const resp = (
           evt as {
-            response?: { error?: { message?: string }; incomplete_details?: { reason?: string } };
+            response?: {
+              error?: { message?: string };
+              incomplete_details?: { reason?: string };
+              usage?: { input_tokens?: number; output_tokens?: number; total_tokens?: number };
+            };
           }
         ).response;
-        throw new ModelResponseError({
-          info: `Responses API stream ended with status '${type}' for model: '${this.modelName}'`,
-          cause: new Error(resp?.error?.message ?? resp?.incomplete_details?.reason ?? "no error message"),
-        });
+        const code = type === "response.failed" ? "failed" : "incomplete";
+        const reason = resp?.error?.message ?? resp?.incomplete_details?.reason ?? "no details";
+        partialResponse.partialMessages.push(createPartialResponseErrorMessage(AssistantRoleLiteral, code, reason, "openai"));
+        if (resp?.usage) {
+          partialResponse.usage = {
+            promptTokens: resp.usage.input_tokens ?? 0,
+            completionTokens: resp.usage.output_tokens ?? 0,
+            totalTokens: resp.usage.total_tokens ?? 0,
+          };
+        }
       } else if (type === "error") {
         const errorPayload = (
           evt as {
@@ -1698,7 +1851,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
   protected buildSearchResultContent(
     text: string,
-    annotations: ReadonlyArray<{ url: string; title: string; start_index: number; end_index: number }>
+    annotations: ReadonlyArray<{ url: string; title: string; start_index: number; end_index: number }>,
+    query = ""
   ): ContentType {
     const urlMap = new Map<string, number>();
     const responses: { source: string; url: string; title: string }[] = [];
@@ -1725,7 +1879,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       });
     }
 
-    return createSearchResultContent("openai", "", responses, references);
+    return createSearchResultContent("openai", query, responses, references);
   }
 }
 

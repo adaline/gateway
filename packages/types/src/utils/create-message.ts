@@ -27,6 +27,7 @@ import {
   ReasoningContentTypeLiteral,
   ReasoningModalityLiteral,
   RedactedReasoningContentTypeLiteral,
+  ResponseErrorTypeLiteral,
   RoleEnumType,
   SafetyErrorTypeLiteral,
   SearchResultContent,
@@ -356,6 +357,47 @@ const createPartialSafetyErrorMessage = (
   });
 };
 
+const createResponseErrorContent = (code: string, message: string, provider?: string): ContentType => {
+  return ErrorContent().parse({
+    modality: ErrorModalityLiteral,
+    value: {
+      type: ResponseErrorTypeLiteral,
+      value: {
+        code,
+        message,
+        provider,
+      },
+    },
+  });
+};
+
+const createPartialResponseErrorContent = (code?: string, message?: string, provider?: string): PartialContentType => {
+  return PartialErrorContent().parse({
+    modality: PartialErrorModalityLiteral,
+    value: {
+      type: ResponseErrorTypeLiteral,
+      code,
+      message,
+      provider,
+    },
+  });
+};
+
+const createPartialResponseErrorMessage = (role: RoleEnumType, code?: string, message?: string, provider?: string): PartialMessageType => {
+  return PartialMessage().parse({
+    role: role,
+    partialContent: PartialErrorContent().parse({
+      modality: PartialErrorModalityLiteral,
+      value: {
+        type: ResponseErrorTypeLiteral,
+        code,
+        message,
+        provider,
+      },
+    }),
+  });
+};
+
 const createSearchResultContent = (
   type: string,
   query: string,
@@ -400,6 +442,8 @@ export {
   createBase64ImageMessage,
   createPartialReasoningMessage,
   createPartialRedactedReasoningMessage,
+  createPartialResponseErrorContent,
+  createPartialResponseErrorMessage,
   createPartialSafetyErrorContent,
   createPartialSafetyErrorMessage,
   createPartialSearchResultContent,
@@ -411,6 +455,7 @@ export {
   createReasoningMessage,
   createRedactedReasoningContent,
   createRedactedReasoningMessage,
+  createResponseErrorContent,
   createSafetyErrorContent,
   createSearchResultContent,
   createTextContent,

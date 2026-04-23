@@ -1,4 +1,13 @@
-import { CHAT_CONFIG, MultiStringConfigItem, RangeConfigItem, SelectBooleanConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import { z } from "zod";
+
+import {
+  CHAT_CONFIG,
+  MultiStringConfigItem,
+  ObjectSchemaConfigItem,
+  RangeConfigItem,
+  SelectBooleanConfigItem,
+  SelectStringConfigItem,
+} from "@adaline/provider";
 
 const temperature = RangeConfigItem({
   param: "temperature",
@@ -168,12 +177,35 @@ const webSearchTool = SelectBooleanConfigItem({
   default: false,
 });
 
-const webSearchContextSize = SelectStringConfigItem({
-  param: "webSearchContextSize",
-  title: "Web Search Context Size",
-  description: "High level guidance for the amount of context window space to use for the search.",
-  default: "medium",
-  choices: ["low", "medium", "high"],
+// Responses API only. Up to 100 domains; subdomains included automatically by OpenAI.
+const webSearchAllowedDomains = MultiStringConfigItem({
+  param: "webSearchAllowedDomains",
+  title: "Web Search Allowed Domains",
+  description:
+    "Restrict web search to this list of domains. Up to 100 entries; subdomains included automatically. Responses API only — ignored on Chat Completions search-preview SKUs.",
+  max: 100,
+});
+
+// Responses API only. Approximate user location for geo-relevant search.
+const webSearchUserLocation = ObjectSchemaConfigItem({
+  param: "webSearchUserLocation",
+  title: "Web Search User Location",
+  description: "Approximate user location for geo-relevant web search results. Responses API only.",
+  objectSchema: z.object({
+    country: z.string().optional(),
+    city: z.string().optional(),
+    region: z.string().optional(),
+    timezone: z.string().optional(),
+  }),
+});
+
+// Responses API only. Default true (live web access). Set false for cached/indexed-only.
+const webSearchExternalAccess = SelectBooleanConfigItem({
+  param: "webSearchExternalAccess",
+  title: "Web Search External Access",
+  description:
+    "Allow external web access. Set to false to restrict to cached/indexed results. Responses API only. Ignored on web_search_preview.",
+  default: true,
 });
 
 export {
@@ -193,6 +225,8 @@ export {
   topLogProbs,
   topP,
   verbosity,
-  webSearchContextSize,
+  webSearchAllowedDomains,
+  webSearchExternalAccess,
   webSearchTool,
+  webSearchUserLocation,
 };

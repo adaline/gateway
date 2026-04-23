@@ -155,6 +155,7 @@ const OpenAIResponsesRequest = z.object({
   input: z.union([z.string(), z.array(OpenAIResponsesRequestInputItem)]),
   instructions: z.string().nullable().optional(),
   max_output_tokens: z.number().min(0).nullable().optional(),
+  top_logprobs: z.number().int().min(0).max(20).nullable().optional(),
   temperature: z.number().min(0).max(2).nullable().optional(),
   top_p: z.number().min(0).max(1).nullable().optional(),
   stream: z.boolean().optional(),
@@ -172,19 +173,57 @@ const OpenAIResponsesRequest = z.object({
       type: z.enum(["auto", "disabled"]),
     })
     .optional(),
+  service_tier: z.enum(["auto", "default", "flex", "scale", "priority"]).nullable().optional(),
+  safety_identifier: z.string().optional(),
   include: z.array(z.string()).optional(),
 });
 type OpenAIResponsesRequestType = z.infer<typeof OpenAIResponsesRequest>;
 
 // ─── Response: Output Content Parts ──────────────────────────────────────────
 
-const OpenAIResponsesOutputTextAnnotation = z.object({
+const OpenAIResponsesUrlCitationAnnotation = z.object({
   type: z.literal("url_citation"),
   start_index: z.number(),
   end_index: z.number(),
   url: z.string(),
   title: z.string(),
 });
+type OpenAIResponsesUrlCitationAnnotationType = z.infer<typeof OpenAIResponsesUrlCitationAnnotation>;
+
+const OpenAIResponsesFileCitationAnnotation = z.object({
+  type: z.literal("file_citation"),
+  file_id: z.string(),
+  index: z.number(),
+  filename: z.string().optional(),
+  quote: z.string().optional(),
+});
+type OpenAIResponsesFileCitationAnnotationType = z.infer<typeof OpenAIResponsesFileCitationAnnotation>;
+
+const OpenAIResponsesFilePathAnnotation = z.object({
+  type: z.literal("file_path"),
+  file_id: z.string(),
+  start_index: z.number(),
+  end_index: z.number(),
+});
+type OpenAIResponsesFilePathAnnotationType = z.infer<typeof OpenAIResponsesFilePathAnnotation>;
+
+const OpenAIResponsesContainerFileCitationAnnotation = z.object({
+  type: z.literal("container_file_citation"),
+  container_id: z.string(),
+  file_id: z.string(),
+  start_index: z.number(),
+  end_index: z.number(),
+  filename: z.string().optional(),
+  quote: z.string().optional(),
+});
+type OpenAIResponsesContainerFileCitationAnnotationType = z.infer<typeof OpenAIResponsesContainerFileCitationAnnotation>;
+
+const OpenAIResponsesOutputTextAnnotation = z.discriminatedUnion("type", [
+  OpenAIResponsesUrlCitationAnnotation,
+  OpenAIResponsesFileCitationAnnotation,
+  OpenAIResponsesFilePathAnnotation,
+  OpenAIResponsesContainerFileCitationAnnotation,
+]);
 type OpenAIResponsesOutputTextAnnotationType = z.infer<typeof OpenAIResponsesOutputTextAnnotation>;
 
 // Per OpenAI docs: each logprob carries the token plus `top_logprobs` alternatives.
@@ -632,7 +671,10 @@ type OpenAIResponsesStreamEventType = z.infer<typeof OpenAIResponsesStreamEvent>
 
 export {
   OpenAIResponsesCompleteResponse,
+  OpenAIResponsesContainerFileCitationAnnotation,
   OpenAIResponsesError,
+  OpenAIResponsesFileCitationAnnotation,
+  OpenAIResponsesFilePathAnnotation,
   OpenAIResponsesOutputContentPart,
   OpenAIResponsesOutputFileSearchCallItem,
   OpenAIResponsesOutputFunctionCallItem,
@@ -642,6 +684,7 @@ export {
   OpenAIResponsesOutputRefusalContentPart,
   OpenAIResponsesOutputTextAnnotation,
   OpenAIResponsesOutputTextContentPart,
+  OpenAIResponsesUrlCitationAnnotation,
   OpenAIResponsesOutputWebSearchCallItem,
   OpenAIResponsesRequest,
   OpenAIResponsesRequestFunctionCallItem,
@@ -694,7 +737,10 @@ export {
   OpenAIResponsesStreamEventWebSearchCallSearching,
   OpenAIResponsesUsage,
   type OpenAIResponsesCompleteResponseType,
+  type OpenAIResponsesContainerFileCitationAnnotationType,
   type OpenAIResponsesErrorType,
+  type OpenAIResponsesFileCitationAnnotationType,
+  type OpenAIResponsesFilePathAnnotationType,
   type OpenAIResponsesOutputContentPartType,
   type OpenAIResponsesOutputFileSearchCallItemType,
   type OpenAIResponsesOutputFunctionCallItemType,
@@ -704,6 +750,7 @@ export {
   type OpenAIResponsesOutputRefusalContentPartType,
   type OpenAIResponsesOutputTextAnnotationType,
   type OpenAIResponsesOutputTextContentPartType,
+  type OpenAIResponsesUrlCitationAnnotationType,
   type OpenAIResponsesOutputWebSearchCallItemType,
   type OpenAIResponsesRequestFunctionCallItemType,
   type OpenAIResponsesRequestFunctionCallOutputItemType,

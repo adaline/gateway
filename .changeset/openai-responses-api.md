@@ -35,6 +35,13 @@ The OpenAI provider now routes to the Responses API (`POST /v1/responses`) whene
 
 The `BaseChatModelResponsesApi` class and its `BaseChatModelResponsesApiOptions` export are removed. Consumers who extended or typed against these symbols should switch to `BaseChatModel` + `BaseChatModelOptions` and pass `{ forceResponsesApi: true }` in the constructor options to preserve "always use Responses API" behavior.
 
+**Additional gap fixes**
+
+- `feat(openai)` pre-validate `webSearchTool=true` + `reasoningEffort="minimal"`: `transformConfigResponsesApi` now throws a typed `InvalidConfigError` before the request leaves the client, instead of surfacing OpenAI's raw HTTP 400 for this rejected combination on gpt-5 models.
+- `feat(openai)` non-fatal model failures now surface as `ErrorContent` items. For `status: "failed" | "incomplete" | "cancelled"` responses and `response.failed` / `response.incomplete` streaming events, the provider appends a `response_error` ErrorContent to the assistant message instead of throwing. Callers receive any partial text plus an error marker. Terminal "failed" with no output still throws `ModelResponseError`. The nested stream-level `{type: "error", ...}` event (OpenAI stream infrastructure error) continues to throw.
+- `fix(openai)` refusals now surface as ErrorContent with `code: "refusal"` instead of TextContent. Callers can programmatically distinguish a refusal from a normal assistant answer by checking for `modality: "error"` + `value.type: "response_error"` + `value.value.code: "refusal"` on output messages. Refusal text is in `value.value.message`. This is a behavior change: consumers that previously consumed refusals as TextContent must now also inspect ErrorContent to see refusal text.
+- `feat(types)` new `response_error` variant in `ErrorContent` and `PartialErrorContent` discriminated unions (see the separate `@adaline/types` changeset).
+
 **Out of scope (tracked for follow-up)**
 
 - Stateful conversation features: `previous_response_id`, `store`, server-managed reasoning history.

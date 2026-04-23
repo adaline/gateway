@@ -5,3 +5,4 @@ export * from "./paired-select-config-item";
 export * from "./range-config-item";
 export * from "./select-boolean-config-item";
 export * from "./select-string-config-item";
+export * from "./string-config-item";

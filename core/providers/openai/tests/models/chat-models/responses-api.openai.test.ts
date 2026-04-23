@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ChatModelSchema, ChatModelSchemaType, InvalidConfigError, ModelResponseError } from "@adaline/provider";
 import {
   AssistantRoleLiteral,
+  ConfigType,
   ImageModalityLiteral,
   SearchResultModalityLiteral,
   SystemRoleLiteral,
@@ -608,13 +609,11 @@ describe("request body — Responses path", () => {
     expect(body.verbosity).toBeUndefined();
   });
 
-  it("drops CC-only keys (logprobs, top_logprobs, frequency_penalty, presence_penalty, stop, seed, stream_options, web_search_options, n)", async () => {
+  it("drops CC-only keys (logprobs boolean, frequency_penalty, presence_penalty, stop, seed, stream_options, web_search_options, n)", async () => {
     const messages = [makeUserTextMessage("Test dropping CC-only keys")];
     const body = (await model.getCompleteChatData(
       {
         webSearchTool: true,
-        logProbs: true,
-        topLogProbs: 3,
         frequencyPenalty: 0.5,
         presencePenalty: 0.5,
         stop: ["\n"],
@@ -623,7 +622,6 @@ describe("request body — Responses path", () => {
       messages
     )) as Record<string, unknown>;
     expect(body.logprobs).toBeUndefined();
-    expect(body.top_logprobs).toBeUndefined();
     expect(body.frequency_penalty).toBeUndefined();
     expect(body.presence_penalty).toBeUndefined();
     expect(body.stop).toBeUndefined();
@@ -639,26 +637,91 @@ describe("request body — Responses path", () => {
     expect(body.include).toBeUndefined();
   });
 
-  it("silently ignores webSearchContextSize on Responses path", async () => {
-    const messages = [makeUserTextMessage("Search with context size")];
-    const body = (await model.getCompleteChatData({ webSearchTool: true, webSearchContextSize: "high" }, messages)) as Record<
-      string,
-      unknown
-    >;
-    expect(body.web_search_options).toBeUndefined();
-    expect(body.webSearchContextSize).toBeUndefined();
-    expect(body.search_context_size).toBeUndefined();
-    // web_search tool is injected without any context-size field
-    const tools = body.tools as { type: string; search_context_size?: unknown; filters?: unknown }[];
-    const webSearchTool = tools.find((t) => t.type === "web_search");
+  it("emits allowed_domains filter when webSearchAllowedDomains is set", async () => {
+    const messages = [makeUserTextMessage("search")];
+    const body = (await model.getCompleteChatData(
+      { webSearchTool: true, webSearchAllowedDomains: ["openai.com", "anthropic.com"] } as ConfigType,
+      messages
+    )) as { tools: Array<Record<string, unknown>> };
+    const webSearchTool = body.tools.find((t) => t.type === "web_search");
     expect(webSearchTool).toBeDefined();
-    expect(webSearchTool?.search_context_size).toBeUndefined();
+    expect((webSearchTool as { filters?: unknown }).filters).toEqual({ allowed_domains: ["openai.com", "anthropic.com"] });
   });
 
-  it("still maps webSearchContextSize to web_search_options.search_context_size when webSearchTool=false (CC path)", async () => {
-    const messages = [makeUserTextMessage("CC path with context size")];
-    const result = await model.getCompleteChatData({ webSearchTool: false, webSearchContextSize: "high" }, messages);
-    expect(result.web_search_options).toBeUndefined();
+  it("emits user_location when webSearchUserLocation is set (partial fields)", async () => {
+    const messages = [makeUserTextMessage("search")];
+    const body = (await model.getCompleteChatData(
+      { webSearchTool: true, webSearchUserLocation: { country: "US", city: "San Francisco" } } as ConfigType,
+      messages
+    )) as { tools: Array<Record<string, unknown>> };
+    const webSearchTool = body.tools.find((t) => t.type === "web_search");
+    expect((webSearchTool as { user_location?: unknown }).user_location).toEqual({
+      type: "approximate",
+      country: "US",
+      city: "San Francisco",
+    });
+  });
+
+  it("emits external_web_access=false when webSearchExternalAccess is false", async () => {
+    const messages = [makeUserTextMessage("search")];
+    const body = (await model.getCompleteChatData({ webSearchTool: true, webSearchExternalAccess: false } as ConfigType, messages)) as {
+      tools: Array<Record<string, unknown>>;
+    };
+    const webSearchTool = body.tools.find((t) => t.type === "web_search");
+    expect((webSearchTool as { external_web_access?: unknown }).external_web_access).toBe(false);
+  });
+
+  it("does not emit external_web_access when true (default)", async () => {
+    const messages = [makeUserTextMessage("search")];
+    const body = (await model.getCompleteChatData({ webSearchTool: true, webSearchExternalAccess: true } as ConfigType, messages)) as {
+      tools: Array<Record<string, unknown>>;
+    };
+    const webSearchTool = body.tools.find((t) => t.type === "web_search");
+    expect((webSearchTool as { external_web_access?: unknown }).external_web_access).toBeUndefined();
+  });
+
+  it("combines all three filter fields correctly", async () => {
+    const messages = [makeUserTextMessage("search")];
+    const body = (await model.getCompleteChatData(
+      {
+        webSearchTool: true,
+        webSearchAllowedDomains: ["example.com"],
+        webSearchUserLocation: { country: "US", timezone: "America/Los_Angeles" },
+        webSearchExternalAccess: false,
+      } as ConfigType,
+      messages
+    )) as { tools: Array<Record<string, unknown>> };
+    const webSearchTool = body.tools.find((t) => t.type === "web_search") as {
+      filters?: unknown;
+      user_location?: unknown;
+      external_web_access?: unknown;
+    };
+    expect(webSearchTool.filters).toEqual({ allowed_domains: ["example.com"] });
+    expect(webSearchTool.user_location).toEqual({ type: "approximate", country: "US", timezone: "America/Los_Angeles" });
+    expect(webSearchTool.external_web_access).toBe(false);
+  });
+
+  it("does not emit filters / user_location / external_web_access when they are omitted", async () => {
+    const messages = [makeUserTextMessage("search")];
+    const body = (await model.getCompleteChatData({ webSearchTool: true } as ConfigType, messages)) as {
+      tools: Array<Record<string, unknown>>;
+    };
+    const webSearchTool = body.tools.find((t) => t.type === "web_search") as {
+      filters?: unknown;
+      user_location?: unknown;
+      external_web_access?: unknown;
+    };
+    expect(webSearchTool.filters).toBeUndefined();
+    expect(webSearchTool.user_location).toBeUndefined();
+    expect(webSearchTool.external_web_access).toBeUndefined();
+  });
+
+  it("throws InvalidConfigError when webSearchTool=true and reasoningEffort=minimal", async () => {
+    const gpt5Model = makeGpt5Model();
+    const messages = [makeUserTextMessage("hi")];
+    await expect(
+      gpt5Model.getCompleteChatData({ webSearchTool: true, reasoningEffort: "minimal" } as ConfigType, messages)
+    ).rejects.toThrow(InvalidConfigError);
   });
 
   it("throws InvalidConfigError when webSearchTool=true on a model whose schema lacks webSearchTool", async () => {
@@ -677,6 +740,35 @@ describe("request body — Responses path", () => {
     const modelNoWS = new BaseChatModel(schemaWithoutWebSearch, mockOptions);
     const messages = [makeUserTextMessage("hi")];
     await expect(modelNoWS.getCompleteChatData({ webSearchTool: true }, messages)).rejects.toThrow(InvalidConfigError);
+  });
+
+  it("emits top_logprobs when logProbs=true and topLogProbs>0", async () => {
+    const model = makeGpt5Model({ forceResponsesApi: true });
+    const messages = [makeUserTextMessage("hi")];
+    const body = await model.getCompleteChatData({ logProbs: true, topLogProbs: 3 } as ConfigType, messages);
+    expect((body as Record<string, unknown>).top_logprobs).toBe(3);
+    expect((body as Record<string, unknown>).logprobs).toBeUndefined();
+  });
+
+  it("emits top_logprobs=0 when logProbs=true and topLogProbs is omitted/default", async () => {
+    const model = makeGpt5Model({ forceResponsesApi: true });
+    const messages = [makeUserTextMessage("hi")];
+    const body = await model.getCompleteChatData({ logProbs: true } as ConfigType, messages);
+    expect((body as Record<string, unknown>).top_logprobs).toBe(0);
+  });
+
+  it("does not emit top_logprobs when logProbs is false/omitted", async () => {
+    const model = makeGpt5Model({ forceResponsesApi: true });
+    const messages = [makeUserTextMessage("hi")];
+    const body = await model.getCompleteChatData({} as ConfigType, messages);
+    expect((body as Record<string, unknown>).top_logprobs).toBeUndefined();
+    expect((body as Record<string, unknown>).logprobs).toBeUndefined();
+  });
+
+  it("throws InvalidConfigError when topLogProbs>0 but logProbs is not true", async () => {
+    const model = makeGpt5Model({ forceResponsesApi: true });
+    const messages = [makeUserTextMessage("hi")];
+    await expect(model.getCompleteChatData({ topLogProbs: 5 } as ConfigType, messages)).rejects.toThrow(InvalidConfigError);
   });
 
   it.skip("emits file content as input_file content part (deferred — Gateway doesn't yet expose file modality for OpenAI)", () => {
@@ -860,24 +952,60 @@ describe("transformCompleteChatResponse — Responses path", () => {
     expect(searchResult.value.references[0].text).toMatch(/^\.\.\..*\[2\]$/);
   });
 
-  it("surfaces refusal content-part text as a TextContent", () => {
+  it("surfaces refusal content-part as ResponseErrorContent with code='refusal'", () => {
     const envelope = makeResponsesEnvelope([
       {
         id: "msg_1",
         type: "message",
         role: "assistant",
         status: "completed",
-        content: [{ type: "refusal", refusal: "Sorry, I cannot help with that" }],
+        content: [{ type: "refusal", refusal: "I can't help with that." }],
       },
     ]);
     const result = model.transformCompleteChatResponse(envelope);
-    expect(result.messages[0].content).toHaveLength(1);
-    const refusal = result.messages[0].content[0] as { modality: string; value: string };
-    expect(refusal.modality).toBe(TextModalityLiteral);
-    expect(refusal.value).toBe("Sorry, I cannot help with that");
+    const errorPart = result.messages[0].content.find((c: { modality: string }) => c.modality === "error") as
+      | { modality: string; value: { type: string; value: { code: string; message: string; provider?: string } } }
+      | undefined;
+    expect(errorPart).toBeDefined();
+    expect(errorPart!.value.type).toBe("response_error");
+    expect(errorPart!.value.value.code).toBe("refusal");
+    expect(errorPart!.value.value.message).toBe("I can't help with that.");
+    expect(errorPart!.value.value.provider).toBe("openai");
+    // No text content for a pure-refusal response
+    expect(result.messages[0].content.filter((c: { modality: string }) => c.modality === TextModalityLiteral)).toHaveLength(0);
   });
 
-  it("ignores reasoning items by default (Q6 out-of-scope)", () => {
+  it("handles message with both output_text and refusal content parts", () => {
+    const envelope = makeResponsesEnvelope([
+      {
+        id: "msg_1",
+        type: "message",
+        role: "assistant",
+        status: "completed",
+        content: [
+          { type: "output_text", text: "Here's what I can share:", annotations: [] },
+          { type: "refusal", refusal: "Cannot elaborate on the restricted part." },
+        ],
+      },
+    ]);
+    const result = model.transformCompleteChatResponse(envelope);
+    const textParts = result.messages[0].content.filter((c: { modality: string }) => c.modality === TextModalityLiteral) as {
+      modality: string;
+      value: string;
+    }[];
+    const errorParts = result.messages[0].content.filter((c: { modality: string }) => c.modality === "error") as {
+      modality: string;
+      value: { type: string; value: { code: string; message: string; provider?: string } };
+    }[];
+    expect(textParts).toHaveLength(1);
+    expect(textParts[0].value).toBe("Here's what I can share:");
+    expect(errorParts).toHaveLength(1);
+    expect(errorParts[0].value.value.code).toBe("refusal");
+    expect(errorParts[0].value.value.message).toBe("Cannot elaborate on the restricted part.");
+    expect(errorParts[0].value.value.provider).toBe("openai");
+  });
+
+  it("skips empty reasoning items (no summary, no encrypted_content)", () => {
     const envelope = makeResponsesEnvelope([
       {
         id: "rs_1",
@@ -894,14 +1022,75 @@ describe("transformCompleteChatResponse — Responses path", () => {
       },
     ]);
     const result = model.transformCompleteChatResponse(envelope);
-    // Only the message text; reasoning item produced no content
+    // Only the message text; empty reasoning item produced no content
     expect(result.messages[0].content).toHaveLength(1);
     const textContent = result.messages[0].content[0] as { modality: string; value: string };
     expect(textContent.modality).toBe(TextModalityLiteral);
     expect(textContent.value).toBe("After reasoning...");
   });
 
-  it("ignores web_search_call items (no content emitted, citations arrive via message annotations)", () => {
+  it("surfaces reasoning item summary as ReasoningContent", () => {
+    const envelope = {
+      id: "resp_r",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "completed" as const,
+      output: [
+        {
+          id: "rs_1",
+          type: "reasoning",
+          status: null,
+          summary: [
+            { type: "summary_text", text: "Let me think about this." },
+            { type: "summary_text", text: "Considering the options..." },
+          ],
+        },
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [{ type: "output_text", text: "Answer", annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const reasoningPart = result.messages[0].content.find((c) => c.modality === "reasoning") as
+      | { modality: string; value: { thinking: string; signature: string } }
+      | undefined;
+    expect(reasoningPart).toBeDefined();
+    expect(reasoningPart!.value.thinking).toContain("Let me think about this.");
+    expect(reasoningPart!.value.thinking).toContain("Considering the options...");
+  });
+
+  it("emits ReasoningContent with encrypted_content as signature", () => {
+    const envelope = {
+      id: "resp_r3",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "completed" as const,
+      output: [
+        { id: "rs_1", type: "reasoning", summary: [], encrypted_content: "enc_base64_blob", status: null },
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [{ type: "output_text", text: "Answer", annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const reasoningPart = result.messages[0].content.find((c) => c.modality === "reasoning") as
+      | { modality: string; value: { thinking: string; signature: string } }
+      | undefined;
+    expect(reasoningPart).toBeDefined();
+    expect(reasoningPart!.value.signature).toBe("enc_base64_blob");
+  });
+
+  it("emits no content for web_search_call without query and no annotations", () => {
     const envelope = makeResponsesEnvelope([
       { id: "ws_1", type: "web_search_call", status: "completed" },
       {
@@ -913,11 +1102,104 @@ describe("transformCompleteChatResponse — Responses path", () => {
       },
     ]);
     const result = model.transformCompleteChatResponse(envelope);
-    // Only the message text; web_search_call produced no content, no annotations → no SearchResult
+    // Only the message text; web_search_call produced no content, no annotations and no query → no SearchResult
     expect(result.messages[0].content).toHaveLength(1);
     const textContent = result.messages[0].content[0] as { modality: string; value: string };
     expect(textContent.modality).toBe(TextModalityLiteral);
     expect(textContent.value).toBe("Web search result");
+  });
+
+  it("populates SearchResultContent.query from web_search_call.action.query", () => {
+    const envelope = {
+      id: "resp_q1",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "completed" as const,
+      output: [
+        { id: "ws_1", type: "web_search_call", status: "completed", action: { type: "search", query: "latest AI news" } },
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "Foo.",
+              annotations: [{ type: "url_citation", start_index: 0, end_index: 3, url: "https://e.com", title: "E" }],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const searchPart = result.messages[0].content.find((c) => c.modality === "search-result") as
+      | { modality: string; value: { query: string } }
+      | undefined;
+    expect(searchPart).toBeDefined();
+    expect(searchPart!.value.query).toBe("latest AI news");
+  });
+
+  it("joins multiple web_search_call queries with ' | '", () => {
+    const envelope = {
+      id: "resp_q2",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "completed" as const,
+      output: [
+        { id: "ws_1", type: "web_search_call", status: "completed", action: { type: "search", query: "q1" } },
+        { id: "ws_2", type: "web_search_call", status: "completed", action: { type: "search", query: "q2" } },
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "Both.",
+              annotations: [{ type: "url_citation", start_index: 0, end_index: 4, url: "https://e.com", title: "E" }],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const searchPart = result.messages[0].content.find((c) => c.modality === "search-result") as
+      | { modality: string; value: { query: string } }
+      | undefined;
+    expect(searchPart).toBeDefined();
+    expect(searchPart!.value.query).toBe("q1 | q2");
+  });
+
+  it("emits SearchResultContent with query only when web_search_call happened but no annotations", () => {
+    const envelope = {
+      id: "resp_q3",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "completed" as const,
+      output: [
+        { id: "ws_1", type: "web_search_call", status: "completed", action: { type: "search", query: "niche query" } },
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [{ type: "output_text", text: "Nothing useful found.", annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 2, total_tokens: 7 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const searchPart = result.messages[0].content.find((c) => c.modality === "search-result") as
+      | { modality: string; value: { query: string; responses: unknown[]; references: unknown[] } }
+      | undefined;
+    expect(searchPart).toBeDefined();
+    expect(searchPart!.value.query).toBe("niche query");
+    expect(searchPart!.value.responses).toEqual([]);
+    expect(searchPart!.value.references).toEqual([]);
   });
 
   it("maps usage.input_tokens to promptTokens and usage.output_tokens to completionTokens", () => {
@@ -951,6 +1233,345 @@ describe("transformCompleteChatResponse — Responses path", () => {
       error: { type: "invalid_request_error", message: "Request was rejected", code: "invalid_request", param: null },
     };
     expect(() => model.transformCompleteChatResponse(errorEnvelope)).toThrow(ModelResponseError);
+  });
+
+  it("surfaces incomplete status as ResponseError content after partial output", () => {
+    const envelope = {
+      id: "resp_1",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "incomplete" as const,
+      incomplete_details: { reason: "max_output_tokens" },
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "incomplete",
+          content: [{ type: "output_text", text: "Partial answer", annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 10, output_tokens: 5, total_tokens: 15 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const contents = result.messages[0].content;
+    expect(contents.some((c) => c.modality === "text" && (c as { value: string }).value === "Partial answer")).toBe(true);
+    const errorPart = contents.find((c) => c.modality === "error") as
+      | { modality: string; value: { type: string; value: { code: string; message: string; provider?: string } } }
+      | undefined;
+    expect(errorPart).toBeDefined();
+    expect(errorPart!.value.type).toBe("response_error");
+    expect(errorPart!.value.value.code).toBe("incomplete");
+    expect(errorPart!.value.value.message).toContain("max_output_tokens");
+    expect(errorPart!.value.value.provider).toBe("openai");
+  });
+
+  it("surfaces failed status with output as ResponseError (does not throw)", () => {
+    const envelope = {
+      id: "resp_2",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "failed" as const,
+      error: { type: "server_error", message: "backend hiccup", code: null, param: null },
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "failed",
+          content: [{ type: "output_text", text: "So far...", annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 2, total_tokens: 7 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const errorPart = result.messages[0].content.find((c) => c.modality === "error") as
+      | { modality: string; value: { type: string; value: { code: string; message: string } } }
+      | undefined;
+    expect(errorPart).toBeDefined();
+    expect(errorPart!.value.value.code).toBe("server_error");
+  });
+
+  it("throws ModelResponseError on failed status with empty output", () => {
+    const envelope = {
+      id: "resp_3",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "failed" as const,
+      error: { type: "server_error", message: "hard fail", code: null, param: null },
+      output: [],
+      usage: { input_tokens: 0, output_tokens: 0, total_tokens: 0 },
+    };
+    expect(() => model.transformCompleteChatResponse(envelope)).toThrow(ModelResponseError);
+  });
+
+  it("surfaces cancelled status as ResponseError", () => {
+    const envelope = {
+      id: "resp_4",
+      object: "response" as const,
+      model: "gpt-4o",
+      status: "cancelled" as const,
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "incomplete",
+          content: [{ type: "output_text", text: "Starting...", annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 2, total_tokens: 7 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const errorPart = result.messages[0].content.find((c) => c.modality === "error") as
+      | { modality: string; value: { type: string; value: { code: string; message: string } } }
+      | undefined;
+    expect(errorPart).toBeDefined();
+    expect(errorPart!.value.value.code).toBe("cancelled");
+  });
+
+  it("accepts file_citation annotations without rejecting the response", () => {
+    const model = makeModel();
+    const envelope = {
+      id: "resp_fc",
+      object: "response",
+      model: "gpt-4o",
+      status: "completed",
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "See the file.",
+              annotations: [{ type: "file_citation", file_id: "file-abc", index: 5, filename: "report.pdf", quote: "foo" }],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const textParts = result.messages[0].content.filter((c) => c.modality === "text");
+    expect(textParts).toHaveLength(1);
+    const searchParts = result.messages[0].content.filter((c) => c.modality === "search-result");
+    expect(searchParts).toHaveLength(0); // file_citation is not url_citation; no SearchResultContent
+  });
+
+  it("accepts file_path annotations without rejecting the response", () => {
+    const model = makeModel();
+    const envelope = {
+      id: "resp_fp",
+      object: "response",
+      model: "gpt-4o",
+      status: "completed",
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "Output saved.",
+              annotations: [{ type: "file_path", file_id: "file-xyz", start_index: 0, end_index: 10 }],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const textParts = result.messages[0].content.filter((c) => c.modality === "text");
+    expect(textParts).toHaveLength(1);
+  });
+
+  it("accepts container_file_citation annotations without rejecting the response", () => {
+    const model = makeModel();
+    const envelope = {
+      id: "resp_cfc",
+      object: "response",
+      model: "gpt-4o",
+      status: "completed",
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "Container output.",
+              annotations: [
+                {
+                  type: "container_file_citation",
+                  container_id: "cntr_1",
+                  file_id: "file-1",
+                  start_index: 0,
+                  end_index: 5,
+                  filename: "a.txt",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const textParts = result.messages[0].content.filter((c) => c.modality === "text");
+    expect(textParts).toHaveLength(1);
+  });
+
+  it("mixes url_citation with non-URL annotations — only URL citations become SearchResultContent", () => {
+    const model = makeModel();
+    const envelope = {
+      id: "resp_mix",
+      object: "response",
+      model: "gpt-4o",
+      status: "completed",
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "Paris.",
+              annotations: [
+                { type: "url_citation", start_index: 0, end_index: 5, url: "https://example.com/paris", title: "Paris" },
+                { type: "file_citation", file_id: "file-abc", index: 10, filename: "paris.pdf" },
+              ],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 5, total_tokens: 10 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    const searchParts = result.messages[0].content.filter((c) => c.modality === "search-result");
+    expect(searchParts).toHaveLength(1);
+    expect((searchParts[0] as any).value.responses).toHaveLength(1);
+    expect((searchParts[0] as any).value.responses[0].url).toBe("https://example.com/paris");
+  });
+
+  it("surfaces logprobs from output_text content parts", () => {
+    const envelope = {
+      id: "resp_lp",
+      object: "response",
+      model: "gpt-4o",
+      status: "completed",
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "Hi",
+              annotations: [],
+              logprobs: [
+                {
+                  token: "H",
+                  logprob: -0.1,
+                  bytes: [72],
+                  top_logprobs: [
+                    { token: "H", logprob: -0.1, bytes: [72] },
+                    { token: "h", logprob: -2.5, bytes: [104] },
+                  ],
+                },
+                {
+                  token: "i",
+                  logprob: -0.2,
+                  bytes: [105],
+                  top_logprobs: [{ token: "i", logprob: -0.2, bytes: [105] }],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 2, total_tokens: 7 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    expect(result.logProbs).toHaveLength(2);
+    expect(result.logProbs?.[0]).toEqual({
+      token: "H",
+      logProb: -0.1,
+      bytes: [72],
+      topLogProbs: [
+        { token: "H", logProb: -0.1, bytes: [72] },
+        { token: "h", logProb: -2.5, bytes: [104] },
+      ],
+    });
+    expect(result.logProbs?.[1].token).toBe("i");
+    expect(result.logProbs?.[1].topLogProbs).toHaveLength(1);
+  });
+
+  it("returns empty logProbs when output_text parts have no logprobs", () => {
+    const envelope = {
+      id: "resp_nolp",
+      object: "response",
+      model: "gpt-4o",
+      status: "completed",
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [{ type: "output_text", text: "Hi", annotations: [] }],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 1, total_tokens: 6 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    expect(result.logProbs).toEqual([]);
+  });
+
+  it("flattens logprobs across multiple output_text parts in one message", () => {
+    const envelope = {
+      id: "resp_multi",
+      object: "response",
+      model: "gpt-4o",
+      status: "completed",
+      output: [
+        {
+          id: "msg_1",
+          type: "message",
+          role: "assistant",
+          status: "completed",
+          content: [
+            {
+              type: "output_text",
+              text: "A",
+              annotations: [],
+              logprobs: [{ token: "A", logprob: -0.1, bytes: [65], top_logprobs: [] }],
+            },
+            {
+              type: "output_text",
+              text: "B",
+              annotations: [],
+              logprobs: [{ token: "B", logprob: -0.2, bytes: [66], top_logprobs: [] }],
+            },
+          ],
+        },
+      ],
+      usage: { input_tokens: 5, output_tokens: 2, total_tokens: 7 },
+    };
+    const result = model.transformCompleteChatResponse(envelope);
+    expect(result.logProbs).toHaveLength(2);
+    expect(result.logProbs?.[0].token).toBe("A");
+    expect(result.logProbs?.[1].token).toBe("B");
   });
 });
 
@@ -1070,18 +1691,53 @@ describe("transformStreamChatResponseChunk — Responses path", () => {
     expect(msg.partialContent.value.thinking).toBe("I am thinking...");
   });
 
-  it("emits PartialTextContent on response.refusal.delta", async () => {
-    const chunk = makeRefusalDelta("I cannot help");
+  it("emits PartialResponseErrorContent with code='refusal' on response.refusal.delta", async () => {
+    const chunk = makeRefusalDelta("I can't help");
     const results = await collectChunks(model, chunk, "");
     const emitting = results.find((r) => r.partialResponse.partialMessages.length > 0);
     expect(emitting).toBeDefined();
     const msg = emitting!.partialResponse.partialMessages[0] as {
       role: string;
-      partialContent: { modality: string; value: string };
+      partialContent: { modality: string; value: { type: string; code?: string; message?: string; provider?: string } };
     };
     expect(msg.role).toBe(AssistantRoleLiteral);
-    expect(msg.partialContent.modality).toBe("partial-text");
-    expect(msg.partialContent.value).toBe("I cannot help");
+    expect(msg.partialContent.modality).toBe("partial-error");
+    expect(msg.partialContent.value.type).toBe("response_error");
+    expect(msg.partialContent.value.code).toBe("refusal");
+    expect(msg.partialContent.value.message).toBe("I can't help");
+    expect(msg.partialContent.value.provider).toBe("openai");
+  });
+
+  it("concatenates refusal chunks across deltas via merge", async () => {
+    // Stream two refusal delta chunks; each must emit a PartialResponseErrorContent carrying
+    // its own fragment. The @adaline/types merger is responsible for concatenating the final
+    // `message` field — contract tested at that layer.
+    const chunk1 = makeRefusalDelta("I can't help");
+    const chunk2 = makeRefusalDelta(" with that.");
+
+    const partials: {
+      role: string;
+      partialContent: { modality: string; value: { type: string; code?: string; message?: string } };
+    }[] = [];
+    let buffer = "";
+    for (const chunk of [chunk1, chunk2]) {
+      const results = await collectChunks(model, chunk, buffer);
+      for (const r of results) {
+        for (const pm of r.partialResponse.partialMessages ?? []) {
+          partials.push(
+            pm as {
+              role: string;
+              partialContent: { modality: string; value: { type: string; code?: string; message?: string } };
+            }
+          );
+        }
+        buffer = r.buffer;
+      }
+    }
+    const refusalPartials = partials.filter((pm) => pm.partialContent.value.code === "refusal");
+    expect(refusalPartials).toHaveLength(2);
+    expect(refusalPartials[0].partialContent.value.message).toBe("I can't help");
+    expect(refusalPartials[1].partialContent.value.message).toBe(" with that.");
   });
 
   it("resolves item_id to synthetic index across chunks for function_call_arguments.delta", async () => {
@@ -1139,9 +1795,44 @@ describe("transformStreamChatResponseChunk — Responses path", () => {
     expect(usage.totalTokens).toBe(40);
   });
 
-  it("throws ModelResponseError on response.failed event", async () => {
+  it("emits PartialResponseErrorContent on response.failed instead of throwing", async () => {
     const chunk = makeFailed();
-    await expect(collectChunks(model, chunk, "")).rejects.toThrow(ModelResponseError);
+    const results = await collectChunks(model, chunk, "");
+    const allPartials = results.flatMap((r) => r.partialResponse.partialMessages) as {
+      role: string;
+      partialContent: { modality: string; value: { type?: string; code?: string; message?: string; provider?: string } };
+    }[];
+    const errorPartial = allPartials.find(
+      (pm) => pm.partialContent?.modality === "partial-error" && pm.partialContent?.value?.type === "response_error"
+    );
+    expect(errorPartial).toBeDefined();
+    expect(errorPartial!.partialContent.value.code).toBe("failed");
+    expect(errorPartial!.partialContent.value.provider).toBe("openai");
+  });
+
+  it("emits PartialResponseErrorContent on response.incomplete instead of throwing", async () => {
+    const chunk = makeChunkLine({
+      type: "response.incomplete",
+      response: {
+        id: "resp_i",
+        object: "response",
+        model: "gpt-4o",
+        status: "incomplete",
+        incomplete_details: { reason: "max_output_tokens" },
+        output: [],
+        usage: null,
+      },
+    });
+    const results = await collectChunks(model, chunk, "");
+    const allPartials = results.flatMap((r) => r.partialResponse.partialMessages) as {
+      role: string;
+      partialContent: { modality: string; value: { type?: string; code?: string; message?: string } };
+    }[];
+    const errorPartial = allPartials.find(
+      (pm) => pm.partialContent?.value?.type === "response_error" && pm.partialContent?.value?.code === "incomplete"
+    );
+    expect(errorPartial).toBeDefined();
+    expect(errorPartial!.partialContent.value.message).toContain("max_output_tokens");
   });
 
   it("throws ModelResponseError on nested error event {type:error, error:{...}} with cause set to inner error payload", async () => {
@@ -1171,6 +1862,23 @@ describe("transformStreamChatResponseChunk — Responses path", () => {
     const results = await collectChunks(model, chunk, "");
     const allPartials = results.flatMap((r) => r.partialResponse.partialMessages);
     expect(allPartials).toHaveLength(0);
+  });
+
+  it("emits PartialSearchResultContent on response.output_item.added for web_search_call", async () => {
+    const chunk = makeChunkLine({
+      type: "response.output_item.added",
+      output_index: 0,
+      item: { id: "ws_1", type: "web_search_call", status: "in_progress", action: { type: "search", query: "what is X?" } },
+    });
+
+    const results = await collectChunks(model, chunk, "");
+    const allPartials = results.flatMap((r) => r.partialResponse.partialMessages) as {
+      role: string;
+      partialContent: { modality: string; value: { query?: string } };
+    }[];
+    const searchPartial = allPartials.find((pm) => pm.partialContent?.modality === "partial-search-result");
+    expect(searchPartial).toBeDefined();
+    expect(searchPartial!.partialContent.value.query).toBe("what is X?");
   });
 
   it("throws ModelResponseError on malformed JSON in SSE data line", async () => {
@@ -1256,6 +1964,16 @@ describe("registry", () => {
       const schema = schemas[literal];
       expect(schema.modalities).toContain(SearchResultModalityLiteral);
     });
+
+    it.each(q2Models)(
+      "model '%s' declares webSearchAllowedDomains, webSearchUserLocation, webSearchExternalAccess config keys",
+      (literal) => {
+        const schema = schemas[literal];
+        expect(schema.config.def.webSearchAllowedDomains).toBeDefined();
+        expect(schema.config.def.webSearchUserLocation).toBeDefined();
+        expect(schema.config.def.webSearchExternalAccess).toBeDefined();
+      }
+    );
   });
 
   describe("Q2 exclusions — must NOT declare webSearchTool", () => {
@@ -1264,6 +1982,17 @@ describe("registry", () => {
       expect(schema, `schema missing for ${literal}`).toBeDefined();
       expect((schema.config.def as Record<string, unknown>).webSearchTool).toBeUndefined();
     });
+
+    it.each(noWebSearchModels)(
+      "model '%s' does not declare webSearchAllowedDomains/webSearchUserLocation/webSearchExternalAccess",
+      (literal) => {
+        const schema = schemas[literal];
+        const def = schema.config.def as Record<string, unknown>;
+        expect(def.webSearchAllowedDomains).toBeUndefined();
+        expect(def.webSearchUserLocation).toBeUndefined();
+        expect(def.webSearchExternalAccess).toBeUndefined();
+      }
+    );
   });
 
   describe("CC search-preview SKUs — keep their existing webSearchTool config (unchanged)", () => {
@@ -1271,6 +2000,14 @@ describe("registry", () => {
       const schema = schemas[literal];
       expect(schema, `schema missing for ${literal}`).toBeDefined();
       expect((schema.config.def as Record<string, unknown>).webSearchTool).toBeDefined();
+    });
+
+    it.each(ccSearchPreviewModels)("model '%s' does NOT declare Responses-API-only filter keys (CC path unchanged)", (literal) => {
+      const schema = schemas[literal];
+      const def = schema.config.def as Record<string, unknown>;
+      expect(def.webSearchAllowedDomains).toBeUndefined();
+      expect(def.webSearchUserLocation).toBeUndefined();
+      expect(def.webSearchExternalAccess).toBeUndefined();
     });
   });
 });

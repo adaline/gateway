@@ -6,6 +6,7 @@ import { PairedSelectConfigItemDef, PairedSelectConfigItemTypeLiteral } from "./
 import { RangeConfigItemDef, RangeConfigItemTypeLiteral } from "./range-config-item";
 import { SelectBooleanConfigItemDef, SelectBooleanConfigItemTypeLiteral } from "./select-boolean-config-item";
 import { SelectStringConfigItemDef, SelectStringConfigItemTypeLiteral } from "./select-string-config-item";
+import { StringConfigItemDef, StringConfigItemTypeLiteral } from "./string-config-item";
 
 const ConfigItemLiterals = [
   RangeConfigItemTypeLiteral,
@@ -14,6 +15,7 @@ const ConfigItemLiterals = [
   ObjectSchemaConfigItemTypeLiteral,
   SelectBooleanConfigItemTypeLiteral,
   PairedSelectConfigItemTypeLiteral,
+  StringConfigItemTypeLiteral,
 ] as const;
 const ConfigItemEnum = z.enum(ConfigItemLiterals);
 type ConfigItemEnumType = z.infer<typeof ConfigItemEnum>;
@@ -25,6 +27,7 @@ const ConfigItemDef = z.discriminatedUnion("type", [
   SelectBooleanConfigItemDef,
   ObjectSchemaConfigItemDef,
   PairedSelectConfigItemDef,
+  StringConfigItemDef,
 ]);
 type ConfigItemDefType = z.infer<typeof ConfigItemDef>;
 

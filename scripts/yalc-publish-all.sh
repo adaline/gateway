@@ -39,10 +39,15 @@ skipped_no_dist=0
 
 while IFS= read -r -d '' pkg; do
   dir="$(dirname "$pkg")"
-  name=$(node -p "try { require('$pkg').name || '' } catch { '' }" 2>/dev/null)
-  private=$(node -p "try { !!require('$pkg').private } catch { false }" 2>/dev/null)
+  name=$(node -p "try { require('./$pkg').name || '' } catch { '' }" 2>/dev/null)
+  private=$(node -p "try { !!require('./$pkg').private } catch { false }" 2>/dev/null)
 
-  if [[ -z "$name" || "$name" != @adaline/* ]]; then
+  if [[ -z "$name" ]]; then
+    printf "  warn (unreadable)   %s\n" "$pkg" >&2
+    continue
+  fi
+
+  if [[ "$name" != @adaline/* ]]; then
     continue
   fi
 
@@ -59,7 +64,9 @@ while IFS= read -r -d '' pkg; do
   fi
 
   printf "  publishing          %s\n" "$name"
-  (cd "$dir" && yalc publish --push)
+  # --no-scripts skips prepublishOnly (which would trigger a redundant tsup rebuild).
+  # We trust that `pnpm run build` has already produced an up-to-date dist/.
+  (cd "$dir" && yalc publish --push --no-scripts)
   published=$((published + 1))
 done < <(
   find core packages -maxdepth 4 -name package.json \
