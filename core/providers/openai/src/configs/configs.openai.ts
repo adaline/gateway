@@ -33,8 +33,6 @@ import {
   ChatModelResponseSchemaConfigSchema,
   ChatModelResponseSchemaWithWebSearchConfigDef,
   ChatModelResponseSchemaWithWebSearchConfigSchema,
-  ChatModelWebSearchConfigDef,
-  ChatModelWebSearchConfigSchema,
 } from "./chat-model";
 import {
   EmbeddingModelBaseConfigDef,
@@ -83,10 +81,6 @@ const OpenAIChatModelConfigs = {
   gpt5Pro: (maxOutputTokens: number, maxSequences: number) => ({
     def: ChatModelGPT5ProConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelGPT5ProConfigSchema(maxOutputTokens, maxSequences),
-  }),
-  webSearch: (maxOutputTokens: number, maxSequences: number) => ({
-    def: ChatModelWebSearchConfigDef(maxOutputTokens, maxSequences),
-    schema: ChatModelWebSearchConfigSchema(maxOutputTokens, maxSequences),
   }),
   responseSchemaWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
     def: ChatModelResponseSchemaWithWebSearchConfigDef(maxOutputTokens, maxSequences),

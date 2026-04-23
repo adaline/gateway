@@ -1,13 +1,4 @@
-import { z } from "zod";
-
-import {
-  CHAT_CONFIG,
-  MultiStringConfigItem,
-  ObjectSchemaConfigItem,
-  RangeConfigItem,
-  SelectBooleanConfigItem,
-  SelectStringConfigItem,
-} from "@adaline/provider";
+import { CHAT_CONFIG, MultiStringConfigItem, RangeConfigItem, SelectBooleanConfigItem, SelectStringConfigItem } from "@adaline/provider";
 
 const temperature = RangeConfigItem({
   param: "temperature",
@@ -186,19 +177,6 @@ const webSearchAllowedDomains = MultiStringConfigItem({
   max: 100,
 });
 
-// Responses API only. Approximate user location for geo-relevant search.
-const webSearchUserLocation = ObjectSchemaConfigItem({
-  param: "webSearchUserLocation",
-  title: "Web Search User Location",
-  description: "Approximate user location for geo-relevant web search results. Responses API only.",
-  objectSchema: z.object({
-    country: z.string().optional(),
-    city: z.string().optional(),
-    region: z.string().optional(),
-    timezone: z.string().optional(),
-  }),
-});
-
 // Responses API only. Default true (live web access). Set false for cached/indexed-only.
 const webSearchExternalAccess = SelectBooleanConfigItem({
   param: "webSearchExternalAccess",
@@ -228,5 +206,4 @@ export {
   webSearchAllowedDomains,
   webSearchExternalAccess,
   webSearchTool,
-  webSearchUserLocation,
 };
