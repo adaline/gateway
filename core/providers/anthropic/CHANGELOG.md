@@ -1,5 +1,13 @@
 # @adaline/anthropic
 
+## 1.13.7
+
+### Patch Changes
+
+- Updated dependencies [4f55295]
+  - @adaline/types@1.15.0
+  - @adaline/provider@1.10.4
+
 ## 1.13.6
 
 ### Patch Changes
