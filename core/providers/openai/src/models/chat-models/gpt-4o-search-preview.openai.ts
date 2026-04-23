@@ -5,7 +5,12 @@ import { ChatModelSchema } from "@adaline/provider";
 import { OpenAIChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
-import { OpenAIChatModelRoles, OpenAIChatModelRolesMap, OpenAIChatModelWebSearchModalities, OpenAIChatModelWebSearchModalitiesEnum } from "./types";
+import {
+  OpenAIChatModelRoles,
+  OpenAIChatModelRolesMap,
+  OpenAIChatModelWebSearchModalities,
+  OpenAIChatModelWebSearchModalitiesEnum,
+} from "./types";
 
 const GPT_4o_Search_PreviewLiteral = "gpt-4o-search-preview";
 const GPT_4o_Search_PreviewDescription =
@@ -20,8 +25,8 @@ const GPT_4o_Search_PreviewSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAI
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.webSearch(16384, 4).def,
-    schema: OpenAIChatModelConfigs.webSearch(16384, 4).schema,
+    def: OpenAIChatModelConfigs.responseSchema(16384, 4).def,
+    schema: OpenAIChatModelConfigs.responseSchema(16384, 4).schema,
   },
   price: pricingData[GPT_4o_Search_PreviewLiteral],
 });

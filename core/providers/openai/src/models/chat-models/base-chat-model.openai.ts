@@ -470,18 +470,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
     }
 
-    // Web-search-options construction for CC search-preview SKUs (gpt-4o-search-preview family,
-    // gpt-5-search-api). Via the public getCompleteChatData path, shouldUseResponsesApi intercepts
-    // webSearchTool=true and routes to Responses, so this branch is unreachable today. It remains
-    // for (a) direct transformConfig callers (ChatModelV1 contract), and (b) to keep CC search-preview
-    // semantics intact if routing later adds a forceChatCompletions counterpart.
-    if ("webSearch" in transformedConfig && transformedConfig.webSearch === true) {
-      transformedConfig.web_search_options = {};
-    }
-    // Always strip internal web-search keys (even when webSearchTool=false) so nothing leaks to the CC body.
-    delete transformedConfig.webSearch;
+    // Always strip internal web-search keys so nothing leaks to the CC body.
     delete transformedConfig.webSearchAllowedDomains;
-    delete transformedConfig.webSearchUserLocation;
     delete transformedConfig.webSearchExternalAccess;
 
     return transformedConfig;
@@ -1062,9 +1052,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     //      logprobs, frequency_penalty, presence_penalty, stop, seed, n, stream_options, web_search_options.
     //   2. Internal config keys that are Responses API params but belong INSIDE `tools[]`,
     //      not at the top level. `transformToolsResponsesApi` reads them from config and
-    //      builds `{type:"web_search", filters, user_location, external_web_access}` inside
-    //      the tools entry. Skipping them here prevents double-emission, which OpenAI would
-    //      reject as unknown top-level fields.
+    //      builds `{type:"web_search", filters, external_web_access}` inside the tools entry.
+    //      Skipping them here prevents double-emission, which OpenAI would reject as unknown
+    //      top-level fields.
     const skipFromResponsesTopLevel = new Set<string>([
       // Category 1 — CC-only
       "logprobs",
@@ -1075,10 +1065,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       "n",
       "stream_options",
       "web_search_options",
-      // Category 2 — Responses API, consumed by transformToolsResponsesApi
+      // Category 2 — Responses API, consumed by transformToolsResponsesApi. These are
+      // the `def.param` wire names (not schema keys). `webSearch` is the param name of
+      // the `webSearchTool` atom — dropping it would leak `{"webSearch": true}` to the
+      // top level of the Responses body, which OpenAI rejects.
       "webSearch",
       "webSearchAllowedDomains",
-      "webSearchUserLocation",
       "webSearchExternalAccess",
     ]);
 
@@ -1387,21 +1379,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       const domains = (config as { webSearchAllowedDomains?: string[] }).webSearchAllowedDomains;
       if (Array.isArray(domains) && domains.length > 0) {
         webSearchTool.filters = { allowed_domains: domains };
-      }
-
-      const loc = (
-        config as {
-          webSearchUserLocation?: { country?: string; city?: string; region?: string; timezone?: string };
-        }
-      ).webSearchUserLocation;
-      if (loc && (loc.country || loc.city || loc.region || loc.timezone)) {
-        webSearchTool.user_location = {
-          type: "approximate",
-          ...(loc.country ? { country: loc.country } : {}),
-          ...(loc.city ? { city: loc.city } : {}),
-          ...(loc.region ? { region: loc.region } : {}),
-          ...(loc.timezone ? { timezone: loc.timezone } : {}),
-        };
       }
 
       const externalAccess = (config as { webSearchExternalAccess?: boolean }).webSearchExternalAccess;

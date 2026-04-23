@@ -27,8 +27,8 @@ describe("OpenAI Web Search", () => {
     roles: mockRolesMap,
     modalities: mockWebSearchModalities,
     config: {
-      def: OpenAIChatModelConfigs.webSearch(16384, 4).def,
-      schema: OpenAIChatModelConfigs.webSearch(16384, 4).schema,
+      def: OpenAIChatModelConfigs.responseSchema(16384, 4).def,
+      schema: OpenAIChatModelConfigs.responseSchema(16384, 4).schema,
     },
   });
 
@@ -38,16 +38,6 @@ describe("OpenAI Web Search", () => {
     modelName: "test-web-search-model",
   };
 
-  // --- Config Tests ---
-  describe("web search config", () => {
-    it("should have webSearchTool config key", () => {
-      const configDef = OpenAIChatModelConfigs.webSearch(16384, 4).def;
-      expect(configDef.webSearchTool).toBeDefined();
-      expect(configDef.webSearchTool.type).toBe("select-boolean");
-      expect(configDef.webSearchTool.param).toBe("webSearch");
-    });
-  });
-
   // --- transformConfig Tests ---
   describe("transformConfig", () => {
     let model: BaseChatModel;
@@ -56,34 +46,12 @@ describe("OpenAI Web Search", () => {
       model = new BaseChatModel(mockModelSchema, mockOptions);
     });
 
-    it("should transform webSearch config into empty web_search_options", () => {
-      const result = model.transformConfig({
-        webSearchTool: true,
-      });
-
-      expect(result.web_search_options).toBeDefined();
-      expect(result.web_search_options).toEqual({});
-      expect(result.webSearch).toBeUndefined();
-    });
-
-    it("should not include web_search_options when webSearchTool is false", () => {
-      const result = model.transformConfig({
-        webSearchTool: false,
-      });
-
-      expect(result.web_search_options).toBeUndefined();
-      expect(result.webSearch).toBeUndefined();
-    });
-
     it("strips Responses-only keys from CC body (regression guard)", () => {
       const result = model.transformConfig({
-        webSearchTool: true,
         webSearchAllowedDomains: ["leak.example"],
-        webSearchUserLocation: { country: "XX" },
         webSearchExternalAccess: false,
       } as any);
       expect(result.webSearchAllowedDomains).toBeUndefined();
-      expect(result.webSearchUserLocation).toBeUndefined();
       expect(result.webSearchExternalAccess).toBeUndefined();
     });
   });
@@ -337,7 +305,7 @@ describe("OpenAI Web Search", () => {
       expect(schemas["gpt-5-search-api"]).toBeDefined();
       expect(schemas["gpt-5-search-api"].name).toBe("gpt-5-search-api");
       expect(schemas["gpt-5-search-api"].modalities).toContain(SearchResultModalityLiteral);
-      expect(schemas["gpt-5-search-api"].config.def.webSearchTool).toBeDefined();
+      expect((schemas["gpt-5-search-api"].config.def as Record<string, unknown>).webSearchTool).toBeUndefined();
     });
 
     it("should include search-result modality in search-preview models", () => {
@@ -350,10 +318,9 @@ describe("OpenAI Web Search", () => {
       expect(modalities).toContain(SearchResultModalityLiteral);
     });
 
-    it("should have webSearchTool config in search-preview models", () => {
-      const configDef = schemas["gpt-4o-search-preview"].config.def;
-      expect(configDef.webSearchTool).toBeDefined();
-      expect(configDef.webSearchTool.type).toBe("select-boolean");
+    it("should NOT have webSearchTool config in search-preview models (always-on CC search)", () => {
+      const configDef = schemas["gpt-4o-search-preview"].config.def as Record<string, unknown>;
+      expect(configDef.webSearchTool).toBeUndefined();
     });
   });
 

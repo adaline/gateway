@@ -1,11 +1,10 @@
-import { webSearchAllowedDomains, webSearchExternalAccess, webSearchTool, webSearchUserLocation } from "./common.config.chat-model.openai";
+import { webSearchAllowedDomains, webSearchExternalAccess, webSearchTool } from "./common.config.chat-model.openai";
 import { ChatModelResponseSchemaConfigDef, ChatModelResponseSchemaConfigSchema } from "./response-schema.config.chat-model.openai";
 
 const ChatModelResponseSchemaWithWebSearchConfigDef = (maxOutputTokens: number, maxSequences: number) => ({
   ...ChatModelResponseSchemaConfigDef(maxOutputTokens, maxSequences),
   webSearchTool: webSearchTool.def,
   webSearchAllowedDomains: webSearchAllowedDomains.def,
-  webSearchUserLocation: webSearchUserLocation.def,
   webSearchExternalAccess: webSearchExternalAccess.def,
 });
 
@@ -13,7 +12,6 @@ const ChatModelResponseSchemaWithWebSearchConfigSchema = (maxOutputTokens: numbe
   ChatModelResponseSchemaConfigSchema(maxOutputTokens, maxSequences).extend({
     webSearchTool: webSearchTool.schema,
     webSearchAllowedDomains: webSearchAllowedDomains.schema,
-    webSearchUserLocation: webSearchUserLocation.schema,
     webSearchExternalAccess: webSearchExternalAccess.schema,
   });
 

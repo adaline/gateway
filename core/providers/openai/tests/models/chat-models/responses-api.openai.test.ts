@@ -41,8 +41,8 @@ const mockModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), 
   roles: mockRolesMap,
   modalities: mockWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.webSearch(16384, 4).def,
-    schema: OpenAIChatModelConfigs.webSearch(16384, 4).schema,
+    def: OpenAIChatModelConfigs.responseSchemaWithWebSearch(16384, 4).def,
+    schema: OpenAIChatModelConfigs.responseSchemaWithWebSearch(16384, 4).schema,
   },
 });
 
@@ -524,6 +524,17 @@ describe("request body — Responses path", () => {
     expect(body.tools.some((t) => t.type === "web_search")).toBe(true);
   });
 
+  it("does not leak webSearch/webSearchTool as top-level keys in the Responses body", async () => {
+    const messages = [makeUserTextMessage("Search")];
+    const body = (await model.getCompleteChatData({ webSearchTool: true }, messages)) as Record<string, unknown>;
+    // `webSearchTool` atom declares param: "webSearch" — the skip set must suppress the wire
+    // name, otherwise `{"webSearch": true}` would leak and OpenAI would reject as unknown.
+    expect(body.webSearch).toBeUndefined();
+    expect(body.webSearchTool).toBeUndefined();
+    expect(body.webSearchAllowedDomains).toBeUndefined();
+    expect(body.webSearchExternalAccess).toBeUndefined();
+  });
+
   it("passes tool_choice string through (none|auto|required)", async () => {
     const messages = [makeUserTextMessage("Use tool")];
     const tools = [makeFunctionTool("my_fn", "My function", { type: "object", properties: {} })];
@@ -648,20 +659,6 @@ describe("request body — Responses path", () => {
     expect((webSearchTool as { filters?: unknown }).filters).toEqual({ allowed_domains: ["openai.com", "anthropic.com"] });
   });
 
-  it("emits user_location when webSearchUserLocation is set (partial fields)", async () => {
-    const messages = [makeUserTextMessage("search")];
-    const body = (await model.getCompleteChatData(
-      { webSearchTool: true, webSearchUserLocation: { country: "US", city: "San Francisco" } } as ConfigType,
-      messages
-    )) as { tools: Array<Record<string, unknown>> };
-    const webSearchTool = body.tools.find((t) => t.type === "web_search");
-    expect((webSearchTool as { user_location?: unknown }).user_location).toEqual({
-      type: "approximate",
-      country: "US",
-      city: "San Francisco",
-    });
-  });
-
   it("emits external_web_access=false when webSearchExternalAccess is false", async () => {
     const messages = [makeUserTextMessage("search")];
     const body = (await model.getCompleteChatData({ webSearchTool: true, webSearchExternalAccess: false } as ConfigType, messages)) as {
@@ -686,18 +683,15 @@ describe("request body — Responses path", () => {
       {
         webSearchTool: true,
         webSearchAllowedDomains: ["example.com"],
-        webSearchUserLocation: { country: "US", timezone: "America/Los_Angeles" },
         webSearchExternalAccess: false,
       } as ConfigType,
       messages
     )) as { tools: Array<Record<string, unknown>> };
     const webSearchTool = body.tools.find((t) => t.type === "web_search") as {
       filters?: unknown;
-      user_location?: unknown;
       external_web_access?: unknown;
     };
     expect(webSearchTool.filters).toEqual({ allowed_domains: ["example.com"] });
-    expect(webSearchTool.user_location).toEqual({ type: "approximate", country: "US", timezone: "America/Los_Angeles" });
     expect(webSearchTool.external_web_access).toBe(false);
   });
 
@@ -1965,15 +1959,11 @@ describe("registry", () => {
       expect(schema.modalities).toContain(SearchResultModalityLiteral);
     });
 
-    it.each(q2Models)(
-      "model '%s' declares webSearchAllowedDomains, webSearchUserLocation, webSearchExternalAccess config keys",
-      (literal) => {
-        const schema = schemas[literal];
-        expect(schema.config.def.webSearchAllowedDomains).toBeDefined();
-        expect(schema.config.def.webSearchUserLocation).toBeDefined();
-        expect(schema.config.def.webSearchExternalAccess).toBeDefined();
-      }
-    );
+    it.each(q2Models)("model '%s' declares webSearchAllowedDomains, webSearchExternalAccess config keys", (literal) => {
+      const schema = schemas[literal];
+      expect(schema.config.def.webSearchAllowedDomains).toBeDefined();
+      expect(schema.config.def.webSearchExternalAccess).toBeDefined();
+    });
   });
 
   describe("Q2 exclusions — must NOT declare webSearchTool", () => {
@@ -1983,30 +1973,25 @@ describe("registry", () => {
       expect((schema.config.def as Record<string, unknown>).webSearchTool).toBeUndefined();
     });
 
-    it.each(noWebSearchModels)(
-      "model '%s' does not declare webSearchAllowedDomains/webSearchUserLocation/webSearchExternalAccess",
-      (literal) => {
-        const schema = schemas[literal];
-        const def = schema.config.def as Record<string, unknown>;
-        expect(def.webSearchAllowedDomains).toBeUndefined();
-        expect(def.webSearchUserLocation).toBeUndefined();
-        expect(def.webSearchExternalAccess).toBeUndefined();
-      }
-    );
+    it.each(noWebSearchModels)("model '%s' does not declare webSearchAllowedDomains/webSearchExternalAccess", (literal) => {
+      const schema = schemas[literal];
+      const def = schema.config.def as Record<string, unknown>;
+      expect(def.webSearchAllowedDomains).toBeUndefined();
+      expect(def.webSearchExternalAccess).toBeUndefined();
+    });
   });
 
-  describe("CC search-preview SKUs — keep their existing webSearchTool config (unchanged)", () => {
-    it.each(ccSearchPreviewModels)("model '%s' still declares webSearchTool (CC path)", (literal) => {
+  describe("CC search-preview SKUs — do NOT declare webSearchTool (they always search server-side)", () => {
+    it.each(ccSearchPreviewModels)("model '%s' does not declare webSearchTool (always-on CC search)", (literal) => {
       const schema = schemas[literal];
       expect(schema, `schema missing for ${literal}`).toBeDefined();
-      expect((schema.config.def as Record<string, unknown>).webSearchTool).toBeDefined();
+      expect((schema.config.def as Record<string, unknown>).webSearchTool).toBeUndefined();
     });
 
     it.each(ccSearchPreviewModels)("model '%s' does NOT declare Responses-API-only filter keys (CC path unchanged)", (literal) => {
       const schema = schemas[literal];
       const def = schema.config.def as Record<string, unknown>;
       expect(def.webSearchAllowedDomains).toBeUndefined();
-      expect(def.webSearchUserLocation).toBeUndefined();
       expect(def.webSearchExternalAccess).toBeUndefined();
     });
   });
@@ -2018,7 +2003,6 @@ describe("registry", () => {
         {
           webSearchTool: true,
           webSearchAllowedDomains: ["example.com"],
-          webSearchUserLocation: { country: "US", city: "SF" },
           webSearchExternalAccess: false,
         } as ConfigType,
         [makeUserTextMessage("search")]
@@ -2026,13 +2010,11 @@ describe("registry", () => {
       // None of the raw config keys should appear at the top level — they're consumed by
       // transformToolsResponsesApi and built into the `tools` entry.
       expect((body as Record<string, unknown>).webSearchAllowedDomains).toBeUndefined();
-      expect((body as Record<string, unknown>).webSearchUserLocation).toBeUndefined();
       expect((body as Record<string, unknown>).webSearchExternalAccess).toBeUndefined();
       // But they SHOULD appear in the web_search tool entry.
       const tools = body.tools as Array<Record<string, unknown>>;
       const webSearchTool = tools.find((t) => t.type === "web_search") as Record<string, unknown>;
       expect(webSearchTool.filters).toEqual({ allowed_domains: ["example.com"] });
-      expect(webSearchTool.user_location).toEqual({ type: "approximate", country: "US", city: "SF" });
       expect(webSearchTool.external_web_access).toBe(false);
     });
 

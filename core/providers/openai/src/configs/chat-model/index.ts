@@ -15,4 +15,3 @@ export * from "./o1-series-with-web-search.config.chat-model.openai";
 export * from "./response-format.config.chat-model.openai";
 export * from "./response-schema.config.chat-model.openai";
 export * from "./response-schema-with-web-search.config.chat-model.openai";
-export * from "./web-search.config.chat-model.openai";
