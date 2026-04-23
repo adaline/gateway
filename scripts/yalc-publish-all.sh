@@ -6,14 +6,14 @@
 #   pnpm run build
 #   bash scripts/yalc-publish-all.sh
 #
-# First-time setup in a consumer (e.g. pegasus):
-#   cd ~/ws/adaline/adx-global/pegasus
+# First-time setup in a consumer (e.g. orpheus):
+#   cd ~/orpheus
 #   yalc add @adaline/types @adaline/provider @adaline/gateway @adaline/openai
 #   pnpm install
 #
 # Iterate loop after gateway changes:
 #   (in gateway)   pnpm run build && bash scripts/yalc-publish-all.sh
-#   (in pegasus)   files are already updated via yalc push; no extra command
+#   (in orpheus)   files are already updated via yalc push; no extra command
 #
 # Cleanup in consumer when done:
 #   yalc remove --all && pnpm install
