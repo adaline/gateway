@@ -3,6 +3,7 @@ import { z } from "zod";
 import { EmbeddingModelSchema } from "@adaline/provider";
 
 import { GoogleEmbeddingModelConfigs } from "../../configs";
+import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.google";
 import { GoogleEmbeddingModelModalities, GoogleEmbeddingModelModalitiesEnum } from "./types";
 
@@ -19,6 +20,7 @@ const Text_Embedding_001Schema = EmbeddingModelSchema(GoogleEmbeddingModelModali
     def: GoogleEmbeddingModelConfigs.base(768).def,
     schema: GoogleEmbeddingModelConfigs.base(768).schema,
   },
+  price: embeddingPricingData[Text_Embedding_001Literal],
 });
 
 const Text_Embedding_001Options = BaseEmbeddingModelOptions;

@@ -1,5 +1,6 @@
 import { BaseEmbeddingModel } from "@adaline/openai";
-import { EmbeddingModelSchemaType, HeadersType, ModelError } from "@adaline/provider";
+import { EmbeddingModelSchemaType, HeadersType, ModelError, ModelResponseError } from "@adaline/provider";
+import { EmbeddingModelPriceType } from "@adaline/types";
 
 import { Azure } from "../../../provider";
 import { BaseEmbeddingModelOptions, BaseEmbeddingModelOptionsType } from "../embedding-model-options.azure";
@@ -48,6 +49,13 @@ class BaseEmbeddingModelOpenAI extends BaseEmbeddingModel {
       "api-key": this.azureApiKey,
       source: "adaline",
     };
+  }
+
+  getModelPricing(): EmbeddingModelPriceType {
+    throw new ModelResponseError({
+      info: `Invalid model pricing for model : '${this.modelName}'`,
+      cause: new Error(`Pricing configuration not supported azure provider.`),
+    });
   }
 }
 

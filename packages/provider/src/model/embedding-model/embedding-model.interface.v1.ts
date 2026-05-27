@@ -28,9 +28,7 @@ interface EmbeddingModelV1<MS extends EmbeddingModelSchemaType = EmbeddingModelS
   getGetEmbeddingsData(config: ConfigType, requests: EmbeddingRequestsType): Promise<ParamsType>;
   transformGetEmbeddingsResponse(response: any): EmbeddingResponseType;
 
-  // Optional for backwards compatibility: implementations added before pricing
-  // existed (and embedding models without a pricing entry) need not implement it.
-  getModelPricing?(): EmbeddingModelPriceType;
+  getModelPricing(): EmbeddingModelPriceType;
 }
 
 export { type EmbeddingModelV1 };

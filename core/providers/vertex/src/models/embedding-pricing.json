@@ -1,0 +1,22 @@
+{
+  "text-embedding-004": {
+    "modelName": "text-embedding-004",
+    "currency": "USD",
+    "inputPricePerMillion": 0.1
+  },
+  "text-multilingual-embedding-002": {
+    "modelName": "text-multilingual-embedding-002",
+    "currency": "USD",
+    "inputPricePerMillion": 0.1
+  },
+  "textembedding-gecko@003": {
+    "modelName": "textembedding-gecko@003",
+    "currency": "USD",
+    "inputPricePerMillion": 0.1
+  },
+  "textembedding-gecko-multilingual@001": {
+    "modelName": "textembedding-gecko-multilingual@001",
+    "currency": "USD",
+    "inputPricePerMillion": 0.1
+  }
+}

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { EmbeddingModelSchema } from "@adaline/provider";
 
 import { OpenAIEmbeddingModelConfigs } from "../../configs";
+import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.openai";
 import { OpenAIEmbeddingModelModalities, OpenAIEmbeddingModelModalitiesEnum } from "./types";
 
@@ -19,6 +20,7 @@ const Text_Embedding_3_LargeSchema = EmbeddingModelSchema(OpenAIEmbeddingModelMo
     def: OpenAIEmbeddingModelConfigs.dimensions(3072).def,
     schema: OpenAIEmbeddingModelConfigs.dimensions(3072).schema,
   },
+  price: embeddingPricingData[Text_Embedding_3_LargeLiteral],
 });
 
 const Text_Embedding_3_Large_Options = BaseEmbeddingModelOptions;

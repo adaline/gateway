@@ -16,6 +16,7 @@ import {
 import {
   Config,
   ConfigType,
+  EmbeddingModelPriceType,
   EmbeddingRequests,
   EmbeddingRequestsType,
   EmbeddingResponseType,
@@ -25,6 +26,7 @@ import {
 } from "@adaline/types";
 
 import { TogetherAI } from "../../provider/provider.together-ai";
+import embeddingPricingData from "../embedding-pricing.json";
 import { TogetherAIEmbeddingRequest, TogetherAIGetEmbeddingsResponse } from "./types";
 
 const BaseEmbeddingModelOptions = z.object({
@@ -213,6 +215,19 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     }
 
     throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
+  }
+
+  getModelPricing(): EmbeddingModelPriceType {
+    // Check if the modelName exists in embeddingPricingData before accessing it
+    if (!(this.modelName in embeddingPricingData)) {
+      throw new ModelResponseError({
+        info: `Invalid model pricing for model : '${this.modelName}'`,
+        cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
+      });
+    }
+
+    const entry = embeddingPricingData[this.modelName as keyof typeof embeddingPricingData];
+    return entry as EmbeddingModelPriceType;
   }
 }
 

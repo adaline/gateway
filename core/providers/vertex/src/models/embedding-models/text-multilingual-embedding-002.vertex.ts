@@ -3,6 +3,7 @@ import { z } from "zod";
 import { EmbeddingModelSchema } from "@adaline/provider";
 
 import { VertexEmbeddingModelConfigs } from "../../configs";
+import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.vertex";
 import { VertexEmbeddingModelModalities, VertexEmbeddingModelModalitiesEnum } from "./types";
 
@@ -19,6 +20,7 @@ const Text_Multilingual_Embedding_002Schema = EmbeddingModelSchema(VertexEmbeddi
     def: VertexEmbeddingModelConfigs.base(768).def,
     schema: VertexEmbeddingModelConfigs.base(768).schema,
   },
+  price: embeddingPricingData[Text_Multilingual_Embedding_002Literal],
 });
 
 const Text_Multilingual_Embedding_002Options = BaseEmbeddingModelOptions;

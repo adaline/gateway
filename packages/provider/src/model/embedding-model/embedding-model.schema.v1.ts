@@ -29,9 +29,9 @@ const EmbeddingModelSchema = <M extends z.ZodEnum<[string, ...string[]]> = typeo
           message: "Keys in 'config.def' must exactly match keys in 'config.schema'",
         }
       ),
-    // Optional for backwards compatibility: embedding models without a pricing
-    // entry (e.g. other providers) still parse. Populated for Voyage models.
-    price: z.custom<EmbeddingModelPriceType>().optional(),
+    // Required at the type level but runtime-permissive (z.custom accepts
+    // undefined), so dynamic `__base__` schemas can omit it. Mirrors ChatModelSchema.price.
+    price: z.custom<EmbeddingModelPriceType>(),
   });
 type EmbeddingModelSchemaType<M extends z.ZodEnum<[string, ...string[]]> = typeof EmbeddingModalityEnum> = z.infer<
   ReturnType<typeof EmbeddingModelSchema<M>>

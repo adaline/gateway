@@ -1,0 +1,12 @@
+{
+  "text-embedding-001": {
+    "modelName": "text-embedding-001",
+    "currency": "USD",
+    "inputPricePerMillion": 0
+  },
+  "text-embedding-004": {
+    "modelName": "text-embedding-004",
+    "currency": "USD",
+    "inputPricePerMillion": 0
+  }
+}

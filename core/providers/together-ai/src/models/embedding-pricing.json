@@ -1,0 +1,7 @@
+{
+  "intfloat/multilingual-e5-large-instruct": {
+    "modelName": "intfloat/multilingual-e5-large-instruct",
+    "currency": "USD",
+    "inputPricePerMillion": 0.02
+  }
+}

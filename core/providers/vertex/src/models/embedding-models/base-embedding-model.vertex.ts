@@ -16,6 +16,8 @@ import {
 import {
   Config,
   ConfigType,
+  EmbeddingModelPrice,
+  EmbeddingModelPriceType,
   EmbeddingRequests,
   EmbeddingRequestsType,
   EmbeddingResponseType,
@@ -25,6 +27,9 @@ import {
 } from "@adaline/types";
 
 import { Vertex } from "../../provider/provider.vertex";
+// Vertex AI prices text embeddings per 1k characters at $0.000025. At ~4 chars/token
+// that is ~$0.10 per 1M tokens, used for all four embedding models below.
+import embeddingPricingData from "../embedding-pricing.json";
 import { VertexEmbeddingRequest, VertexGetEmbeddingsResponse } from "./types";
 
 const BaseEmbeddingModelOptions = z.object({
@@ -254,6 +259,19 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     }
 
     throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
+  }
+
+  getModelPricing(): EmbeddingModelPriceType {
+    if (!(this.modelName in embeddingPricingData)) {
+      throw new ModelResponseError({
+        info: `Invalid model pricing for model : '${this.modelName}'`,
+        cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
+      });
+    }
+    const entry = embeddingPricingData[this.modelName as keyof typeof embeddingPricingData];
+    // Parse (rather than cast) so the JSON is validated against the schema and
+    // the `currency` default is applied.
+    return EmbeddingModelPrice.parse(entry);
   }
 }
 
