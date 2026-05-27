@@ -1,0 +1,52 @@
+{
+  "voyage-3.5": {
+    "modelName": "voyage-3.5",
+    "currency": "USD",
+    "inputPricePerMillion": 0.06
+  },
+  "voyage-3.5-lite": {
+    "modelName": "voyage-3.5-lite",
+    "currency": "USD",
+    "inputPricePerMillion": 0.02
+  },
+  "voyage-3-large": {
+    "modelName": "voyage-3-large",
+    "currency": "USD",
+    "inputPricePerMillion": 0.18
+  },
+  "voyage-code-3": {
+    "modelName": "voyage-code-3",
+    "currency": "USD",
+    "inputPricePerMillion": 0.18
+  },
+  "voyage-3": {
+    "modelName": "voyage-3",
+    "currency": "USD",
+    "inputPricePerMillion": 0.06
+  },
+  "voyage-3-lite": {
+    "modelName": "voyage-3-lite",
+    "currency": "USD",
+    "inputPricePerMillion": 0.02
+  },
+  "voyage-code-2": {
+    "modelName": "voyage-code-2",
+    "currency": "USD",
+    "inputPricePerMillion": 0.12
+  },
+  "voyage-finance-2": {
+    "modelName": "voyage-finance-2",
+    "currency": "USD",
+    "inputPricePerMillion": 0.12
+  },
+  "voyage-law-2": {
+    "modelName": "voyage-law-2",
+    "currency": "USD",
+    "inputPricePerMillion": 0.12
+  },
+  "voyage-multilingual-2": {
+    "modelName": "voyage-multilingual-2",
+    "currency": "USD",
+    "inputPricePerMillion": 0.12
+  }
+}

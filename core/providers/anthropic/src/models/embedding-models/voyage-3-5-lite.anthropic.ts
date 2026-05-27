@@ -3,6 +3,7 @@ import { z } from "zod";
 import { EmbeddingModelSchema } from "@adaline/provider";
 
 import { AnthropicEmbeddingModelConfigs } from "../../configs";
+import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.anthropic";
 import { AnthropicEmbeddingModelModalities, AnthropicEmbeddingModelModalitiesEnum } from "./types";
 
@@ -16,9 +17,10 @@ const Voyage3_5LiteSchema = EmbeddingModelSchema(AnthropicEmbeddingModelModaliti
   maxInputTokens: 32000,
   maxOutputTokens: 32000, // max output dimensions are 2048 (default 1024; also supports 256, 512)
   config: {
-    def: AnthropicEmbeddingModelConfigs.base().def,
-    schema: AnthropicEmbeddingModelConfigs.base().schema,
+    def: AnthropicEmbeddingModelConfigs.flexible().def,
+    schema: AnthropicEmbeddingModelConfigs.flexible().schema,
   },
+  price: embeddingPricingData[Voyage3_5LiteLiteral],
 });
 
 const Voyage3_5LiteOptions = BaseEmbeddingModelOptions;

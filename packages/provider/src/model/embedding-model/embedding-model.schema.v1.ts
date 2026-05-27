@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EmbeddingModalityEnum } from "@adaline/types";
+import { EmbeddingModalityEnum, EmbeddingModelPriceType } from "@adaline/types";
 
 import { ConfigItemDef } from "../../types/config";
 
@@ -29,6 +29,9 @@ const EmbeddingModelSchema = <M extends z.ZodEnum<[string, ...string[]]> = typeo
           message: "Keys in 'config.def' must exactly match keys in 'config.schema'",
         }
       ),
+    // Optional for backwards compatibility: embedding models without a pricing
+    // entry (e.g. other providers) still parse. Populated for Voyage models.
+    price: z.custom<EmbeddingModelPriceType>().optional(),
   });
 type EmbeddingModelSchemaType<M extends z.ZodEnum<[string, ...string[]]> = typeof EmbeddingModalityEnum> = z.infer<
   ReturnType<typeof EmbeddingModelSchema<M>>

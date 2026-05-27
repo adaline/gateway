@@ -18,6 +18,8 @@ import {
   Base64EmbeddingType,
   Config,
   ConfigType,
+  EmbeddingModelPrice,
+  EmbeddingModelPriceType,
   EmbeddingRequests,
   EmbeddingRequestsType,
   EmbeddingResponseType,
@@ -27,6 +29,7 @@ import {
 } from "@adaline/types";
 
 import { Anthropic } from "../../provider/provider.anthropic";
+import embeddingPricingData from "../embedding-pricing.json";
 import { AnthropicEmbeddingRequest, AnthropicGetEmbeddingsResponse } from "./types";
 
 const BaseEmbeddingModelOptions = z.object({
@@ -101,6 +104,13 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
       encodingFormat: parsedRequest.encoding_format,
       inputType: parsedRequest.input_type,
       truncation: parsedRequest.truncation,
+      // Flexible-dimension models only; round-tripped back into config as the
+      // string the select config-item expects (coerced to number on the way out).
+      outputDimension:
+        parsedRequest.output_dimension !== null && parsedRequest.output_dimension !== undefined
+          ? String(parsedRequest.output_dimension)
+          : undefined,
+      outputDtype: parsedRequest.output_dtype,
     };
 
     const config = Config().parse(removeUndefinedEntries(_config));
@@ -133,6 +143,12 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     if ("encodingFormat" in config && config.encodingFormat === "") {
       delete config.encodingFormat;
     }
+    if ("outputDimension" in config && config.outputDimension === "") {
+      delete config.outputDimension;
+    }
+    if ("outputDtype" in config && config.outputDtype === "") {
+      delete config.outputDtype;
+    }
 
     const _parsedConfig = this.modelSchema.config.schema.safeParse(config);
     if (!_parsedConfig.success) {
@@ -156,7 +172,12 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     const transformedConfig = Object.keys(parsedConfig).reduce((acc, key) => {
       const def = this.modelSchema.config.def[key];
       const paramKey = def.param;
-      const paramValue = parsedConfig[key];
+      let paramValue = parsedConfig[key];
+      // Voyage expects `output_dimension` as an integer. There is no numeric
+      // select config-item, so it's modeled as a string select and coerced here.
+      if (paramKey === "output_dimension" && typeof paramValue === "string") {
+        paramValue = Number(paramValue);
+      }
       acc[paramKey] = paramValue;
       return acc;
     }, {} as ParamsType);
@@ -237,6 +258,19 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     }
 
     throw new ModelResponseError({ info: "Invalid response from model", cause: safe.error });
+  }
+
+  getModelPricing(): EmbeddingModelPriceType {
+    if (!(this.modelName in embeddingPricingData)) {
+      throw new ModelResponseError({
+        info: `Invalid model pricing for model : '${this.modelName}'`,
+        cause: new Error(`No pricing configuration found for model "${this.modelName}"`),
+      });
+    }
+    const entry = embeddingPricingData[this.modelName as keyof typeof embeddingPricingData];
+    // Parse (rather than cast) so the JSON is validated against the schema and
+    // the `currency` default is applied.
+    return EmbeddingModelPrice.parse(entry);
   }
 }
 

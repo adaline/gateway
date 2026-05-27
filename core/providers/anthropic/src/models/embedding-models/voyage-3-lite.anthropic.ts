@@ -3,6 +3,7 @@ import { z } from "zod";
 import { EmbeddingModelSchema } from "@adaline/provider";
 
 import { AnthropicEmbeddingModelConfigs } from "../../configs";
+import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.anthropic";
 import { AnthropicEmbeddingModelModalities, AnthropicEmbeddingModelModalitiesEnum } from "./types";
 
@@ -19,6 +20,7 @@ const Voyage3LiteSchema = EmbeddingModelSchema(AnthropicEmbeddingModelModalities
     def: AnthropicEmbeddingModelConfigs.base().def,
     schema: AnthropicEmbeddingModelConfigs.base().schema,
   },
+  price: embeddingPricingData[Voyage3LiteLiteral],
 });
 
 const Voyage3LiteOptions = BaseEmbeddingModelOptions;

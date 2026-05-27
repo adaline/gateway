@@ -1,4 +1,4 @@
-import { ConfigType, EmbeddingRequestsType, EmbeddingResponseType } from "@adaline/types";
+import { ConfigType, EmbeddingModelPriceType, EmbeddingRequestsType, EmbeddingResponseType } from "@adaline/types";
 
 import { HeadersType, ParamsType, UrlType } from "../../types";
 import { EmbeddingModelSchemaType } from "./embedding-model.schema.v1";
@@ -27,6 +27,10 @@ interface EmbeddingModelV1<MS extends EmbeddingModelSchemaType = EmbeddingModelS
   getGetEmbeddingsHeaders(config?: ConfigType, requests?: EmbeddingRequestsType): Promise<HeadersType>;
   getGetEmbeddingsData(config: ConfigType, requests: EmbeddingRequestsType): Promise<ParamsType>;
   transformGetEmbeddingsResponse(response: any): EmbeddingResponseType;
+
+  // Optional for backwards compatibility: implementations added before pricing
+  // existed (and embedding models without a pricing entry) need not implement it.
+  getModelPricing?(): EmbeddingModelPriceType;
 }
 
 export { type EmbeddingModelV1 };
