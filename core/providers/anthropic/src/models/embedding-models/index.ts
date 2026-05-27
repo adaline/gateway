@@ -6,3 +6,7 @@ export * from "./voyage-multilingual-2.anthropic";
 export * from "./voyage-finance-2.anthropic";
 export * from "./voyage-3-lite.anthropic";
 export * from "./voyage-3.anthropic";
+export * from "./voyage-3-large.anthropic";
+export * from "./voyage-3-5.anthropic";
+export * from "./voyage-3-5-lite.anthropic";
+export * from "./voyage-code-3.anthropic";
