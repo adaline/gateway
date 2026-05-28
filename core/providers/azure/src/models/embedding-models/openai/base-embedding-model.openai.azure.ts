@@ -54,7 +54,7 @@ class BaseEmbeddingModelOpenAI extends BaseEmbeddingModel {
   getModelPricing(): EmbeddingModelPriceType {
     throw new ModelResponseError({
       info: `Invalid model pricing for model : '${this.modelName}'`,
-      cause: new Error(`Pricing configuration not supported azure provider.`),
+      cause: new Error(`Pricing configuration not supported for azure provider.`),
     });
   }
 }

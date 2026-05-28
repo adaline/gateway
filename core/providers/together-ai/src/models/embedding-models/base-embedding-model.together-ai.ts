@@ -16,6 +16,7 @@ import {
 import {
   Config,
   ConfigType,
+  EmbeddingModelPrice,
   EmbeddingModelPriceType,
   EmbeddingRequests,
   EmbeddingRequestsType,
@@ -227,7 +228,9 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     }
 
     const entry = embeddingPricingData[this.modelName as keyof typeof embeddingPricingData];
-    return entry as EmbeddingModelPriceType;
+    // Parse (rather than cast) so the JSON is validated against the schema and
+    // the `currency` default is applied — matches anthropic/openai/google/vertex.
+    return EmbeddingModelPrice.parse(entry);
   }
 }
 
