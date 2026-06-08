@@ -18,5 +18,10 @@
     "modelName": "textembedding-gecko-multilingual@001",
     "currency": "USD",
     "inputPricePerMillion": 0.1
+  },
+  "gemini-embedding-001": {
+    "modelName": "gemini-embedding-001",
+    "currency": "USD",
+    "inputPricePerMillion": 0.15
   }
 }
