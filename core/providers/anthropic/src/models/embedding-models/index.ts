@@ -10,3 +10,7 @@ export * from "./voyage-3-large.anthropic";
 export * from "./voyage-3-5.anthropic";
 export * from "./voyage-3-5-lite.anthropic";
 export * from "./voyage-code-3.anthropic";
+export * from "./voyage-4-large.anthropic";
+export * from "./voyage-4.anthropic";
+export * from "./voyage-4-lite.anthropic";
+export * from "./voyage-4-nano.anthropic";

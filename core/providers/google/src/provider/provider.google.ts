@@ -151,6 +151,11 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini_Embedding_001Options,
       modelSchema: Models.Gemini_Embedding_001Schema,
     },
+    [Models.Gemini_Embedding_2Literal]: {
+      model: Models.Gemini_Embedding_2,
+      modelOptions: Models.Gemini_Embedding_2Options,
+      modelSchema: Models.Gemini_Embedding_2Schema,
+    },
   };
 
   chatModelLiterals(): string[] {

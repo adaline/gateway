@@ -48,5 +48,25 @@
     "modelName": "voyage-multilingual-2",
     "currency": "USD",
     "inputPricePerMillion": 0.12
+  },
+  "voyage-4-large": {
+    "modelName": "voyage-4-large",
+    "currency": "USD",
+    "inputPricePerMillion": 0.18
+  },
+  "voyage-4": {
+    "modelName": "voyage-4",
+    "currency": "USD",
+    "inputPricePerMillion": 0.06
+  },
+  "voyage-4-lite": {
+    "modelName": "voyage-4-lite",
+    "currency": "USD",
+    "inputPricePerMillion": 0.02
+  },
+  "voyage-4-nano": {
+    "modelName": "voyage-4-nano",
+    "currency": "USD",
+    "inputPricePerMillion": 0.01
   }
 }

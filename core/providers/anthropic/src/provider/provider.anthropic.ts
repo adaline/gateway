@@ -154,6 +154,26 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       modelOptions: Models.VoyageCode3Options,
       modelSchema: Models.VoyageCode3Schema,
     },
+    [Models.Voyage4LargeLiteral]: {
+      model: Models.Voyage4Large,
+      modelOptions: Models.Voyage4LargeOptions,
+      modelSchema: Models.Voyage4LargeSchema,
+    },
+    [Models.Voyage4Literal]: {
+      model: Models.Voyage4,
+      modelOptions: Models.Voyage4Options,
+      modelSchema: Models.Voyage4Schema,
+    },
+    [Models.Voyage4LiteLiteral]: {
+      model: Models.Voyage4Lite,
+      modelOptions: Models.Voyage4LiteOptions,
+      modelSchema: Models.Voyage4LiteSchema,
+    },
+    [Models.Voyage4NanoLiteral]: {
+      model: Models.Voyage4Nano,
+      modelOptions: Models.Voyage4NanoOptions,
+      modelSchema: Models.Voyage4NanoSchema,
+    },
   };
 
   chatModelLiterals(): string[] {
