@@ -155,6 +155,16 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Text_Embedding_Gecko_Multilingual_001Options,
       modelSchema: Models.Text_Embedding_Gecko_Multilingual_001Schema,
     },
+    [Models.Text_Embedding_005Literal]: {
+      model: Models.Text_Embedding_005,
+      modelOptions: Models.Text_Embedding_005Options,
+      modelSchema: Models.Text_Embedding_005Schema,
+    },
+    [Models.Gemini_Embedding_001Literal]: {
+      model: Models.Gemini_Embedding_001,
+      modelOptions: Models.Gemini_Embedding_001Options,
+      modelSchema: Models.Gemini_Embedding_001Schema,
+    },
   };
 
   chatModelLiterals(): string[] {
