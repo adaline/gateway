@@ -22,12 +22,12 @@ const GPT_5_ProSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelPro
   name: GPT_5_ProLiteral,
   description: GPT_5_ProDescription,
   maxInputTokens: 400000,
-  maxOutputTokens: 272000,
+  maxOutputTokens: 131072,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelProWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5ProWithWebSearch(272000, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5ProWithWebSearch(272000, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5ProWithWebSearch(131072, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5ProWithWebSearch(131072, 4).schema,
   },
   price: pricingData[GPT_5_ProLiteral],
 });
