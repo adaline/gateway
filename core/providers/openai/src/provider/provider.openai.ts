@@ -68,6 +68,11 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_5Options,
       modelSchema: Models.GPT_5Schema,
     },
+    [Models.GPT_5_ProLiteral]: {
+      model: Models.GPT_5_Pro,
+      modelOptions: Models.GPT_5_ProOptions,
+      modelSchema: Models.GPT_5_ProSchema,
+    },
     [Models.GPT_5_1Literal]: {
       model: Models.GPT_5_1,
       modelOptions: Models.GPT_5_1Options,
@@ -113,10 +118,25 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_5_4_MiniOptions,
       modelSchema: Models.GPT_5_4_MiniSchema,
     },
+    [Models.GPT_5_4_NanoLiteral]: {
+      model: Models.GPT_5_4_Nano,
+      modelOptions: Models.GPT_5_4_NanoOptions,
+      modelSchema: Models.GPT_5_4_NanoSchema,
+    },
     [Models.GPT_5_4_ProLiteral]: {
       model: Models.GPT_5_4_Pro,
       modelOptions: Models.GPT_5_4_ProOptions,
       modelSchema: Models.GPT_5_4_ProSchema,
+    },
+    [Models.GPT_5_5Literal]: {
+      model: Models.GPT_5_5,
+      modelOptions: Models.GPT_5_5Options,
+      modelSchema: Models.GPT_5_5Schema,
+    },
+    [Models.GPT_5_5_ProLiteral]: {
+      model: Models.GPT_5_5_Pro,
+      modelOptions: Models.GPT_5_5_ProOptions,
+      modelSchema: Models.GPT_5_5_ProSchema,
     },
     [Models.GPT_5_MiniLiteral]: {
       model: Models.GPT_5_Mini,
@@ -237,6 +257,11 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.O3,
       modelOptions: Models.O3Options,
       modelSchema: Models.O3Schema,
+    },
+    [Models.O3ProLiteral]: {
+      model: Models.O3Pro,
+      modelOptions: Models.O3ProOptions,
+      modelSchema: Models.O3ProSchema,
     },
     [Models.O4_Mini_2025_04_16Literal]: {
       model: Models.O4_Mini_2025_04_16,

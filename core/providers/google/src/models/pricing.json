@@ -556,5 +556,37 @@
         }
       }
     ]
+  },
+  "gemini-3.5-flash": {
+    "modelName": "gemini-3.5-flash",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.5,
+            "outputPricePerMillion": 9
+          }
+        }
+      }
+    ]
+  },
+  "gemini-3.1-flash-lite": {
+    "modelName": "gemini-3.1-flash-lite",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.25,
+            "outputPricePerMillion": 1.5
+          }
+        }
+      }
+    ]
   }
 }

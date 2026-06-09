@@ -254,5 +254,37 @@
         }
       }
     ]
+  },
+  "claude-opus-4-8": {
+    "modelName": "claude-opus-4-8",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 25
+          }
+        }
+      }
+    ]
+  },
+  "claude-fable-5": {
+    "modelName": "claude-fable-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 10,
+            "outputPricePerMillion": 50
+          }
+        }
+      }
+    ]
   }
 }

@@ -58,7 +58,7 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini1_5ProOptions,
       modelSchema: Models.Gemini1_5ProSchema,
     },
-    // gemini-2.0-flash-exp is deprecated 
+    // gemini-2.0-flash-exp is deprecated
     // Removed from available models to prevent it from being used as a default
     // [Models.Gemini2_0FlashExpLiteral]: {
     //   model: Models.Gemini2_0FlashExp,
@@ -125,6 +125,16 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.Gemini2_5FlashLitePreview092025,
       modelOptions: Models.Gemini2_5FlashLitePreview092025Options,
       modelSchema: Models.Gemini2_5FlashLitePreview092025Schema,
+    },
+    [Models.Gemini3_5FlashLiteral]: {
+      model: Models.Gemini3_5Flash,
+      modelOptions: Models.Gemini3_5FlashOptions,
+      modelSchema: Models.Gemini3_5FlashSchema,
+    },
+    [Models.Gemini3_1FlashLiteLiteral]: {
+      model: Models.Gemini3_1FlashLite,
+      modelOptions: Models.Gemini3_1FlashLiteOptions,
+      modelSchema: Models.Gemini3_1FlashLiteSchema,
     },
   };
 

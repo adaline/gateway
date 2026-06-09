@@ -18,6 +18,8 @@ export * from "./gemini-2.5-pro-preview-03-25.google";
 export * from "./gemini-2.5-pro.google";
 export * from "./gemini-3.1-pro-preview-customtools.google";
 export * from "./gemini-3.1-pro-preview.google";
+export * from "./gemini-3.1-flash-lite.google";
+export * from "./gemini-3.5-flash.google";
 export * from "./gemini-3-flash-preview.google";
 export * from "./gemini-3-pro-preview.google";
 export * from "./types";
