@@ -5,6 +5,8 @@ export * from "./gpt5-1.config.chat-model.openai";
 export * from "./gpt5-1-with-web-search.config.chat-model.openai";
 export * from "./gpt5-2-plus.config.chat-model.openai";
 export * from "./gpt5-2-plus-with-web-search.config.chat-model.openai";
+export * from "./gpt5-6.config.chat-model.openai";
+export * from "./gpt5-6-with-web-search.config.chat-model.openai";
 export * from "./gpt5-codex.config.chat-model.openai";
 export * from "./gpt5-pro.config.chat-model.openai";
 export * from "./gpt5-pro-with-web-search.config.chat-model.openai";

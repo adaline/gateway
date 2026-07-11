@@ -28,7 +28,7 @@ const ChatGPT_5_2Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelW
     def: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(131072, 4).def,
     schema: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(131072, 4).schema,
   },
-  price: pricingData["gpt-5.2"],
+  price: pricingData[ChatGPT_5_2Literal],
 });
 
 const ChatGPT_5_2Options = BaseChatModelOptions;

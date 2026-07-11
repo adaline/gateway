@@ -14,7 +14,8 @@ import {
 
 const GPT_4_0613Literal = "gpt-4-0613";
 const GPT_4_0613Description =
-  "Snapshot of gpt-4 from June 13th 2023 with improved function calling support. Training data up to Sept 2021.";
+  "Snapshot of gpt-4 from June 13th 2023 with improved function calling support. Training data up to Sept 2021. " +
+  "Deprecated by OpenAI; scheduled shutdown 2026-10-23 (replacement: gpt-5.5).";
 
 const GPT_4_0613Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelTextToolModalitiesEnum).parse({
   name: GPT_4_0613Literal,

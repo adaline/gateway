@@ -138,6 +138,21 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_5_5_ProOptions,
       modelSchema: Models.GPT_5_5_ProSchema,
     },
+    [Models.GPT_5_6_SolLiteral]: {
+      model: Models.GPT_5_6_Sol,
+      modelOptions: Models.GPT_5_6_SolOptions,
+      modelSchema: Models.GPT_5_6_SolSchema,
+    },
+    [Models.GPT_5_6_TerraLiteral]: {
+      model: Models.GPT_5_6_Terra,
+      modelOptions: Models.GPT_5_6_TerraOptions,
+      modelSchema: Models.GPT_5_6_TerraSchema,
+    },
+    [Models.GPT_5_6_LunaLiteral]: {
+      model: Models.GPT_5_6_Luna,
+      modelOptions: Models.GPT_5_6_LunaOptions,
+      modelSchema: Models.GPT_5_6_LunaSchema,
+    },
     [Models.GPT_5_MiniLiteral]: {
       model: Models.GPT_5_Mini,
       modelOptions: Models.GPT_5_MiniOptions,

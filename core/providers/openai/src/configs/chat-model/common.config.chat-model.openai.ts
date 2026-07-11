@@ -152,6 +152,33 @@ const reasoningEffortPro = SelectStringConfigItem({
   choices: ["medium", "high", "xhigh"],
 });
 
+// GPT-5.6 reasoning effort: reintroduces 'minimal' alongside 'none' on top of the
+// 5.2+ enum (none/minimal/low/medium/high/xhigh). Default is 'medium' for GPT-5.6,
+// unlike the 'none' default used by 5.2 through 5.5.
+// See https://developers.openai.com/api/docs/guides/reasoning
+const reasoningEffort5_6 = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'xhigh' engages the deepest reasoning.",
+  default: "medium",
+  choices: ["none", "minimal", "low", "medium", "high", "xhigh"],
+});
+
+// GPT-5.6 reasoning mode: independent of reasoning effort, selects between 'standard'
+// (default) and 'pro' execution. 'pro' handles difficult tasks that can tolerate higher
+// latency and token usage. Confirmed wire param is the nested `reasoning.mode` field,
+// sibling to `reasoning.effort` — see transformConfigResponsesApi's reasoning_mode handling.
+// See https://developers.openai.com/api/docs/guides/reasoning
+const reasoningMode = SelectStringConfigItem({
+  param: "reasoning_mode",
+  title: "Reasoning Mode",
+  description:
+    "Selects between standard and pro reasoning execution, independent of reasoning effort. 'pro' handles difficult tasks that need more model work at higher latency and token cost.",
+  default: "standard",
+  choices: ["standard", "pro"],
+});
+
 const verbosity = SelectStringConfigItem({
   param: "verbosity",
   title: "Verbosity",
@@ -194,8 +221,10 @@ export {
   reasoningEffort,
   reasoningEffort5_1,
   reasoningEffort5_2Plus,
+  reasoningEffort5_6,
   reasoningEffortCodex,
   reasoningEffortPro,
+  reasoningMode,
   seed,
   stop,
   temperature,

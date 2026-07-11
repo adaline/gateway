@@ -15,7 +15,8 @@ import {
 const GPT_3_5_Turbo_0125Literal = "gpt-3.5-turbo-0125";
 const GPT_3_5_Turbo_0125Description =
   "The latest GPT-3.5 Turbo model with higher accuracy at responding in requested formats and a fix for a bug which caused a \
-  text encoding issue for non-English language function calls. Training data up to Sept 2021.";
+  text encoding issue for non-English language function calls. Training data up to Sept 2021. \
+  Deprecated by OpenAI; scheduled shutdown 2026-10-23 (replacement: gpt-5.4-mini).";
 
 const GPT_3_5_Turbo_0125Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelTextToolModalitiesEnum).parse({
   name: GPT_3_5_Turbo_0125Literal,

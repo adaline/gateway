@@ -1099,7 +1099,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
       }
 
       if (paramKey === "reasoning_effort") {
-        responsesConfig.reasoning = { effort: paramValue };
+        responsesConfig.reasoning = { ...(responsesConfig.reasoning as Record<string, unknown> | undefined), effort: paramValue };
+        continue;
+      }
+
+      if (paramKey === "reasoning_mode") {
+        responsesConfig.reasoning = { ...(responsesConfig.reasoning as Record<string, unknown> | undefined), mode: paramValue };
         continue;
       }
 

@@ -527,6 +527,22 @@
       }
     ]
   },
+  "chatgpt-5.2": {
+    "modelName": "chatgpt-5.2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.75,
+            "outputPricePerMillion": 14.0
+          }
+        }
+      }
+    ]
+  },
   "gpt-5.2-codex": {
     "modelName": "gpt-5.2-codex",
     "currency": "USD",
@@ -660,6 +676,64 @@
           "base": {
             "inputPricePerMillion": 10.0,
             "outputPricePerMillion": 45.0
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5.6-sol": {
+    "modelName": "gpt-5.6-sol",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5.0,
+            "outputPricePerMillion": 30.0
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5.6-terra": {
+    "modelName": "gpt-5.6-terra",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": 272000,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.5,
+            "outputPricePerMillion": 15.0
+          }
+        }
+      },
+      {
+        "minTokens": 272000,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5.0,
+            "outputPricePerMillion": 22.5
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5.6-luna": {
+    "modelName": "gpt-5.6-luna",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.0,
+            "outputPricePerMillion": 6.0
           }
         }
       }

@@ -9,6 +9,10 @@ import {
   ChatModelGPT5_2PlusConfigSchema,
   ChatModelGPT5_2PlusWithWebSearchConfigDef,
   ChatModelGPT5_2PlusWithWebSearchConfigSchema,
+  ChatModelGPT5_6ConfigDef,
+  ChatModelGPT5_6ConfigSchema,
+  ChatModelGPT5_6WithWebSearchConfigDef,
+  ChatModelGPT5_6WithWebSearchConfigSchema,
   ChatModelGPT5CodexConfigDef,
   ChatModelGPT5CodexConfigSchema,
   ChatModelGPT5ConfigDef,
@@ -74,6 +78,10 @@ const OpenAIChatModelConfigs = {
     def: ChatModelGPT5_2PlusConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelGPT5_2PlusConfigSchema(maxOutputTokens, maxSequences),
   }),
+  gpt5_6: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT5_6ConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT5_6ConfigSchema(maxOutputTokens, maxSequences),
+  }),
   gpt5Codex: (maxOutputTokens: number, maxSequences: number) => ({
     def: ChatModelGPT5CodexConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelGPT5CodexConfigSchema(maxOutputTokens, maxSequences),
@@ -105,6 +113,10 @@ const OpenAIChatModelConfigs = {
   gpt5_2PlusWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
     def: ChatModelGPT5_2PlusWithWebSearchConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelGPT5_2PlusWithWebSearchConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt5_6WithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT5_6WithWebSearchConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT5_6WithWebSearchConfigSchema(maxOutputTokens, maxSequences),
   }),
   gpt5ProWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
     def: ChatModelGPT5ProWithWebSearchConfigDef(maxOutputTokens, maxSequences),
