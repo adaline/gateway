@@ -13,14 +13,16 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-const BedrockClaudeOpus4_7Literal = "anthropic.claude-opus-4-7-v1";
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-4-7.html (retrieved 2026-07-10)
+// ID fix: Bedrock never served a "-v1" suffixed ID for Opus 4.7 (that's a transitional exception unique to Opus 4.6).
+const BedrockClaudeOpus4_7Literal = "anthropic.claude-opus-4-7";
 const BedrockClaudeOpus4_7Description =
-  "Most intelligent model for building agents and coding. Features 128K max output tokens and 200K context window. Training cutoff: January 2026.";
+  "Most intelligent model for building agents and coding. Features 128K max output tokens and 1M context window. Training cutoff: January 2026.";
 
 const BedrockClaudeOpus4_7Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeOpus4_7Literal,
   description: BedrockClaudeOpus4_7Description,
-  maxInputTokens: 200000,
+  maxInputTokens: 1000000,
   maxOutputTokens: 128000,
   maxReasoningTokens: 128000,
   roles: AnthropicChatModelRolesMap,

@@ -13,15 +13,16 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-// Bedrock model ID reference: https://docs.anthropic.com/en/docs/about-claude/models/overview (retrieved 2026-02-25)
-const BedrockClaudeSonnet4_6Literal = "anthropic.claude-sonnet-4-6-v1";
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-4-6.html (retrieved 2026-07-10)
+// ID fix: Bedrock never served a "-v1" suffixed ID for Sonnet 4.6 (that's a transitional exception unique to Opus 4.6).
+const BedrockClaudeSonnet4_6Literal = "anthropic.claude-sonnet-4-6";
 const BedrockClaudeSonnet4_6Description =
   "Balanced model for agentic reasoning and coding with strong performance at low latency. Training cutoff: August 2025.";
 
 const BedrockClaudeSonnet4_6Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeSonnet4_6Literal,
   description: BedrockClaudeSonnet4_6Description,
-  maxInputTokens: 200000,
+  maxInputTokens: 1000000,
   maxOutputTokens: 64000,
   maxReasoningTokens: 64000,
   roles: AnthropicChatModelRolesMap,
@@ -49,4 +50,3 @@ export {
   BedrockClaudeSonnet4_6Schema,
   type BedrockClaudeSonnet4_6OptionsType,
 };
-

@@ -95,6 +95,16 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelOptions: Models.BedrockClaudeOpus4_7Options,
       modelSchema: Models.BedrockClaudeOpus4_7Schema,
     },
+    [Models.BedrockClaudeOpus4_8Literal]: {
+      model: Models.BedrockClaudeOpus4_8,
+      modelOptions: Models.BedrockClaudeOpus4_8Options,
+      modelSchema: Models.BedrockClaudeOpus4_8Schema,
+    },
+    [Models.BedrockClaudeSonnet5Literal]: {
+      model: Models.BedrockClaudeSonnet5,
+      modelOptions: Models.BedrockClaudeSonnet5Options,
+      modelSchema: Models.BedrockClaudeSonnet5Schema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<
