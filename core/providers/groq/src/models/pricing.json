@@ -318,5 +318,53 @@
         }
       }
     ]
+  },
+  "qwen/qwen3.6-27b": {
+    "modelName": "qwen/qwen3.6-27b",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.6,
+            "outputPricePerMillion": 3.0
+          }
+        }
+      }
+    ]
+  },
+  "meta-llama/llama-prompt-guard-2-86m": {
+    "modelName": "meta-llama/llama-prompt-guard-2-86m",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.04,
+            "outputPricePerMillion": 0.04
+          }
+        }
+      }
+    ]
+  },
+  "meta-llama/llama-prompt-guard-2-22m": {
+    "modelName": "meta-llama/llama-prompt-guard-2-22m",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.03,
+            "outputPricePerMillion": 0.03
+          }
+        }
+      }
+    ]
   }
 }

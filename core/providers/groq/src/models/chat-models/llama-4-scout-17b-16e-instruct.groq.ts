@@ -9,7 +9,7 @@ import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq"
 
 const Llama_4_Scout_17b_16e_InstructLiteral = "meta-llama/llama-4-scout-17b-16e-instruct" as const;
 const Llama_4_Scout_17b_16e_InstructDescription =
-  "Llama 4 Scout is Meta's natively multimodal model that enables text and image understanding. Model offers industry-leading performance for multimodal tasks like natural assistant-like chat, image recognition, and coding tasks.";
+  "Llama 4 Scout is Meta's natively multimodal model that enables text and image understanding. Model offers industry-leading performance for multimodal tasks like natural assistant-like chat, image recognition, and coding tasks. Deprecated by Groq; scheduled removal 2026-07-17 (replacement: openai/gpt-oss-120b or qwen/qwen3.6-27b).";
 
 const Llama_4_Scout_17b_16e_InstructSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalitiesEnum).parse({
   name: Llama_4_Scout_17b_16e_InstructLiteral,

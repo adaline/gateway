@@ -14,7 +14,7 @@ import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq"
 
 const Qwen3_32bLiteral = "qwen/qwen3-32b" as const;
 const Qwen3_32bDescription =
-  "Qwen 3 32B is the latest generation of large language models in the Qwen series, offering groundbreaking advancements in reasoning, instruction-following, agent capabilities, and multilingual support. It uniquely supports seamless switching between thinking mode (for complex logical reasoning, math, and coding) and non-thinking mode (for efficient, general-purpose dialogue) within a single model. ";
+  "Qwen 3 32B is the latest generation of large language models in the Qwen series, offering groundbreaking advancements in reasoning, instruction-following, agent capabilities, and multilingual support. It uniquely supports seamless switching between thinking mode (for complex logical reasoning, math, and coding) and non-thinking mode (for efficient, general-purpose dialogue) within a single model. Deprecated by Groq; scheduled removal 2026-07-17 (replacement: openai/gpt-oss-120b).";
 
 const Qwen3_32bSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelTextToolModalitiesEnum).parse({
   name: Qwen3_32bLiteral,

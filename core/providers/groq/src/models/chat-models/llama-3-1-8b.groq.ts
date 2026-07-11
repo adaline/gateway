@@ -16,7 +16,8 @@ const Llama_3_1_8bLiteral = "llama-3.1-8b-instant" as const;
 // https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md
 const Llama_3_1_8bDescription =
   "The Llama 3.1 instruction tuned text only models (8B, 70B, 405B) are optimized for multilingual dialogue use cases and \
-  outperform many of the available open source and closed chat models on common industry benchmarks.";
+  outperform many of the available open source and closed chat models on common industry benchmarks. \
+  Deprecated by Groq; scheduled removal 2026-08-16 (replacement: openai/gpt-oss-20b).";
 
 const Llama_3_1_8bSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelTextToolModalitiesEnum).parse({
   name: Llama_3_1_8bLiteral,

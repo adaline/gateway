@@ -14,7 +14,7 @@ import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq"
 
 const Llama_3_3_70b_VersatileLiteral = "llama-3.3-70b-versatile" as const;
 const Llama_3_3_70b_VersatileDescription =
-  "Llama-3.3-70B-Versatile is Meta's advanced multilingual large language model, optimized for a wide range of natural language processing tasks. With 70 billion parameters, it offers high performance across various benchmarks while maintaining efficiency suitable for diverse applications.";
+  "Llama-3.3-70B-Versatile is Meta's advanced multilingual large language model, optimized for a wide range of natural language processing tasks. With 70 billion parameters, it offers high performance across various benchmarks while maintaining efficiency suitable for diverse applications. Deprecated by Groq; scheduled removal 2026-08-16 (replacement: openai/gpt-oss-120b).";
 
 const Llama_3_3_70b_VersatileSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelTextToolModalitiesEnum).parse({
   name: Llama_3_3_70b_VersatileLiteral,

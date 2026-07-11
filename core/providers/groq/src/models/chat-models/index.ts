@@ -12,3 +12,6 @@ export * from "./kimi-k2-instruct-0905.groq";
 export * from "./llama-4-maverick-17b-128e-instruct.groq";
 export * from "./llama-4-scout-17b-16e-instruct.groq";
 export * from "./gpt-oss-safeguard-20b.groq";
+export * from "./qwen3-6-27b.groq";
+export * from "./llama-prompt-guard-2-86m.groq";
+export * from "./llama-prompt-guard-2-22m.groq";
