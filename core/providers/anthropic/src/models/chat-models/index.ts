@@ -8,6 +8,7 @@ export * from "./claude-opus-4-8.anthropic";
 export * from "./claude-fable-5.anthropic";
 export * from "./claude-sonnet-4-5-20250929.anthropic";
 export * from "./claude-sonnet-4-6.anthropic";
+export * from "./claude-sonnet-5.anthropic";
 export * from "./claude-haiku-4-5-20251001.anthropic";
 export * from "./claude-3-5-sonnet-20240620.anthropic";
 export * from "./claude-3-5-sonnet-20241022.anthropic";
