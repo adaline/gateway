@@ -89,6 +89,36 @@ class XAI<C extends Models.BaseChatModelOptionsType> implements ProviderV1<C, ne
       modelOptions: Models.Grok_Code_Fast_1_Options,
       modelSchema: Models.Grok_Code_Fast_1_Schema,
     },
+    [Models.Grok_4_5_Literal]: {
+      model: Models.Grok_4_5,
+      modelOptions: Models.Grok_4_5_Options,
+      modelSchema: Models.Grok_4_5_Schema,
+    },
+    [Models.Grok_4_3_Literal]: {
+      model: Models.Grok_4_3,
+      modelOptions: Models.Grok_4_3_Options,
+      modelSchema: Models.Grok_4_3_Schema,
+    },
+    [Models.Grok_4_20_0309_Reasoning_Literal]: {
+      model: Models.Grok_4_20_0309_Reasoning,
+      modelOptions: Models.Grok_4_20_0309_Reasoning_Options,
+      modelSchema: Models.Grok_4_20_0309_Reasoning_Schema,
+    },
+    [Models.Grok_4_20_0309_Non_Reasoning_Literal]: {
+      model: Models.Grok_4_20_0309_Non_Reasoning,
+      modelOptions: Models.Grok_4_20_0309_Non_Reasoning_Options,
+      modelSchema: Models.Grok_4_20_0309_Non_Reasoning_Schema,
+    },
+    [Models.Grok_4_20_Multi_Agent_0309_Literal]: {
+      model: Models.Grok_4_20_Multi_Agent_0309,
+      modelOptions: Models.Grok_4_20_Multi_Agent_0309_Options,
+      modelSchema: Models.Grok_4_20_Multi_Agent_0309_Schema,
+    },
+    [Models.Grok_Build_0_1_Literal]: {
+      model: Models.Grok_Build_0_1,
+      modelOptions: Models.Grok_Build_0_1_Options,
+      modelSchema: Models.Grok_Build_0_1_Schema,
+    },
   };
 
   chatModelLiterals(): string[] {

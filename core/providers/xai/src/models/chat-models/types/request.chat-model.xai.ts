@@ -116,7 +116,7 @@ const XAIChatRequest = z.object({
   top_p: z.number().min(0).max(1).nullable().optional(),
   tools: z.array(XAIChatRequestTool).optional(),
   tool_choice: XAIChatRequestToolChoiceEnum.or(XAIChatRequestToolChoiceFunction).optional(),
-  reasoning_effort: z.enum(["low", "high"]).optional(),
+  reasoning_effort: z.enum(["low", "high", "none"]).optional(),
 });
 type XAIChatRequestType = z.infer<typeof XAIChatRequest>;
 
