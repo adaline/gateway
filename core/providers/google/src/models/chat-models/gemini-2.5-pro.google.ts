@@ -9,7 +9,8 @@ import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatMod
 
 const Gemini2_5ProLiteral = "gemini-2.5-pro";
 const Gemini2_5ProDescription =
-  "Google's Gemini 2.5 Pro model for enhanced thinking, reasoning, multimodal understanding, and advanced coding.";
+  "Google's Gemini 2.5 Pro model for enhanced thinking, reasoning, multimodal understanding, and advanced coding. " +
+  "Deprecated by Google; scheduled shutdown 2026-10-16 (replacement: gemini-3.1-pro-preview).";
 
 const Gemini2_5ProSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5ProLiteral,

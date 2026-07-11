@@ -10,7 +10,8 @@ import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatMod
 const Gemini2_5FlashLiteLiteral = "gemini-2.5-flash-lite";
 const Gemini2_5FlashLiteDescription =
   "Google's most cost-efficient and fastest model in the 2.5 series. \
-  Optimized for high-volume, latency-sensitive tasks like translation and classification with enhanced reasoning capabilities.";
+  Optimized for high-volume, latency-sensitive tasks like translation and classification with enhanced reasoning capabilities. \
+  Deprecated by Google; scheduled shutdown 2026-10-16 (replacement: gemini-3.1-flash-lite).";
 
 const Gemini2_5FlashLiteSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5FlashLiteLiteral,

@@ -10,7 +10,8 @@ import { GoogleEmbeddingModelModalities, GoogleEmbeddingModelModalitiesEnum } fr
 const Gemini_Embedding_001Literal = "gemini-embedding-001";
 const Gemini_Embedding_001_Description =
   "Gemini embedding model — Matryoshka representation learning. Default 3072 dimensions; " +
-  "recommended sizes 768 / 1536 / 3072 via `outputDimensionality`. Max input 2048 tokens.";
+  "recommended sizes 768 / 1536 / 3072 via `outputDimensionality`. Max input 2048 tokens. " +
+  "Deprecated by Google; scheduled shutdown 2026-07-14 (replacement: gemini-embedding-2).";
 
 const Gemini_Embedding_001Schema = EmbeddingModelSchema(GoogleEmbeddingModelModalitiesEnum).parse({
   name: Gemini_Embedding_001Literal,

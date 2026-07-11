@@ -9,7 +9,8 @@ import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatMod
 
 const Gemini2_5FlashLiteral = "gemini-2.5-flash";
 const Gemini2_5FlashDescription =
-  "Google's Gemini 2.5 Flash model for enhanced thinking, reasoning, multimodal understanding, and advanced coding.";
+  "Google's Gemini 2.5 Flash model for enhanced thinking, reasoning, multimodal understanding, and advanced coding. " +
+  "Deprecated by Google; scheduled shutdown 2026-10-16 (replacement: gemini-3.5-flash).";
 
 const Gemini2_5FlashSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5FlashLiteral,

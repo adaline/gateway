@@ -383,11 +383,21 @@
     "tokenRanges": [
       {
         "minTokens": 0,
-        "maxTokens": null,
+        "maxTokens": 200000,
         "prices": {
           "base": {
             "inputPricePerMillion": 1.25,
             "outputPricePerMillion": 10
+          }
+        }
+      },
+      {
+        "minTokens": 200001,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.5,
+            "outputPricePerMillion": 15
           }
         }
       }
