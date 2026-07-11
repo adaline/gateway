@@ -172,7 +172,13 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
   }
 
   private shouldUseResponsesApi(config: ConfigType, _tools?: ToolType[]): boolean {
-    return this.forceResponsesApi || (config as { webSearchTool?: unknown }).webSearchTool === true;
+    // reasoningMode has no Chat Completions wire form; its only documented shape is the
+    // Responses API's nested `reasoning.mode`, so its presence forces the Responses path.
+    return (
+      this.forceResponsesApi ||
+      (config as { webSearchTool?: unknown }).webSearchTool === true ||
+      (config as { reasoningMode?: unknown }).reasoningMode != null
+    );
   }
 
   transformModelRequest(request: OpenAIChatRequestType): {
@@ -1386,7 +1392,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         webSearchTool.filters = { allowed_domains: domains };
       }
 
-      const externalAccess = (config as { webSearchExternalAccess?: boolean }).webSearchExternalAccess;
+      // Raw config is inspected here (schema defaults are never applied on this path), so
+      // fall back to the model's config-def default — default-deny models (GPT-5.6+) keep
+      // external_web_access off unless the caller explicitly opts in.
+      const externalAccessDef = this.modelSchema.config.def.webSearchExternalAccess as { default?: boolean | null } | undefined;
+      const externalAccess = (config as { webSearchExternalAccess?: boolean }).webSearchExternalAccess ?? externalAccessDef?.default;
       if (externalAccess === false) {
         webSearchTool.external_web_access = false;
       }

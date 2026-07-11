@@ -213,6 +213,16 @@ const webSearchExternalAccess = SelectBooleanConfigItem({
   default: true,
 });
 
+// Default-deny variant used by newer model families (GPT-5.6+): live web access must be
+// explicitly opted into with webSearchExternalAccess: true.
+const webSearchExternalAccessDefaultOff = SelectBooleanConfigItem({
+  param: "webSearchExternalAccess",
+  title: "Web Search External Access",
+  description:
+    "Allow external web access. Defaults to false (cached/indexed results only); set to true to enable live web access. Responses API only. Ignored on web_search_preview.",
+  default: false,
+});
+
 export {
   frequencyPenalty,
   logProbs,
@@ -234,5 +244,6 @@ export {
   verbosity,
   webSearchAllowedDomains,
   webSearchExternalAccess,
+  webSearchExternalAccessDefaultOff,
   webSearchTool,
 };
