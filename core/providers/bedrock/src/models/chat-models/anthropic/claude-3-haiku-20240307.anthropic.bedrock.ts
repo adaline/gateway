@@ -16,7 +16,8 @@ import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 const BedrockClaude3Haiku20240307Literal = "anthropic.claude-3-haiku-20240307-v1:0";
 const BedrockClaude3Haiku20240307Description =
   "Claude 3 Haiku is a large-scale multimodal model trained by Anthropic. \
-It is the successor to Claude 3 and is designed to be more powerful and capable than its predecessor.";
+It is the successor to Claude 3 and is designed to be more powerful and capable than its predecessor. \
+Legacy on AWS Bedrock; EOL 2026-09-10.";
 
 const BedrockClaude3Haiku20240307Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicChatModelModalitiesEnum).parse({
   name: BedrockClaude3Haiku20240307Literal,

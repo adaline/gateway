@@ -754,7 +754,7 @@ describe("BaseChatModel", () => {
           type: "message",
           role: "assistant",
           content: [], // Content blocks usually start empty here
-          model: "claude-3-opus-20240229",
+          model: "claude-sonnet-4-5-20250929",
           stop_reason: null,
           stop_sequence: null,
           usage: { input_tokens: 15, output_tokens: 0 }, // Initial usage
@@ -1349,7 +1349,7 @@ describe("BaseChatModel", () => {
       type: "message",
       role: "assistant",
       content: content,
-      model: "claude-3-opus-20240229",
+      model: "claude-sonnet-4-5-20250929",
       stop_reason: "end_turn",
       stop_sequence: null,
       usage: usage,

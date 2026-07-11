@@ -14,7 +14,7 @@ import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
 const BedrockClaude3_5Sonnet20240620Literal = "anthropic.claude-3-5-sonnet-20240620-v1:0";
-const BedrockClaude3_5Sonnet20240620Description = "Most intelligent model. Highest level of intelligence and capability.";
+const BedrockClaude3_5Sonnet20240620Description = "Most intelligent model. Highest level of intelligence and capability. Legacy on AWS Bedrock; EOL 2026-07-30.";
 
 const BedrockClaude3_5Sonnet20240620Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicChatModelModalitiesEnum).parse({
   name: BedrockClaude3_5Sonnet20240620Literal,

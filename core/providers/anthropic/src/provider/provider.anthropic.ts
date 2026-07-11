@@ -19,46 +19,6 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       modelSchema: ChatModelSchemaType;
     }
   > = {
-    [Models.Claude3Haiku20240307Literal]: {
-      model: Models.Claude3Haiku20240307,
-      modelOptions: Models.Claude3Haiku20240307Options,
-      modelSchema: Models.Claude3Haiku20240307Schema,
-    },
-    [Models.Claude3Sonnet20240229Literal]: {
-      model: Models.Claude3Sonnet20240229,
-      modelOptions: Models.Claude3Sonnet20240229Options,
-      modelSchema: Models.Claude3Sonnet20240229Schema,
-    },
-    [Models.Claude3Opus20240229Literal]: {
-      model: Models.Claude3Opus20240229,
-      modelOptions: Models.Claude3Opus20240229Options,
-      modelSchema: Models.Claude3Opus20240229Schema,
-    },
-    [Models.Claude3_5Sonnet20240620Literal]: {
-      model: Models.Claude3_5Sonnet20240620,
-      modelOptions: Models.Claude3_5Sonnet20240620Options,
-      modelSchema: Models.Claude3_5Sonnet20240620Schema,
-    },
-    [Models.Claude3_5Sonnet20241022Literal]: {
-      model: Models.Claude3_5Sonnet20241022,
-      modelOptions: Models.Claude3_5Sonnet20241022Options,
-      modelSchema: Models.Claude3_5Sonnet20241022Schema,
-    },
-    [Models.Claude3_5Haiku20241022Literal]: {
-      model: Models.Claude3_5Haiku20241022,
-      modelOptions: Models.Claude3_5Haiku20241022Options,
-      modelSchema: Models.Claude3_5Haiku20241022Schema,
-    },
-    [Models.Claude3_7Sonnet20250219Literal]: {
-      model: Models.Claude3_7Sonnet20250219,
-      modelOptions: Models.Claude3_7Sonnet20250219Options,
-      modelSchema: Models.Claude3_7Sonnet20250219Schema,
-    },
-    [Models.Claude4Sonnet20250514Literal]: {
-      model: Models.Claude4Sonnet20250514,
-      modelOptions: Models.Claude4Sonnet20250514Options,
-      modelSchema: Models.Claude4Sonnet20250514Schema,
-    },
     [Models.ClaudeSonnet4_520250929Literal]: {
       model: Models.ClaudeSonnet4_520250929,
       modelOptions: Models.ClaudeSonnet4_520250929Options,
@@ -73,11 +33,6 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       model: Models.ClaudeHaiku4_520251001,
       modelOptions: Models.ClaudeHaiku4_520251001Options,
       modelSchema: Models.ClaudeHaiku4_520251001Schema,
-    },
-    [Models.Claude4Opus20250514Literal]: {
-      model: Models.Claude4Opus20250514,
-      modelOptions: Models.Claude4Opus20250514Options,
-      modelSchema: Models.Claude4Opus20250514Schema,
     },
     [Models.ClaudeOpus4_520251101Literal]: {
       model: Models.ClaudeOpus4_520251101,

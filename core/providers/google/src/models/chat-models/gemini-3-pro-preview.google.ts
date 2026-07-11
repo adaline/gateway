@@ -13,6 +13,7 @@ const Gemini3ProPreviewDescription =
   "Google's latest Gemini 3 Pro Preview model with enhanced multimodal understanding, reasoning, and thinking capabilities. \
   Supports Text, Image, Video, Audio, and PDF inputs. Knowledge cutoff: January 2025.";
 
+// Retired on the Gemini API (no longer registered with the google provider); schema retained for @adaline/vertex, which still serves this model.
 const Gemini3ProPreviewSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini3ProPreviewLiteral,
   description: Gemini3ProPreviewDescription,
@@ -43,6 +44,3 @@ export {
   Gemini3ProPreviewSchema,
   type Gemini3ProPreviewOptionsType,
 };
-
-
-

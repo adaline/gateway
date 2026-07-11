@@ -1,20 +1,4 @@
 {
-  "gemma2-9b-it": {
-    "modelName": "gemma2-9b-it",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.2,
-            "outputPricePerMillion": 0.2
-          }
-        }
-      }
-    ]
-  },
   "llama-3.1-8b-instant": {
     "modelName": "llama-3.1-8b-instant",
     "currency": "USD",
@@ -26,118 +10,6 @@
           "base": {
             "inputPricePerMillion": 0.05,
             "outputPricePerMillion": 0.08
-          }
-        }
-      }
-    ]
-  },
-  "llama-3.2-11b-vision-preview": {
-    "modelName": "llama-3.2-11b-vision-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.18,
-            "outputPricePerMillion": 0.18
-          }
-        }
-      }
-    ]
-  },
-  "llama-3.2-1b-preview": {
-    "modelName": "llama-3.2-1b-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.04,
-            "outputPricePerMillion": 0.04
-          }
-        }
-      }
-    ]
-  },
-  "llama-3.2-3b-preview": {
-    "modelName": "llama-3.2-3b-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.06,
-            "outputPricePerMillion": 0.06
-          }
-        }
-      }
-    ]
-  },
-  "llama-3.2-90b-vision-preview": {
-    "modelName": "llama-3.2-90b-vision-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.7,
-            "outputPricePerMillion": 0.8
-          }
-        }
-      }
-    ]
-  },
-  "llama3-70b-8192": {
-    "modelName": "llama3-70b-8192",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.59,
-            "outputPricePerMillion": 0.79
-          }
-        }
-      }
-    ]
-  },
-  "llama3-8b-8192": {
-    "modelName": "llama3-8b-8192",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.05,
-            "outputPricePerMillion": 0.08
-          }
-        }
-      }
-    ]
-  },
-  "llama-guard-3-8b": {
-    "modelName": "llama-guard-3-8b",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.2,
-            "outputPricePerMillion": 0.2
           }
         }
       }
@@ -159,70 +31,6 @@
       }
     ]
   },
-  "meta-llama/llama-guard-4-12b": {
-    "modelName": "meta-llama/llama-guard-4-12b",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.2,
-            "outputPricePerMillion": 0.2
-          }
-        }
-      }
-    ]
-  },
-  "deepseek-r1-distill-llama-70b": {
-    "modelName": "deepseek-r1-distill-llama-70b",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.75,
-            "outputPricePerMillion": 0.99
-          }
-        }
-      }
-    ]
-  },
-  "moonshotai/kimi-k2-instruct": {
-    "modelName": "moonshotai/kimi-k2-instruct",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 1.0,
-            "outputPricePerMillion": 3.0
-          }
-        }
-      }
-    ]
-  },
-  "moonshotai/kimi-k2-instruct-0905": {
-    "modelName": "moonshotai/kimi-k2-instruct-0905",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 1.0,
-            "outputPricePerMillion": 3.0
-          }
-        }
-      }
-    ]
-  },
   "qwen/qwen3-32b": {
     "modelName": "qwen/qwen3-32b",
     "currency": "USD",
@@ -234,22 +42,6 @@
           "base": {
             "inputPricePerMillion": 0.29,
             "outputPricePerMillion": 0.59
-          }
-        }
-      }
-    ]
-  },
-  "meta-llama/llama-4-maverick-17b-128e-instruct": {
-    "modelName": "meta-llama/llama-4-maverick-17b-128e-instruct",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.2,
-            "outputPricePerMillion": 0.6
           }
         }
       }

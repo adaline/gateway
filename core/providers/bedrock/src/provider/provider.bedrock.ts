@@ -30,11 +30,6 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelOptions: Models.BedrockClaude3Sonnet20240229Options,
       modelSchema: Models.BedrockClaude3Sonnet20240229Schema,
     },
-    [Models.BedrockClaude3Opus20240229Literal]: {
-      model: Models.BedrockClaude3Opus20240229,
-      modelOptions: Models.BedrockClaude3Opus20240229Options,
-      modelSchema: Models.BedrockClaude3Opus20240229Schema,
-    },
     [Models.BedrockClaude3_5Sonnet20240620Literal]: {
       model: Models.BedrockClaude3_5Sonnet20240620,
       modelOptions: Models.BedrockClaude3_5Sonnet20240620Options,
@@ -74,11 +69,6 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       model: Models.BedrockClaudeHaiku4_520251001,
       modelOptions: Models.BedrockClaudeHaiku4_520251001Options,
       modelSchema: Models.BedrockClaudeHaiku4_520251001Schema,
-    },
-    [Models.BedrockClaude4Opus20250514Literal]: {
-      model: Models.BedrockClaude4Opus20250514,
-      modelOptions: Models.BedrockClaude4Opus20250514Options,
-      modelSchema: Models.BedrockClaude4Opus20250514Schema,
     },
     [Models.BedrockClaudeOpus4_520251101Literal]: {
       model: Models.BedrockClaudeOpus4_520251101,

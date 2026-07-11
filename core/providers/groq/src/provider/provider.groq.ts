@@ -18,11 +18,6 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelSchema: ChatModelSchemaType;
     }
   > = {
-    [Models.Gemma2_9b_ITLiteral]: {
-      model: Models.Gemma2_9b_IT,
-      modelOptions: Models.Gemma2_9b_ITOptions,
-      modelSchema: Models.Gemma2_9b_ITSchema,
-    },
     [Models.Llama_3_1_8bLiteral]: {
       model: Models.Llama_3_1_8b,
       modelOptions: Models.Llama_3_1_8b_Options,
@@ -33,35 +28,10 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Llama_3_3_70b_Versatile_Options,
       modelSchema: Models.Llama_3_3_70b_VersatileSchema,
     },
-    [Models.Llama_Guard_4_12bLiteral]: {
-      model: Models.Llama_Guard_4_12b,
-      modelOptions: Models.Llama_Guard_4_12b_Options,
-      modelSchema: Models.Llama_Guard_4_12bSchema,
-    },
     [Models.Qwen3_32bLiteral]: {
       model: Models.Qwen3_32b,
       modelOptions: Models.Qwen3_32b_Options,
       modelSchema: Models.Qwen3_32bSchema,
-    },
-    [Models.Deepseek_R1_Distill_Llama_70bLiteral]: {
-      model: Models.Deepseek_R1_Distill_Llama_70b,
-      modelOptions: Models.Deepseek_R1_Distill_Llama_70b_Options,
-      modelSchema: Models.Deepseek_R1_Distill_Llama_70bSchema,
-    },
-    [Models.Kimi_K2_InstructLiteral]: {
-      model: Models.Kimi_K2_Instruct,
-      modelOptions: Models.Kimi_K2_Instruct_Options,
-      modelSchema: Models.Kimi_K2_InstructSchema,
-    },
-    [Models.Kimi_K2_Instruct_0905Literal]: {
-      model: Models.Kimi_K2_Instruct_0905,
-      modelOptions: Models.Kimi_K2_Instruct_0905_Options,
-      modelSchema: Models.Kimi_K2_Instruct_0905Schema,
-    },
-    [Models.Llama_4_Maverick_17b_128e_InstructLiteral]: {
-      model: Models.Llama_4_Maverick_17b_128e_Instruct,
-      modelOptions: Models.Llama_4_Maverick_17b_128e_Instruct_Options,
-      modelSchema: Models.Llama_4_Maverick_17b_128e_InstructSchema,
     },
     [Models.Llama_4_Scout_17b_16e_InstructLiteral]: {
       model: Models.Llama_4_Scout_17b_16e_Instruct,
