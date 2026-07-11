@@ -199,7 +199,12 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     _config.stop = parsedRequest.stop;
     _config.logProbs = parsedRequest.logprobs;
     _config.topLogProbs = parsedRequest.top_logprobs;
-    _config.reasoningEffort = parsedRequest.reasoning_effort;
+    // Only models whose config defines reasoningEffort (e.g. grok-4.3) accept the param;
+    // xAI documents no effort control for the others, so drop it here instead of injecting
+    // a config key that transformConfig would reject.
+    if ("reasoningEffort" in this.modelSchema.config.def) {
+      _config.reasoningEffort = parsedRequest.reasoning_effort;
+    }
 
     const config = Config().parse(removeUndefinedEntries(_config));
 
