@@ -27,8 +27,6 @@ import {
 } from "@adaline/types";
 
 import { Google } from "../../provider/provider.google";
-// text-embedding-001/004 are free on the Gemini API (no per-token charge), so
-// their pricing entries carry inputPricePerMillion: 0.
 import embeddingPricingData from "../embedding-pricing.json";
 import { GoogleEmbeddingRequest, GoogleEmbeddingRequestInputType, GoogleGetEmbeddingsResponse } from "./types";
 
@@ -96,9 +94,7 @@ class BaseEmbeddingModel implements EmbeddingModelV1<EmbeddingModelSchemaType> {
     if (responseData && typeof responseData === "object") {
       const data = responseData as { error?: { details?: Array<{ "@type"?: string; retryDelay?: string }> } };
       if (data.error?.details && Array.isArray(data.error.details)) {
-        const retryInfo = data.error.details.find(
-          (detail) => detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo"
-        );
+        const retryInfo = data.error.details.find((detail) => detail["@type"] === "type.googleapis.com/google.rpc.RetryInfo");
         if (retryInfo?.retryDelay) {
           delayMs = parseDuration(retryInfo.retryDelay);
         }

@@ -10,7 +10,7 @@ import { XAIChatModelRoles, XAIChatModelRolesMap, XAIChatModelTextToolModalities
 // spec-reference: https://docs.x.ai/docs/models, https://docs.x.ai/developers/models,
 // https://docs.x.ai/docs/models/grok-4.5 (retrieved 2026-07-10)
 // maxOutputTokens is not published by xAI docs; 131072 is carried from the grok-4.x family
-// convention (see grok-4-fast-reasoning.xai.ts, grok-4.1-fast-reasoning.xai.ts).
+// convention shared across the grok-4.x model family.
 const Grok_4_5_Literal = "grok-4.5";
 const Grok_4_5_Description =
   "Grok-4.5 is xAI's most intelligent and fastest general-purpose model, recommended as the default for everything including code, with reasoning enabled and a 500K context window.";

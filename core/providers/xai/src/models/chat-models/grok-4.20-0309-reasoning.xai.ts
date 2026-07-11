@@ -10,7 +10,7 @@ import { XAIChatModelRoles, XAIChatModelRolesMap, XAIChatModelTextToolModalities
 // spec-reference: https://docs.x.ai/docs/models, https://docs.x.ai/developers/models,
 // https://docs.x.ai/developers/models/grok-4.20 (retrieved 2026-07-10)
 // maxOutputTokens is not published by xAI docs; 131072 is carried from the grok-4.x family
-// convention (see grok-4-fast-reasoning.xai.ts, grok-4.1-fast-reasoning.xai.ts).
+// convention shared across the grok-4.x model family.
 const Grok_4_20_0309_Reasoning_Literal = "grok-4.20-0309-reasoning";
 const Grok_4_20_0309_Reasoning_Description =
   "Grok-4.20 (0309) Reasoning is xAI's reasoning-enabled variant of the grok-4.20 family with a 1M-token context window.";

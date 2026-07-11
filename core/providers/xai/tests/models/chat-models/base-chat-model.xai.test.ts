@@ -18,8 +18,8 @@ describe("BaseChatModel", () => {
   const mockModalities = ["text", "image", "tool-call", "tool-response"] as const;
 
   const mockModelSchema: ChatModelSchemaType = ChatModelSchema(z.enum(mockRoles), z.enum(mockModalities)).parse({
-    name: "grok-2",
-    description: "Grok 2 model",
+    name: "grok-4.3",
+    description: "Grok 4.3 model",
     maxInputTokens: 131072,
     maxOutputTokens: 131072,
     roles: mockRolesMap,
@@ -33,7 +33,7 @@ describe("BaseChatModel", () => {
   const mockOptions = {
     apiKey: "test-api-key",
     baseUrl: "https://api.x.ai/v1",
-    modelName: "grok-2",
+    modelName: "grok-4.3",
   };
 
   describe("constructor", () => {
@@ -73,7 +73,7 @@ describe("BaseChatModel", () => {
     it("should return the default params with model name", () => {
       const model = new BaseChatModel(mockModelSchema, mockOptions);
       expect(model.getDefaultParams()).toEqual({
-        model: "grok-2",
+        model: "grok-4.3",
       });
     });
   });

@@ -95,15 +95,6 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "required", "none"],
 });
 
-const reasoningEffort = SelectStringConfigItem({
-  param: "reasoning_effort",
-  title: "Reasoning Effort",
-  description:
-    "Controls how much time the model spends thinking before responding. 'low' uses minimal thinking time for quick responses, 'high' uses maximum thinking time for complex problems. Only supported by grok-3-mini models.",
-  default: "low",
-  choices: ["low", "high"],
-});
-
 const reasoningEffortNoneLow = SelectStringConfigItem({
   param: "reasoning_effort",
   title: "Reasoning Effort",
@@ -118,7 +109,6 @@ export {
   logProbs,
   maxTokens,
   presencePenalty,
-  reasoningEffort,
   reasoningEffortNoneLow,
   seed,
   stop,

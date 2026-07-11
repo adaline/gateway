@@ -11,6 +11,7 @@ const Gemini2_5ProPreview0325Literal = "gemini-2.5-pro-preview-03-25";
 const Gemini2_5ProPreview0325Description =
   "Google's preview model in Gemini 2.5 family for enhanced thinking, reasoning, multimodal understanding, and advanced coding.";
 
+// Retired on the Gemini API (no longer registered with the google provider); schema retained for @adaline/vertex, which still serves this model.
 const Gemini2_5ProPreview0325Schema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5ProPreview0325Literal,
   description: Gemini2_5ProPreview0325Description,

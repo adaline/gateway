@@ -63,22 +63,6 @@
       }
     ]
   },
-  "anthropic.claude-3-opus-20240229-v1:0": {
-    "modelName": "anthropic.claude-3-opus-20240229-v1:0",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 15,
-            "outputPricePerMillion": 75
-          }
-        }
-      }
-    ]
-  },
   "anthropic.claude-3-sonnet-20240229-v1:0": {
     "modelName": "anthropic.claude-3-sonnet-20240229-v1:0",
     "currency": "USD",
@@ -90,22 +74,6 @@
           "base": {
             "inputPricePerMillion": 3,
             "outputPricePerMillion": 15
-          }
-        }
-      }
-    ]
-  },
-  "anthropic.claude-opus-4-20250514-v1:0": {
-    "modelName": "anthropic.claude-opus-4-20250514-v1:0",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 15,
-            "outputPricePerMillion": 75
           }
         }
       }

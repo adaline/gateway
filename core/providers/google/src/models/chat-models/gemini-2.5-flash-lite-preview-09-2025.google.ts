@@ -11,6 +11,7 @@ const Gemini2_5FlashLitePreview092025Literal = "gemini-2.5-flash-lite-preview-09
 const Gemini2_5FlashLitePreview092025Description =
   "Google's preview Flash Lite variant in the Gemini 2.5 family, optimized for low-latency, high-volume tasks.";
 
+// Retired on the Gemini API (no longer registered with the google provider); schema retained for @adaline/vertex, which still serves this model.
 const Gemini2_5FlashLitePreview092025Schema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5FlashLitePreview092025Literal,
   description: Gemini2_5FlashLitePreview092025Description,
@@ -41,4 +42,3 @@ export {
   Gemini2_5FlashLitePreview092025Schema,
   type Gemini2_5FlashLitePreview092025OptionsType,
 };
-

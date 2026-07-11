@@ -10,7 +10,7 @@ import { XAIChatModelRoles, XAIChatModelRolesMap, XAIChatModelTextToolModalities
 // spec-reference: https://docs.x.ai/docs/models, https://docs.x.ai/developers/models,
 // https://docs.x.ai/developers/models/grok-build-0.1 (retrieved 2026-07-10)
 // maxOutputTokens is not published by xAI docs; 131072 is carried from the grok-4.x family
-// convention (see grok-code-fast-1.xai.ts, this model's predecessor).
+// convention shared across the grok-4.x model family.
 const Grok_Build_0_1_Literal = "grok-build-0.1";
 const Grok_Build_0_1_Description =
   "Grok Build 0.1 is xAI's intelligent coding model for agentic software engineering and web-dev workflow tasks, successor to Grok Code Fast 1, with a 256K context window.";

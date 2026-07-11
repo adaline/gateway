@@ -3,7 +3,6 @@ import { z } from "zod";
 import {
   logProbs,
   maxTokens,
-  reasoningEffort,
   reasoningEffortNoneLow,
   seed,
   temperature,
@@ -34,30 +33,6 @@ const ChatModelReasoningConfigDef = (maxOutputTokens: number) =>
     toolChoice: toolChoice.def,
   }) as const;
 
-const ChatModelMiniReasoningConfigSchema = (maxOutputTokens: number, _maxSequences: number) =>
-  z.object({
-    temperature: temperature.schema,
-    maxTokens: maxTokens(maxOutputTokens).schema,
-    topP: topP.schema,
-    seed: seed.schema.transform((value) => (value === 0 ? undefined : value)),
-    logProbs: logProbs.schema,
-    topLogProbs: topLogProbs.schema,
-    toolChoice: toolChoice.schema,
-    reasoningEffort: reasoningEffort.schema,
-  });
-
-const ChatModelMiniReasoningConfigDef = (maxOutputTokens: number) =>
-  ({
-    temperature: temperature.def,
-    maxTokens: maxTokens(maxOutputTokens).def,
-    topP: topP.def,
-    seed: seed.def,
-    logProbs: logProbs.def,
-    topLogProbs: topLogProbs.def,
-    toolChoice: toolChoice.def,
-    reasoningEffort: reasoningEffort.def,
-  }) as const;
-
 // grok-4.3 documents a reasoning_effort control confirmed for values 'none' and 'low' only
 // (see spec-reference comment in grok-4.3.xai.ts); higher effort levels are unverified,
 // so this variant reuses the 'reasoning_effort' wire param but scopes its choices accordingly.
@@ -86,8 +61,6 @@ const ChatModelReasoningEffortConfigDef = (maxOutputTokens: number) =>
   }) as const;
 
 export {
-  ChatModelMiniReasoningConfigDef,
-  ChatModelMiniReasoningConfigSchema,
   ChatModelReasoningConfigDef,
   ChatModelReasoningConfigSchema,
   ChatModelReasoningEffortConfigDef,

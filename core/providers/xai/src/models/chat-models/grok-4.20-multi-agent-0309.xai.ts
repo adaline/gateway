@@ -10,7 +10,7 @@ import { XAIChatModelRoles, XAIChatModelRolesMap, XAIChatModelTextToolModalities
 // spec-reference: https://docs.x.ai/docs/models, https://docs.x.ai/developers/models
 // (retrieved 2026-07-10)
 // maxOutputTokens is not published by xAI docs; 131072 is carried from the grok-4.x family
-// convention (see grok-4-fast-reasoning.xai.ts, grok-4.1-fast-reasoning.xai.ts).
+// convention shared across the grok-4.x model family.
 const Grok_4_20_Multi_Agent_0309_Literal = "grok-4.20-multi-agent-0309";
 const Grok_4_20_Multi_Agent_0309_Description =
   "Grok-4.20 Multi-Agent (0309) is xAI's multi-agent variant of the grok-4.20 family with reasoning enabled and a 1M-token context window.";
