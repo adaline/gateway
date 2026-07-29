@@ -1,5 +1,12 @@
 # @adaline/open-router
 
+## 1.11.6
+
+### Patch Changes
+
+- Updated dependencies [173dbff]
+  - @adaline/provider@1.10.6
+
 ## 1.11.5
 
 ### Patch Changes
