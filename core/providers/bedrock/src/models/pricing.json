@@ -8,8 +8,8 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 1,
-            "outputPricePerMillion": 5
+            "inputPricePerMillion": 0.8,
+            "outputPricePerMillion": 4
           }
         }
       }
@@ -152,8 +152,40 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 6.0,
-            "outputPricePerMillion": 30.0
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 25
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-opus-5": {
+    "modelName": "anthropic.claude-opus-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 25
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-fable-5": {
+    "modelName": "anthropic.claude-fable-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 10,
+            "outputPricePerMillion": 50
           }
         }
       }
@@ -168,8 +200,8 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 2.0,
-            "outputPricePerMillion": 10.0
+            "inputPricePerMillion": 2,
+            "outputPricePerMillion": 10
           }
         }
       }
