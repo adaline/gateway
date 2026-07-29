@@ -68,7 +68,7 @@ describe("OpenAI Web Search", () => {
       id: "chatcmpl-search-123",
       object: "chat.completion" as const,
       created: 1677652288,
-      model: "gpt-4o-search-preview",
+      model: "gpt-4o",
       system_fingerprint: "fp_search",
       choices: [
         {
@@ -210,7 +210,7 @@ describe("OpenAI Web Search", () => {
         id: "chatcmpl-null",
         object: "chat.completion" as const,
         created: 1677652288,
-        model: "gpt-4o-search-preview",
+        model: "gpt-4o",
         system_fingerprint: "fp_search",
         choices: [
           {
@@ -253,7 +253,7 @@ describe("OpenAI Web Search", () => {
         id: "chatcmpl-123",
         object: "chat.completion" as const,
         created: 1677652288,
-        model: "gpt-4o-search-preview",
+        model: "gpt-4o",
         system_fingerprint: "fp_search",
         choices: [
           {
@@ -286,21 +286,6 @@ describe("OpenAI Web Search", () => {
     const provider = new OpenAI();
     const schemas = provider.chatModelSchemas();
 
-    it("should register gpt-4o-search-preview model", () => {
-      expect(schemas["gpt-4o-search-preview"]).toBeDefined();
-      expect(schemas["gpt-4o-search-preview"].name).toBe("gpt-4o-search-preview");
-    });
-
-    it("should register gpt-4o-mini-search-preview model", () => {
-      expect(schemas["gpt-4o-mini-search-preview"]).toBeDefined();
-      expect(schemas["gpt-4o-mini-search-preview"].name).toBe("gpt-4o-mini-search-preview");
-    });
-
-    it("should register dated variants", () => {
-      expect(schemas["gpt-4o-search-preview-2025-03-11"]).toBeDefined();
-      expect(schemas["gpt-4o-mini-search-preview-2025-03-11"]).toBeDefined();
-    });
-
     it("should register gpt-5-search-api model", () => {
       expect(schemas["gpt-5-search-api"]).toBeDefined();
       expect(schemas["gpt-5-search-api"].name).toBe("gpt-5-search-api");
@@ -309,7 +294,7 @@ describe("OpenAI Web Search", () => {
     });
 
     it("should include search-result modality in search-preview models", () => {
-      const modalities = schemas["gpt-4o-search-preview"].modalities;
+      const modalities = schemas["gpt-5-search-api"].modalities;
       expect(modalities).toContain(SearchResultModalityLiteral);
     });
 
@@ -319,7 +304,7 @@ describe("OpenAI Web Search", () => {
     });
 
     it("should NOT have webSearchTool config in search-preview models (always-on CC search)", () => {
-      const configDef = schemas["gpt-4o-search-preview"].config.def as Record<string, unknown>;
+      const configDef = schemas["gpt-5-search-api"].config.def as Record<string, unknown>;
       expect(configDef.webSearchTool).toBeUndefined();
     });
   });

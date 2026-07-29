@@ -47,22 +47,6 @@
       }
     ]
   },
-  "gpt-4-0125-preview": {
-    "modelName": "gpt-4-0125-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 30,
-            "outputPricePerMillion": 60
-          }
-        }
-      }
-    ]
-  },
   "gpt-4-0613": {
     "modelName": "gpt-4-0613",
     "currency": "USD",
@@ -97,22 +81,6 @@
   },
   "gpt-4-turbo-2024-04-09": {
     "modelName": "gpt-4-turbo-2024-04-09",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 10,
-            "outputPricePerMillion": 30
-          }
-        }
-      }
-    ]
-  },
-  "gpt-4-turbo-preview": {
-    "modelName": "gpt-4-turbo-preview",
     "currency": "USD",
     "tokenRanges": [
       {
@@ -234,22 +202,6 @@
           "base": {
             "inputPricePerMillion": 5,
             "outputPricePerMillion": 20
-          }
-        }
-      }
-    ]
-  },
-  "chatgpt-4o-latest": {
-    "modelName": "chatgpt-4o-latest",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 5,
-            "outputPricePerMillion": 15
           }
         }
       }
@@ -479,22 +431,6 @@
       }
     ]
   },
-  "gpt-5-chat-latest": {
-    "modelName": "gpt-5-chat-latest",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 1.25,
-            "outputPricePerMillion": 10.0
-          }
-        }
-      }
-    ]
-  },
   "gpt-5.1": {
     "modelName": "gpt-5.1",
     "currency": "USD",
@@ -543,22 +479,6 @@
       }
     ]
   },
-  "gpt-5.2-codex": {
-    "modelName": "gpt-5.2-codex",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 1.75,
-            "outputPricePerMillion": 14.0
-          }
-        }
-      }
-    ]
-  },
   "gpt-5.2-chat-latest": {
     "modelName": "gpt-5.2-chat-latest",
     "currency": "USD",
@@ -586,6 +506,22 @@
           "base": {
             "inputPricePerMillion": 21.0,
             "outputPricePerMillion": 168.0
+          }
+        }
+      }
+    ]
+  },
+  "gpt-5.2-codex": {
+    "modelName": "gpt-5.2-codex",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.75,
+            "outputPricePerMillion": 14.0
           }
         }
       }
@@ -739,54 +675,6 @@
       }
     ]
   },
-  "gpt-4o-search-preview": {
-    "modelName": "gpt-4o-search-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 5,
-            "outputPricePerMillion": 20
-          }
-        }
-      }
-    ]
-  },
-  "gpt-4o-search-preview-2025-03-11": {
-    "modelName": "gpt-4o-search-preview-2025-03-11",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 5,
-            "outputPricePerMillion": 20
-          }
-        }
-      }
-    ]
-  },
-  "gpt-4o-mini-search-preview": {
-    "modelName": "gpt-4o-mini-search-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.6,
-            "outputPricePerMillion": 2.4
-          }
-        }
-      }
-    ]
-  },
   "gpt-5-search-api": {
     "modelName": "gpt-5-search-api",
     "currency": "USD",
@@ -798,22 +686,6 @@
           "base": {
             "inputPricePerMillion": 5,
             "outputPricePerMillion": 20
-          }
-        }
-      }
-    ]
-  },
-  "gpt-4o-mini-search-preview-2025-03-11": {
-    "modelName": "gpt-4o-mini-search-preview-2025-03-11",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.6,
-            "outputPricePerMillion": 2.4
           }
         }
       }

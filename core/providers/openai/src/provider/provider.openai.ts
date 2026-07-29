@@ -33,11 +33,6 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_3_5_Turbo_1106Options,
       modelSchema: Models.GPT_3_5_Turbo_1106Schema,
     },
-    [Models.GPT_4_0125_PreviewLiteral]: {
-      model: Models.GPT_4_0125_Preview,
-      modelOptions: Models.GPT_4_0125_PreviewOptions,
-      modelSchema: Models.GPT_4_0125_PreviewSchema,
-    },
     [Models.GPT_4_0613Literal]: {
       model: Models.GPT_4_0613,
       modelOptions: Models.GPT_4_0613Options,
@@ -82,11 +77,6 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.GPT_5_2,
       modelOptions: Models.GPT_5_2Options,
       modelSchema: Models.GPT_5_2Schema,
-    },
-    [Models.GPT_5_2_CodexLiteral]: {
-      model: Models.GPT_5_2_Codex,
-      modelOptions: Models.GPT_5_2_CodexOptions,
-      modelSchema: Models.GPT_5_2_CodexSchema,
     },
     [Models.ChatGPT_5_2Literal]: {
       model: Models.ChatGPT_5_2,
@@ -163,20 +153,10 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.GPT_5_NanoOptions,
       modelSchema: Models.GPT_5_NanoSchema,
     },
-    [Models.GPT_5_ChatLatestLiteral]: {
-      model: Models.GPT_5_ChatLatest,
-      modelOptions: Models.GPT_5_ChatLatestOptions,
-      modelSchema: Models.GPT_5_ChatLatestSchema,
-    },
     [Models.GPT_4_Turbo_2024_04_09Literal]: {
       model: Models.GPT_4_Turbo_2024_04_09,
       modelOptions: Models.GPT_4_Turbo_2024_04_09Options,
       modelSchema: Models.GPT_4_Turbo_2024_04_09Schema,
-    },
-    [Models.GPT_4_Turbo_PreviewLiteral]: {
-      model: Models.GPT_4_Turbo_Preview,
-      modelOptions: Models.GPT_4_Turbo_PreviewOptions,
-      modelSchema: Models.GPT_4_Turbo_PreviewSchema,
     },
     [Models.GPT_4_TurboLiteral]: {
       model: Models.GPT_4_Turbo,
@@ -202,31 +182,6 @@ class OpenAI<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.GPT_4o,
       modelOptions: Models.GPT_4oOptions,
       modelSchema: Models.GPT_4oSchema,
-    },
-    [Models.ChatGPT_4o_LatestLiteral]: {
-      model: Models.ChatGPT_4o_Latest,
-      modelOptions: Models.ChatGPT_4o_LatestOptions,
-      modelSchema: Models.ChatGPT_4o_LatestSchema,
-    },
-    [Models.GPT_4o_Search_PreviewLiteral]: {
-      model: Models.GPT_4o_Search_Preview,
-      modelOptions: Models.GPT_4o_Search_PreviewOptions,
-      modelSchema: Models.GPT_4o_Search_PreviewSchema,
-    },
-    [Models.GPT_4o_Search_Preview_2025_03_11Literal]: {
-      model: Models.GPT_4o_Search_Preview_2025_03_11,
-      modelOptions: Models.GPT_4o_Search_Preview_2025_03_11Options,
-      modelSchema: Models.GPT_4o_Search_Preview_2025_03_11Schema,
-    },
-    [Models.GPT_4o_Mini_Search_PreviewLiteral]: {
-      model: Models.GPT_4o_Mini_Search_Preview,
-      modelOptions: Models.GPT_4o_Mini_Search_PreviewOptions,
-      modelSchema: Models.GPT_4o_Mini_Search_PreviewSchema,
-    },
-    [Models.GPT_4o_Mini_Search_Preview_2025_03_11Literal]: {
-      model: Models.GPT_4o_Mini_Search_Preview_2025_03_11,
-      modelOptions: Models.GPT_4o_Mini_Search_Preview_2025_03_11Options,
-      modelSchema: Models.GPT_4o_Mini_Search_Preview_2025_03_11Schema,
     },
     [Models.GPT_5_Search_ApiLiteral]: {
       model: Models.GPT_5_Search_Api,

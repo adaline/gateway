@@ -25,21 +25,6 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini2_5FlashLiteOptions,
       modelSchema: Models.Gemini2_5FlashLiteSchema,
     },
-    [Models.Gemini2_5FlashLitePreview092025Literal]: {
-      model: Models.Gemini2_5FlashLitePreview092025,
-      modelOptions: Models.Gemini2_5FlashLitePreview092025Options,
-      modelSchema: Models.Gemini2_5FlashLitePreview092025Schema,
-    },
-    [Models.Gemini2_5FlashPreview0417Literal]: {
-      model: Models.Gemini2_5FlashPreview0417,
-      modelOptions: Models.Gemini2_5FlashPreview0417Options,
-      modelSchema: Models.Gemini2_5FlashPreview0417Schema,
-    },
-    [Models.Gemini2_5ProPreview0325Literal]: {
-      model: Models.Gemini2_5ProPreview0325,
-      modelOptions: Models.Gemini2_5ProPreview0325Options,
-      modelSchema: Models.Gemini2_5ProPreview0325Schema,
-    },
     [Models.Gemini2_5FlashLiteral]: {
       model: Models.Gemini2_5Flash,
       modelOptions: Models.Gemini2_5FlashOptions,
@@ -64,11 +49,6 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       model: Models.Gemini3_1ProPreviewCustomtools,
       modelOptions: Models.Gemini3_1ProPreviewCustomtoolsOptions,
       modelSchema: Models.Gemini3_1ProPreviewCustomtoolsSchema,
-    },
-    [Models.Gemini3ProPreviewLiteral]: {
-      model: Models.Gemini3ProPreview,
-      modelOptions: Models.Gemini3ProPreviewOptions,
-      modelSchema: Models.Gemini3ProPreviewSchema,
     },
     [Models.Gemini3_5FlashLiteral]: {
       model: Models.Gemini3_5Flash,

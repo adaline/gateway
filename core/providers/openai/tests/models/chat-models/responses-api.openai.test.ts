@@ -1904,7 +1904,6 @@ describe("registry", () => {
     "gpt-5",
     "gpt-5-mini",
     "gpt-5-nano",
-    "gpt-5-chat-latest",
     "gpt-5.1",
     "gpt-5.2",
     "gpt-5.2-chat-latest",
@@ -1926,19 +1925,11 @@ describe("registry", () => {
   // Models that must NOT declare webSearchTool at all (no Responses web_search support).
   const noWebSearchModels = [
     "gpt-4.1-nano", // no Responses web_search support
-    "chatgpt-4o-latest", // no function-call support (M1 critic)
-    "gpt-5.2-codex", // codex variant, tool-free
     "gpt-5.3-codex", // codex variant, tool-free
   ];
 
   // CC always-on-search SKUs: they DO declare webSearchTool but stay on the CC path.
-  const ccSearchPreviewModels = [
-    "gpt-4o-search-preview",
-    "gpt-4o-search-preview-2025-03-11",
-    "gpt-4o-mini-search-preview",
-    "gpt-4o-mini-search-preview-2025-03-11",
-    "gpt-5-search-api",
-  ];
+  const ccSearchPreviewModels = ["gpt-5-search-api"];
 
   describe("Q2 allowlist — declares webSearchTool + search-result modality", () => {
     it.each(q2Models)("model '%s' declares webSearchTool config key", (literal) => {

@@ -128,7 +128,7 @@ const reasoningEffort5_2Plus = SelectStringConfigItem({
   choices: ["none", "low", "medium", "high", "xhigh"],
 });
 
-// Reasoning effort for codex variants (gpt-5.2-codex, gpt-5.3-codex). Codex models
+// Reasoning effort for codex variants (gpt-5.3-codex). Codex models
 // always run with some reasoning, so 'none' and 'minimal' are not accepted.
 // See https://developers.openai.com/api/docs/models/gpt-5.3-codex
 const reasoningEffortCodex = SelectStringConfigItem({
