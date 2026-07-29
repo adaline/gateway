@@ -7,7 +7,9 @@ const SelectStringConfigItemDef = z.object({
   param: z.string().min(1),
   title: z.string().min(1),
   description: z.string().min(1).max(500),
-  default: z.string(),
+  // null means the upstream provider documents no default for the param, matching
+  // SelectBooleanConfigItem and the string | null already accepted by the schema builder below.
+  default: z.string().nullable(),
   choices: z.array(z.string()),
 });
 type SelectStringConfigItemDefType = z.infer<typeof SelectStringConfigItemDef>;
