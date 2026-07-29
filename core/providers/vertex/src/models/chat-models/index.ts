@@ -5,5 +5,7 @@ export * from "./gemini-2.5-pro.vertex";
 export * from "./gemini-3.1-flash-lite.vertex";
 export * from "./gemini-3.1-pro-preview.vertex";
 export * from "./gemini-3.1-pro-preview-customtools.vertex";
+export * from "./gemini-3.5-flash-lite.vertex";
 export * from "./gemini-3.5-flash.vertex";
+export * from "./gemini-3.6-flash.vertex";
 export * from "./gemini-3-flash-preview.vertex";

@@ -60,6 +60,16 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini3_1FlashLiteOptions,
       modelSchema: Models.Gemini3_1FlashLiteSchema,
     },
+    [Models.Gemini3_5FlashLiteLiteral]: {
+      model: Models.Gemini3_5FlashLite,
+      modelOptions: Models.Gemini3_5FlashLiteOptions,
+      modelSchema: Models.Gemini3_5FlashLiteSchema,
+    },
+    [Models.Gemini3_6FlashLiteral]: {
+      model: Models.Gemini3_6Flash,
+      modelOptions: Models.Gemini3_6FlashOptions,
+      modelSchema: Models.Gemini3_6FlashSchema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<
