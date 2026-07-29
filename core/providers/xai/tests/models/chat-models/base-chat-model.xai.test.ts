@@ -5,7 +5,7 @@ import { ChatModelSchema, ChatModelSchemaType } from "@adaline/provider";
 import { Config, MessageType, SystemRoleLiteral, TextModalityLiteral, UserRoleLiteral } from "@adaline/types";
 
 import { XAIChatModelConfigs } from "../../../src/configs";
-import { BaseChatModel } from "../../../src/models";
+import { BaseChatModel, Grok_4_3, Grok_4_5, Grok_4_20_0309_Non_Reasoning, Grok_4_20_Multi_Agent_0309 } from "../../../src/models";
 
 describe("BaseChatModel", () => {
   const mockRolesMap = {
@@ -104,6 +104,67 @@ describe("BaseChatModel", () => {
         logprobs: true,
         top_logprobs: 5,
       });
+    });
+  });
+
+  describe("reasoning effort per model", () => {
+    const modelOptions = { apiKey: "test-api-key" };
+
+    it("should accept low, medium and high on grok-4.5 and reject the values it cannot take", () => {
+      const model = new Grok_4_5({ ...modelOptions, modelName: "grok-4.5" });
+      expect(model.transformConfig(Config().parse({ reasoningEffort: "medium" }), [], [])).toEqual({
+        reasoning_effort: "medium",
+      });
+      expect(() => model.transformConfig(Config().parse({ reasoningEffort: "none" }), [], [])).toThrow();
+      expect(() => model.transformConfig(Config().parse({ reasoningEffort: "xhigh" }), [], [])).toThrow();
+    });
+
+    it("should accept low, medium, high and xhigh on grok-4.20-multi-agent-0309", () => {
+      const model = new Grok_4_20_Multi_Agent_0309({ ...modelOptions, modelName: "grok-4.20-multi-agent-0309" });
+      expect(model.transformConfig(Config().parse({ reasoningEffort: "xhigh" }), [], [])).toEqual({
+        reasoning_effort: "xhigh",
+      });
+      expect(() => model.transformConfig(Config().parse({ reasoningEffort: "none" }), [], [])).toThrow();
+    });
+
+    it("should keep grok-4.3 scoped to none and low", () => {
+      const model = new Grok_4_3({ ...modelOptions, modelName: "grok-4.3" });
+      expect(model.transformConfig(Config().parse({ reasoningEffort: "none" }), [], [])).toEqual({
+        reasoning_effort: "none",
+      });
+      expect(() => model.transformConfig(Config().parse({ reasoningEffort: "high" }), [], [])).toThrow();
+    });
+
+    // Effort defaults are documentation for callers, not something the gateway sends on its own.
+    it("should not send reasoning_effort when the caller omits it", () => {
+      expect(new Grok_4_5({ ...modelOptions, modelName: "grok-4.5" }).transformConfig(Config().parse({}), [], [])).toEqual({});
+      expect(
+        new Grok_4_20_Multi_Agent_0309({ ...modelOptions, modelName: "grok-4.20-multi-agent-0309" }).transformConfig(
+          Config().parse({}),
+          [],
+          []
+        )
+      ).toEqual({});
+    });
+
+    it("should drop reasoning_effort from requests for models that do not document the control", () => {
+      const model = new Grok_4_20_0309_Non_Reasoning({ ...modelOptions, modelName: "grok-4.20-0309-non-reasoning" });
+      const request = model.transformModelRequest({
+        model: "grok-4.20-0309-non-reasoning",
+        messages: [{ role: "user", content: "Hello!" }],
+        reasoning_effort: "low",
+      });
+      expect(request.config.reasoningEffort).toBeUndefined();
+    });
+
+    it("should carry reasoning_effort into config for models that do document it", () => {
+      const model = new Grok_4_20_Multi_Agent_0309({ ...modelOptions, modelName: "grok-4.20-multi-agent-0309" });
+      const request = model.transformModelRequest({
+        model: "grok-4.20-multi-agent-0309",
+        messages: [{ role: "user", content: "Hello!" }],
+        reasoning_effort: "xhigh",
+      });
+      expect(request.config.reasoningEffort).toBe("xhigh");
     });
   });
 

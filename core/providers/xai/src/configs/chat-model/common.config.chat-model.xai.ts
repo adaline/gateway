@@ -104,11 +104,38 @@ const reasoningEffortNoneLow = SelectStringConfigItem({
   choices: ["none", "low"],
 });
 
+// grok-4.5 documents reasoning_effort as 'low' / 'medium' / 'high' with a 'high' default, and
+// states the control cannot be disabled — 'none' is intentionally not offered.
+// See https://docs.x.ai/developers/model-capabilities/text/reasoning (retrieved 2026-07-29)
+const reasoningEffortLowMediumHigh = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls how deeply the model reasons before responding. 'low' spends the least thinking time, 'high' the most. Reasoning cannot be disabled on this model. Only supported by grok-4.5.",
+  default: "high",
+  choices: ["low", "medium", "high"],
+});
+
+// grok-4.20-multi-agent-0309 reuses the reasoning_effort param to select how many agents run
+// rather than how deeply each one reasons. xAI documents no default for it, so this item has
+// none — a default here would silently pin the agent count on every request.
+// See https://docs.x.ai/developers/model-capabilities/text/multi-agent (retrieved 2026-07-29)
+const reasoningEffortAgentCount = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Selects how many agents run rather than how deeply the model reasons: 'low' and 'medium' run 4 agents, 'high' and 'xhigh' run 16 agents. xAI documents no default. Only supported by grok-4.20-multi-agent-0309.",
+  default: null,
+  choices: ["low", "medium", "high", "xhigh"],
+});
+
 export {
   frequencyPenalty,
   logProbs,
   maxTokens,
   presencePenalty,
+  reasoningEffortAgentCount,
+  reasoningEffortLowMediumHigh,
   reasoningEffortNoneLow,
   seed,
   stop,

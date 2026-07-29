@@ -11,8 +11,9 @@ import { XAIChatModelRoles, XAIChatModelRolesMap, XAIChatModelTextToolModalities
 // https://docs.x.ai/docs/models/grok-4.5 (retrieved 2026-07-10)
 // maxOutputTokens is not published by xAI docs; 131072 is carried from the grok-4.x family
 // convention shared across the grok-4.x model family.
-// Reasoning is always on for this model; xAI documents no reasoning_effort control for it
-// (unlike grok-4.3), so the effort-less reasoning config is intentional.
+// Reasoning is always on for this model: xAI documents reasoning_effort as 'low' / 'medium' /
+// 'high' with a 'high' default and states it cannot be disabled, so 'none' is not offered.
+// See https://docs.x.ai/developers/model-capabilities/text/reasoning (retrieved 2026-07-29)
 const Grok_4_5_Literal = "grok-4.5";
 const Grok_4_5_Description =
   "Grok-4.5 is xAI's most intelligent and fastest general-purpose model, recommended as the default for everything including code, with reasoning enabled and a 500K context window.";
@@ -25,8 +26,8 @@ const Grok_4_5_Schema = ChatModelSchema(XAIChatModelRoles, XAIChatModelTextToolM
   roles: XAIChatModelRolesMap,
   modalities: XAIChatModelTextToolModalities,
   config: {
-    def: XAIChatModelConfigs.ChatModelReasoningConfigDef(131072),
-    schema: XAIChatModelConfigs.ChatModelReasoningConfigSchema(131072),
+    def: XAIChatModelConfigs.ChatModelReasoningEffortLowMediumHighConfigDef(131072),
+    schema: XAIChatModelConfigs.ChatModelReasoningEffortLowMediumHighConfigSchema(131072),
   },
   price: pricingData[Grok_4_5_Literal],
 });
