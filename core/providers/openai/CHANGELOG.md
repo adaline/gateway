@@ -1,5 +1,44 @@
 # @adaline/openai
 
+## 1.23.0
+
+### Minor Changes
+
+- 173dbff: Remove models the providers no longer serve, per official deprecation/retirement pages (retrieved 2026-07-29).
+
+  BREAKING (for consumers pinning these literals or importing their classes):
+
+  - OpenAI: `gpt-5-chat-latest`, `gpt-4o-search-preview`(+2025-03-11), `gpt-4o-mini-search-preview`(+2025-03-11) — shut down 2026-07-23; `chatgpt-4o-latest`, `gpt-4-0125-preview`, `gpt-4-turbo-preview` — already shut down earlier in 2026. `gpt-5.2-codex` is unregistered from openai routing (shut down on the OpenAI API) but its schema remains exported for `@adaline/azure`, where it stays GA until 2027-01-14.
+  - Groq: `qwen/qwen3-32b`, `meta-llama/llama-4-scout-17b-16e-instruct` — shut down 2026-07-17.
+  - Google & Vertex: the dated Gemini previews (`gemini-2.5-flash-preview-04-17`, `gemini-2.5-flash-lite-preview-09-2025`, `gemini-2.5-pro-preview-03-25`, `gemini-3-pro-preview`) — retirement now confirmed on both platforms; the schemas previously retained for Vertex are fully deleted.
+  - Bedrock: `anthropic.claude-3-sonnet-20240229-v1:0`, `anthropic.claude-3-5-sonnet-20240620-v1:0`, `anthropic.claude-3-5-sonnet-20241022-v2:0`, `anthropic.claude-3-7-sonnet-20250219-v1:0` — AWS EOL 2026-07-30.
+
+  Note: `gemini-embedding-001` is NOT removed — the previously annotated 2026-07-14 shutdown was a misreading of its release date; Google's deprecations table gives 2028-05-14 (annotation corrected in the follow-up release).
+
+### Patch Changes
+
+- 173dbff: Add the latest provider models and correct spec/pricing drift (verified against official provider pages, 2026-07-29).
+
+  Added:
+
+  - Anthropic: `claude-opus-5` (1M context, 128K output, adaptive thinking).
+  - Bedrock: `anthropic.claude-opus-5` and `anthropic.claude-fable-5` — the fable-5 gap from the previous sync is closed (AWS pricing confirmed at $10/$50 via the AWS pricing feed; requires the provider_data_share opt-in).
+  - Google: `gemini-3.6-flash`, `gemini-3.5-flash-lite` (both GA 2026-07-21).
+  - Vertex: wrappers for both new Gemini models.
+  - xAI: newly documented reasoning-effort controls for `grok-4.5` (low/medium/high, default high) and `grok-4.20-multi-agent-0309` (low/medium/high/xhigh, selecting agent count).
+
+  Fixed:
+
+  - OpenAI gpt-5.6 family: usable input corrected to 922K (was the 1.05M total context window); long-context pricing tiers added for `gpt-5.6-sol` and `gpt-5.6-luna`; reasoning-effort enum gains `max`.
+  - Google: `gemini-embedding-001` deprecation annotation corrected — shutdown is 2028-05-14, not 2026-07-14 (release-date misread in the previous sync).
+  - Vertex: `gemini-3.1-pro-preview`(+customtools) output pricing was understated ($8/$12 → $12/$18; >200K input $3.5 → $4).
+  - Groq: `openai/gpt-oss-120b` was priced at gpt-oss-20b's rates ($0.075/$0.30 → $0.15/$0.60); documented max-output corrections for qwen3.6-27b (16,384) and the gpt-oss family (65,536).
+  - Bedrock: `anthropic.claude-opus-4-8` $6/$30 → $5/$25; `anthropic.claude-3-5-haiku` $1/$5 → $0.80/$4.00 (standard on-demand rate, not latency-optimized).
+  - Provider: `SelectStringConfigItem` def accepts `default: null` for params whose upstream documents no default.
+
+- Updated dependencies [173dbff]
+  - @adaline/provider@1.10.6
+
 ## 1.22.5
 
 ### Patch Changes
