@@ -11,6 +11,9 @@ import { XAIChatModelRoles, XAIChatModelRolesMap, XAIChatModelTextToolModalities
 // (retrieved 2026-07-10)
 // maxOutputTokens is not published by xAI docs; 131072 is carried from the grok-4.x family
 // convention shared across the grok-4.x model family.
+// reasoning_effort on this model selects the agent count instead of reasoning depth: 'low' and
+// 'medium' run 4 agents, 'high' and 'xhigh' run 16. xAI documents no default, so none is set.
+// See https://docs.x.ai/developers/model-capabilities/text/multi-agent (retrieved 2026-07-29)
 const Grok_4_20_Multi_Agent_0309_Literal = "grok-4.20-multi-agent-0309";
 const Grok_4_20_Multi_Agent_0309_Description =
   "Grok-4.20 Multi-Agent (0309) is xAI's multi-agent variant of the grok-4.20 family with reasoning enabled and a 1M-token context window.";
@@ -23,8 +26,8 @@ const Grok_4_20_Multi_Agent_0309_Schema = ChatModelSchema(XAIChatModelRoles, XAI
   roles: XAIChatModelRolesMap,
   modalities: XAIChatModelTextToolModalities,
   config: {
-    def: XAIChatModelConfigs.ChatModelReasoningConfigDef(131072),
-    schema: XAIChatModelConfigs.ChatModelReasoningConfigSchema(131072),
+    def: XAIChatModelConfigs.ChatModelReasoningEffortAgentCountConfigDef(131072),
+    schema: XAIChatModelConfigs.ChatModelReasoningEffortAgentCountConfigSchema(131072),
   },
   price: pricingData[Grok_4_20_Multi_Agent_0309_Literal],
 });

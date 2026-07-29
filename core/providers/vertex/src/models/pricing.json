@@ -15,64 +15,6 @@
       }
     ]
   },
-  "gemini-2.5-flash-lite-preview-09-2025": {
-    "modelName": "gemini-2.5-flash-lite-preview-09-2025",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.1,
-            "outputPricePerMillion": 0.4
-          }
-        }
-      }
-    ]
-  },
-  "gemini-2.5-flash-preview-04-17": {
-    "modelName": "gemini-2.5-flash-preview-04-17",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.5,
-            "outputPricePerMillion": 2
-          }
-        }
-      }
-    ]
-  },
-  "gemini-2.5-pro-preview-03-25": {
-    "modelName": "gemini-2.5-pro-preview-03-25",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": 200000,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 1.25,
-            "outputPricePerMillion": 10
-          }
-        }
-      },
-      {
-        "minTokens": 200001,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 2.5,
-            "outputPricePerMillion": 15
-          }
-        }
-      }
-    ]
-  },
   "gemini-2.5-flash": {
     "modelName": "gemini-2.5-flash",
     "currency": "USD",
@@ -115,8 +57,8 @@
       }
     ]
   },
-  "gemini-3-pro-preview": {
-    "modelName": "gemini-3-pro-preview",
+  "gemini-3.1-pro-preview": {
+    "modelName": "gemini-3.1-pro-preview",
     "currency": "USD",
     "tokenRanges": [
       {
@@ -141,32 +83,6 @@
       }
     ]
   },
-  "gemini-3.1-pro-preview": {
-    "modelName": "gemini-3.1-pro-preview",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": 200000,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 2.0,
-            "outputPricePerMillion": 8.0
-          }
-        }
-      },
-      {
-        "minTokens": 200001,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 3.5,
-            "outputPricePerMillion": 12.0
-          }
-        }
-      }
-    ]
-  },
   "gemini-3.1-pro-preview-customtools": {
     "modelName": "gemini-3.1-pro-preview-customtools",
     "currency": "USD",
@@ -176,8 +92,8 @@
         "maxTokens": 200000,
         "prices": {
           "base": {
-            "inputPricePerMillion": 2.0,
-            "outputPricePerMillion": 8.0
+            "inputPricePerMillion": 2,
+            "outputPricePerMillion": 12
           }
         }
       },
@@ -186,8 +102,8 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 3.5,
-            "outputPricePerMillion": 12.0
+            "inputPricePerMillion": 4,
+            "outputPricePerMillion": 18
           }
         }
       }
@@ -203,7 +119,7 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 0.5,
-            "outputPricePerMillion": 3.0
+            "outputPricePerMillion": 3
           }
         }
       }
@@ -219,7 +135,7 @@
         "prices": {
           "base": {
             "inputPricePerMillion": 1.5,
-            "outputPricePerMillion": 9.0
+            "outputPricePerMillion": 9
           }
         }
       }
@@ -236,6 +152,38 @@
           "base": {
             "inputPricePerMillion": 0.25,
             "outputPricePerMillion": 1.5
+          }
+        }
+      }
+    ]
+  },
+  "gemini-3.5-flash-lite": {
+    "modelName": "gemini-3.5-flash-lite",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.3,
+            "outputPricePerMillion": 2.5
+          }
+        }
+      }
+    ]
+  },
+  "gemini-3.6-flash": {
+    "modelName": "gemini-3.6-flash",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.5,
+            "outputPricePerMillion": 7.5
           }
         }
       }

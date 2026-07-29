@@ -3,6 +3,7 @@ export * from "./claude-opus-4-5-20251101.anthropic";
 export * from "./claude-opus-4-6.anthropic";
 export * from "./claude-opus-4-7.anthropic";
 export * from "./claude-opus-4-8.anthropic";
+export * from "./claude-opus-5.anthropic";
 export * from "./claude-fable-5.anthropic";
 export * from "./claude-sonnet-4-5-20250929.anthropic";
 export * from "./claude-sonnet-4-6.anthropic";

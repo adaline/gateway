@@ -31,38 +31,6 @@
       }
     ]
   },
-  "qwen/qwen3-32b": {
-    "modelName": "qwen/qwen3-32b",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.29,
-            "outputPricePerMillion": 0.59
-          }
-        }
-      }
-    ]
-  },
-  "meta-llama/llama-4-scout-17b-16e-instruct": {
-    "modelName": "meta-llama/llama-4-scout-17b-16e-instruct",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.11,
-            "outputPricePerMillion": 0.34
-          }
-        }
-      }
-    ]
-  },
   "openai/gpt-oss-20b": {
     "modelName": "openai/gpt-oss-20b",
     "currency": "USD",
@@ -88,8 +56,8 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 0.075,
-            "outputPricePerMillion": 0.3
+            "inputPricePerMillion": 0.15,
+            "outputPricePerMillion": 0.6
           }
         }
       }

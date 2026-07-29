@@ -28,16 +28,6 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Llama_3_3_70b_Versatile_Options,
       modelSchema: Models.Llama_3_3_70b_VersatileSchema,
     },
-    [Models.Qwen3_32bLiteral]: {
-      model: Models.Qwen3_32b,
-      modelOptions: Models.Qwen3_32b_Options,
-      modelSchema: Models.Qwen3_32bSchema,
-    },
-    [Models.Llama_4_Scout_17b_16e_InstructLiteral]: {
-      model: Models.Llama_4_Scout_17b_16e_Instruct,
-      modelOptions: Models.Llama_4_Scout_17b_16e_Instruct_Options,
-      modelSchema: Models.Llama_4_Scout_17b_16e_InstructSchema,
-    },
     [Models.Gpt_Oss_20bLiteral]: {
       model: Models.Gpt_Oss_20b,
       modelOptions: Models.Gpt_Oss_20b_Options,

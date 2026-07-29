@@ -116,7 +116,8 @@ const XAIChatRequest = z.object({
   top_p: z.number().min(0).max(1).nullable().optional(),
   tools: z.array(XAIChatRequestTool).optional(),
   tool_choice: XAIChatRequestToolChoiceEnum.or(XAIChatRequestToolChoiceFunction).optional(),
-  reasoning_effort: z.enum(["low", "none"]).optional(),
+  // Union of every value any grok model accepts; each model's config schema narrows it further.
+  reasoning_effort: z.enum(["none", "low", "medium", "high", "xhigh"]).optional(),
 });
 type XAIChatRequestType = z.infer<typeof XAIChatRequest>;
 

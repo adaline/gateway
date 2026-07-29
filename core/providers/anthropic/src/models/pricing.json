@@ -142,5 +142,21 @@
         }
       }
     ]
+  },
+  "claude-opus-5": {
+    "modelName": "claude-opus-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 5,
+            "outputPricePerMillion": 25
+          }
+        }
+      }
+    ]
   }
 }

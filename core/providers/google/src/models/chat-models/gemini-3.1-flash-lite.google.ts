@@ -12,7 +12,8 @@ const Gemini3_1FlashLiteLiteral = "gemini-3.1-flash-lite";
 const Gemini3_1FlashLiteDescription =
   "Google's most cost-efficient and fastest model in the Gemini 3.1 series. \
   A thinking model optimized for high-volume, latency-sensitive tasks like classification and translation. \
-  Supports Text, Image, Video, Audio, and PDF inputs. Knowledge cutoff: January 2025.";
+  Supports Text, Image, Video, Audio, and PDF inputs. Knowledge cutoff: January 2025. \
+  Deprecated by Google; scheduled shutdown 2027-05-07 (replacement: gemini-3.5-flash-lite).";
 
 const Gemini3_1FlashLiteSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini3_1FlashLiteLiteral,

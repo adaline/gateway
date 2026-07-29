@@ -12,7 +12,7 @@ import {
   OpenAIChatModelWithWebSearchModalitiesEnum,
 } from "./types";
 
-// Specs reference: https://developers.openai.com/api/docs/models/gpt-5.6-luna (retrieved 2026-07-10)
+// Specs reference: https://developers.openai.com/api/docs/models/gpt-5.6-luna (retrieved 2026-07-29)
 const GPT_5_6_LunaLiteral = "gpt-5.6-luna";
 const GPT_5_6_LunaDescription =
   "GPT-5.6 model optimized for cost-sensitive, high-volume workloads, with native computer-use, agentic, coding, and reasoning \
@@ -21,7 +21,7 @@ const GPT_5_6_LunaDescription =
 const GPT_5_6_LunaSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_6_LunaLiteral,
   description: GPT_5_6_LunaDescription,
-  maxInputTokens: 1050000,
+  maxInputTokens: 922000,
   maxOutputTokens: 128000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,

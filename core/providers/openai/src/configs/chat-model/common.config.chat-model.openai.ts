@@ -128,7 +128,7 @@ const reasoningEffort5_2Plus = SelectStringConfigItem({
   choices: ["none", "low", "medium", "high", "xhigh"],
 });
 
-// Reasoning effort for codex variants (gpt-5.2-codex, gpt-5.3-codex). Codex models
+// Reasoning effort for codex variants (gpt-5.3-codex). Codex models
 // always run with some reasoning, so 'none' and 'minimal' are not accepted.
 // See https://developers.openai.com/api/docs/models/gpt-5.3-codex
 const reasoningEffortCodex = SelectStringConfigItem({
@@ -152,17 +152,17 @@ const reasoningEffortPro = SelectStringConfigItem({
   choices: ["medium", "high", "xhigh"],
 });
 
-// GPT-5.6 reasoning effort: reintroduces 'minimal' alongside 'none' on top of the
-// 5.2+ enum (none/minimal/low/medium/high/xhigh). Default is 'medium' for GPT-5.6,
+// GPT-5.6 reasoning effort: reintroduces 'minimal' alongside 'none' and adds 'max' above
+// 'xhigh' (none/minimal/low/medium/high/xhigh/max). Default is 'medium' for GPT-5.6,
 // unlike the 'none' default used by 5.2 through 5.5.
 // See https://developers.openai.com/api/docs/guides/reasoning
 const reasoningEffort5_6 = SelectStringConfigItem({
   param: "reasoning_effort",
   title: "Reasoning Effort",
   description:
-    "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'xhigh' engages the deepest reasoning.",
+    "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'xhigh' engages deep reasoning, and 'max' engages the deepest reasoning for the most complex tasks.",
   default: "medium",
-  choices: ["none", "minimal", "low", "medium", "high", "xhigh"],
+  choices: ["none", "minimal", "low", "medium", "high", "xhigh", "max"],
 });
 
 // GPT-5.6 reasoning mode: independent of reasoning effort, selects between 'standard'

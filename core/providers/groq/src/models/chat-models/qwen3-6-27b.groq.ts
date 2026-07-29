@@ -12,7 +12,7 @@ import { GroqChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
-// Specs reference: https://console.groq.com/docs/model/qwen/qwen3.6-27b, https://console.groq.com/docs/models (retrieved 2026-07-10)
+// Specs reference: https://console.groq.com/docs/model/qwen/qwen3.6-27b, https://console.groq.com/docs/models (retrieved 2026-07-29)
 // Note: Qwen3.6 27B accepts text + image input (up to 3 images) upstream, but Groq has no existing
 // vision/image-modality precedent in this provider's chat models, so this model is registered with the
 // same text+tool modalities as its sibling models rather than introducing new modality plumbing.
@@ -26,12 +26,12 @@ const Qwen3_6_27bSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelT
   name: Qwen3_6_27bLiteral,
   description: Qwen3_6_27bDescription,
   maxInputTokens: 131072,
-  maxOutputTokens: 32768,
+  maxOutputTokens: 16384,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelTextToolModalities,
   config: {
-    def: GroqChatModelConfigs.base(32768).def,
-    schema: GroqChatModelConfigs.base(32768).schema,
+    def: GroqChatModelConfigs.base(16384).def,
+    schema: GroqChatModelConfigs.base(16384).schema,
   },
   price: pricingData[Qwen3_6_27bLiteral],
 });

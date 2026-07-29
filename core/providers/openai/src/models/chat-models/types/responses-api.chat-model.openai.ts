@@ -124,7 +124,7 @@ type OpenAIResponsesRequestToolChoiceType = z.infer<typeof OpenAIResponsesReques
 // ─── Request: Reasoning & Text Format ────────────────────────────────────────
 
 const OpenAIResponsesRequestReasoning = z.object({
-  effort: z.enum(["none", "minimal", "low", "medium", "high", "xhigh"]).optional(),
+  effort: z.enum(["none", "minimal", "low", "medium", "high", "xhigh", "max"]).optional(),
   summary: z.enum(["auto", "concise", "detailed"]).nullable().optional(),
 });
 type OpenAIResponsesRequestReasoningType = z.infer<typeof OpenAIResponsesRequestReasoning>;

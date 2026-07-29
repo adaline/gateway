@@ -12,7 +12,7 @@ import {
   OpenAIChatModelWithWebSearchModalitiesEnum,
 } from "./types";
 
-// Specs reference: https://developers.openai.com/api/docs/models/gpt-5.6-sol (retrieved 2026-07-10)
+// Specs reference: https://developers.openai.com/api/docs/models/gpt-5.6-sol (retrieved 2026-07-29)
 const GPT_5_6_SolLiteral = "gpt-5.6-sol";
 const GPT_5_6_SolDescription =
   "Frontier GPT-5.6 model for complex professional work (aliased as gpt-5.6), with native computer-use, agentic, coding, and \
@@ -21,7 +21,7 @@ const GPT_5_6_SolDescription =
 const GPT_5_6_SolSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_6_SolLiteral,
   description: GPT_5_6_SolDescription,
-  maxInputTokens: 1050000,
+  maxInputTokens: 922000,
   maxOutputTokens: 128000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,
