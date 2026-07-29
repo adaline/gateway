@@ -623,11 +623,21 @@
     "tokenRanges": [
       {
         "minTokens": 0,
-        "maxTokens": null,
+        "maxTokens": 272000,
         "prices": {
           "base": {
             "inputPricePerMillion": 5.0,
             "outputPricePerMillion": 30.0
+          }
+        }
+      },
+      {
+        "minTokens": 272000,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 10.0,
+            "outputPricePerMillion": 45.0
           }
         }
       }
@@ -665,11 +675,21 @@
     "tokenRanges": [
       {
         "minTokens": 0,
-        "maxTokens": null,
+        "maxTokens": 272000,
         "prices": {
           "base": {
             "inputPricePerMillion": 1.0,
             "outputPricePerMillion": 6.0
+          }
+        }
+      },
+      {
+        "minTokens": 272000,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2.0,
+            "outputPricePerMillion": 9.0
           }
         }
       }

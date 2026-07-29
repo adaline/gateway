@@ -3,7 +3,7 @@ import { reasoningEffort5_6, reasoningMode, verbosity } from "./common.config.ch
 import { ChatModelResponseSchemaConfigDef, ChatModelResponseSchemaConfigSchema } from "./response-schema.config.chat-model.openai";
 
 // Config for the GPT-5.6 family (sol/terra/luna). Reuses the 5.2+ reasoning_effort
-// param but with the GPT-5.6 enum (none/minimal/low/medium/high/xhigh, default 'medium'),
+// param but with the GPT-5.6 enum (none/minimal/low/medium/high/xhigh/max, default 'medium'),
 // and adds an independent reasoning mode (standard/pro) on top.
 const ChatModelGPT5_6ConfigDef = (maxOutputTokens: number, maxSequences: number) => ({
   ...ChatModelBaseConfigDef(maxOutputTokens, maxSequences),

@@ -15,7 +15,8 @@ import {
 const GPT_5_2_ChatLatestLiteral = "gpt-5.2-chat-latest";
 const GPT_5_2_ChatLatestDescription =
   "Latest GPT-5.2 chat-optimized model for conversational workloads with tool/function calling support. \
-  Training data up to January 2025.";
+  Training data up to January 2025. \
+  Deprecated by OpenAI; scheduled shutdown 2026-08-10 (replacement: gpt-5.6-sol).";
 
 const GPT_5_2_ChatLatestSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_2_ChatLatestLiteral,
