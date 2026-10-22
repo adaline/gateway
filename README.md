@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@adaline/gateway)](https://npmjs.com/package/@adaline/gateway)
 [![npm](https://img.shields.io/npm/dm/@adaline/gateway)](https://npmjs.com/package/@adaline/gateway)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@adaline/gateway)
-[![License](https://img.shields.io/github/license/Ileriayo/markdown-badges)](./LICENSE)
+[![License](https://img.shields.io/github/license/adaline/gateway)](./LICENSE)
 
 The only fully local, production-grade Super SDK that provides a simple, unified, and powerful interface for calling more than 300+ LLMs.
 
