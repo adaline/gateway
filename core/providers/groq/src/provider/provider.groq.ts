@@ -18,16 +18,6 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelSchema: ChatModelSchemaType;
     }
   > = {
-    [Models.Llama_3_1_8bLiteral]: {
-      model: Models.Llama_3_1_8b,
-      modelOptions: Models.Llama_3_1_8b_Options,
-      modelSchema: Models.Llama_3_1_8bSchema,
-    },
-    [Models.Llama_3_3_70b_VersatileLiteral]: {
-      model: Models.Llama_3_3_70b_Versatile,
-      modelOptions: Models.Llama_3_3_70b_Versatile_Options,
-      modelSchema: Models.Llama_3_3_70b_VersatileSchema,
-    },
     [Models.Gpt_Oss_20bLiteral]: {
       model: Models.Gpt_Oss_20b,
       modelOptions: Models.Gpt_Oss_20b_Options,
@@ -43,10 +33,10 @@ class Groq<C extends Models.BaseChatModelOptionsType, E extends Record<string, a
       modelOptions: Models.Gpt_Oss_Safeguard_20b_Options,
       modelSchema: Models.Gpt_Oss_Safeguard_20bSchema,
     },
-    [Models.Qwen3_6_27bLiteral]: {
-      model: Models.Qwen3_6_27b,
-      modelOptions: Models.Qwen3_6_27b_Options,
-      modelSchema: Models.Qwen3_6_27bSchema,
+    [Models.Qwen3_8_27bLiteral]: {
+      model: Models.Qwen3_8_27b,
+      modelOptions: Models.Qwen3_8_27b_Options,
+      modelSchema: Models.Qwen3_8_27bSchema,
     },
     [Models.Llama_Prompt_Guard_2_86mLiteral]: {
       model: Models.Llama_Prompt_Guard_2_86m,

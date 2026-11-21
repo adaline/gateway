@@ -13,6 +13,7 @@ import pricingData from "../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 // Specs reference: https://console.groq.com/docs/models (retrieved 2026-07-29)
+// reasoning_effort: 'low' / 'medium' / 'high', no documented default (https://console.groq.com/docs/reasoning, retrieved 2026-11-20).
 const Gpt_Oss_20bLiteral = "openai/gpt-oss-20b" as const;
 const Gpt_Oss_20bDescription =
   "GPT-OSS 20B is OpenAI's flagship open source model, built on a Mixture-of-Experts (MoE) architecture with 20 billion parameters and 32 experts.";
@@ -25,8 +26,8 @@ const Gpt_Oss_20bSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelT
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelTextToolModalities,
   config: {
-    def: GroqChatModelConfigs.base(65536).def,
-    schema: GroqChatModelConfigs.base(65536).schema,
+    def: GroqChatModelConfigs.reasoningEffortLowMediumHigh(65536).def,
+    schema: GroqChatModelConfigs.reasoningEffortLowMediumHigh(65536).schema,
   },
   price: pricingData[Gpt_Oss_20bLiteral],
 });

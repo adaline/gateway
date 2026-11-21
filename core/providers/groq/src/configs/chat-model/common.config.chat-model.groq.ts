@@ -87,4 +87,42 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "required", "none"],
 });
 
-export { frequencyPenalty, maxTokens, presencePenalty, seed, stop, temperature, toolChoice, topP, responseFormat };
+// gpt-oss-20b, gpt-oss-120b and gpt-oss-safeguard-20b accept reasoning_effort 'low' / 'medium' /
+// 'high'. Groq documents no default, so none is set and the param is only sent when the caller
+// picks a value.
+// See https://console.groq.com/docs/reasoning (retrieved 2026-11-20)
+const reasoningEffortLowMediumHigh = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls how deeply the model reasons before responding. 'low' spends the least thinking time, 'high' the most. Groq documents no default. Supported by the gpt-oss models.",
+  default: null,
+  choices: ["low", "medium", "high"],
+});
+
+// qwen3.8-27b accepts reasoning_effort 'none' / 'low' / 'medium' / 'high' ('none' switches to
+// instruct mode). Groq also accepts 'default', which is deliberately not exposed. No default is
+// documented, so none is set.
+// See https://console.groq.com/docs/reasoning, https://console.groq.com/docs/model/qwen/qwen3.8-27b (retrieved 2026-11-20)
+const reasoningEffortNoneLowMediumHigh = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls how deeply the model reasons before responding. 'none' disables thinking (instruct mode), 'low' to 'high' raise the thinking budget. Groq documents no default. Supported by qwen3.8-27b.",
+  default: null,
+  choices: ["none", "low", "medium", "high"],
+});
+
+export {
+  frequencyPenalty,
+  maxTokens,
+  presencePenalty,
+  reasoningEffortLowMediumHigh,
+  reasoningEffortNoneLowMediumHigh,
+  responseFormat,
+  seed,
+  stop,
+  temperature,
+  toolChoice,
+  topP,
+};

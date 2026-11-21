@@ -13,6 +13,8 @@ import pricingData from "../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 // Specs reference: https://console.groq.com/docs/models (retrieved 2026-07-29)
+// Preview: listed in Groq's Preview Models table, not production (retrieved 2026-11-20).
+// reasoning_effort: 'low' / 'medium' / 'high', no documented default (https://console.groq.com/docs/reasoning, retrieved 2026-11-20).
 const Gpt_Oss_Safeguard_20bLiteral = "openai/gpt-oss-safeguard-20b" as const;
 const Gpt_Oss_Safeguard_20bDescription = "Safety-focused GPT-OSS model for policy enforcement and moderation checks in agent pipelines.";
 
@@ -24,8 +26,8 @@ const Gpt_Oss_Safeguard_20bSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAI
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelTextToolModalities,
   config: {
-    def: GroqChatModelConfigs.base(65536).def,
-    schema: GroqChatModelConfigs.base(65536).schema,
+    def: GroqChatModelConfigs.reasoningEffortLowMediumHigh(65536).def,
+    schema: GroqChatModelConfigs.reasoningEffortLowMediumHigh(65536).schema,
   },
   price: pricingData[Gpt_Oss_Safeguard_20bLiteral],
 });

@@ -197,10 +197,10 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     _config.presencePenalty = parsedRequest.presence_penalty;
     _config.frequencyPenalty = parsedRequest.frequency_penalty;
     _config.stop = parsedRequest.stop;
-    _config.logProbs = parsedRequest.logprobs;
-    _config.topLogProbs = parsedRequest.top_logprobs;
-    // Only models whose config defines reasoningEffort (grok-4.3, grok-4.5 and the multi-agent
-    // variant, each with its own choices) accept the param;
+    // logprobs / top_logprobs are accepted on the wire but dropped: xAI documents them as
+    // unsupported (silently ignored) on grok-4.20+, so no model config defines them.
+    // Only models whose config defines reasoningEffort (grok-4.7, grok-4.6, grok-4.5, grok-4.3 and
+    // the multi-agent variant, each with its own choices) accept the param;
     // xAI documents no effort control for the others, so drop it here instead of injecting
     // a config key that transformConfig would reject.
     if ("reasoningEffort" in this.modelSchema.config.def) {
@@ -394,13 +394,6 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
       return acc;
     }, {} as ParamsType);
-
-    if (transformedConfig.top_logprobs && !transformedConfig.logprobs) {
-      throw new InvalidConfigError({
-        info: `Invalid config for model : '${this.modelName}'`,
-        cause: new Error("'logprobs' must be 'true' when 'top_logprobs' is specified"),
-      });
-    }
 
     if ("tool_choice" in transformedConfig && transformedConfig.tool_choice !== undefined) {
       const toolChoice = transformedConfig.tool_choice as string;
