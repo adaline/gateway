@@ -4,7 +4,12 @@ import { ErrorContent, ErrorModalityLiteral, PartialErrorContent, PartialErrorMo
 import { ImageContent, ImageModalityLiteral } from "./image-content";
 import { PdfContent, PdfModalityLiteral } from "./pdf-content";
 import { PartialReasoningContent, PartialReasoningModalityLiteral, ReasoningContent, ReasoningModalityLiteral } from "./reasoning-content";
-import { PartialSearchResultContent, PartialSearchResultModalityLiteral, SearchResultContent, SearchResultModalityLiteral } from "./search-result";
+import {
+  PartialSearchResultContent,
+  PartialSearchResultModalityLiteral,
+  SearchResultContent,
+  SearchResultModalityLiteral,
+} from "./search-result";
 import { PartialTextContent, PartialTextModalityLiteral, TextContent, TextModalityLiteral } from "./text-content";
 import { PartialToolCallContent, PartialToolCallModalityLiteral, ToolCallContent, ToolCallModalityLiteral } from "./tool-call-content";
 import { PartialToolResponseContent, ToolResponseContent, ToolResponseModalityLiteral } from "./tool-response-content";
@@ -62,7 +67,13 @@ type ContentType<
   SRCM extends z.ZodTypeAny = z.ZodUndefined,
 > = z.infer<ReturnType<typeof Content<TCM, ICM, PCM, TCCM, TRCM, RCM, ECM, SRCM>>>;
 
-const PartialModalityLiterals = [PartialTextModalityLiteral, PartialToolCallModalityLiteral, PartialReasoningModalityLiteral, PartialErrorModalityLiteral, PartialSearchResultModalityLiteral] as const;
+const PartialModalityLiterals = [
+  PartialTextModalityLiteral,
+  PartialToolCallModalityLiteral,
+  PartialReasoningModalityLiteral,
+  PartialErrorModalityLiteral,
+  PartialSearchResultModalityLiteral,
+] as const;
 const PartialModalityEnum = z.enum(PartialModalityLiterals);
 type PartialModalityEnumType = z.infer<typeof PartialModalityEnum>;
 
@@ -79,7 +90,7 @@ const PartialContent = <
   PartialToolResponseContentMetadata: TRCM = z.undefined() as TRCM,
   PartialReasoningContentMetadata: RCM = z.undefined() as RCM,
   PartialErrorContentMetadata: ECM = z.undefined() as ECM,
-  PartialSearchResultContentMetadata: SRCM = z.undefined() as SRCM,
+  PartialSearchResultContentMetadata: SRCM = z.undefined() as SRCM
 ) =>
   z.discriminatedUnion("modality", [
     PartialTextContent(PartialTextContentMetadata),

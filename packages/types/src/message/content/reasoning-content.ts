@@ -15,11 +15,11 @@ type ReasoningContentValueType = z.infer<typeof ReasoningContentValue>;
 
 const RedactedReasoningContentValue = z.object({
   type: z.literal(RedactedReasoningContentTypeLiteral),
-  data: z.string()
+  data: z.string(),
 });
 type RedactedReasoningContentValueType = z.infer<typeof RedactedReasoningContentValue>;
 
-const ReasoningContentValueUnion = z.discriminatedUnion("type", [ ReasoningContentValue, RedactedReasoningContentValue ]);
+const ReasoningContentValueUnion = z.discriminatedUnion("type", [ReasoningContentValue, RedactedReasoningContentValue]);
 type ReasoningContentValueUnionType = z.infer<typeof ReasoningContentValueUnion>;
 
 const ReasoningContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = z.undefined() as M) =>
@@ -36,10 +36,7 @@ const PartialReasoningContentValue = z.object({
   thinking: ReasoningContentValue.shape.thinking.optional(),
   signature: ReasoningContentValue.shape.signature.optional(),
 });
-const PartialReasoningContentValueUnion = z.discriminatedUnion("type", [ 
-  PartialReasoningContentValue, 
-  RedactedReasoningContentValue 
-]);
+const PartialReasoningContentValueUnion = z.discriminatedUnion("type", [PartialReasoningContentValue, RedactedReasoningContentValue]);
 
 const PartialReasoningContent = <M extends z.ZodTypeAny = z.ZodUndefined>(Metadata: M = z.undefined() as M) =>
   z.object({

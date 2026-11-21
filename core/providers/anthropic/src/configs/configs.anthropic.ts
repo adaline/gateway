@@ -1,5 +1,14 @@
+import {
+  AdaptiveThinkingConfigOptions,
+  ChatModelAdaptiveThinkingConfigDef,
+  ChatModelAdaptiveThinkingConfigSchema,
+} from "./chat-model/adaptive-thinking.config.chat-model.anthropic";
 import { ChatModelBaseConfigDef, ChatModelBaseConfigSchema } from "./chat-model/base.config.chat-model.anthropic";
-import { ChatModelReasoningConfigDef, ChatModelReasoningConfigSchema } from "./chat-model/extended-thinking.config.chat-model.anthropic";
+import {
+  ChatModelReasoningConfigDef,
+  ChatModelReasoningConfigSchema,
+  ExtendedThinkingEffortOptions,
+} from "./chat-model/extended-thinking.config.chat-model.anthropic";
 import { EmbeddingModelBaseConfigDef, EmbeddingModelBaseConfigSchema } from "./embedding-model/base.config.embedding-model.anthropic";
 import {
   EmbeddingModelFlexibleConfigDef,
@@ -11,9 +20,21 @@ const AnthropicChatModelConfigs = {
     def: ChatModelBaseConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelBaseConfigSchema(maxOutputTokens, maxSequences),
   }),
-  extendedThinking: (maxOutputTokens: number, maxSequences: number, minReasoningToken: number, maxReasoningTokens: number) => ({
-    def: ChatModelReasoningConfigDef(maxOutputTokens, maxSequences, minReasoningToken, maxReasoningTokens),
-    schema: ChatModelReasoningConfigSchema(maxOutputTokens, maxSequences, minReasoningToken, maxReasoningTokens),
+  // Manual extended thinking: thinking: { type: "enabled", budget_tokens }.
+  extendedThinking: (
+    maxOutputTokens: number,
+    maxSequences: number,
+    minReasoningToken: number,
+    maxReasoningTokens: number,
+    effortOptions?: ExtendedThinkingEffortOptions
+  ) => ({
+    def: ChatModelReasoningConfigDef(maxOutputTokens, maxSequences, minReasoningToken, maxReasoningTokens, effortOptions),
+    schema: ChatModelReasoningConfigSchema(maxOutputTokens, maxSequences, minReasoningToken, maxReasoningTokens, effortOptions),
+  }),
+  // Adaptive thinking: thinking: { type: "adaptive" | "disabled" | "between_tools" } plus output_config.effort.
+  adaptiveThinking: (options: AdaptiveThinkingConfigOptions) => ({
+    def: ChatModelAdaptiveThinkingConfigDef(options),
+    schema: ChatModelAdaptiveThinkingConfigSchema(options),
   }),
 } as const;
 

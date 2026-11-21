@@ -12,10 +12,22 @@ import {
   AnthropicThinkingChatModelModalitiesEnum,
 } from "./types";
 
-// Specs reference: https://platform.claude.com/docs/en/about-claude/models/overview (retrieved 2026-06-09)
+// Specs reference: https://platform.claude.com/docs/en/about-claude/models/overview and https://platform.claude.com/docs/en/build-with-claude/thinking (retrieved 2026-11-20)
+// Adaptive thinking is always on: 'disabled' and 'between_tools' return a 400 error.
 const ClaudeFable5Literal = "claude-fable-5";
 const ClaudeFable5Description =
-  "Anthropic's most capable model for the hardest agentic, coding, and reasoning tasks, with always-on adaptive thinking. Features a 1M token context window and 128K max output tokens.";
+  "Frontier model for the hardest agentic, coding, and reasoning tasks, with always-on adaptive thinking. Features a 1M token context window and 128K max output tokens.";
+
+const ClaudeFable5Config = AnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 128000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive"],
+  defaultThinkingMode: "adaptive",
+  effortLevels: ["low", "medium", "high", "xhigh", "max"],
+  defaultEffort: "high",
+  samplingParams: false,
+  forcedToolUse: true,
+});
 
 const ClaudeFable5Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: ClaudeFable5Literal,
@@ -26,8 +38,8 @@ const ClaudeFable5Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThi
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 128000).def,
-    schema: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 128000).schema,
+    def: ClaudeFable5Config.def,
+    schema: ClaudeFable5Config.schema,
   },
   price: pricingData[ClaudeFable5Literal],
 });

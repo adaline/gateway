@@ -5,22 +5,31 @@ import { ChatModelSchema } from "@adaline/provider";
 import { AnthropicChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.anthropic";
-import { AnthropicChatModelModalities, AnthropicChatModelModalitiesEnum, AnthropicChatModelRoles, AnthropicChatModelRolesMap } from "./types";
+import {
+  AnthropicChatModelRoles,
+  AnthropicChatModelRolesMap,
+  AnthropicThinkingChatModelModalities,
+  AnthropicThinkingChatModelModalitiesEnum,
+} from "./types";
 
-// Specs reference: https://docs.anthropic.com/en/docs/about-claude/models/overview (retrieved 2026-02-25)
+// Specs reference: https://platform.claude.com/docs/en/about-claude/models/overview and https://platform.claude.com/docs/en/build-with-claude/thinking (retrieved 2026-11-20)
 const ClaudeHaiku4_520251001Literal = "claude-haiku-4-5-20251001";
-const ClaudeHaiku4_520251001Description = "Fast and efficient model for high-throughput chat, extraction, and routing workloads.";
+const ClaudeHaiku4_520251001Description =
+  "Fast and efficient model for high-throughput chat, extraction, and routing workloads, with extended thinking. Features a 200K token context window and 64K max output tokens. Training cutoff: July 2025.";
 
-const ClaudeHaiku4_520251001Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicChatModelModalitiesEnum).parse({
+const ClaudeHaiku4_520251001Config = AnthropicChatModelConfigs.extendedThinking(64000, 4, 1024, 64000);
+
+const ClaudeHaiku4_520251001Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: ClaudeHaiku4_520251001Literal,
   description: ClaudeHaiku4_520251001Description,
   maxInputTokens: 200000,
-  maxOutputTokens: 8192,
+  maxOutputTokens: 64000,
+  maxReasoningTokens: 64000,
   roles: AnthropicChatModelRolesMap,
-  modalities: AnthropicChatModelModalities,
+  modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.base(8192, 4).def,
-    schema: AnthropicChatModelConfigs.base(8192, 4).schema,
+    def: ClaudeHaiku4_520251001Config.def,
+    schema: ClaudeHaiku4_520251001Config.schema,
   },
   price: pricingData[ClaudeHaiku4_520251001Literal],
 });
@@ -41,4 +50,3 @@ export {
   ClaudeHaiku4_520251001Schema,
   type ClaudeHaiku4_520251001OptionsType,
 };
-

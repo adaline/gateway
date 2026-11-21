@@ -13,9 +13,16 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-4-5.html (retrieved 2026-11-20)
+// Pricing: AWS Bedrock global on-demand rate from the AmazonBedrockFoundationModels offer file (retrieved 2026-11-20); regional endpoints cost 10% more.
 const BedrockClaudeOpus4_520251101Literal = "anthropic.claude-opus-4-5-20251101-v1:0";
 const BedrockClaudeOpus4_520251101Description =
   "Premium model combining maximum intelligence with practical performance. Ideal for complex specialized tasks, professional software engineering, and advanced agents. Training cutoff: August 2025.";
+
+const BedrockClaudeOpus4_520251101Config = BedrockAnthropicChatModelConfigs.extendedThinking(64000, 4, 1024, 64000, {
+  levels: ["low", "medium", "high"],
+  default: "high",
+});
 
 const BedrockClaudeOpus4_520251101Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeOpus4_520251101Literal,
@@ -26,8 +33,8 @@ const BedrockClaudeOpus4_520251101Schema = ChatModelSchema(AnthropicChatModelRol
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: BedrockAnthropicChatModelConfigs.base(64000, 4).def,
-    schema: BedrockAnthropicChatModelConfigs.base(64000, 4).schema,
+    def: BedrockClaudeOpus4_520251101Config.def,
+    schema: BedrockClaudeOpus4_520251101Config.schema,
   },
   price: pricingData[BedrockClaudeOpus4_520251101Literal],
 });

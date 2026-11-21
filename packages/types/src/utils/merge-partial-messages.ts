@@ -473,6 +473,15 @@ const mergePartialMessages = (response: PartialChatResponseType[]): ChatResponse
   } else {
     finalizedResponse.usage = undefined;
   }
+
+  // Stop reason: the last chunk that reports one wins (providers send it with the final delta)
+  const stopReason = response
+    .map((chunk) => chunk.stopReason)
+    .filter((reason) => reason !== undefined)
+    .at(-1);
+  if (stopReason !== undefined) {
+    finalizedResponse.stopReason = stopReason;
+  }
   return finalizedResponse;
 };
 

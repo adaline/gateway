@@ -1,52 +1,4 @@
 {
-  "anthropic.claude-3-5-haiku-20241022-v1:0": {
-    "modelName": "anthropic.claude-3-5-haiku-20241022-v1:0",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.8,
-            "outputPricePerMillion": 4
-          }
-        }
-      }
-    ]
-  },
-  "anthropic.claude-3-haiku-20240307-v1:0": {
-    "modelName": "anthropic.claude-3-haiku-20240307-v1:0",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 0.25,
-            "outputPricePerMillion": 1.25
-          }
-        }
-      }
-    ]
-  },
-  "anthropic.claude-sonnet-4-20250514-v1:0": {
-    "modelName": "anthropic.claude-sonnet-4-20250514-v1:0",
-    "currency": "USD",
-    "tokenRanges": [
-      {
-        "minTokens": 0,
-        "maxTokens": null,
-        "prices": {
-          "base": {
-            "inputPricePerMillion": 3,
-            "outputPricePerMillion": 15
-          }
-        }
-      }
-    ]
-  },
   "anthropic.claude-sonnet-4-5-20250929-v1:0": {
     "modelName": "anthropic.claude-sonnet-4-5-20250929-v1:0",
     "currency": "USD",
@@ -202,6 +154,96 @@
           "base": {
             "inputPricePerMillion": 2,
             "outputPricePerMillion": 10
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-opus-5-5": {
+    "modelName": "anthropic.claude-opus-5-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 4,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-sonnet-5-5": {
+    "modelName": "anthropic.claude-sonnet-5-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2,
+            "outputPricePerMillion": 10
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-fable-5-1": {
+    "modelName": "anthropic.claude-fable-5-1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 10,
+            "outputPricePerMillion": 50
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-fable-5-2": {
+    "modelName": "anthropic.claude-fable-5-2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 8,
+            "outputPricePerMillion": 40
+          }
+        }
+      }
+    ]
+  },
+  "anthropic.claude-haiku-5-5": {
+    "modelName": "anthropic.claude-haiku-5-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": 100001,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.1,
+            "outputPricePerMillion": 0.5
+          }
+        }
+      },
+      {
+        "minTokens": 100001,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 2.5
           }
         }
       }

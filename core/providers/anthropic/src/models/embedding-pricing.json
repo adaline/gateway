@@ -52,7 +52,7 @@
   "voyage-4-large": {
     "modelName": "voyage-4-large",
     "currency": "USD",
-    "inputPricePerMillion": 0.18
+    "inputPricePerMillion": 0.12
   },
   "voyage-4": {
     "modelName": "voyage-4",
@@ -68,5 +68,10 @@
     "modelName": "voyage-4-nano",
     "currency": "USD",
     "inputPricePerMillion": 0.01
+  },
+  "voyage-code-4": {
+    "modelName": "voyage-code-4",
+    "currency": "USD",
+    "inputPricePerMillion": 0.12
   }
 }

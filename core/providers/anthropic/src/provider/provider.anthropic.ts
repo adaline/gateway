@@ -69,6 +69,31 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       modelOptions: Models.ClaudeOpus5Options,
       modelSchema: Models.ClaudeOpus5Schema,
     },
+    [Models.ClaudeFable5_1Literal]: {
+      model: Models.ClaudeFable5_1,
+      modelOptions: Models.ClaudeFable5_1Options,
+      modelSchema: Models.ClaudeFable5_1Schema,
+    },
+    [Models.ClaudeFable5_2Literal]: {
+      model: Models.ClaudeFable5_2,
+      modelOptions: Models.ClaudeFable5_2Options,
+      modelSchema: Models.ClaudeFable5_2Schema,
+    },
+    [Models.ClaudeOpus5_5Literal]: {
+      model: Models.ClaudeOpus5_5,
+      modelOptions: Models.ClaudeOpus5_5Options,
+      modelSchema: Models.ClaudeOpus5_5Schema,
+    },
+    [Models.ClaudeSonnet5_5Literal]: {
+      model: Models.ClaudeSonnet5_5,
+      modelOptions: Models.ClaudeSonnet5_5Options,
+      modelSchema: Models.ClaudeSonnet5_5Schema,
+    },
+    [Models.ClaudeHaiku5_5Literal]: {
+      model: Models.ClaudeHaiku5_5,
+      modelOptions: Models.ClaudeHaiku5_5Options,
+      modelSchema: Models.ClaudeHaiku5_5Schema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<
@@ -128,6 +153,11 @@ class Anthropic<C extends Models.BaseChatModelOptionsType, E extends Models.Base
       model: Models.VoyageCode3,
       modelOptions: Models.VoyageCode3Options,
       modelSchema: Models.VoyageCode3Schema,
+    },
+    [Models.VoyageCode4Literal]: {
+      model: Models.VoyageCode4,
+      modelOptions: Models.VoyageCode4Options,
+      modelSchema: Models.VoyageCode4Schema,
     },
     [Models.Voyage4LargeLiteral]: {
       model: Models.Voyage4Large,

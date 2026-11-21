@@ -1,6 +1,10 @@
 import { CHAT_CONFIG, RangeConfigItem, SelectBooleanConfigItem } from "@adaline/provider";
 
+import { effort, type AnthropicEffortLevel } from "./adaptive-thinking.config.chat-model.anthropic";
 import { ChatModelBaseConfigDef, ChatModelBaseConfigSchema } from "./base.config.chat-model.anthropic";
+
+// Claude Opus 4.5 is the only extended-thinking model that also accepts the effort parameter, which composes with budget_tokens.
+type ExtendedThinkingEffortOptions = { levels: AnthropicEffortLevel[]; default: AnthropicEffortLevel };
 
 const maxReasoningTokens = (minReasoningToken: number, maxReasoningToken: number) =>
   RangeConfigItem({
@@ -25,22 +29,26 @@ const ChatModelReasoningConfigDef = (
   maxOutputTokens: number,
   maxSequences: number,
   minReasoningToken: number,
-  maxReasoningToken: number
+  maxReasoningToken: number,
+  effortOptions?: ExtendedThinkingEffortOptions
 ) => ({
   ...ChatModelBaseConfigDef(maxOutputTokens, maxSequences),
   reasoningEnabled: reasoningEnabled.def,
   maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).def,
+  ...(effortOptions ? { reasoningEffort: effort(effortOptions.levels, effortOptions.default).def } : {}),
 });
 
 const ChatModelReasoningConfigSchema = (
   maxOutputTokens: number,
   maxSequences: number,
   minReasoningToken: number,
-  maxReasoningToken: number
+  maxReasoningToken: number,
+  effortOptions?: ExtendedThinkingEffortOptions
 ) =>
   ChatModelBaseConfigSchema(maxOutputTokens, maxSequences).extend({
     reasoningEnabled: reasoningEnabled.schema,
     maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).schema,
+    ...(effortOptions ? { reasoningEffort: effort(effortOptions.levels, effortOptions.default).schema } : {}),
   });
 
-export { ChatModelReasoningConfigDef, ChatModelReasoningConfigSchema };
+export { ChatModelReasoningConfigDef, ChatModelReasoningConfigSchema, type ExtendedThinkingEffortOptions };

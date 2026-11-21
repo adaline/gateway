@@ -13,11 +13,24 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-4-7.html (retrieved 2026-07-10)
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-4-7.html (retrieved 2026-11-20)
+// Pricing: AWS Bedrock global on-demand rate from the AmazonBedrockFoundationModels offer file (retrieved 2026-11-20); regional endpoints cost 10% more.
 // ID fix: Bedrock never served a "-v1" suffixed ID for Opus 4.7 (that's a transitional exception unique to Opus 4.6).
+// Rejects budget_tokens and non-default temperature / top_p / top_k with a 400 error.
 const BedrockClaudeOpus4_7Literal = "anthropic.claude-opus-4-7";
 const BedrockClaudeOpus4_7Description =
-  "Most intelligent model for building agents and coding. Features 128K max output tokens and 1M context window. Training cutoff: January 2026.";
+  "Intelligent model for building agents and coding, with adaptive thinking. Features 128K max output tokens and 1M context window. Training cutoff: January 2026.";
+
+const BedrockClaudeOpus4_7Config = BedrockAnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 128000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive", "disabled"],
+  defaultThinkingMode: "disabled",
+  effortLevels: ["low", "medium", "high", "xhigh", "max"],
+  defaultEffort: "high",
+  samplingParams: false,
+  forcedToolUse: true,
+});
 
 const BedrockClaudeOpus4_7Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeOpus4_7Literal,
@@ -28,8 +41,8 @@ const BedrockClaudeOpus4_7Schema = ChatModelSchema(AnthropicChatModelRoles, Anth
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: BedrockAnthropicChatModelConfigs.base(128000, 4).def,
-    schema: BedrockAnthropicChatModelConfigs.base(128000, 4).schema,
+    def: BedrockClaudeOpus4_7Config.def,
+    schema: BedrockClaudeOpus4_7Config.schema,
   },
   price: pricingData[BedrockClaudeOpus4_7Literal],
 });

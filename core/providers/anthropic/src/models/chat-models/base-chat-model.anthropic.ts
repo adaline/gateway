@@ -183,6 +183,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     _config.topK = parsedRequest.top_k;
     _config.stop = parsedRequest.stop_sequences;
 
+    if (parsedRequest.thinking) {
+      if (parsedRequest.thinking.type === "enabled") {
+        _config.reasoningEnabled = true;
+        _config.maxReasoningTokens = parsedRequest.thinking.budget_tokens;
+      } else {
+        _config.thinkingMode = parsedRequest.thinking.type;
+      }
+    }
+    _config.reasoningEffort = parsedRequest.output_config?.effort;
+
     const config = Config().parse(removeUndefinedEntries(_config));
 
     const messages: MessageType[] = [];
@@ -362,9 +372,11 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         });
       } else if (tools && tools.length > 0) {
         const configToolChoice = this.modelSchema.config.def.toolChoice as SelectStringConfigItemDefType;
+        // Models that reject forced tool use offer no 'any' choice, so a named tool is rejected for them too.
+        const allowsForcedToolUse = configToolChoice.choices.includes("any");
         if (configToolChoice.choices.includes(toolChoice)) {
           transformedConfig.tool_choice = { type: toolChoice };
-        } else if (tools.map((tool) => tool.definition.schema.name).includes(toolChoice)) {
+        } else if (allowsForcedToolUse && tools.map((tool) => tool.definition.schema.name).includes(toolChoice)) {
           transformedConfig.tool_choice = { type: "tool", name: toolChoice };
         } else {
           throw new InvalidConfigError({
@@ -378,6 +390,16 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     const hasExtendedThinking = _reasoningEnabled !== undefined;
     const hasThinkingTokens = _maxReasoningTokens !== undefined;
+
+    // Adaptive-thinking models (schemas with 'thinkingMode') reject budget_tokens with a 400 error.
+    if ((hasExtendedThinking || hasThinkingTokens) && "thinkingMode" in this.modelSchema.config.def) {
+      throw new InvalidConfigError({
+        info: `Invalid extended thinking config for model: '${this.modelName}'`,
+        cause: new Error(
+          "'reasoningEnabled' and 'maxReasoningTokens' are not supported by this model, use 'thinkingMode' and 'reasoningEffort'"
+        ),
+      });
+    }
 
     if (hasExtendedThinking !== hasThinkingTokens) {
       throw new InvalidConfigError({
@@ -402,6 +424,24 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
           });
         }
       }
+    }
+
+    // thinkingMode (param 'thinking') and reasoningEffort (param 'effort') arrive as plain strings.
+    if ("thinking" in transformedConfig) {
+      const thinkingMode = transformedConfig.thinking;
+      if (typeof thinkingMode === "string") {
+        // 'adaptive' asks for summarized thinking: Claude 5 and later models default to display 'omitted'.
+        transformedConfig.thinking = thinkingMode === "adaptive" ? { type: "adaptive", display: "summarized" } : { type: thinkingMode };
+      } else if (thinkingMode === null) {
+        delete transformedConfig.thinking;
+      }
+    }
+
+    if ("effort" in transformedConfig) {
+      if (transformedConfig.effort !== null) {
+        transformedConfig.output_config = { effort: transformedConfig.effort };
+      }
+      delete transformedConfig.effort;
     }
 
     // Add MCP servers if MCP is enabled and servers are configured
@@ -467,9 +507,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
 
     // Filter out error and search-result modalities from all messages (these are output-only modalities)
     parsedMessages.forEach((message) => {
-      message.content = message.content.filter(
-        (content) => content.modality !== "error" && content.modality !== "search-result"
-      );
+      message.content = message.content.filter((content) => content.modality !== "error" && content.modality !== "search-result");
     });
 
     let systemMessage: AnthropicRequestType["system"] = "";
@@ -769,6 +807,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         messages: messages,
         usage: usage,
         logProbs: [],
+        // "refusal" means a classifier declined the request with HTTP 200; callers should branch on it.
+        stopReason: parsedResponse.stop_reason,
       };
     }
 
@@ -910,6 +950,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   completionTokens: parsedResponse.usage.output_tokens,
                   totalTokens: parsedResponse.usage.output_tokens,
                 },
+                ...(parsedResponse.delta.stop_reason ? { stopReason: parsedResponse.delta.stop_reason } : {}),
               },
               buffer: buffer,
             };

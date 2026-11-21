@@ -869,6 +869,7 @@ describe("BaseChatModelAnthropic", () => {
         messages: expectedMessages,
         usage: expectedUsage,
         logProbs: [],
+        stopReason: "end_turn",
       });
     });
 
@@ -885,6 +886,7 @@ describe("BaseChatModelAnthropic", () => {
         messages: expectedMessages,
         usage: expectedUsage,
         logProbs: [],
+        stopReason: "end_turn",
       });
     });
 
@@ -910,6 +912,7 @@ describe("BaseChatModelAnthropic", () => {
         messages: expectedMessages,
         usage: expectedUsage,
         logProbs: [],
+        stopReason: "end_turn",
       });
       // Check specific indices if needed
       expect((result.messages[0].content[1] as any).index).toBe(1);
@@ -936,6 +939,7 @@ describe("BaseChatModelAnthropic", () => {
         messages: expectedMessages,
         usage: expectedUsage,
         logProbs: [],
+        stopReason: "end_turn",
       });
     });
 
@@ -958,6 +962,7 @@ describe("BaseChatModelAnthropic", () => {
         messages: expectedMessages,
         usage: expectedUsage,
         logProbs: [],
+        stopReason: "end_turn",
       });
       // Verify the arguments part is undefined string
       expect(typeof (result.messages[0].content[0] as any).args).toBe("undefined");

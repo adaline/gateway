@@ -13,12 +13,23 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-5.html (retrieved 2026-07-29)
-// Pricing verified: https://aws.amazon.com/bedrock/pricing/ (retrieved 2026-07-29)
-// Adaptive thinking is on by default and can be disabled; effort is capped at `high` when thinking is disabled.
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-opus-5.html (retrieved 2026-11-20)
+// Pricing: AWS Bedrock global on-demand rate from the AmazonBedrockFoundationModels offer file (retrieved 2026-11-20); regional endpoints cost 10% more.
+// Adaptive thinking is on by default; 'disabled' is accepted only at 'high' effort or below.
 const BedrockClaudeOpus5Literal = "anthropic.claude-opus-5";
 const BedrockClaudeOpus5Description =
   "Anthropic's Opus model for coding, agents, and deeper reasoning in enterprise workflows, with adaptive thinking on by default and a 1M token context window.";
+
+const BedrockClaudeOpus5Config = BedrockAnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 128000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive", "disabled"],
+  defaultThinkingMode: "adaptive",
+  effortLevels: ["low", "medium", "high", "xhigh", "max"],
+  defaultEffort: "high",
+  samplingParams: false,
+  forcedToolUse: true,
+});
 
 const BedrockClaudeOpus5Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeOpus5Literal,
@@ -29,8 +40,8 @@ const BedrockClaudeOpus5Schema = ChatModelSchema(AnthropicChatModelRoles, Anthro
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: BedrockAnthropicChatModelConfigs.base(128000, 4).def,
-    schema: BedrockAnthropicChatModelConfigs.base(128000, 4).schema,
+    def: BedrockClaudeOpus5Config.def,
+    schema: BedrockClaudeOpus5Config.schema,
   },
   price: pricingData[BedrockClaudeOpus5Literal],
 });

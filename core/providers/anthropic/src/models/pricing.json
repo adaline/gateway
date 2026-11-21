@@ -136,8 +136,8 @@
         "maxTokens": null,
         "prices": {
           "base": {
-            "inputPricePerMillion": 3,
-            "outputPricePerMillion": 15
+            "inputPricePerMillion": 2,
+            "outputPricePerMillion": 10
           }
         }
       }
@@ -154,6 +154,96 @@
           "base": {
             "inputPricePerMillion": 5,
             "outputPricePerMillion": 25
+          }
+        }
+      }
+    ]
+  },
+  "claude-fable-5-2": {
+    "modelName": "claude-fable-5-2",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 8,
+            "outputPricePerMillion": 40
+          }
+        }
+      }
+    ]
+  },
+  "claude-fable-5-1": {
+    "modelName": "claude-fable-5-1",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 10,
+            "outputPricePerMillion": 50
+          }
+        }
+      }
+    ]
+  },
+  "claude-opus-5-5": {
+    "modelName": "claude-opus-5-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 4,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
+  "claude-sonnet-5-5": {
+    "modelName": "claude-sonnet-5-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 2,
+            "outputPricePerMillion": 10
+          }
+        }
+      }
+    ]
+  },
+  "claude-haiku-5-5": {
+    "modelName": "claude-haiku-5-5",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": 100001,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.1,
+            "outputPricePerMillion": 0.5
+          }
+        }
+      },
+      {
+        "minTokens": 100001,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 0.5,
+            "outputPricePerMillion": 2.5
           }
         }
       }
