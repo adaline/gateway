@@ -1,17 +1,6 @@
 import { z } from "zod";
 
-import {
-  frequencyPenalty,
-  logProbs,
-  maxTokens,
-  presencePenalty,
-  seed,
-  stop,
-  temperature,
-  toolChoice,
-  topLogProbs,
-  topP,
-} from "./common.config.chat-model.xai";
+import { frequencyPenalty, maxTokens, presencePenalty, seed, stop, temperature, toolChoice, topP } from "./common.config.chat-model.xai";
 
 const ChatModelBaseConfigSchema = (maxOutputTokens: number, maxSequences: number) =>
   z.object({
@@ -22,8 +11,6 @@ const ChatModelBaseConfigSchema = (maxOutputTokens: number, maxSequences: number
     frequencyPenalty: frequencyPenalty.schema,
     presencePenalty: presencePenalty.schema,
     seed: seed.schema.transform((value) => (value === 0 ? undefined : value)),
-    logProbs: logProbs.schema,
-    topLogProbs: topLogProbs.schema,
     toolChoice: toolChoice.schema,
   });
 
@@ -36,8 +23,6 @@ const ChatModelBaseConfigDef = (maxOutputTokens: number, maxSequences: number) =
     frequencyPenalty: frequencyPenalty.def,
     presencePenalty: presencePenalty.def,
     seed: seed.def,
-    logProbs: logProbs.def,
-    topLogProbs: topLogProbs.def,
     toolChoice: toolChoice.def,
   }) as const;
 

@@ -1,4 +1,8 @@
-import { CHAT_CONFIG, MultiStringConfigItem, RangeConfigItem, SelectBooleanConfigItem, SelectStringConfigItem } from "@adaline/provider";
+import { CHAT_CONFIG, MultiStringConfigItem, RangeConfigItem, SelectStringConfigItem } from "@adaline/provider";
+
+// logprobs / top_logprobs are intentionally absent: xAI documents both as unsupported (silently
+// ignored) on grok-4.20 and newer, and every model in this package is grok-4.20+.
+// See https://docs.x.ai/docs (retrieved 2026-11-20)
 
 const temperature = RangeConfigItem({
   param: "temperature",
@@ -69,23 +73,6 @@ const seed = RangeConfigItem({
   default: 0,
 });
 
-const logProbs = SelectBooleanConfigItem({
-  param: "logprobs",
-  title: CHAT_CONFIG.LOG_PROBS.title,
-  description: CHAT_CONFIG.LOG_PROBS.description,
-  default: false,
-});
-
-const topLogProbs = RangeConfigItem({
-  param: "top_logprobs",
-  title: CHAT_CONFIG.TOP_LOG_PROBS.title,
-  description: CHAT_CONFIG.TOP_LOG_PROBS.description,
-  min: 0,
-  max: 20,
-  step: 1,
-  default: 0,
-});
-
 const toolChoice = SelectStringConfigItem({
   param: "tool_choice",
   title: "Tool choice",
@@ -95,13 +82,16 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "required", "none"],
 });
 
-const reasoningEffortNoneLow = SelectStringConfigItem({
+// grok-4.3's model page lists reasoning_effort as 'none' / 'low' / 'medium' / 'high' / 'xhigh'
+// with a 'low' default; 'none' disables reasoning.
+// See https://docs.x.ai/developers/models/grok-4.3 (retrieved 2026-11-20)
+const reasoningEffortNoneLowMediumHighXhigh = SelectStringConfigItem({
   param: "reasoning_effort",
   title: "Reasoning Effort",
   description:
-    "Controls how much time the model spends thinking before responding. 'none' disables extended reasoning for the fastest responses, 'low' uses minimal thinking time for quick responses. Only supported by grok-4.3.",
+    "Controls how much time the model spends thinking before responding. 'none' disables reasoning for the fastest responses, 'low' through 'xhigh' spend progressively more thinking time. Only supported by grok-4.3.",
   default: "low",
-  choices: ["none", "low"],
+  choices: ["none", "low", "medium", "high", "xhigh"],
 });
 
 // grok-4.5 documents reasoning_effort as 'low' / 'medium' / 'high' with a 'high' default, and
@@ -114,6 +104,18 @@ const reasoningEffortLowMediumHigh = SelectStringConfigItem({
     "Controls how deeply the model reasons before responding. 'low' spends the least thinking time, 'high' the most. Reasoning cannot be disabled on this model. Only supported by grok-4.5.",
   default: "high",
   choices: ["low", "medium", "high"],
+});
+
+// grok-4.7 and grok-4.6 document reasoning_effort as 'low' / 'medium' / 'high' / 'xhigh' with a
+// 'high' default; reasoning is always on, so 'none' is intentionally not offered.
+// See https://docs.x.ai/developers/model-capabilities/text/reasoning (retrieved 2026-11-20)
+const reasoningEffortLowMediumHighXhigh = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls how deeply the model reasons before responding. 'low' spends the least thinking time, 'xhigh' the most. Reasoning cannot be disabled on these models. Supported by grok-4.7 and grok-4.6.",
+  default: "high",
+  choices: ["low", "medium", "high", "xhigh"],
 });
 
 // grok-4.20-multi-agent-0309 reuses the reasoning_effort param to select how many agents run
@@ -131,16 +133,15 @@ const reasoningEffortAgentCount = SelectStringConfigItem({
 
 export {
   frequencyPenalty,
-  logProbs,
   maxTokens,
   presencePenalty,
   reasoningEffortAgentCount,
   reasoningEffortLowMediumHigh,
-  reasoningEffortNoneLow,
+  reasoningEffortLowMediumHighXhigh,
+  reasoningEffortNoneLowMediumHighXhigh,
   seed,
   stop,
   temperature,
   toolChoice,
-  topLogProbs,
   topP,
 };

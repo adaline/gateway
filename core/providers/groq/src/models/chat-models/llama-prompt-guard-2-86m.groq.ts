@@ -14,6 +14,7 @@ import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq"
 
 // Specs reference: https://console.groq.com/docs/model/meta-llama/llama-prompt-guard-2-86m,
 // https://console.groq.com/docs/models (retrieved 2026-07-10)
+// Preview: listed in Groq's Preview Models table, not production (retrieved 2026-11-20).
 const Llama_Prompt_Guard_2_86mLiteral = "meta-llama/llama-prompt-guard-2-86m" as const;
 const Llama_Prompt_Guard_2_86mDescription =
   "Llama Prompt Guard 2 86M is Meta's 86M-parameter classifier that detects and prevents prompt attacks, such as \

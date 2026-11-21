@@ -13,6 +13,7 @@ import pricingData from "../pricing.json";
 import { BaseChatModelGroq, BaseChatModelOptions } from "./base-chat-model.groq";
 
 // Specs reference: https://console.groq.com/docs/models (retrieved 2026-07-10)
+// Preview: listed in Groq's Preview Models table, not production (retrieved 2026-11-20).
 const Llama_Prompt_Guard_2_22mLiteral = "meta-llama/llama-prompt-guard-2-22m" as const;
 const Llama_Prompt_Guard_2_22mDescription =
   "Llama Prompt Guard 2 22M is Meta's 22M-parameter classifier, a smaller and cheaper sibling of the 86M variant, \

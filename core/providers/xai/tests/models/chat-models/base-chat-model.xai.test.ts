@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
 
-import { ChatModelSchema, ChatModelSchemaType } from "@adaline/provider";
+import { ChatModelSchema, ChatModelSchemaType, InvalidConfigError, SelectStringConfigItemDefType } from "@adaline/provider";
 import { Config, MessageType, SystemRoleLiteral, TextModalityLiteral, UserRoleLiteral } from "@adaline/types";
 
 import { XAIChatModelConfigs } from "../../../src/configs";
@@ -90,8 +90,6 @@ describe("BaseChatModel", () => {
         frequencyPenalty: 0.5,
         presencePenalty: 0.5,
         seed: 1,
-        logProbs: true,
-        topLogProbs: 5,
       });
       expect(model.transformConfig(config, messages, [])).toEqual({
         max_tokens: 2000,
@@ -101,9 +99,29 @@ describe("BaseChatModel", () => {
         top_p: 1,
         stop: ["test"],
         seed: 1,
+      });
+    });
+
+    // xAI documents logprobs / top_logprobs as unsupported (silently ignored) on grok-4.20+.
+    it("should never send logprobs or top_logprobs, which no grok-4.20+ config defines", () => {
+      const model = new BaseChatModel(mockModelSchema, mockOptions);
+      expect(model.transformConfig(Config().parse({ logProbs: true, topLogProbs: 5, temperature: 1 }), [], [])).toEqual({
+        temperature: 1,
+      });
+      expect("logProbs" in model.modelSchema.config.def).toBe(false);
+      expect("topLogProbs" in model.modelSchema.config.def).toBe(false);
+    });
+
+    it("should drop logprobs and top_logprobs from incoming requests", () => {
+      const model = new Grok_4_20_0309_Non_Reasoning({ apiKey: "test-api-key", modelName: "grok-4.20-0309-non-reasoning" });
+      const request = model.transformModelRequest({
+        model: "grok-4.20-0309-non-reasoning",
+        messages: [{ role: "user", content: "Hello!" }],
         logprobs: true,
         top_logprobs: 5,
       });
+      expect(request.config.logProbs).toBeUndefined();
+      expect(request.config.topLogProbs).toBeUndefined();
     });
   });
 
@@ -127,12 +145,18 @@ describe("BaseChatModel", () => {
       expect(() => model.transformConfig(Config().parse({ reasoningEffort: "none" }), [], [])).toThrow();
     });
 
-    it("should keep grok-4.3 scoped to none and low", () => {
+    it("should accept none, low, medium, high and xhigh on grok-4.3 with a low default", () => {
       const model = new Grok_4_3({ ...modelOptions, modelName: "grok-4.3" });
-      expect(model.transformConfig(Config().parse({ reasoningEffort: "none" }), [], [])).toEqual({
-        reasoning_effort: "none",
-      });
-      expect(() => model.transformConfig(Config().parse({ reasoningEffort: "high" }), [], [])).toThrow();
+      for (const effort of ["none", "low", "medium", "high", "xhigh"]) {
+        expect(model.transformConfig(Config().parse({ reasoningEffort: effort }), [], [])).toEqual({
+          reasoning_effort: effort,
+        });
+      }
+      expect(() => model.transformConfig(Config().parse({ reasoningEffort: "minimal" }), [], [])).toThrow(InvalidConfigError);
+      expect(() => model.transformConfig(Config().parse({ reasoningEffort: "max" }), [], [])).toThrow(InvalidConfigError);
+      const def = model.modelSchema.config.def.reasoningEffort as SelectStringConfigItemDefType;
+      expect(def.default).toBe("low");
+      expect(def.choices).toEqual(["none", "low", "medium", "high", "xhigh"]);
     });
 
     // Effort defaults are documentation for callers, not something the gateway sends on its own.

@@ -19,6 +19,16 @@ class XAI<C extends Models.BaseChatModelOptionsType> implements ProviderV1<C, ne
       modelSchema: ChatModelSchemaType;
     }
   > = {
+    [Models.Grok_4_7_Literal]: {
+      model: Models.Grok_4_7,
+      modelOptions: Models.Grok_4_7_Options,
+      modelSchema: Models.Grok_4_7_Schema,
+    },
+    [Models.Grok_4_6_Literal]: {
+      model: Models.Grok_4_6,
+      modelOptions: Models.Grok_4_6_Options,
+      modelSchema: Models.Grok_4_6_Schema,
+    },
     [Models.Grok_4_5_Literal]: {
       model: Models.Grok_4_5,
       modelOptions: Models.Grok_4_5_Options,
@@ -43,11 +53,6 @@ class XAI<C extends Models.BaseChatModelOptionsType> implements ProviderV1<C, ne
       model: Models.Grok_4_20_Multi_Agent_0309,
       modelOptions: Models.Grok_4_20_Multi_Agent_0309_Options,
       modelSchema: Models.Grok_4_20_Multi_Agent_0309_Schema,
-    },
-    [Models.Grok_Build_0_1_Literal]: {
-      model: Models.Grok_Build_0_1,
-      modelOptions: Models.Grok_Build_0_1_Options,
-      modelSchema: Models.Grok_Build_0_1_Schema,
     },
   };
 

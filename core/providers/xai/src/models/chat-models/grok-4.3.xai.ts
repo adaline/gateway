@@ -11,8 +11,8 @@ import { XAIChatModelRoles, XAIChatModelRolesMap, XAIChatModelTextToolModalities
 // https://docs.x.ai/developers/migration/may-15-retirement (retrieved 2026-07-10)
 // maxOutputTokens is not published by xAI docs; 131072 is carried from the grok-4.x family
 // convention shared across the grok-4.x model family.
-// reasoning_effort is confirmed for values 'none' and 'low' only (via migration guidance);
-// higher effort levels are unverified and intentionally omitted.
+// reasoning_effort: the model page lists 'none' / 'low' / 'medium' / 'high' / 'xhigh' with a
+// 'low' default (https://docs.x.ai/developers/models/grok-4.3, retrieved 2026-11-20).
 const Grok_4_3_Literal = "grok-4.3";
 const Grok_4_3_Description =
   "Grok-4.3 is xAI's flagship model with a 1M-token context window, reasoning effort control, strong non-hallucination rate, and agentic tool calling. Primary migration target for retired grok-4 / grok-4.1-fast / grok-3 slugs.";
