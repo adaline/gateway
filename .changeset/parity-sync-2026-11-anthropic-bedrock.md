@@ -1,6 +1,7 @@
 ---
 "@adaline/anthropic": minor
 "@adaline/bedrock": minor
+"@adaline/types": minor
 ---
 
 Parity sync 2026-11-20 for Claude on the Claude API and AWS Bedrock (verified against Anthropic's models, pricing, thinking and effort docs, AWS model cards and the AWS pricing feed).
@@ -13,6 +14,8 @@ Parity sync 2026-11-20 for Claude on the Claude API and AWS Bedrock (verified ag
 - `toolChoice` drops `any` and named tools on models that reject forced tool use (Opus 5.5, Sonnet 5.5, Fable 5.1, Fable 5.2) and offers `auto` / `none`.
 - Opus 4.6 and Sonnet 4.6 move from deprecated budget thinking to adaptive thinking. **Breaking:** pass `thinkingMode` / `reasoningEffort` instead of `reasoningEnabled` / `maxReasoningTokens` for these models.
 - Opus 4.5 keeps budget thinking and gains the `reasoningEffort` control.
+
+**Stop reason.** `ChatResponse` and `PartialChatResponse` gain an optional `stopReason` string, and `mergePartialMessages` carries the last one reported. Anthropic and Bedrock populate it from `stop_reason`, so a `"refusal"` (HTTP 200 from the dual-use classifiers on Fable 5.x / Opus 5.5) can be told apart from an ordinary completion.
 
 Added:
 

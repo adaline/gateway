@@ -807,6 +807,8 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         messages: messages,
         usage: usage,
         logProbs: [],
+        // "refusal" means a classifier declined the request with HTTP 200; callers should branch on it.
+        stopReason: parsedResponse.stop_reason,
       };
     }
 
@@ -948,6 +950,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
                   completionTokens: parsedResponse.usage.output_tokens,
                   totalTokens: parsedResponse.usage.output_tokens,
                 },
+                ...(parsedResponse.delta.stop_reason ? { stopReason: parsedResponse.delta.stop_reason } : {}),
               },
               buffer: buffer,
             };

@@ -267,6 +267,22 @@ describe("Anthropic text generation with adaptive thinking", () => {
       usage: { input_tokens: 9, output_tokens: 6 },
     });
     expect(result.messages[0].content).toEqual([createTextContent("I can't help with that.")]);
+    expect(result.stopReason).toBe("refusal");
+  });
+
+  it("reports the stop reason on ordinary completions too", () => {
+    const model = modelFor("claude-haiku-5-5");
+    const result = model.transformCompleteChatResponse({
+      id: "msg_04",
+      type: "message",
+      role: "assistant",
+      model: "claude-haiku-5-5",
+      content: [{ type: "text", text: "Done." }],
+      stop_reason: "end_turn",
+      stop_sequence: null,
+      usage: { input_tokens: 3, output_tokens: 2 },
+    });
+    expect(result.stopReason).toBe("end_turn");
   });
 });
 
@@ -308,5 +324,15 @@ describe("Anthropic streaming with adaptive thinking", () => {
     const usages = results.map((result) => result.partialResponse.usage).filter((usage) => usage !== undefined);
     expect(usages[0]).toMatchObject({ promptTokens: 20 });
     expect(usages[usages.length - 1]).toMatchObject({ completionTokens: 30 });
+
+    const stopReasons = results.map((result) => result.partialResponse.stopReason).filter((reason) => reason !== undefined);
+    expect(stopReasons).toEqual(["end_turn"]);
+  });
+
+  it("surfaces a streamed refusal through the message_delta stop reason", async () => {
+    const model = modelFor("claude-fable-5-2");
+    const chunk = sse({ type: "message_delta", delta: { stop_reason: "refusal", stop_sequence: null }, usage: { output_tokens: 4 } });
+    const results = await collectAsyncGenerator(model.transformStreamChatResponseChunk(chunk, ""));
+    expect(results.map((result) => result.partialResponse.stopReason)).toContain("refusal");
   });
 });

@@ -24,10 +24,16 @@ type ChatLogProbType = z.infer<typeof ChatLogProb>;
 const ChatLogProbs = z.array(ChatLogProb);
 type ChatLogProbsType = z.infer<typeof ChatLogProbs>;
 
+// Provider-reported reason the model stopped (e.g. Anthropic "end_turn", "max_tokens", "refusal").
+// Lets callers tell a refusal apart from an ordinary completion.
+const ChatStopReason = z.string();
+type ChatStopReasonType = z.infer<typeof ChatStopReason>;
+
 const ChatResponse = z.object({
   messages: z.array(Message()),
   usage: ChatUsage.optional(),
   logProbs: ChatLogProbs.optional(),
+  stopReason: ChatStopReason.optional(),
 });
 type ChatResponseType = z.infer<typeof ChatResponse>;
 
@@ -43,6 +49,7 @@ const PartialChatResponse = z.object({
   partialMessages: z.array(PartialMessage()),
   usage: PartialChatUsage.optional(),
   logProbs: ChatLogProbs.optional(),
+  stopReason: ChatStopReason.optional(),
 });
 type PartialChatResponseType = z.infer<typeof PartialChatResponse>;
 
@@ -51,6 +58,7 @@ export {
   ChatLogProb,
   ChatLogProbs,
   ChatResponse,
+  ChatStopReason,
   ChatUsage,
   PartialChatResponse,
   PartialChatUsage,
@@ -58,6 +66,7 @@ export {
   type ChatLogProbsType,
   type ChatLogProbType,
   type ChatResponseType,
+  type ChatStopReasonType,
   type ChatUsageType,
   type PartialChatResponseType,
   type PartialChatUsageType,
