@@ -1,4 +1,3 @@
-
 import { ChatModelBaseConfigDef, ChatModelBaseConfigSchema } from "./base.config.chat-model.openai";
 import { reasoningEffort, verbosity } from "./common.config.chat-model.openai";
 import { ChatModelResponseSchemaConfigDef, ChatModelResponseSchemaConfigSchema } from "./response-schema.config.chat-model.openai";

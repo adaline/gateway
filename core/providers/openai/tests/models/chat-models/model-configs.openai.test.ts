@@ -102,6 +102,13 @@ describe("OpenAI model config definitions", () => {
     });
   });
 
+  describe("1.05M-context GPT-5.x family", () => {
+    it.each(["gpt-5.4", "gpt-5.4-pro", "gpt-5.5", "gpt-5.5-pro"])("%s reports the same 922000 usable input as gpt-5.6", (literal) => {
+      expect(schemas[literal].maxInputTokens).toBe(922000);
+      expect(schemas[literal].maxOutputTokens).toBe(128000);
+    });
+  });
+
   describe("GPT-6 family", () => {
     const gpt6 = ["gpt-6-astra", "gpt-6-sol", "gpt-6-luna", "gpt-6.1-sol", "gpt-6.1-terra", "gpt-6.2-astra", "gpt-6.2-sol"];
 
