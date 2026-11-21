@@ -16,18 +16,19 @@ import {
 const GPT_5_ProLiteral = "gpt-5-pro";
 const GPT_5_ProDescription =
   "GPT-5 Pro reasoning variant that allocates additional compute for the most reliable, in-depth answers on complex tasks. \
-  Training data up to September 2024. Available via the OpenAI Responses API only.";
+  Training data up to September 2024. Available via the OpenAI Responses API only. \
+  Deprecated by OpenAI; scheduled shutdown 2026-12-11 (replacement: gpt-6.1-sol).";
 
 const GPT_5_ProSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelProWithWebSearchModalitiesEnum).parse({
   name: GPT_5_ProLiteral,
   description: GPT_5_ProDescription,
   maxInputTokens: 400000,
-  maxOutputTokens: 131072,
+  maxOutputTokens: 272000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelProWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5ProWithWebSearch(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5ProWithWebSearch(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5ProHighOnlyWithWebSearch(272000, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5ProHighOnlyWithWebSearch(272000, 4).schema,
   },
   price: pricingData[GPT_5_ProLiteral],
 });

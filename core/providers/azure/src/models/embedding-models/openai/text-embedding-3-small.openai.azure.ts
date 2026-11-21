@@ -5,6 +5,8 @@ import { Text_Embedding_3_SmallSchema as OpenAI_Text_Embedding_3_SmallSchema } f
 import { BaseEmbeddingModelOptions } from "../embedding-model-options.azure";
 import { BaseEmbeddingModelOpenAI } from "./base-embedding-model.openai.azure";
 
+// Retirement schedule: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule (retrieved 2026-11-20)
+// Azure retirement: 2028-02-09.
 const Text_Embedding_3_SmallLiteral = "text-embedding-3-small" as const;
 const Text_Embedding_3_SmallSchema = OpenAI_Text_Embedding_3_SmallSchema;
 const Text_Embedding_3_SmallOptions = BaseEmbeddingModelOptions;

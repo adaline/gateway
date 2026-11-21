@@ -7,6 +7,8 @@ import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
 import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatModelRoles, OpenAIChatModelRolesMap } from "./types";
 
+// Retired on the OpenAI API 2026-10-23 (no longer registered with the openai provider);
+// schema retained for @adaline/azure, where gpt-4.1-nano remains GA until 2027-04-14.
 const GPT_4_1_NanoLiteral = "gpt-4.1-nano";
 const GPT_4_1_NanoDescription =
   "Fastest, most cost-effective GPT-4.1 model. \

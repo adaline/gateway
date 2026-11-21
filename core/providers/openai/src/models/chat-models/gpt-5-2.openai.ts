@@ -15,18 +15,18 @@ import {
 const GPT_5_2Literal = "gpt-5.2";
 const GPT_5_2Description =
   "Flagship GPT-5.2 model with enhanced reasoning controls and extended knowledge coverage. \
-  Training data up to January 2025.";
+  Knowledge cutoff: August 31, 2025.";
 
 const GPT_5_2Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_2Literal,
   description: GPT_5_2Description,
   maxInputTokens: 400000,
-  maxOutputTokens: 131072,
+  maxOutputTokens: 128000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(128000, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(128000, 4).schema,
   },
   price: pricingData[GPT_5_2Literal],
 });

@@ -13,6 +13,8 @@ import {
 } from "./types";
 
 // Specs reference: https://developers.openai.com/api/docs/models/gpt-5.5-pro (retrieved 2026-06-09)
+// Pricing: the >272K tier ($60/$270) comes from the official pricing page (retrieved 2026-11-20); the
+// gpt-5.5-pro model page conflicts (lists a single flat rate). Pricing page taken as authoritative.
 const GPT_5_5_ProLiteral = "gpt-5.5-pro";
 const GPT_5_5_ProDescription =
   "Highest-stakes reasoning variant of GPT-5.5 that allocates additional compute for the most complex professional work. \
@@ -26,8 +28,8 @@ const GPT_5_5_ProSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelP
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelProWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5ProWithWebSearch(128000, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5ProWithWebSearch(128000, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5_5ProWithWebSearch(128000, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5_5ProWithWebSearch(128000, 4).schema,
   },
   price: pricingData[GPT_5_5_ProLiteral],
 });

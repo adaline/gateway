@@ -5,6 +5,8 @@ import { Text_Embedding_Ada002Schema as OpenAI_Text_Embedding_Ada_002Schema } fr
 import { BaseEmbeddingModelOptions } from "../embedding-model-options.azure";
 import { BaseEmbeddingModelOpenAI } from "./base-embedding-model.openai.azure";
 
+// Retirement schedule: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule (retrieved 2026-11-20)
+// Azure retirement: 2028-02-09.
 const Text_Embedding_Ada_002Literal = "text-embedding-ada-002" as const;
 const Text_Embedding_Ada_002Schema = OpenAI_Text_Embedding_Ada_002Schema;
 const Text_Embedding_Ada_002Options = BaseEmbeddingModelOptions;

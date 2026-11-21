@@ -5,6 +5,8 @@ import { Text_Embedding_3_LargeSchema as OpenAI_Text_Embedding_3_LargeSchema } f
 import { BaseEmbeddingModelOptions } from "../embedding-model-options.azure";
 import { BaseEmbeddingModelOpenAI } from "./base-embedding-model.openai.azure";
 
+// Retirement schedule: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule (retrieved 2026-11-20)
+// Azure retirement: 2028-02-09.
 const Text_Embedding_3_LargeLiteral = "text-embedding-3-large" as const;
 const Text_Embedding_3_LargeSchema = OpenAI_Text_Embedding_3_LargeSchema;
 const Text_Embedding_3_LargeOptions = BaseEmbeddingModelOptions;

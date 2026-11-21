@@ -15,7 +15,7 @@ import {
 const GPT_4_1Literal = "gpt-4.1";
 const GPT_4_1Description =
   "Flagship model for complex tasks. It is well suited for problem solving across domains. \
-  Training data up to May 2024.";
+  Knowledge cutoff: June 1, 2024. Default snapshot deprecated by OpenAI; scheduled shutdown 2027-01-14 (replacement: gpt-6-luna).";
 
 const GPT_4_1Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_4_1Literal,

@@ -12,6 +12,8 @@ import {
   OpenAIChatModelWithWebSearchModalitiesEnum,
 } from "./types";
 
+// Retired on the OpenAI API 2026-10-23 (no longer registered with the openai provider);
+// schema retained for @adaline/azure, where gpt-4o-2024-05-13 remains GA until 2027-01-14.
 const GPT_4o_2024_05_13Literal = "gpt-4o-2024-05-13";
 const GPT_4o_2024_05_13Description = "Latest snapshot of gpt-4o that supports Structured Outputs. Training data up to Oct 2023.";
 

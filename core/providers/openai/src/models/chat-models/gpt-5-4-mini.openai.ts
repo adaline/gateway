@@ -21,7 +21,7 @@ const GPT_5_4_MiniDescription =
 const GPT_5_4_MiniSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_4_MiniLiteral,
   description: GPT_5_4_MiniDescription,
-  maxInputTokens: 400000,
+  maxInputTokens: 272000,
   maxOutputTokens: 128000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,

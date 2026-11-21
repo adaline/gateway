@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ChatModelSchema } from "@adaline/provider";
 
 import { OpenAIChatModelConfigs } from "../../configs";
+import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.openai";
 import {
   OpenAIChatModelRoles,
@@ -12,7 +13,9 @@ import {
 } from "./types";
 
 const O3Literal = "o3";
-const O3Description = "A new standard for math, science, coding, and visual reasoning tasks. Training data up to Jun 2024.";
+const O3Description =
+  "A new standard for math, science, coding, and visual reasoning tasks. Training data up to Jun 2024. \
+  Deprecated by OpenAI; scheduled shutdown 2026-12-11 (replacement: gpt-6.1-sol).";
 
 const O3Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: O3Literal,
@@ -25,6 +28,7 @@ const O3Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSea
     def: OpenAIChatModelConfigs.oSeriesWithWebSearch(100000, 4).def,
     schema: OpenAIChatModelConfigs.oSeriesWithWebSearch(100000, 4).schema,
   },
+  price: pricingData[O3Literal],
 });
 
 const O3Options = BaseChatModelOptions;

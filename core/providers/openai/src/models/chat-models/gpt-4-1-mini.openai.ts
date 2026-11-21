@@ -15,7 +15,7 @@ import {
 const GPT_4_1_MiniLiteral = "gpt-4.1-mini";
 const GPT_4_1_MiniDescription =
   "Provides a balance between intelligence, speed, and cost that makes it an attractive model for many use cases. \
-  Training data up to May 2024.";
+  Knowledge cutoff: June 1, 2024. Default snapshot deprecated by OpenAI; scheduled shutdown 2027-01-14 (replacement: gpt-6-luna).";
 
 const GPT_4_1_MiniSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_4_1_MiniLiteral,

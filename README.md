@@ -215,14 +215,14 @@ console.log(openaiChatModels); // Array of chat model names
 const openaiEmbeddingModels = openai.embeddingModelLiterals();
 console.log(openaiEmbeddingModels); // Array of embedding model names
 
-const o4MiniSchema = openai.chatModelSchemas()["o4-mini"]; // Schema for the o4-mini chat model
-console.log(o4MiniSchema.name);
-console.log(o4MiniSchema.description);
-console.log(o4MiniSchema.maxInputTokens);
-console.log(o4MiniSchema.maxOutputTokens);
-console.log(o4MiniSchema.roles);
-console.log(o4MiniSchema.modalities);
-console.log(o4MiniSchema.config); 
+const gpt54MiniSchema = openai.chatModelSchemas()["gpt-5.4-mini"]; // Schema for the gpt-5.4-mini chat model
+console.log(gpt54MiniSchema.name);
+console.log(gpt54MiniSchema.description);
+console.log(gpt54MiniSchema.maxInputTokens);
+console.log(gpt54MiniSchema.maxOutputTokens);
+console.log(gpt54MiniSchema.roles);
+console.log(gpt54MiniSchema.modalities);
+console.log(gpt54MiniSchema.config); 
 ```
 
 ## Prompt Types
@@ -252,9 +252,9 @@ import { OpenAI } from "@adaline/openai";
 
 const openai = new OpenAI();
 
-const o4MiniSchema = openai.chatModelSchemas()["o4-mini"];
-console.log(o4MiniSchema.config.def); // Verbose description of the Config for this LLM
-console.log(o4MiniSchema.config.schema); // Zod type to validate Config for this LLM
+const gpt54MiniSchema = openai.chatModelSchemas()["gpt-5.4-mini"];
+console.log(gpt54MiniSchema.config.def); // Verbose description of the Config for this LLM
+console.log(gpt54MiniSchema.config.schema); // Zod type to validate Config for this LLM
 ```
 
 ### Message

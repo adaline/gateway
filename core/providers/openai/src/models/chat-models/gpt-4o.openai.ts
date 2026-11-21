@@ -14,19 +14,19 @@ import {
 
 const GPT_4oLiteral = "gpt-4o";
 const GPT_4oDescription =
-  "Most advanced, multimodal flagship model that is cheaper and faster than GPT-4 Turbo. Currently points to gpt-4o-2024-05-13. \
-  Training data up to Oct 2023.";
+  "Most advanced, multimodal flagship model that is cheaper and faster than GPT-4 Turbo. Currently points to gpt-4o-2024-08-06. \
+  Training data up to Oct 2023. Default snapshot deprecated by OpenAI; scheduled shutdown 2027-01-14 (replacement: gpt-6-luna).";
 
 const GPT_4oSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_4oLiteral,
   description: GPT_4oDescription,
   maxInputTokens: 128000,
-  maxOutputTokens: 4092,
+  maxOutputTokens: 16384,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.responseSchemaWithWebSearch(4092, 4).def,
-    schema: OpenAIChatModelConfigs.responseSchemaWithWebSearch(4092, 4).schema,
+    def: OpenAIChatModelConfigs.responseSchemaWithWebSearch(16384, 4).def,
+    schema: OpenAIChatModelConfigs.responseSchemaWithWebSearch(16384, 4).schema,
   },
   price: pricingData[GPT_4oLiteral],
 });

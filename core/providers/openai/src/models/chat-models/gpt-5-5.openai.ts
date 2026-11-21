@@ -27,8 +27,8 @@ const GPT_5_5Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithW
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(128000, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5_2PlusWithWebSearch(128000, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5_5WithWebSearch(128000, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5_5WithWebSearch(128000, 4).schema,
   },
   price: pricingData[GPT_5_5Literal],
 });

@@ -17,7 +17,7 @@ import {
 
 import { OpenAI } from "../../../src";
 import { OpenAIChatModelConfigs } from "../../../src/configs";
-import { BaseChatModel } from "../../../src/models";
+import { BaseChatModel, GPT_4_1_NanoSchema } from "../../../src/models";
 
 // ─── Test Roles & Modalities ───────────────────────────────────────────────────
 
@@ -1896,7 +1896,6 @@ describe("registry", () => {
   const q2Models = [
     "gpt-4o",
     "gpt-4o-2024-08-06",
-    "gpt-4o-2024-05-13",
     "gpt-4o-mini",
     "gpt-4o-mini-2024-07-18",
     "gpt-4.1",
@@ -1906,27 +1905,30 @@ describe("registry", () => {
     "gpt-5-nano",
     "gpt-5.1",
     "gpt-5.2",
-    "gpt-5.2-chat-latest",
     "chatgpt-5.2",
     "gpt-5.4",
     "gpt-5.4-mini",
     "gpt-5.2-pro",
     "gpt-5.4-pro",
-    "o1",
-    "o1-2024-12-17",
+    "gpt-6-astra",
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "gpt-6.1-sol",
+    "gpt-6.1-terra",
+    "gpt-6.2-astra",
+    "gpt-6.2-sol",
     "o3",
     "o3-2025-04-16",
-    "o3-mini",
-    "o3-mini-2025-01-31",
-    "o4-mini",
-    "o4-mini-2025-04-16",
   ];
 
   // Models that must NOT declare webSearchTool at all (no Responses web_search support).
   const noWebSearchModels = [
-    "gpt-4.1-nano", // no Responses web_search support
+    "gpt-4.1-nano", // no Responses web_search support (unregistered; schema retained for @adaline/azure)
     "gpt-5.3-codex", // codex variant, tool-free
   ];
+  // Schemas retired on the OpenAI API but still exported for @adaline/azure.
+  const azureRetainedSchemas: Record<string, ChatModelSchemaType> = { "gpt-4.1-nano": GPT_4_1_NanoSchema };
+  const lookupSchema = (literal: string): ChatModelSchemaType => schemas[literal] ?? azureRetainedSchemas[literal];
 
   // CC always-on-search SKUs: they DO declare webSearchTool but stay on the CC path.
   const ccSearchPreviewModels = ["gpt-5-search-api"];
@@ -1959,13 +1961,13 @@ describe("registry", () => {
 
   describe("Q2 exclusions — must NOT declare webSearchTool", () => {
     it.each(noWebSearchModels)("model '%s' does not declare webSearchTool", (literal) => {
-      const schema = schemas[literal];
+      const schema = lookupSchema(literal);
       expect(schema, `schema missing for ${literal}`).toBeDefined();
       expect((schema.config.def as Record<string, unknown>).webSearchTool).toBeUndefined();
     });
 
     it.each(noWebSearchModels)("model '%s' does not declare webSearchAllowedDomains/webSearchExternalAccess", (literal) => {
-      const schema = schemas[literal];
+      const schema = lookupSchema(literal);
       const def = schema.config.def as Record<string, unknown>;
       expect(def.webSearchAllowedDomains).toBeUndefined();
       expect(def.webSearchExternalAccess).toBeUndefined();

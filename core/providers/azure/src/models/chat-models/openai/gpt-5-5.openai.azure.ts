@@ -6,7 +6,8 @@ import { BaseChatModelOptions } from "../chat-model-options.azure";
 import { BaseChatModelOpenAI } from "./base-chat-model.openai.azure";
 
 // Specs reference: https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure (retrieved 2026-07-10)
-// Retirement schedule: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule (retrieved 2026-07-10)
+// Retirement schedule: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule (retrieved 2026-11-20)
+// Azure retirement: 2027-10-26.
 const GPT_5_5Literal = "gpt-5.5" as const;
 const GPT_5_5Schema = OpenAI_GPT_5_5Schema;
 const GPT_5_5Options = BaseChatModelOptions;
