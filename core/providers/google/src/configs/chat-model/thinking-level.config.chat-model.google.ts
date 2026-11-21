@@ -18,7 +18,7 @@ import { responseFormat, responseSchema } from "./response-schema.config.chat-mo
  * - No thinkingBudget: thinking is controlled by `thinking_level` only (Gemini 4 on Vertex returns HTTP 400 for
  *   thinking_budget and MINIMAL).
  * - Per-model thinking-level choices and UI default.
- * The schema is strict, so removed keys are rejected locally instead of being silently stripped.
+ * Removed keys are stripped (never sent), matching how other providers handle parameters a model does not accept.
  */
 const ChatModelThinkingLevelConfigSchema = (
   maxOutputTokens: number,
@@ -26,19 +26,17 @@ const ChatModelThinkingLevelConfigSchema = (
   levels: readonly GoogleThinkingLevelType[],
   defaultLevel: GoogleThinkingLevelType
 ) =>
-  z
-    .object({
-      maxTokens: maxTokens(maxOutputTokens).schema,
-      stop: stop(maxSequences).schema,
-      toolChoice: toolChoice.schema,
-      safetySettings: safetySettings.schema,
-      googleSearchTool: googleSearchTool.schema,
-      responseFormat: responseFormat.schema,
-      responseSchema: responseSchema.schema,
-      reasoningEnabled: reasoningEnabled.schema,
-      reasoningEffort: thinkingLevel(levels, defaultLevel).schema,
-    })
-    .strict();
+  z.object({
+    maxTokens: maxTokens(maxOutputTokens).schema,
+    stop: stop(maxSequences).schema,
+    toolChoice: toolChoice.schema,
+    safetySettings: safetySettings.schema,
+    googleSearchTool: googleSearchTool.schema,
+    responseFormat: responseFormat.schema,
+    responseSchema: responseSchema.schema,
+    reasoningEnabled: reasoningEnabled.schema,
+    reasoningEffort: thinkingLevel(levels, defaultLevel).schema,
+  });
 
 const ChatModelThinkingLevelConfigDef = (
   maxOutputTokens: number,

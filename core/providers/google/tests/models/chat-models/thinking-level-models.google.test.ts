@@ -54,9 +54,11 @@ describe("thinking-level config builder (Gemini 3.6+ models)", () => {
       );
     });
 
-    it.each(["temperature", "topP", "topK", "maxReasoningTokens", "thinkingBudget"])("rejects the '%s' key", (key) => {
-      expect(schema.config.schema.safeParse({ [key]: 1 }).success).toBe(false);
-      expect(() => createModel(modelName).transformConfig(Config().parse({ [key]: 1 }))).toThrow(InvalidConfigError);
+    it.each(["temperature", "topP", "topK", "maxReasoningTokens", "thinkingBudget"])("never sends the '%s' key", (key) => {
+      const transformed = JSON.stringify(createModel(modelName).transformConfig(Config().parse({ [key]: 1 })));
+      for (const param of ["temperature", "topP", "topK", "thinkingBudget"]) {
+        expect(transformed).not.toContain(param);
+      }
     });
 
     it.each(ALL_LEVELS)("accepts or rejects thinking level %s per model", (level) => {
