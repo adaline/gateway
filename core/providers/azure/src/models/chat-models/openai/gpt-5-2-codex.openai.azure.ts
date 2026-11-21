@@ -5,6 +5,8 @@ import { GPT_5_2_CodexSchema as OpenAI_GPT_5_2_CodexSchema } from "@adaline/open
 import { BaseChatModelOptions } from "../chat-model-options.azure";
 import { BaseChatModelOpenAI } from "./base-chat-model.openai.azure";
 
+// Retirement schedule: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule (retrieved 2026-11-20)
+// Azure retirement: 2027-07-13.
 const GPT_5_2_CodexLiteral = "gpt-5.2-codex" as const;
 const GPT_5_2_CodexSchema = OpenAI_GPT_5_2_CodexSchema;
 const GPT_5_2_CodexOptions = BaseChatModelOptions;

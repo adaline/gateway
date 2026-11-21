@@ -13,7 +13,6 @@ import {
   UrlType,
   urlWithoutTrailingSlash,
 } from "@adaline/provider";
-
 import {
   Base64EmbeddingLiteral,
   Base64EmbeddingType,
@@ -31,9 +30,8 @@ import {
 } from "@adaline/types";
 
 import embeddingPricingData from "../embedding-pricing.json";
-import { OpenAIEmbeddingRequest, OpenAIGetEmbeddingsResponse } from "./types";
-
 import { OpenAI } from "./../../provider/provider.openai";
+import { OpenAIEmbeddingRequest, OpenAIGetEmbeddingsResponse } from "./types";
 
 const BaseEmbeddingModelOptions = z.object({
   modelName: z.string(),

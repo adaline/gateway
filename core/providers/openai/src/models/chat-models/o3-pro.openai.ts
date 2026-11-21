@@ -16,7 +16,8 @@ import {
 const O3ProLiteral = "o3-pro";
 const O3ProDescription =
   "Version of o3 that uses more compute for the most reliable responses on math, science, coding, and visual reasoning tasks. \
-  Training data up to Jun 2024. Available via the OpenAI Responses API only.";
+  Training data up to Jun 2024. Available via the OpenAI Responses API only. \
+  Deprecated by OpenAI; scheduled shutdown 2026-12-11 (replacement: gpt-6.1-sol).";
 
 const O3ProSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: O3ProLiteral,

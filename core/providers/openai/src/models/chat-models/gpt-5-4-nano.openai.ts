@@ -16,12 +16,12 @@ import {
 const GPT_5_4_NanoLiteral = "gpt-5.4-nano";
 const GPT_5_4_NanoDescription =
   "Cheapest, fastest GPT-5.4-class model for simple, high-volume tasks like classification, extraction, and ranking. \
-  Training data up to August 2025.";
+  Training data up to August 2025. Deprecated by OpenAI; scheduled shutdown 2027-04-01 (replacement: gpt-6-luna).";
 
 const GPT_5_4_NanoSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_4_NanoLiteral,
   description: GPT_5_4_NanoDescription,
-  maxInputTokens: 400000,
+  maxInputTokens: 272000,
   maxOutputTokens: 128000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,

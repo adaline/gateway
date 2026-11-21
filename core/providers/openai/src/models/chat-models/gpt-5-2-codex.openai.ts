@@ -9,10 +9,10 @@ import { OpenAIChatModelModalities, OpenAIChatModelModalitiesEnum, OpenAIChatMod
 
 // Specs reference: https://platform.openai.com/docs/models/gpt-5.2-codex (retrieved 2026-02-25)
 // Retired on the OpenAI API 2026-07-23 (no longer registered with the openai provider);
-// schema retained for @adaline/azure, where gpt-5.2-codex remains GA until 2027-01-14.
+// schema retained for @adaline/azure, where gpt-5.2-codex remains GA until 2027-07-13.
 const GPT_5_2_CodexLiteral = "gpt-5.2-codex";
 const GPT_5_2_CodexDescription =
-  "Coding-optimized GPT-5.2 Codex model for software engineering, debugging, and autonomous coding workflows.";
+  "Coding-optimized GPT-5.2 Codex model for software engineering, debugging, and autonomous coding workflows. Retired on the OpenAI API 2026-07-23 (replacement: gpt-5.3-codex); available only through Azure OpenAI, GA until 2027-07-13.";
 
 const GPT_5_2_CodexSchema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelModalitiesEnum).parse({
   name: GPT_5_2_CodexLiteral,

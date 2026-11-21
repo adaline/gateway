@@ -13,18 +13,20 @@ import {
 } from "./types";
 
 const GPT_4o_2024_08_06Literal = "gpt-4o-2024-08-06";
-const GPT_4o_2024_08_06Description = "Latest snapshot of gpt-4o that supports Structured Outputs. Training data up to Oct 2023.";
+const GPT_4o_2024_08_06Description =
+  "Latest snapshot of gpt-4o that supports Structured Outputs. Training data up to Oct 2023. \
+  Deprecated by OpenAI; scheduled shutdown 2027-01-14 (replacement: gpt-6-luna).";
 
 const GPT_4o_2024_08_06Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_4o_2024_08_06Literal,
   description: GPT_4o_2024_08_06Description,
   maxInputTokens: 128000,
-  maxOutputTokens: 4092,
+  maxOutputTokens: 16384,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.responseSchemaWithWebSearch(4092, 4).def,
-    schema: OpenAIChatModelConfigs.responseSchemaWithWebSearch(4092, 4).schema,
+    def: OpenAIChatModelConfigs.responseSchemaWithWebSearch(16384, 4).def,
+    schema: OpenAIChatModelConfigs.responseSchemaWithWebSearch(16384, 4).schema,
   },
   price: pricingData[GPT_4o_2024_08_06Literal],
 });

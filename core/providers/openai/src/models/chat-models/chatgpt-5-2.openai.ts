@@ -12,6 +12,8 @@ import {
   OpenAIChatModelWithWebSearchModalitiesEnum,
 } from "./types";
 
+// No official OpenAI model page for chatgpt-5.2 for the third consecutive sync (last checked 2026-11-20),
+// and no retirement evidence either. Kept — re-verify via live probe against the API next sync.
 const ChatGPT_5_2Literal = "chatgpt-5.2";
 const ChatGPT_5_2Description =
   "ChatGPT-5.2 model optimized for conversational workloads with tool/function calling support. \

@@ -9,6 +9,10 @@ import {
   ChatModelGPT5_2PlusConfigSchema,
   ChatModelGPT5_2PlusWithWebSearchConfigDef,
   ChatModelGPT5_2PlusWithWebSearchConfigSchema,
+  ChatModelGPT5_5ProWithWebSearchConfigDef,
+  ChatModelGPT5_5ProWithWebSearchConfigSchema,
+  ChatModelGPT5_5WithWebSearchConfigDef,
+  ChatModelGPT5_5WithWebSearchConfigSchema,
   ChatModelGPT5_6ConfigDef,
   ChatModelGPT5_6ConfigSchema,
   ChatModelGPT5_6WithWebSearchConfigDef,
@@ -19,10 +23,18 @@ import {
   ChatModelGPT5ConfigSchema,
   ChatModelGPT5ProConfigDef,
   ChatModelGPT5ProConfigSchema,
+  ChatModelGPT5ProHighOnlyWithWebSearchConfigDef,
+  ChatModelGPT5ProHighOnlyWithWebSearchConfigSchema,
   ChatModelGPT5ProWithWebSearchConfigDef,
   ChatModelGPT5ProWithWebSearchConfigSchema,
   ChatModelGPT5WithWebSearchConfigDef,
   ChatModelGPT5WithWebSearchConfigSchema,
+  ChatModelGPT6AstraWithWebSearchConfigDef,
+  ChatModelGPT6AstraWithWebSearchConfigSchema,
+  ChatModelGPT6LowToMaxWithWebSearchConfigDef,
+  ChatModelGPT6LowToMaxWithWebSearchConfigSchema,
+  ChatModelGPT6WithWebSearchConfigDef,
+  ChatModelGPT6WithWebSearchConfigSchema,
   ChatModelO1SeriesConfigDef,
   ChatModelO1SeriesConfigSchema,
   ChatModelO1SeriesWithWebSearchConfigDef,
@@ -121,6 +133,30 @@ const OpenAIChatModelConfigs = {
   gpt5ProWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
     def: ChatModelGPT5ProWithWebSearchConfigDef(maxOutputTokens, maxSequences),
     schema: ChatModelGPT5ProWithWebSearchConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt5ProHighOnlyWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT5ProHighOnlyWithWebSearchConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT5ProHighOnlyWithWebSearchConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt5_5WithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT5_5WithWebSearchConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT5_5WithWebSearchConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt5_5ProWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT5_5ProWithWebSearchConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT5_5ProWithWebSearchConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt6WithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT6WithWebSearchConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT6WithWebSearchConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt6LowToMaxWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT6LowToMaxWithWebSearchConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT6LowToMaxWithWebSearchConfigSchema(maxOutputTokens, maxSequences),
+  }),
+  gpt6AstraWithWebSearch: (maxOutputTokens: number, maxSequences: number) => ({
+    def: ChatModelGPT6AstraWithWebSearchConfigDef(maxOutputTokens, maxSequences),
+    schema: ChatModelGPT6AstraWithWebSearchConfigSchema(maxOutputTokens, maxSequences),
   }),
 } as const;
 

@@ -16,7 +16,7 @@ import {
 const GPT_5_1Literal = "gpt-5.1";
 const GPT_5_1Description =
   "Flagship GPT-5.1 model for coding and agentic tasks with configurable reasoning effort. \
-  Training data up to September 2024.";
+  Training data up to September 2024. Deprecated by OpenAI; scheduled shutdown 2027-04-01 (replacement: gpt-6-sol).";
 
 const GPT_5_1Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_1Literal,

@@ -21,7 +21,7 @@ const GPT_5_4Description =
 const GPT_5_4Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5_4Literal,
   description: GPT_5_4Description,
-  maxInputTokens: 1050000,
+  maxInputTokens: 922000, // 1.05M context window minus the 128K output reservation (same shape as gpt-5.6)
   maxOutputTokens: 128000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,

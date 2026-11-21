@@ -117,7 +117,7 @@ const reasoningEffort5_1 = SelectStringConfigItem({
 });
 
 // Shared reasoning effort for gpt-5.2 through gpt-5.4 chat models: adds 'xhigh' on top
-// of the 5.1 enum. Default is 'none'. Pro and codex variants use their own enums.
+// of the 5.1 enum. Default is 'none'. Pro and codex variants, and gpt-5.5, use their own enums.
 // See https://developers.openai.com/api/docs/models/gpt-5.4
 const reasoningEffort5_2Plus = SelectStringConfigItem({
   param: "reasoning_effort",
@@ -125,6 +125,17 @@ const reasoningEffort5_2Plus = SelectStringConfigItem({
   description:
     "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'xhigh' engages the deepest reasoning.",
   default: "none",
+  choices: ["none", "low", "medium", "high", "xhigh"],
+});
+
+// GPT-5.5 reasoning effort: same none..xhigh enum as 5.2-5.4 but defaults to 'medium'.
+// See https://developers.openai.com/api/docs/models/gpt-5.5 (retrieved 2026-11-20)
+const reasoningEffort5_5 = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'xhigh' engages the deepest reasoning.",
+  default: "medium",
   choices: ["none", "low", "medium", "high", "xhigh"],
 });
 
@@ -140,7 +151,7 @@ const reasoningEffortCodex = SelectStringConfigItem({
   choices: ["low", "medium", "high", "xhigh"],
 });
 
-// Reasoning effort for pro variants (gpt-5.2-pro, gpt-5.4-pro). Pro tiers are
+// Reasoning effort for pro variants (gpt-5.2-pro, gpt-5.4-pro). gpt-5.5-pro and gpt-5-pro use their own items. Pro tiers are
 // reasoning-heavy by design and only expose medium/high/xhigh.
 // See https://developers.openai.com/api/docs/models/gpt-5.4-pro
 const reasoningEffortPro = SelectStringConfigItem({
@@ -152,20 +163,56 @@ const reasoningEffortPro = SelectStringConfigItem({
   choices: ["medium", "high", "xhigh"],
 });
 
-// GPT-5.6 reasoning effort: reintroduces 'minimal' alongside 'none' and adds 'max' above
-// 'xhigh' (none/minimal/low/medium/high/xhigh/max). Default is 'medium' for GPT-5.6,
-// unlike the 'none' default used by 5.2 through 5.5.
-// See https://developers.openai.com/api/docs/guides/reasoning
+// Reasoning effort for gpt-5.5-pro: same medium/high/xhigh enum as the other pro tiers,
+// but defaults to 'high'.
+// See https://developers.openai.com/api/docs/models/gpt-5.5-pro (retrieved 2026-11-20)
+const reasoningEffortProDefaultHigh = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. Pro tiers require at least 'medium' and support up to 'xhigh'.",
+  default: "high",
+  choices: ["medium", "high", "xhigh"],
+});
+
+// Reasoning effort for gpt-5-pro: the model only accepts 'high'.
+// See https://developers.openai.com/api/docs/models/gpt-5-pro (retrieved 2026-11-20)
+const reasoningEffortHighOnly = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description: "Controls the depth of the model's reasoning before delivering an answer. This model only supports 'high'.",
+  default: "high",
+  choices: ["high"],
+});
+
+// GPT-5.6 reasoning effort: none/low/medium/high/xhigh/max, default 'medium' (unlike the
+// 'none' default used by 5.2 through 5.4). 'minimal' is NOT accepted on GPT-5.6. Also shared
+// by the GPT-6 models whose effort enum starts at 'none' (gpt-6-sol, gpt-6-luna, gpt-6.1-terra).
+// See https://developers.openai.com/api/docs/guides/reasoning (retrieved 2026-11-20)
 const reasoningEffort5_6 = SelectStringConfigItem({
   param: "reasoning_effort",
   title: "Reasoning Effort",
   description:
     "Controls the depth of the model's reasoning before delivering an answer. 'none' disables reasoning for fastest responses, 'xhigh' engages deep reasoning, and 'max' engages the deepest reasoning for the most complex tasks.",
   default: "medium",
-  choices: ["none", "minimal", "low", "medium", "high", "xhigh", "max"],
+  choices: ["none", "low", "medium", "high", "xhigh", "max"],
 });
 
-// GPT-5.6 reasoning mode: independent of reasoning effort, selects between 'standard'
+// Reasoning effort for GPT-6 models that always reason (gpt-6-astra, gpt-6.1-sol, gpt-6.2-astra,
+// gpt-6.2-sol): low/medium/high/xhigh/max, default 'medium' — 'none' is rejected.
+// The GPT-6.2 enums come from secondary sources: the official 6.2 model pages (retrieved
+// 2026-11-20) only state that 'none' is rejected. Re-verify against the docs next sync.
+// See https://developers.openai.com/api/docs/guides/reasoning
+const reasoningEffortLowToMax = SelectStringConfigItem({
+  param: "reasoning_effort",
+  title: "Reasoning Effort",
+  description:
+    "Controls the depth of the model's reasoning before delivering an answer. 'low' is the minimum (reasoning cannot be disabled), 'xhigh' engages deep reasoning, and 'max' engages the deepest reasoning for the most complex tasks.",
+  default: "medium",
+  choices: ["low", "medium", "high", "xhigh", "max"],
+});
+
+// GPT-5.6 / GPT-6 reasoning mode: independent of reasoning effort, selects between 'standard'
 // (default) and 'pro' execution. 'pro' handles difficult tasks that can tolerate higher
 // latency and token usage. Confirmed wire param is the nested `reasoning.mode` field,
 // sibling to `reasoning.effort` — see transformConfigResponsesApi's reasoning_mode handling.
@@ -231,9 +278,13 @@ export {
   reasoningEffort,
   reasoningEffort5_1,
   reasoningEffort5_2Plus,
+  reasoningEffort5_5,
   reasoningEffort5_6,
   reasoningEffortCodex,
+  reasoningEffortHighOnly,
+  reasoningEffortLowToMax,
   reasoningEffortPro,
+  reasoningEffortProDefaultHigh,
   reasoningMode,
   seed,
   stop,

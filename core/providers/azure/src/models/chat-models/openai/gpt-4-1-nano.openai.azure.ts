@@ -5,6 +5,8 @@ import { GPT_4_1_NanoSchema as OpenAI_GPT_4_1_NanoSchema } from "@adaline/openai
 import { BaseChatModelOptions } from "../chat-model-options.azure";
 import { BaseChatModelOpenAI } from "./base-chat-model.openai.azure";
 
+// Retirement schedule: https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule (retrieved 2026-11-20)
+// Azure retirement: 2027-04-14.
 const GPT_4_1_NanoLiteral = "gpt-4.1-nano" as const;
 const GPT_4_1_NanoSchema = OpenAI_GPT_4_1_NanoSchema;
 const GPT_4_1_NanoOptions = BaseChatModelOptions;

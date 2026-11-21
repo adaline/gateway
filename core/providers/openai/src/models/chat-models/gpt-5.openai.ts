@@ -15,18 +15,18 @@ import {
 const GPT_5Literal = "gpt-5";
 const GPT_5Description =
   "Most advanced GPT-5 model for complex reasoning and problem-solving tasks. \
-  Training data up to October 2024.";
+  Knowledge cutoff: September 30, 2024. Deprecated by OpenAI; scheduled shutdown 2026-12-11 (replacement: gpt-6.1-sol).";
 
 const GPT_5Schema = ChatModelSchema(OpenAIChatModelRoles, OpenAIChatModelWithWebSearchModalitiesEnum).parse({
   name: GPT_5Literal,
   description: GPT_5Description,
-  maxInputTokens: 400000,
-  maxOutputTokens: 131072,
+  maxInputTokens: 272000,
+  maxOutputTokens: 128000,
   roles: OpenAIChatModelRolesMap,
   modalities: OpenAIChatModelWithWebSearchModalities,
   config: {
-    def: OpenAIChatModelConfigs.gpt5WithWebSearch(131072, 4).def,
-    schema: OpenAIChatModelConfigs.gpt5WithWebSearch(131072, 4).schema,
+    def: OpenAIChatModelConfigs.gpt5WithWebSearch(128000, 4).def,
+    schema: OpenAIChatModelConfigs.gpt5WithWebSearch(128000, 4).schema,
   },
   price: pricingData[GPT_5Literal],
 });

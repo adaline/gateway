@@ -13,6 +13,9 @@ import {
 } from "./types";
 
 // Specs reference: https://developers.openai.com/api/docs/models/gpt-5.6-sol (retrieved 2026-07-29)
+// Pricing: a promotional rate of $4/$20 per 1M tokens (>272K: $8/$30) runs until 2026-11-30, and the
+// post-promo price is unstated. pricing.json deliberately keeps the standard $5/$30 (>272K: $10/$45);
+// re-verify after 2026-11-30.
 const GPT_5_6_SolLiteral = "gpt-5.6-sol";
 const GPT_5_6_SolDescription =
   "Frontier GPT-5.6 model for complex professional work (aliased as gpt-5.6), with native computer-use, agentic, coding, and \
