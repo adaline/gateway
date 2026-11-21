@@ -1025,7 +1025,9 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         completeChatResponse.usage = {
           promptTokens: parsedResponse.usageMetadata.promptTokenCount,
           totalTokens: parsedResponse.usageMetadata.totalTokenCount,
-          completionTokens: parsedResponse.usageMetadata.candidatesTokenCount || 0,
+          // Thinking tokens are billed as output tokens, so they count towards completion tokens.
+          completionTokens:
+            (parsedResponse.usageMetadata.candidatesTokenCount || 0) + (parsedResponse.usageMetadata.thoughtsTokenCount || 0),
         };
       }
 
@@ -1190,6 +1192,15 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
     };
   }
 
+  // Thinking tokens (thoughtsTokenCount) are billed as output, so they count towards completion tokens.
+  // Returns undefined when the chunk reports neither count, preserving the previous partial-usage shape.
+  private getStreamCompletionTokens(usage: NonNullable<GoogleStreamChatResponseType["usageMetadata"]>): number | undefined {
+    if (usage.candidatesTokenCount === undefined && usage.thoughtsTokenCount === undefined) {
+      return undefined;
+    }
+    return (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0);
+  }
+
   async *transformStreamChatResponseChunk(
     chunk: string,
     buffer: string
@@ -1267,7 +1278,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
         if (parsedResponse.usageMetadata) {
           partialResponse.usage = {
             promptTokens: parsedResponse.usageMetadata.promptTokenCount,
-            completionTokens: parsedResponse.usageMetadata.candidatesTokenCount,
+            completionTokens: this.getStreamCompletionTokens(parsedResponse.usageMetadata),
             totalTokens: parsedResponse.usageMetadata.totalTokenCount,
           };
         }
@@ -1409,7 +1420,7 @@ class BaseChatModel implements ChatModelV1<ChatModelSchemaType> {
             ) {
               partialResponse.usage = {
                 promptTokens: parsedResponse.usageMetadata.promptTokenCount,
-                completionTokens: parsedResponse.usageMetadata.candidatesTokenCount,
+                completionTokens: this.getStreamCompletionTokens(parsedResponse.usageMetadata),
                 totalTokens: parsedResponse.usageMetadata.totalTokenCount,
               };
             }

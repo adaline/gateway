@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { ChatModelSchema } from "@adaline/provider";
 
-import { GoogleChatModelConfigs } from "../../configs";
+import { GOOGLE_REASONING_THINKING_LEVELS, GoogleChatModelConfigs } from "../../configs";
 import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.google";
 import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatModelRoles, GoogleChatModelRolesMap } from "./types";
@@ -23,8 +23,8 @@ const Gemini3_1FlashLiteSchema = ChatModelSchema(GoogleChatModelRoles, GoogleCha
   roles: GoogleChatModelRolesMap,
   modalities: GoogleChatModelModalities,
   config: {
-    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536).def,
-    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536).schema,
+    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536, GOOGLE_REASONING_THINKING_LEVELS, "MINIMAL").def,
+    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536, GOOGLE_REASONING_THINKING_LEVELS, "MINIMAL").schema,
   },
   price: pricingData[Gemini3_1FlashLiteLiteral],
 });

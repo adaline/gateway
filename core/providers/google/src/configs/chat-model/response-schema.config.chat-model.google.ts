@@ -42,4 +42,4 @@ const GoogleChatModelResponseSchemaConfigSchema = (
     responseSchema: responseSchema.schema,
   });
 
-export { GoogleChatModelResponseSchemaConfigDef, GoogleChatModelResponseSchemaConfigSchema };
+export { GoogleChatModelResponseSchemaConfigDef, GoogleChatModelResponseSchemaConfigSchema, responseFormat, responseSchema };

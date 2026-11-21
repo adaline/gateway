@@ -17,6 +17,6 @@
   "gemini-embedding-2": {
     "modelName": "gemini-embedding-2",
     "currency": "USD",
-    "inputPricePerMillion": 0.15
+    "inputPricePerMillion": 0.2
   }
 }

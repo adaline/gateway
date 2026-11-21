@@ -5,7 +5,7 @@
     "tokenRanges": [
       {
         "minTokens": 0,
-        "maxTokens": 200000,
+        "maxTokens": 200001,
         "prices": {
           "base": {
             "inputPricePerMillion": 1.25,
@@ -31,7 +31,7 @@
     "tokenRanges": [
       {
         "minTokens": 0,
-        "maxTokens": 200000,
+        "maxTokens": 200001,
         "prices": {
           "base": {
             "inputPricePerMillion": 2,
@@ -57,7 +57,7 @@
     "tokenRanges": [
       {
         "minTokens": 0,
-        "maxTokens": 200000,
+        "maxTokens": 200001,
         "prices": {
           "base": {
             "inputPricePerMillion": 2,
@@ -184,6 +184,86 @@
           "base": {
             "inputPricePerMillion": 0.3,
             "outputPricePerMillion": 2.5
+          }
+        }
+      }
+    ]
+  },
+  "gemini-4-carbon": {
+    "modelName": "gemini-4-carbon",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 4,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
+  "gemini-4-argon": {
+    "modelName": "gemini-4-argon",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 4,
+            "outputPricePerMillion": 20
+          }
+        }
+      }
+    ]
+  },
+  "gemini-4-neon": {
+    "modelName": "gemini-4-neon",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 3,
+            "outputPricePerMillion": 15
+          }
+        }
+      }
+    ]
+  },
+  "gemini-4-hydrogen": {
+    "modelName": "gemini-4-hydrogen",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.5,
+            "outputPricePerMillion": 7.5
+          }
+        }
+      }
+    ]
+  },
+  "gemini-3.8-flash": {
+    "modelName": "gemini-3.8-flash",
+    "currency": "USD",
+    "tokenRanges": [
+      {
+        "minTokens": 0,
+        "maxTokens": null,
+        "prices": {
+          "base": {
+            "inputPricePerMillion": 1.5,
+            "outputPricePerMillion": 7.5
           }
         }
       }

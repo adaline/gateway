@@ -8,7 +8,11 @@ import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-
 import { VertexEmbeddingModelModalities, VertexEmbeddingModelModalitiesEnum } from "./types";
 
 const Text_Multilingual_Embedding_002Literal = "text-multilingual-embedding-002";
-const Text_Multilingual_Embedding_002_Description = "text-multilingual-embedding-002";
+// Specs reference: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions (retrieved 2026-11-20)
+const Text_Multilingual_Embedding_002_Description =
+  "Vertex AI text-multilingual-embedding-002 — multilingual general-purpose text embedding covering 100+ languages, " +
+  "default 768 dims, configurable via `outputDimensionality`. Max input 2048 tokens. " +
+  "Scheduled retirement 2027-04-01 (replacement: gemini-embedding-001 / gemini-embedding-2).";
 
 const Text_Multilingual_Embedding_002Schema = EmbeddingModelSchema(VertexEmbeddingModelModalitiesEnum).parse({
   name: Text_Multilingual_Embedding_002Literal,

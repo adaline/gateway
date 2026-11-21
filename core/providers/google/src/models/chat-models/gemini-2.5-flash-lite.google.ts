@@ -7,11 +7,12 @@ import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.google";
 import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatModelRoles, GoogleChatModelRolesMap } from "./types";
 
+// Specs reference: https://aistudio.google.com/docs/deprecations (retrieved 2026-11-20)
 const Gemini2_5FlashLiteLiteral = "gemini-2.5-flash-lite";
 const Gemini2_5FlashLiteDescription =
   "Google's most cost-efficient and fastest model in the 2.5 series. \
   Optimized for high-volume, latency-sensitive tasks like translation and classification with enhanced reasoning capabilities. \
-  Deprecated by Google; scheduled shutdown 2026-10-16 (replacement: gemini-3.1-flash-lite).";
+  Not deprecated; will continue to be served until further notice. Since 2026-09-18, access is limited to prior users.";
 
 const Gemini2_5FlashLiteSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5FlashLiteLiteral,
@@ -37,10 +38,9 @@ class Gemini2_5FlashLite extends BaseChatModel {
 }
 
 export {
-    Gemini2_5FlashLite,
-    Gemini2_5FlashLiteLiteral,
-    Gemini2_5FlashLiteOptions,
-    Gemini2_5FlashLiteSchema,
-    type Gemini2_5FlashLiteOptionsType
+  Gemini2_5FlashLite,
+  Gemini2_5FlashLiteLiteral,
+  Gemini2_5FlashLiteOptions,
+  Gemini2_5FlashLiteSchema,
+  type Gemini2_5FlashLiteOptionsType,
 };
-

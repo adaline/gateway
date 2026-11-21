@@ -7,10 +7,12 @@ import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.vertex";
 import { VertexEmbeddingModelModalities, VertexEmbeddingModelModalitiesEnum } from "./types";
 
+// Specs reference: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions (retrieved 2026-11-20)
 const Gemini_Embedding_001Literal = "gemini-embedding-001";
 const Gemini_Embedding_001_Description =
   "Gemini embedding model on Vertex AI — Matryoshka representation learning. Default 3072 " +
-  "dimensions; recommended sizes 768 / 1536 / 3072 via `outputDimensionality`. Max input 2048 tokens.";
+  "dimensions; recommended sizes 768 / 1536 / 3072 via `outputDimensionality`. Max input 2048 tokens. " +
+  "Retirement no sooner than 2028-05-20 (replacement: gemini-embedding-2).";
 
 const Gemini_Embedding_001Schema = EmbeddingModelSchema(VertexEmbeddingModelModalitiesEnum).parse({
   name: Gemini_Embedding_001Literal,

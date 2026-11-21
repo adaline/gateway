@@ -17,6 +17,9 @@ const Gemini3_1ProPreviewLiteral = "gemini-3.1-pro-preview" as const;
 const Gemini3_1ProPreviewDescription =
   "Google's Gemini 3.1 Pro Preview model on Vertex AI with improved reasoning and multimodal performance for complex agentic tasks.";
 
+// Gemini 3.1 Pro does not support the MINIMAL thinking level (mirrors @adaline/google); default HIGH.
+const Gemini3_1ProPreviewThinkingLevels = ["LOW", "MEDIUM", "HIGH"] as const;
+
 const Gemini3_1ProPreviewSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini3_1ProPreviewLiteral,
   description: Gemini3_1ProPreviewDescription,
@@ -25,8 +28,8 @@ const Gemini3_1ProPreviewSchema = ChatModelSchema(GoogleChatModelRoles, GoogleCh
   roles: GoogleChatModelRolesMap,
   modalities: GoogleChatModelModalities,
   config: {
-    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536).def,
-    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536).schema,
+    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536, Gemini3_1ProPreviewThinkingLevels, "HIGH").def,
+    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536, Gemini3_1ProPreviewThinkingLevels, "HIGH").schema,
   },
   price: pricingData[Gemini3_1ProPreviewLiteral],
 });

@@ -20,21 +20,6 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelSchema: ChatModelSchemaType;
     }
   > = {
-    [Models.Gemini2_5FlashLiteLiteral]: {
-      model: Models.Gemini2_5FlashLite,
-      modelOptions: Models.Gemini2_5FlashLiteOptions,
-      modelSchema: Models.Gemini2_5FlashLiteSchema,
-    },
-    [Models.Gemini2_5FlashLiteral]: {
-      model: Models.Gemini2_5Flash,
-      modelOptions: Models.Gemini2_5FlashOptions,
-      modelSchema: Models.Gemini2_5FlashSchema,
-    },
-    [Models.Gemini2_5ProLiteral]: {
-      model: Models.Gemini2_5Pro,
-      modelOptions: Models.Gemini2_5ProOptions,
-      modelSchema: Models.Gemini2_5ProSchema,
-    },
     [Models.Gemini3FlashPreviewLiteral]: {
       model: Models.Gemini3FlashPreview,
       modelOptions: Models.Gemini3FlashPreviewOptions,
@@ -65,10 +50,30 @@ class Vertex<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini3_5FlashLiteOptions,
       modelSchema: Models.Gemini3_5FlashLiteSchema,
     },
-    [Models.Gemini3_6FlashLiteral]: {
-      model: Models.Gemini3_6Flash,
-      modelOptions: Models.Gemini3_6FlashOptions,
-      modelSchema: Models.Gemini3_6FlashSchema,
+    [Models.Gemini3_8FlashLiteral]: {
+      model: Models.Gemini3_8Flash,
+      modelOptions: Models.Gemini3_8FlashOptions,
+      modelSchema: Models.Gemini3_8FlashSchema,
+    },
+    [Models.Gemini4ArgonLiteral]: {
+      model: Models.Gemini4Argon,
+      modelOptions: Models.Gemini4ArgonOptions,
+      modelSchema: Models.Gemini4ArgonSchema,
+    },
+    [Models.Gemini4CarbonLiteral]: {
+      model: Models.Gemini4Carbon,
+      modelOptions: Models.Gemini4CarbonOptions,
+      modelSchema: Models.Gemini4CarbonSchema,
+    },
+    [Models.Gemini4HydrogenLiteral]: {
+      model: Models.Gemini4Hydrogen,
+      modelOptions: Models.Gemini4HydrogenOptions,
+      modelSchema: Models.Gemini4HydrogenSchema,
+    },
+    [Models.Gemini4NeonLiteral]: {
+      model: Models.Gemini4Neon,
+      modelOptions: Models.Gemini4NeonOptions,
+      modelSchema: Models.Gemini4NeonSchema,
     },
   };
 
