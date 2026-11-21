@@ -7,10 +7,12 @@ import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.google";
 import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatModelRoles, GoogleChatModelRolesMap } from "./types";
 
+// Specs reference: https://aistudio.google.com/docs/changelog (2026-11-02 entry, retrieved 2026-11-20)
+// Specs reference: https://aistudio.google.com/docs/deprecations (retrieved 2026-11-20)
 const Gemini2_5ProLiteral = "gemini-2.5-pro";
 const Gemini2_5ProDescription =
   "Google's Gemini 2.5 Pro model for enhanced thinking, reasoning, multimodal understanding, and advanced coding. " +
-  "Deprecated by Google; scheduled shutdown 2026-10-16 (replacement: gemini-3.1-pro-preview).";
+  "Deprecated; from 2026-12-01 requests route to gemini-3.8-flash, billed at that model's rates.";
 
 const Gemini2_5ProSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini2_5ProLiteral,
@@ -35,10 +37,4 @@ class Gemini2_5Pro extends BaseChatModel {
   }
 }
 
-export {
-  Gemini2_5Pro,
-  Gemini2_5ProLiteral,
-  Gemini2_5ProOptions,
-  Gemini2_5ProSchema,
-  type Gemini2_5ProOptionsType,
-};
+export { Gemini2_5Pro, Gemini2_5ProLiteral, Gemini2_5ProOptions, Gemini2_5ProSchema, type Gemini2_5ProOptionsType };

@@ -1,5 +1,10 @@
-import { maxReasoningTokens, reasoningEnabled, reasoningEffort } from "./common.config.chat-model.google";
-
+import {
+  GOOGLE_REASONING_THINKING_LEVELS,
+  GoogleThinkingLevelType,
+  maxReasoningTokens,
+  reasoningEnabled,
+  thinkingLevel,
+} from "./common.config.chat-model.google";
 import {
   GoogleChatModelResponseSchemaConfigDef,
   GoogleChatModelResponseSchemaConfigSchema,
@@ -13,11 +18,13 @@ const ChatModelReasoningConfigSchema = (
   defaultTopP: number,
   minReasoningToken: number,
   maxReasoningToken: number,
+  thinkingLevels: readonly GoogleThinkingLevelType[] = GOOGLE_REASONING_THINKING_LEVELS,
+  defaultThinkingLevel: GoogleThinkingLevelType = "LOW"
 ) =>
   GoogleChatModelResponseSchemaConfigSchema(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP).extend({
     reasoningEnabled: reasoningEnabled.schema,
     maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).schema,
-    reasoningEffort: reasoningEffort.schema,
+    reasoningEffort: thinkingLevel(thinkingLevels, defaultThinkingLevel).schema,
   });
 
 const ChatModelReasoningConfigDef = (
@@ -28,12 +35,13 @@ const ChatModelReasoningConfigDef = (
   defaultTopP: number,
   minReasoningToken: number,
   maxReasoningToken: number,
-) =>
-  ({
-    ...GoogleChatModelResponseSchemaConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
-    reasoningEnabled: reasoningEnabled.def,
-    maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).def,
-    reasoningEffort: reasoningEffort.def,
-  });
+  thinkingLevels: readonly GoogleThinkingLevelType[] = GOOGLE_REASONING_THINKING_LEVELS,
+  defaultThinkingLevel: GoogleThinkingLevelType = "LOW"
+) => ({
+  ...GoogleChatModelResponseSchemaConfigDef(maxTemperature, defaultTemperature, maxOutputTokens, maxSequences, defaultTopP),
+  reasoningEnabled: reasoningEnabled.def,
+  maxReasoningTokens: maxReasoningTokens(minReasoningToken, maxReasoningToken).def,
+  reasoningEffort: thinkingLevel(thinkingLevels, defaultThinkingLevel).def,
+});
 
 export { ChatModelReasoningConfigDef, ChatModelReasoningConfigSchema };

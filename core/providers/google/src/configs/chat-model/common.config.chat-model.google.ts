@@ -170,14 +170,31 @@ const maxReasoningTokens = (minReasoningToken: number, maxReasoningToken: number
     default: 0,
   });
 
-const reasoningEffort = SelectStringConfigItem({
-  param: "thinkingLevel",
-  title: "Thinking Level",
-  description:
-    "Controls the depth of the model's reasoning process. Higher levels may result in more thorough reasoning but use more tokens.",
-  default: "LOW",
-  choices: ["MINIMAL", "LOW", "MEDIUM", "HIGH"],
-});
+// Every thinking level the Gemini API accepts across models (generationConfig.thinkingConfig.thinkingLevel).
+// Individual models support a subset — each model's config narrows the choices.
+const GOOGLE_THINKING_LEVELS = ["MINIMAL", "LOW", "MEDIUM", "HIGH", "XHIGH"] as const;
+type GoogleThinkingLevelType = (typeof GOOGLE_THINKING_LEVELS)[number];
+
+// Levels accepted by the legacy reasoning config (Gemini 3.x pre-3.6). Default kept at LOW for backwards compatibility.
+const GOOGLE_REASONING_THINKING_LEVELS: GoogleThinkingLevelType[] = ["MINIMAL", "LOW", "MEDIUM", "HIGH"];
+
+// Param naming mirrors `reasoningEffort` (config key) -> `thinkingLevel` (param) so transformConfig maps it to
+// generationConfig.thinkingConfig.thinkingLevel. The default is a UI default only; it is not sent unless selected.
+const thinkingLevel = (levels: readonly GoogleThinkingLevelType[], defaultLevel: GoogleThinkingLevelType) => {
+  if (!levels.includes(defaultLevel)) {
+    throw new Error(`Default thinking level '${defaultLevel}' must be one of [${levels.join(", ")}]`);
+  }
+  return SelectStringConfigItem({
+    param: "thinkingLevel",
+    title: "Thinking Level",
+    description:
+      "Controls the depth of the model's reasoning process. Higher levels may result in more thorough reasoning but use more tokens.",
+    default: defaultLevel,
+    choices: [...levels],
+  });
+};
+
+const reasoningEffort = thinkingLevel(GOOGLE_REASONING_THINKING_LEVELS, "LOW");
 
 const googleSearchTool = SelectBooleanConfigItem({
   param: "googleSearch",
@@ -187,10 +204,12 @@ const googleSearchTool = SelectBooleanConfigItem({
 });
 
 export {
+  GOOGLE_REASONING_THINKING_LEVELS,
   GOOGLE_SAFETY_CATEGORIES,
   GOOGLE_SAFETY_CATEGORY_OPTIONS,
   GOOGLE_SAFETY_THRESHOLDS,
   GOOGLE_SAFETY_THRESHOLD_OPTIONS,
+  GOOGLE_THINKING_LEVELS,
   frequencyPenalty,
   googleSearchTool,
   maxReasoningTokens,
@@ -202,7 +221,9 @@ export {
   stop,
   temperature,
   reasoningEffort,
+  thinkingLevel,
   toolChoice,
   topK,
   topP,
+  type GoogleThinkingLevelType,
 };

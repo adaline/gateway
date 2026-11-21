@@ -7,6 +7,8 @@ import { BaseChatModelOptions, BaseChatModelVertex } from "./base-chat-model.ver
 
 // Specs reference: https://cloud.google.com/gemini-enterprise-agent-platform/generative-ai/pricing (retrieved 2026-07-10)
 // Specs reference: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-5-flash (retrieved 2026-07-10)
+// Specs reference: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions (retrieved 2026-11-20)
+// Retirement: "May 19, 2027 or later".
 const Gemini3_5FlashLiteral = "gemini-3.5-flash" as const;
 const Gemini3_5FlashSchema = {
   ...Google_Gemini3_5FlashSchema,

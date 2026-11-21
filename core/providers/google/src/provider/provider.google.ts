@@ -68,6 +68,31 @@ class Google<C extends Models.BaseChatModelOptionsType, E extends Models.BaseEmb
       modelOptions: Models.Gemini3_5FlashLiteOptions,
       modelSchema: Models.Gemini3_5FlashLiteSchema,
     },
+    [Models.Gemini3_8FlashLiteral]: {
+      model: Models.Gemini3_8Flash,
+      modelOptions: Models.Gemini3_8FlashOptions,
+      modelSchema: Models.Gemini3_8FlashSchema,
+    },
+    [Models.Gemini4CarbonLiteral]: {
+      model: Models.Gemini4Carbon,
+      modelOptions: Models.Gemini4CarbonOptions,
+      modelSchema: Models.Gemini4CarbonSchema,
+    },
+    [Models.Gemini4ArgonLiteral]: {
+      model: Models.Gemini4Argon,
+      modelOptions: Models.Gemini4ArgonOptions,
+      modelSchema: Models.Gemini4ArgonSchema,
+    },
+    [Models.Gemini4NeonLiteral]: {
+      model: Models.Gemini4Neon,
+      modelOptions: Models.Gemini4NeonOptions,
+      modelSchema: Models.Gemini4NeonSchema,
+    },
+    [Models.Gemini4HydrogenLiteral]: {
+      model: Models.Gemini4Hydrogen,
+      modelOptions: Models.Gemini4HydrogenOptions,
+      modelSchema: Models.Gemini4HydrogenSchema,
+    },
   };
 
   private readonly embeddingModelFactories: Record<

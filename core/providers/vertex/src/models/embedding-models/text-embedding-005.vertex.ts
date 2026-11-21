@@ -7,10 +7,12 @@ import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.vertex";
 import { VertexEmbeddingModelModalities, VertexEmbeddingModelModalitiesEnum } from "./types";
 
+// Specs reference: https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-versions (retrieved 2026-11-20)
 const Text_Embedding_005Literal = "text-embedding-005";
 const Text_Embedding_005_Description =
   "Vertex AI text-embedding-005 — English-only general-purpose text embedding, default 768 dims, " +
-  "configurable via `outputDimensionality`. Drop-in successor to text-embedding-004.";
+  "configurable via `outputDimensionality`. Drop-in successor to text-embedding-004. " +
+  "Scheduled retirement 2027-04-01 (replacement: gemini-embedding-001 / gemini-embedding-2).";
 
 const Text_Embedding_005Schema = EmbeddingModelSchema(VertexEmbeddingModelModalitiesEnum).parse({
   name: Text_Embedding_005Literal,

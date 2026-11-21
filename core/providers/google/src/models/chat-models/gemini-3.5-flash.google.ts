@@ -8,11 +8,15 @@ import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.google";
 import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatModelRoles, GoogleChatModelRolesMap } from "./types";
 
 // Specs reference: https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash (retrieved 2026-06-09)
+// Specs reference: https://aistudio.google.com/docs/changelog (retrieved 2026-11-20)
+// Kept (not removed) because @adaline/vertex imports this schema; Vertex still serves gemini-3.5-flash.
+// pricing.json retains the last published rate ($1.50/$9.00) since the model is no longer on the pricing page.
 const Gemini3_5FlashLiteral = "gemini-3.5-flash";
 const Gemini3_5FlashDescription =
   "Google's Gemini 3.5 Flash model for sustained frontier performance on agentic and coding tasks at high speed. \
   A thinking model with enhanced multimodal understanding, reasoning, and advanced coding capabilities. \
-  Supports Text, Image, Video, Audio, and PDF inputs. Knowledge cutoff: January 2025.";
+  Supports Text, Image, Video, Audio, and PDF inputs. Knowledge cutoff: January 2025. \
+  Deprecated; API requests auto-route to gemini-3.6-flash since 2026-10-08; no longer on the pricing page.";
 
 const Gemini3_5FlashSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini3_5FlashLiteral,

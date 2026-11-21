@@ -124,6 +124,8 @@ const GoogleCompleteChatResponse = z.object({
       promptTokenCount: z.number(),
       cachedContentTokenCount: z.number().optional(),
       candidatesTokenCount: z.number().optional(),
+      // Thinking tokens are reported separately from candidatesTokenCount and billed as output.
+      thoughtsTokenCount: z.number().optional(),
       totalTokenCount: z.number(),
     })
     .optional(),
@@ -210,6 +212,7 @@ const GoogleStreamChatResponse = z.object({
       promptTokenCount: z.number().optional(),
       cachedContentTokenCount: z.number().optional(),
       candidatesTokenCount: z.number().optional(),
+      thoughtsTokenCount: z.number().optional(),
       totalTokenCount: z.number().optional(),
     })
     .optional(),

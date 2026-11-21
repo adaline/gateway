@@ -7,12 +7,16 @@ import pricingData from "../pricing.json";
 import { BaseChatModel, BaseChatModelOptions } from "./base-chat-model.google";
 import { GoogleChatModelModalities, GoogleChatModelModalitiesEnum, GoogleChatModelRoles, GoogleChatModelRolesMap } from "./types";
 
-// Specs reference: https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite (retrieved 2026-07-29)
+// Specs reference: https://aistudio.google.com/docs/models/gemini-3.5-flash-lite (retrieved 2026-11-20)
+// Thinking: thinking_level MINIMAL/LOW/MEDIUM/HIGH (default MINIMAL).
+// temperature/topP/topK omitted (deprecated from the Gemini 3.6 generation onward).
 const Gemini3_5FlashLiteLiteral = "gemini-3.5-flash-lite";
 const Gemini3_5FlashLiteDescription =
   "Google's most cost-efficient and fastest model in the Gemini 3.5 series. \
   A thinking model optimized as a low-latency, cost-effective subagent for high-volume tasks like classification and translation. \
   Supports Text, Image, Video, Audio, and PDF inputs.";
+
+const Gemini3_5FlashLiteThinkingLevels = ["MINIMAL", "LOW", "MEDIUM", "HIGH"] as const;
 
 const Gemini3_5FlashLiteSchema = ChatModelSchema(GoogleChatModelRoles, GoogleChatModelModalitiesEnum).parse({
   name: Gemini3_5FlashLiteLiteral,
@@ -22,8 +26,8 @@ const Gemini3_5FlashLiteSchema = ChatModelSchema(GoogleChatModelRoles, GoogleCha
   roles: GoogleChatModelRolesMap,
   modalities: GoogleChatModelModalities,
   config: {
-    def: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536).def,
-    schema: GoogleChatModelConfigs.reasoning(2.0, 1.0, 65536, 4, 0.95, 1, 65536).schema,
+    def: GoogleChatModelConfigs.thinkingLevel(65536, 4, Gemini3_5FlashLiteThinkingLevels, "MINIMAL").def,
+    schema: GoogleChatModelConfigs.thinkingLevel(65536, 4, Gemini3_5FlashLiteThinkingLevels, "MINIMAL").schema,
   },
   price: pricingData[Gemini3_5FlashLiteLiteral],
 });
