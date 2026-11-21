@@ -12,21 +12,34 @@ import {
   AnthropicThinkingChatModelModalitiesEnum,
 } from "./types";
 
+// Specs reference: https://platform.claude.com/docs/en/about-claude/models/overview and https://platform.claude.com/docs/en/build-with-claude/thinking (retrieved 2026-11-20)
+// Thinking is off unless requested. Extended thinking (budget_tokens) is deprecated on this model, so adaptive thinking is used.
 const ClaudeOpus4_6Literal = "claude-opus-4-6";
 const ClaudeOpus4_6Description =
-  "Most intelligent model for building agents and coding. Features 128K max output tokens and 1M context window in beta. Training cutoff: August 2025.";
+  "Intelligent model for building agents and coding, with adaptive thinking. Features a 1M token context window and 128K max output tokens. Training cutoff: August 2025.";
+
+const ClaudeOpus4_6Config = AnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 128000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive", "disabled"],
+  defaultThinkingMode: "disabled",
+  effortLevels: ["low", "medium", "high", "max"],
+  defaultEffort: "high",
+  samplingParams: true,
+  forcedToolUse: true,
+});
 
 const ClaudeOpus4_6Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: ClaudeOpus4_6Literal,
   description: ClaudeOpus4_6Description,
-  maxInputTokens: 200000,
+  maxInputTokens: 1000000,
   maxOutputTokens: 128000,
   maxReasoningTokens: 128000,
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 128000).def,
-    schema: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 128000).schema,
+    def: ClaudeOpus4_6Config.def,
+    schema: ClaudeOpus4_6Config.schema,
   },
   price: pricingData[ClaudeOpus4_6Literal],
 });

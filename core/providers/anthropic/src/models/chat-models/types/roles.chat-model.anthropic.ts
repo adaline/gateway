@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { AssistantRoleLiteral, SystemRoleLiteral, UserRoleLiteral, ToolRoleLiteral } from "@adaline/types";
+import { AssistantRoleLiteral, SystemRoleLiteral, ToolRoleLiteral, UserRoleLiteral } from "@adaline/types";
 
 const AnthropicChatModelRoles = z.enum([SystemRoleLiteral, UserRoleLiteral, AssistantRoleLiteral, ToolRoleLiteral]);
 

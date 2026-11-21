@@ -13,15 +13,25 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-fable-5.html (retrieved 2026-07-29)
-// Pricing verified: https://aws.amazon.com/bedrock/pricing/ (retrieved 2026-07-29)
-// Access requires opting in to provider data sharing — set the data retention mode to `provider_data_share` via the AWS Data Retention
-// API; there is no console UI for this and requests fail without it.
-// Adaptive thinking is always on and cannot be disabled. Dual-use cyber/bio content classifiers return HTTP 200 with
-// stop_reason "refusal" (plus a stop_details restriction category) rather than an error, so callers must treat refusal as a response path.
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-fable-5.html (retrieved 2026-11-20)
+// Pricing: AWS Bedrock global on-demand rate from the AmazonBedrockFoundationModels offer file (retrieved 2026-11-20); regional endpoints cost 10% more.
+// Access requires the `aws_review` data retention mode (set through the AWS Data Retention API); requests fail without it.
+// Adaptive thinking is always on. Dual-use cyber/bio content classifiers return HTTP 200 with stop_reason "refusal"
+// rather than an error, so callers must treat refusal as a response path.
 const BedrockClaudeFable5Literal = "anthropic.claude-fable-5";
 const BedrockClaudeFable5Description =
-  "Anthropic's most capable model for the hardest agentic, coding, and reasoning tasks, with always-on adaptive thinking. Requires the provider data sharing opt-in on AWS Bedrock.";
+  "Frontier model for the hardest agentic, coding, and reasoning tasks, with always-on adaptive thinking. Requires the aws_review data retention mode on AWS Bedrock.";
+
+const BedrockClaudeFable5Config = BedrockAnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 128000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive"],
+  defaultThinkingMode: "adaptive",
+  effortLevels: ["low", "medium", "high", "xhigh", "max"],
+  defaultEffort: "high",
+  samplingParams: false,
+  forcedToolUse: true,
+});
 
 const BedrockClaudeFable5Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeFable5Literal,
@@ -32,8 +42,8 @@ const BedrockClaudeFable5Schema = ChatModelSchema(AnthropicChatModelRoles, Anthr
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: BedrockAnthropicChatModelConfigs.base(128000, 4).def,
-    schema: BedrockAnthropicChatModelConfigs.base(128000, 4).schema,
+    def: BedrockClaudeFable5Config.def,
+    schema: BedrockClaudeFable5Config.schema,
   },
   price: pricingData[BedrockClaudeFable5Literal],
 });

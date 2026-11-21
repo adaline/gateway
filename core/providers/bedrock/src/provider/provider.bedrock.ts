@@ -20,30 +20,10 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelSchema: ChatModelSchemaType;
     }
   > = {
-    [Models.BedrockClaude3Haiku20240307Literal]: {
-      model: Models.BedrockClaude3Haiku20240307,
-      modelOptions: Models.BedrockClaude3Haiku20240307Options,
-      modelSchema: Models.BedrockClaude3Haiku20240307Schema,
-    },
-    [Models.BedrockClaude3_5Haiku20241022Literal]: {
-      model: Models.BedrockClaude3_5Haiku20241022,
-      modelOptions: Models.BedrockClaude3_5Haiku20241022Options,
-      modelSchema: Models.BedrockClaude3_5Haiku20241022Schema,
-    },
-    [Models.BedrockClaude4Sonnet20250514Literal]: {
-      model: Models.BedrockClaude4Sonnet20250514,
-      modelOptions: Models.BedrockClaude4Sonnet20250514Options,
-      modelSchema: Models.BedrockClaude4Sonnet20250514Schema,
-    },
     [Models.BedrockClaudeSonnet4_520250929Literal]: {
       model: Models.BedrockClaudeSonnet4_520250929,
       modelOptions: Models.BedrockClaudeSonnet4_520250929Options,
       modelSchema: Models.BedrockClaudeSonnet4_520250929Schema,
-    },
-    [Models.BedrockClaudeSonnet4_6Literal]: {
-      model: Models.BedrockClaudeSonnet4_6,
-      modelOptions: Models.BedrockClaudeSonnet4_6Options,
-      modelSchema: Models.BedrockClaudeSonnet4_6Schema,
     },
     [Models.BedrockClaudeHaiku4_520251001Literal]: {
       model: Models.BedrockClaudeHaiku4_520251001,
@@ -60,6 +40,11 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelOptions: Models.BedrockClaudeOpus4_6Options,
       modelSchema: Models.BedrockClaudeOpus4_6Schema,
     },
+    [Models.BedrockClaudeSonnet4_6Literal]: {
+      model: Models.BedrockClaudeSonnet4_6,
+      modelOptions: Models.BedrockClaudeSonnet4_6Options,
+      modelSchema: Models.BedrockClaudeSonnet4_6Schema,
+    },
     [Models.BedrockClaudeOpus4_7Literal]: {
       model: Models.BedrockClaudeOpus4_7,
       modelOptions: Models.BedrockClaudeOpus4_7Options,
@@ -70,20 +55,45 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
       modelOptions: Models.BedrockClaudeOpus4_8Options,
       modelSchema: Models.BedrockClaudeOpus4_8Schema,
     },
-    [Models.BedrockClaudeSonnet5Literal]: {
-      model: Models.BedrockClaudeSonnet5,
-      modelOptions: Models.BedrockClaudeSonnet5Options,
-      modelSchema: Models.BedrockClaudeSonnet5Schema,
-    },
     [Models.BedrockClaudeOpus5Literal]: {
       model: Models.BedrockClaudeOpus5,
       modelOptions: Models.BedrockClaudeOpus5Options,
       modelSchema: Models.BedrockClaudeOpus5Schema,
     },
+    [Models.BedrockClaudeSonnet5Literal]: {
+      model: Models.BedrockClaudeSonnet5,
+      modelOptions: Models.BedrockClaudeSonnet5Options,
+      modelSchema: Models.BedrockClaudeSonnet5Schema,
+    },
     [Models.BedrockClaudeFable5Literal]: {
       model: Models.BedrockClaudeFable5,
       modelOptions: Models.BedrockClaudeFable5Options,
       modelSchema: Models.BedrockClaudeFable5Schema,
+    },
+    [Models.BedrockClaudeFable5_1Literal]: {
+      model: Models.BedrockClaudeFable5_1,
+      modelOptions: Models.BedrockClaudeFable5_1Options,
+      modelSchema: Models.BedrockClaudeFable5_1Schema,
+    },
+    [Models.BedrockClaudeFable5_2Literal]: {
+      model: Models.BedrockClaudeFable5_2,
+      modelOptions: Models.BedrockClaudeFable5_2Options,
+      modelSchema: Models.BedrockClaudeFable5_2Schema,
+    },
+    [Models.BedrockClaudeOpus5_5Literal]: {
+      model: Models.BedrockClaudeOpus5_5,
+      modelOptions: Models.BedrockClaudeOpus5_5Options,
+      modelSchema: Models.BedrockClaudeOpus5_5Schema,
+    },
+    [Models.BedrockClaudeSonnet5_5Literal]: {
+      model: Models.BedrockClaudeSonnet5_5,
+      modelOptions: Models.BedrockClaudeSonnet5_5Options,
+      modelSchema: Models.BedrockClaudeSonnet5_5Schema,
+    },
+    [Models.BedrockClaudeHaiku5_5Literal]: {
+      model: Models.BedrockClaudeHaiku5_5,
+      modelOptions: Models.BedrockClaudeHaiku5_5Options,
+      modelSchema: Models.BedrockClaudeHaiku5_5Schema,
     },
   };
 
@@ -113,7 +123,8 @@ class Bedrock<C extends Models.BaseChatModelOptionsType, E extends Record<string
   chatModel(options: C): ChatModelV1 {
     const modelName = options.modelName;
 
-    const inferenceProfilePattern = /^(global|us|eu|ap|me|sa|af|an)\./;
+    // Cross-region inference profile prefixes, e.g. us.anthropic.claude-sonnet-5-5 or global.anthropic.claude-fable-5-2.
+    const inferenceProfilePattern = /^(global|us-gov|us|eu|apac|ap|au|jp|ca|in|me|sa|af|an)\./;
 
     const actualModelName = inferenceProfilePattern.test(modelName) ? modelName.replace(inferenceProfilePattern, "") : modelName;
 

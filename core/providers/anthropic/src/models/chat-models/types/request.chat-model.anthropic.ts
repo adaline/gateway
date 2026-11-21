@@ -21,7 +21,7 @@ const AnthropicRequestTool = z.object({
 type AnthropicRequestToolType = z.infer<typeof AnthropicRequestTool>;
 
 const AnthropicRequestToolChoiceEnum = z.object({
-  type: z.enum(["auto", "any"]),
+  type: z.enum(["auto", "any", "none"]),
 });
 type AnthropicRequestToolChoiceEnumType = z.infer<typeof AnthropicRequestToolChoiceEnum>;
 
@@ -134,6 +134,19 @@ type AnthropicRequestAssistantMessageType = z.infer<typeof AnthropicRequestAssis
 const AnthropicRequestMessage = z.union([AnthropicRequestUserMessage, AnthropicRequestAssistantMessage]);
 type AnthropicRequestMessageType = z.infer<typeof AnthropicRequestMessage>;
 
+const AnthropicRequestThinking = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("enabled"), budget_tokens: z.number().int().min(0), display: z.string().optional() }),
+  z.object({ type: z.literal("adaptive"), display: z.string().optional() }),
+  z.object({ type: z.literal("disabled") }),
+  z.object({ type: z.literal("between_tools") }),
+]);
+type AnthropicRequestThinkingType = z.infer<typeof AnthropicRequestThinking>;
+
+const AnthropicRequestOutputConfig = z.object({
+  effort: z.enum(["low", "medium", "high", "xhigh", "max"]).optional(),
+});
+type AnthropicRequestOutputConfigType = z.infer<typeof AnthropicRequestOutputConfig>;
+
 const AnthropicRequest = z.object({
   model: z.string().min(1).optional(),
   messages: z.array(AnthropicRequestMessage).min(1),
@@ -146,6 +159,8 @@ const AnthropicRequest = z.object({
   top_p: z.number().min(0).max(1).optional(),
   top_k: z.number().min(0).optional(),
   mcp_servers: z.array(AnthropicRequestMcpServer).min(1).optional(),
+  thinking: AnthropicRequestThinking.optional(),
+  output_config: AnthropicRequestOutputConfig.optional(),
 });
 type AnthropicRequestType = z.infer<typeof AnthropicRequest>;
 
@@ -158,8 +173,10 @@ export {
   AnthropicRequestMcpToolResultContent,
   AnthropicRequestMcpToolUseContent,
   AnthropicRequestMessage,
+  AnthropicRequestOutputConfig,
   AnthropicRequestRedactedThinkingContent,
   AnthropicRequestTextContent,
+  AnthropicRequestThinking,
   AnthropicRequestThinkingContent,
   AnthropicRequestTool,
   AnthropicRequestToolCallContent,
@@ -173,6 +190,8 @@ export {
   type AnthropicRequestMcpServerType,
   type AnthropicRequestMcpToolResultContentType,
   type AnthropicRequestMcpToolUseContentType,
+  type AnthropicRequestOutputConfigType,
+  type AnthropicRequestThinkingType,
   type AnthropicRequestMessageType,
   type AnthropicRequestRedactedThinkingContentType,
   type AnthropicRequestTextContentType,

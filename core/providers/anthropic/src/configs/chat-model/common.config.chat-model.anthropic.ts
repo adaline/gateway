@@ -70,6 +70,18 @@ const toolChoice = SelectStringConfigItem({
   choices: ["auto", "any"],
 });
 
+// For models that reject forced tool use (tool_choice 'any' or a named tool) with a 400 error.
+const toolChoiceNoForcedTool = SelectStringConfigItem({
+  param: "tool_choice",
+  title: "Tool choice",
+  description:
+    "Controls which (if any) tool is called by the model. \
+    'auto' means the model can pick between generating a message or calling a tool. \
+    'none' means the model will not call any tool. This model does not support forcing a tool call.",
+  default: "auto",
+  choices: ["auto", "none"],
+});
+
 const mcp = SelectBooleanConfigItem({
   param: "mcp",
   title: "MCP",
@@ -83,4 +95,4 @@ const mcpServers = ObjectSchemaConfigItem({
   description: CHAT_CONFIG.MCP_SERVERS.description,
   objectSchema: z.array(McpServer),
 });
-export { maxTokens, mcp, mcpServers, stop, temperature, toolChoice, topK, topP };
+export { maxTokens, mcp, mcpServers, stop, temperature, toolChoice, toolChoiceNoForcedTool, topK, topP };

@@ -13,12 +13,23 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5.html (retrieved 2026-07-10)
-// Pricing: $2.00 / $10.00 per M tokens is AWS PROMOTIONAL launch pricing in effect through 2026-08-31 (the only
-// Bedrock-verified price at retrieval time) — https://aws.amazon.com/bedrock/pricing/ (retrieved 2026-07-10)
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-5.html (retrieved 2026-11-20)
+// Pricing: AWS Bedrock global on-demand rate from the AmazonBedrockFoundationModels offer file (retrieved 2026-11-20); regional endpoints cost 10% more.
+// $2/$10 launch pricing became the standard price; the scheduled 2026-09-01 increase to $3/$15 did not happen.
 const BedrockClaudeSonnet5Literal = "anthropic.claude-sonnet-5";
 const BedrockClaudeSonnet5Description =
-  "Anthropic's most capable Sonnet model, built for coding, agents, and professional work at scale; near-Opus intelligence at Sonnet cost/speed.";
+  "Anthropic's Sonnet model built for coding, agents, and professional work at scale, with adaptive thinking on by default and a 1M token context window.";
+
+const BedrockClaudeSonnet5Config = BedrockAnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 128000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive", "disabled"],
+  defaultThinkingMode: "adaptive",
+  effortLevels: ["low", "medium", "high", "xhigh", "max"],
+  defaultEffort: "high",
+  samplingParams: false,
+  forcedToolUse: true,
+});
 
 const BedrockClaudeSonnet5Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeSonnet5Literal,
@@ -29,8 +40,8 @@ const BedrockClaudeSonnet5Schema = ChatModelSchema(AnthropicChatModelRoles, Anth
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: BedrockAnthropicChatModelConfigs.base(128000, 4).def,
-    schema: BedrockAnthropicChatModelConfigs.base(128000, 4).schema,
+    def: BedrockClaudeSonnet5Config.def,
+    schema: BedrockClaudeSonnet5Config.schema,
   },
   price: pricingData[BedrockClaudeSonnet5Literal],
 });

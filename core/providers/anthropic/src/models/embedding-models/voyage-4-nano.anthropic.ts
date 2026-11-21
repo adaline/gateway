@@ -7,6 +7,8 @@ import embeddingPricingData from "../embedding-pricing.json";
 import { BaseEmbeddingModel, BaseEmbeddingModelOptions } from "./base-embedding-model.anthropic";
 import { AnthropicEmbeddingModelModalities, AnthropicEmbeddingModelModalitiesEnum } from "./types";
 
+// Not on the Voyage pricing page as of 2026-11-20 (the embeddings docs describe it as an open-weight model);
+// kept because there is no retirement notice. Re-verify with a live API probe.
 const Voyage4NanoLiteral = "voyage-4-nano";
 const Voyage4NanoDescription = "Smallest, fastest Voyage embedding for edge / open-weight deployments. 32K input tokens.";
 

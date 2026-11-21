@@ -13,11 +13,23 @@ import { BaseChatModelOptions } from "../base-chat-model-options.bedrock";
 import pricingData from "./../../pricing.json";
 import { BaseChatModelAnthropic } from "./base-chat-model.anthropic.bedrock";
 
-// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-4-6.html (retrieved 2026-07-10)
-// ID fix: Bedrock never served a "-v1" suffixed ID for Sonnet 4.6 (that's a transitional exception unique to Opus 4.6).
+// Bedrock model card: https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-sonnet-4-6.html (retrieved 2026-11-20)
+// Pricing: AWS Bedrock global on-demand rate from the AmazonBedrockFoundationModels offer file (retrieved 2026-11-20); regional endpoints cost 10% more.
+// AWS caps max output at 64K (the Claude API allows 128K). Thinking is off unless requested.
 const BedrockClaudeSonnet4_6Literal = "anthropic.claude-sonnet-4-6";
 const BedrockClaudeSonnet4_6Description =
-  "Balanced model for agentic reasoning and coding with strong performance at low latency. Training cutoff: August 2025.";
+  "Balanced model for agentic reasoning and coding with strong performance at low latency, with adaptive thinking. Training cutoff: August 2025.";
+
+const BedrockClaudeSonnet4_6Config = BedrockAnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 64000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive", "disabled"],
+  defaultThinkingMode: "disabled",
+  effortLevels: ["low", "medium", "high", "max"],
+  defaultEffort: "high",
+  samplingParams: true,
+  forcedToolUse: true,
+});
 
 const BedrockClaudeSonnet4_6Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: BedrockClaudeSonnet4_6Literal,
@@ -28,8 +40,8 @@ const BedrockClaudeSonnet4_6Schema = ChatModelSchema(AnthropicChatModelRoles, An
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: BedrockAnthropicChatModelConfigs.base(64000, 4).def,
-    schema: BedrockAnthropicChatModelConfigs.base(64000, 4).schema,
+    def: BedrockClaudeSonnet4_6Config.def,
+    schema: BedrockClaudeSonnet4_6Config.schema,
   },
   price: pricingData[BedrockClaudeSonnet4_6Literal],
 });

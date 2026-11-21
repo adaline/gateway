@@ -12,8 +12,16 @@ import {
   AnthropicThinkingChatModelModalitiesEnum,
 } from "./types";
 
+// Specs reference: https://platform.claude.com/docs/en/about-claude/models/overview and https://platform.claude.com/docs/en/build-with-claude/thinking (retrieved 2026-11-20)
+// The only extended-thinking model that also accepts the effort parameter, which composes with budget_tokens.
 const ClaudeOpus4_520251101Literal = "claude-opus-4-5-20251101";
-const ClaudeOpus4_520251101Description = "Premium model combining maximum intelligence with practical performance. Ideal for complex specialized tasks, professional software engineering, and advanced agents. Training cutoff: August 2025.";
+const ClaudeOpus4_520251101Description =
+  "Premium model combining maximum intelligence with practical performance. Ideal for complex specialized tasks, professional software engineering, and advanced agents. Features a 200K token context window and 64K max output tokens. Training cutoff: August 2025.";
+
+const ClaudeOpus4_520251101Config = AnthropicChatModelConfigs.extendedThinking(64000, 4, 1024, 64000, {
+  levels: ["low", "medium", "high"],
+  default: "high",
+});
 
 const ClaudeOpus4_520251101Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: ClaudeOpus4_520251101Literal,
@@ -24,8 +32,8 @@ const ClaudeOpus4_520251101Schema = ChatModelSchema(AnthropicChatModelRoles, Ant
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.extendedThinking(64000, 4, 1024, 64000).def,
-    schema: AnthropicChatModelConfigs.extendedThinking(64000, 4, 1024, 64000).schema,
+    def: ClaudeOpus4_520251101Config.def,
+    schema: ClaudeOpus4_520251101Config.schema,
   },
   price: pricingData[ClaudeOpus4_520251101Literal],
 });

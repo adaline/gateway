@@ -12,10 +12,22 @@ import {
   AnthropicThinkingChatModelModalitiesEnum,
 } from "./types";
 
-// Specs reference: https://platform.claude.com/docs/en/about-claude/models/overview (retrieved 2026-07-10)
+// Specs reference: https://platform.claude.com/docs/en/about-claude/models/overview and https://platform.claude.com/docs/en/build-with-claude/thinking (retrieved 2026-11-20)
+// $2/$10 launch pricing became the standard price; the scheduled 2026-09-01 increase to $3/$15 did not happen.
 const ClaudeSonnet5Literal = "claude-sonnet-5";
 const ClaudeSonnet5Description =
-  "Anthropic's best combination of speed and intelligence — near-frontier Sonnet-tier model with adaptive thinking, a 1M token context window, and 128K max output tokens.";
+  "Fast, intelligent Sonnet-tier model for coding and agents, with adaptive thinking on by default. Features a 1M token context window and 128K max output tokens.";
+
+const ClaudeSonnet5Config = AnthropicChatModelConfigs.adaptiveThinking({
+  maxOutputTokens: 128000,
+  maxSequences: 4,
+  thinkingModes: ["adaptive", "disabled"],
+  defaultThinkingMode: "adaptive",
+  effortLevels: ["low", "medium", "high", "xhigh", "max"],
+  defaultEffort: "high",
+  samplingParams: false,
+  forcedToolUse: true,
+});
 
 const ClaudeSonnet5Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicThinkingChatModelModalitiesEnum).parse({
   name: ClaudeSonnet5Literal,
@@ -26,8 +38,8 @@ const ClaudeSonnet5Schema = ChatModelSchema(AnthropicChatModelRoles, AnthropicTh
   roles: AnthropicChatModelRolesMap,
   modalities: AnthropicThinkingChatModelModalities,
   config: {
-    def: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 128000).def,
-    schema: AnthropicChatModelConfigs.extendedThinking(128000, 4, 1024, 128000).schema,
+    def: ClaudeSonnet5Config.def,
+    schema: ClaudeSonnet5Config.schema,
   },
   price: pricingData[ClaudeSonnet5Literal],
 });
