@@ -1,6 +1,10 @@
 {
   "name": "@adaline/tsconfig",
   "version": "0.12.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adaline/gateway.git"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public"
