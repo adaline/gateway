@@ -1,6 +1,6 @@
 {
   "name": "@adaline/openai",
-  "version": "1.24.0",
+  "version": "1.23.0",
   "license": "MIT",
   "sideEffects": false,
   "private": false,
@@ -49,7 +49,7 @@
     "build": "tsup",
     "lint": "eslint . --ext js,jsx,ts,tsx",
     "format": "prettier --write .",
-    "prepublishOnly": "pnpm run build",
+    "prepublishOnly": "node -e \"require('fs').accessSync('dist/index.mjs')\" || (echo 'dist missing: run pnpm run build before publishing' && exit 1)",
     "post": "npm publish --access public",
     "test": "vitest run",
     "test:watch": "vitest watch"

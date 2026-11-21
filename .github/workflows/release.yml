@@ -94,7 +94,6 @@ jobs:
         run: pnpm run build
 
       - name: Publish to npm
-        continue-on-error: true
         uses: nick-fields/retry@v2
         with:
           max_attempts: 3
