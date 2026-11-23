@@ -1,5 +1,11 @@
 # @adaline/gateway
 
+## 1.15.1
+
+### Patch Changes
+
+- 6432fa6: Documentation housekeeping: refresh the quickstart examples to current models, correct the provider embedding matrix, and add the missing package READMEs for `@adaline/xai`, `@adaline/tsconfig` and `eslint-config-adaline`.
+
 ## 1.15.0
 
 ### Minor Changes
