@@ -39,9 +39,10 @@ jobs:
 
       # changeset publish shells out to the npm CLI; OIDC trusted publishing needs npm >= 11.5.1,
       # but Node 22 ships npm 10.x, which has no OIDC support and fails with ENEEDAUTH.
+      # Pinned to the 11 line: npm 12 installs a pnpm shim that turbo cannot spawn (Exec format error, run 45132145677).
       - name: Upgrade npm for trusted publishing
         run: |
-          npm install -g npm@latest
+          npm install -g npm@11
           npm --version
 
       - name: Install semver tool
