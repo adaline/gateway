@@ -28,21 +28,20 @@ The only fully local, production-grade Super SDK that provides a simple, unified
 
 ### Providers
 
-| Provider              | Chat Models     | Embedding Models  |
-| --------------------- | --------------- | ------------------|
-| OpenAI                | ✅              | ✅                |
-| Anthropic             | ✅              | ❌                |
-| Google AI Studio      | ✅              | ❌                |
-| Google Vertex         | ✅              | ✅                |
-| xAi                   | ✅              | ✅                |
-| AWS Bedrock           | ✅              | ❌                |
-| Azure OpenAI          | ✅              | ✅                |
-| Groq                  | ✅              | ❌                |
-| Together AI           | ✅              | ❌                |
-| Open Router           | ✅              | ❌                |
-| Custom (OpenAI-like)  | ✅              | ❌                |
-| Voyage                | ❌              | ✅                |
-
+| Provider             | Chat Models | Embedding Models |
+| -------------------- | ----------- | ---------------- |
+| OpenAI               | ✅          | ✅               |
+| Anthropic            | ✅          | ✅ (Voyage)      |
+| Google AI Studio     | ✅          | ✅               |
+| Google Vertex        | ✅          | ✅               |
+| xAI                  | ✅          | ❌               |
+| AWS Bedrock          | ✅          | ❌               |
+| Azure OpenAI         | ✅          | ✅               |
+| Groq                 | ✅          | ❌               |
+| Together AI          | ✅          | ✅               |
+| Open Router          | ✅          | ❌               |
+| Custom (OpenAI-like) | ✅          | ❌               |
+| Voyage               | ❌          | ✅               |
 
 ## Installation
 
@@ -76,8 +75,8 @@ const OPENAI_API_KEY = "your-api-key"; // Replace with your OpenAI API key
 const gateway = new Gateway();
 const openai = new OpenAI();
 
-const gpt4o = openai.chatModel({
-  modelName: "gpt-4o",
+const gpt54Mini = openai.chatModel({
+  modelName: "gpt-5.4-mini",
   apiKey: OPENAI_API_KEY,
 });
 
@@ -89,24 +88,28 @@ const config: ConfigType = Config().parse({
 const messages: MessageType[] = [
   {
     role: "system",
-    content: [{
-      modality: "text",
-      value: "You are a helpful assistant. You are extremely concise.",
-    }],
+    content: [
+      {
+        modality: "text",
+        value: "You are a helpful assistant. You are extremely concise.",
+      },
+    ],
   },
   {
     role: "user",
-    content: [{
-      modality: "text",
-      value: `What is ${Math.floor(Math.random() * 100) + 1} + ${Math.floor(Math.random() * 100) + 1}?`,
-    }],
+    content: [
+      {
+        modality: "text",
+        value: `What is ${Math.floor(Math.random() * 100) + 1} + ${Math.floor(Math.random() * 100) + 1}?`,
+      },
+    ],
   },
 ];
 
 // * Complete chat
 async function runCompleteChat() {
   const completeChat = await gateway.completeChat({
-    model: gpt4o,
+    model: gpt54Mini,
     config,
     messages,
     tools: [],
@@ -144,7 +147,7 @@ runCompleteChat();
 // * Stream chat
 async function runStreamChat() {
   const streamChat = await gateway.streamChat({
-    model: gpt4o,
+    model: gpt54Mini,
     config,
     messages,
     tools: [],
@@ -182,13 +185,10 @@ const config: ConfigType = Config().parse({
   dimensions: 255,
 });
 
-  const embeddingRequests: EmbeddingRequestsType = {
-    modality: "text",
-    requests: [
-      "Hello world",
-      "When the going gets tough, the tough get going. Or the tough pivots",
-    ],
-  };
+const embeddingRequests: EmbeddingRequestsType = {
+  modality: "text",
+  requests: ["Hello world", "When the going gets tough, the tough get going. Or the tough pivots"],
+};
 
 async function runWordEmbedding() {
   const wordEmbedding = await gateway.getEmbeddings({
@@ -222,7 +222,7 @@ console.log(gpt54MiniSchema.maxInputTokens);
 console.log(gpt54MiniSchema.maxOutputTokens);
 console.log(gpt54MiniSchema.roles);
 console.log(gpt54MiniSchema.modalities);
-console.log(gpt54MiniSchema.config); 
+console.log(gpt54MiniSchema.config);
 ```
 
 ## Prompt Types
@@ -241,7 +241,7 @@ const config: ConfigType = Config().parse({
   temperature: 0.7,
   maxTokens: 1000,
   // Any unknown fields will be ignored
-  unknownField: "This will be ignored"
+  unknownField: "This will be ignored",
 });
 ```
 
@@ -261,10 +261,10 @@ console.log(gpt54MiniSchema.config.schema); // Zod type to validate Config for t
 
 A `MessageType` is the core component of a prompt sent to the LLM provider and the response received from it. Gateway internally transforms the `MessageType` to and from the LLM provider's schema.
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| role | RoleEnumType | The role of the message sender | Must be one of the defined roles |
-| content | Array<ContentType> | Array of content items | Must contain at least one content item |
+| Field   | Type               | Description                    | Constraints                            |
+| ------- | ------------------ | ------------------------------ | -------------------------------------- |
+| role    | RoleEnumType       | The role of the message sender | Must be one of the defined roles       |
+| content | Array<ContentType> | Array of content items         | Must contain at least one content item |
 
 ```typescript
 // Example of a message
@@ -274,8 +274,8 @@ const message: MessageType = {
     {
       modality: "text",
       value: "Hello, how can I help you today?",
-    }
-  ]
+    },
+  ],
 };
 ```
 
@@ -293,7 +293,7 @@ const completeMessage: MessageType = {
       value: {
         type: "thinking",
         thinking: "The image appears to contain a chart with quarterly sales data. I should point out the key trends.",
-        signature: "reasoning-signature-456"
+        signature: "reasoning-signature-456",
       },
     },
     {
@@ -302,7 +302,7 @@ const completeMessage: MessageType = {
       id: "call_987654321",
       name: "analyze_chart",
       arguments: '{"chart_type": "bar", "data_points": ["Q1", "Q2", "Q3", "Q4"]}',
-    }
+    },
   ],
 };
 ```
@@ -311,12 +311,12 @@ const completeMessage: MessageType = {
 
 A `RoleEnumType` is an enumeration of possible message roles. Gateway internally transforms these roles to and from the LLM provider's accepted roles. For example, the "assistant" role in Gateway will be transformed to the "model" role for Google's Gemini models.
 
-| Value | Description |
-|-------|-------------|
-| system | Messages from the system |
-| user | Messages from the user |
+| Value     | Description                 |
+| --------- | --------------------------- |
+| system    | Messages from the system    |
+| user      | Messages from the user      |
 | assistant | Messages from the assistant |
-| tool | Messages from a tool |
+| tool      | Messages from a tool        |
 
 ```typescript
 // Example of a role
@@ -331,16 +331,16 @@ A `ContentType` is the core part of a message that contains the actual content (
 
 A `TextContentType` represents text content in a message being sent to or received from the LLM provider.
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| modality | "text" | Indicates this is text content | Must be "text" |
-| value | string | The text content | Any valid string |
+| Field    | Type   | Description                    | Constraints      |
+| -------- | ------ | ------------------------------ | ---------------- |
+| modality | "text" | Indicates this is text content | Must be "text"   |
+| value    | string | The text content               | Any valid string |
 
 ```typescript
 // Example of text content
 const textContent: TextContentType = {
   modality: "text",
-  value: "Hello, how can I help you today?"
+  value: "Hello, how can I help you today?",
 };
 ```
 
@@ -348,11 +348,11 @@ const textContent: TextContentType = {
 
 An `ImageContentType` represents image content in a message being sent to or received from the LLM provider.
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| modality | "image" | Indicates this is image content | Must be "image" |
-| detail | ImageContentDetailsLiteralType | The level of detail for processing the image | Must be "low", "medium", "high", or "auto" |
-| value | ImageContentValueType | The image data | Must be either Base64 or URL type |
+| Field    | Type                           | Description                                  | Constraints                                |
+| -------- | ------------------------------ | -------------------------------------------- | ------------------------------------------ |
+| modality | "image"                        | Indicates this is image content              | Must be "image"                            |
+| detail   | ImageContentDetailsLiteralType | The level of detail for processing the image | Must be "low", "medium", "high", or "auto" |
+| value    | ImageContentValueType          | The image data                               | Must be either Base64 or URL type          |
 
 ```typescript
 // Example of base64 image content
@@ -362,7 +362,7 @@ const base64ImageContent: ImageContentType = {
   value: {
     type: "base64",
     base64: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-    mediaType: "png"
+    mediaType: "png",
   },
 };
 
@@ -372,7 +372,7 @@ const urlImageContent: ImageContentType = {
   detail: "medium",
   value: {
     type: "url",
-    url: "https://example.com/image.jpg"
+    url: "https://example.com/image.jpg",
   },
 };
 ```
@@ -381,33 +381,33 @@ The value field can be one of two types:
 
 `Base64ImageContentValueType`:
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| type | "base64" | Indicates base64 encoding | Must be "base64" |
-| base64 | string | Base64-encoded image data | Valid base64 string |
-| mediaType | "png" \| "jpeg" \| "webp" \| "gif" | The image format | Must be one of the specified formats |
+| Field     | Type                               | Description               | Constraints                          |
+| --------- | ---------------------------------- | ------------------------- | ------------------------------------ |
+| type      | "base64"                           | Indicates base64 encoding | Must be "base64"                     |
+| base64    | string                             | Base64-encoded image data | Valid base64 string                  |
+| mediaType | "png" \| "jpeg" \| "webp" \| "gif" | The image format          | Must be one of the specified formats |
 
 ```typescript
 // Example of base64 image content value
 const base64ImageContent: Base64ImageContentValueType = {
   type: "base64",
   base64: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=",
-  mediaType: "png"
+  mediaType: "png",
 };
 ```
 
 `UrlImageContentValueType`:
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| type | "url" | Indicates URL reference | Must be "url" |
-| url | string | URL pointing to the image | Valid URL string |
+| Field | Type   | Description               | Constraints      |
+| ----- | ------ | ------------------------- | ---------------- |
+| type  | "url"  | Indicates URL reference   | Must be "url"    |
+| url   | string | URL pointing to the image | Valid URL string |
 
 ```typescript
 // Example of URL image content value
 const urlImageContent: UrlImageContentValueType = {
   type: "url",
-  url: "https://example.com/image.png"
+  url: "https://example.com/image.png",
 };
 ```
 
@@ -415,13 +415,13 @@ const urlImageContent: UrlImageContentValueType = {
 
 A `ToolCallContentType` represents a tool call in a message being sent to or received from the LLM provider.
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| modality | "tool-call" | Indicates this is a tool call | Must be "tool-call" |
-| index | number | The index of the tool call | Non-negative integer |
-| id | string | Unique identifier for the tool call | Non-empty string |
-| name | string | Name of the tool being called | Non-empty string |
-| arguments | string | Arguments passed to the tool | Any valid string |
+| Field     | Type        | Description                         | Constraints          |
+| --------- | ----------- | ----------------------------------- | -------------------- |
+| modality  | "tool-call" | Indicates this is a tool call       | Must be "tool-call"  |
+| index     | number      | The index of the tool call          | Non-negative integer |
+| id        | string      | Unique identifier for the tool call | Non-empty string     |
+| name      | string      | Name of the tool being called       | Non-empty string     |
+| arguments | string      | Arguments passed to the tool        | Any valid string     |
 
 ```typescript
 // Example of tool call content
@@ -438,13 +438,13 @@ const toolCallContent: ToolCallContentType = {
 
 A `ToolResponseContentType` represents a tool response in a message being sent to or received from the LLM provider.
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| modality | "tool-response" | Indicates this is a tool response | Must be "tool-response" |
-| index | number | The index of the tool response | Non-negative integer |
-| id | string | Unique identifier for the tool call | Non-empty string |
-| name | string | Name of the tool that was called | Non-empty string |
-| data | string | Response data from the tool | Any valid string |
+| Field    | Type            | Description                         | Constraints             |
+| -------- | --------------- | ----------------------------------- | ----------------------- |
+| modality | "tool-response" | Indicates this is a tool response   | Must be "tool-response" |
+| index    | number          | The index of the tool response      | Non-negative integer    |
+| id       | string          | Unique identifier for the tool call | Non-empty string        |
+| name     | string          | Name of the tool that was called    | Non-empty string        |
+| data     | string          | Response data from the tool         | Any valid string        |
 
 ```typescript
 // Example of tool response content
@@ -461,10 +461,10 @@ const toolResponseContent: ToolResponseContentType = {
 
 A `ReasoningContentType` represents reasoning content in a message being sent to or received from the LLM provider.
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| modality | "reasoning" | Indicates this is reasoning content | Must be "reasoning" |
-| value | ReasoningContentValueUnionType | The reasoning content | Must be a valid reasoning value type |
+| Field    | Type                           | Description                         | Constraints                          |
+| -------- | ------------------------------ | ----------------------------------- | ------------------------------------ |
+| modality | "reasoning"                    | Indicates this is reasoning content | Must be "reasoning"                  |
+| value    | ReasoningContentValueUnionType | The reasoning content               | Must be a valid reasoning value type |
 
 ```typescript
 // Example of reasoning content
@@ -473,9 +473,9 @@ const reasoningContent: ReasoningContentType = {
   value: {
     type: "thinking",
     thinking: "I need to consider the user's request carefully...",
-    signature: "reasoning-signature-123"
+    signature: "reasoning-signature-123",
   },
-  metadata: undefined
+  metadata: undefined,
 };
 
 // Example of redacted reasoning content
@@ -483,9 +483,9 @@ const redactedReasoningContent: ReasoningContentType = {
   modality: "reasoning",
   value: {
     type: "redacted",
-    data: "This reasoning has been redacted"
+    data: "This reasoning has been redacted",
   },
-  metadata: undefined
+  metadata: undefined,
 };
 ```
 
@@ -493,29 +493,28 @@ The `value` field can be one of two types:
 
 `ReasoningContentValueType`:
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| type | "thinking" | Indicates thinking content | Must be "thinking" |
-| thinking | string | The thinking/reasoning text | Any valid string |
-| signature | string | A signature for the reasoning | Any valid string |
+| Field     | Type       | Description                   | Constraints        |
+| --------- | ---------- | ----------------------------- | ------------------ |
+| type      | "thinking" | Indicates thinking content    | Must be "thinking" |
+| thinking  | string     | The thinking/reasoning text   | Any valid string   |
+| signature | string     | A signature for the reasoning | Any valid string   |
 
 `RedactedReasoningContentValueType`:
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| type | "redacted" | Indicates redacted content | Must be "redacted" |
-| data | string | The redacted data | Any valid string |
-
+| Field | Type       | Description                | Constraints        |
+| ----- | ---------- | -------------------------- | ------------------ |
+| type  | "redacted" | Indicates redacted content | Must be "redacted" |
+| data  | string     | The redacted data          | Any valid string   |
 
 ### Tool
 
 A `ToolType` represents a tool being sent to the LLM provider.
 
-| Field | Type | Description | Constraints |
-|-------|------|-------------|-------------|
-| type | "function" | Indicates this is a function tool | Must be "function" |
-| definition | Object | Contains the schema of the function | Must contain a valid function schema |
-| definition.schema | FunctionType | The function schema | Must be a valid function schema |
+| Field             | Type         | Description                         | Constraints                          |
+| ----------------- | ------------ | ----------------------------------- | ------------------------------------ |
+| type              | "function"   | Indicates this is a function tool   | Must be "function"                   |
+| definition        | Object       | Contains the schema of the function | Must contain a valid function schema |
+| definition.schema | FunctionType | The function schema                 | Must be a valid function schema      |
 
 For a valid function schema, refer to [OpenAI Function Calling documentation](https://platform.openai.com/docs/guides/function-calling?api-mode=responses).
 
@@ -532,13 +531,13 @@ const getWeatherTool: ToolType = {
         properties: {
           location: {
             type: "string",
-            description: "The city and state, e.g. San Francisco, CA"
-          }
+            description: "The city and state, e.g. San Francisco, CA",
+          },
         },
-        required: ["location"]
-      }
-    }
-  }
+        required: ["location"],
+      },
+    },
+  },
 };
 ```
 
@@ -555,18 +554,19 @@ const searchDatabaseTool: ToolType = {
         properties: {
           query: {
             type: "string",
-            description: "The search query"
+            description: "The search query",
           },
           limit: {
             type: "number",
             description: "Maximum number of results to return",
-            default: 10
-          }
+            default: 10,
+          },
         },
-        required: ["query"]
-      }
-    }
-  }
+        required: ["query"],
+      },
+    },
+  },
 };
 ```
-----
+
+---
