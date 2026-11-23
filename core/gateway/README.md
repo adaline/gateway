@@ -6,7 +6,7 @@
 ![NPM](https://img.shields.io/npm/l/@adaline/gateway)
 [![NPM version](https://img.shields.io/npm/v/@adaline/gateway.svg)](https://npmjs.org/package/@adaline/gateway)
 
-The only fully local production-grade Super SDK that provides a simple, unified, and powerful interface for calling more than 200+ LLMs.
+The only fully local production-grade Super SDK that provides a simple, unified, and powerful interface for calling more than 300+ LLMs.
 
 - Production-ready and used by enterprises.
 - Fully local and _NOT_ a proxy. You can deploy it anywhere.
@@ -32,7 +32,7 @@ The only fully local production-grade Super SDK that provides a simple, unified,
 ### Install packages
 
 ```bash
-npm install @adaline/gateway @adaline/types @adaline/openai @adaline/anthropic 
+npm install @adaline/gateway @adaline/types @adaline/openai @adaline/anthropic
 ```
 
 ### Create a Gateway object
@@ -68,13 +68,13 @@ Model object also exposes functions:
 - and many more to enable deep composability and provide runtime validations.
 
 ```typescript
-const gpt4o = openai.chatModel({
-  modelName: "gpt-4o",
+const gpt54Mini = openai.chatModel({
+  modelName: "gpt-5.4-mini",
   apiKey: "your-api-key",
 });
 
-const haiku = anthropic.chatModel({
-  modelName: "claude-3-haiku-20240307",
+const sonnet = anthropic.chatModel({
+  modelName: "claude-sonnet-5-5",
   apiKey: "your-api-key",
 });
 ```
@@ -94,7 +94,7 @@ const config = Config().parse({
 
 ### Create the messages object
 
-Message object is the Adaline super-type that supports all the roles and modalities across 200+ LLMs.
+Message object is the Adaline super-type that supports all the roles and modalities across 300+ LLMs.
 
 ```typescript
 import { MessageType } from "@adaline/types";
@@ -102,17 +102,21 @@ import { MessageType } from "@adaline/types";
 const messages: MessageType[] = [
   {
     role: "system",
-    content: [{
-      modality: "text",
-      value: "You are a helpful assistant. You are extremely concise.
-    }],
+    content: [
+      {
+        modality: "text",
+        value: "You are a helpful assistant. You are extremely concise.",
+      },
+    ],
   },
   {
     role: "user",
-    content: [{
-      modality: "text",
-      value: `What is ${Math.floor(Math.random() * 100) + 1} + ${Math.floor(Math.random() * 100) + 1}?`,
-    }],
+    content: [
+      {
+        modality: "text",
+        value: `What is ${Math.floor(Math.random() * 100) + 1} + ${Math.floor(Math.random() * 100) + 1}?`,
+      },
+    ],
   },
 ];
 ```
@@ -121,7 +125,7 @@ const messages: MessageType[] = [
 
 ```typescript
 await gateway.streamChat({
-  model: gpt4o,
+  model: gpt54Mini,
   config: config,
   messages: messages,
 });
@@ -131,7 +135,7 @@ await gateway.streamChat({
 
 ```typescript
 await gateway.completeChat({
-  model: haiku,
+  model: sonnet,
   config: config,
   messages: messages,
 });
