@@ -37,6 +37,13 @@ jobs:
         with:
           node-version: 22.x # npm trusted publishing requires Node >= 22.14
 
+      # changeset publish shells out to the npm CLI; OIDC trusted publishing needs npm >= 11.5.1,
+      # but Node 22 ships npm 10.x, which has no OIDC support and fails with ENEEDAUTH.
+      - name: Upgrade npm for trusted publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
+
       - name: Install semver tool
         run: npm install -g semver
 
