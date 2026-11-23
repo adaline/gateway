@@ -1,5 +1,16 @@
 # @adaline/provider
 
+## 1.11.0
+
+### Minor Changes
+
+- 7797ec4: `SelectStringConfigItemDefType.default` is `string | null` (null means the upstream provider documents no default). This type widening shipped in v1.12.1 as a patch; this minor bump records it as the API change it is for TypeScript consumers that read `def.default` as a `string`.
+
+### Patch Changes
+
+- Updated dependencies [7797ec4]
+  - @adaline/types@1.16.0
+
 ## 1.10.6
 
 ### Patch Changes
